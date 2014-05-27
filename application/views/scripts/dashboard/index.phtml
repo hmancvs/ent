@@ -1,0 +1,26 @@
+<?php
+	require_once APPLICATION_PATH.'/includes/header.php';
+		
+	$user->populate($userid);
+	$role = getUserType($user->getType());
+	$title = $role." ".$this->translate("dashboard_pagetitle");
+	
+	$description = 'Welcome to '.getAppName();
+	$icon = $this->baseUrl('images/icon_home.png');
+	
+	$this->headTitle($title.$browserappend);
+	
+?>
+<script>
+	$(document).ready(function() {
+		$('.titlebreadcrumb').html('<?php echo 'Dashboard / '.$role; ?>');
+		$('.titlelabel').html('<?php echo 'Dashboard'; ?>');
+		$('.desclabel').html('<?php echo $description; ?>');
+		$('.pageicon').html('<img src="<?php echo $icon; ?>" />');
+		
+	});
+</script>
+
+<?php
+	require_once APPLICATION_PATH.'/includes/footer.php';
+?>

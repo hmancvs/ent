@@ -1,0 +1,38 @@
+<?php
+	include APPLICATION_PATH.'/includes/header.php';
+	
+	$user = new UserAccount();
+	// $user->populate($userid);
+	
+?>
+<ul id="mainNav">
+    <li class="nav-header" style="height:30px; background: none repeat scroll 0 0 #DDDDDD; border-bottom: 1px solid #CCCCCC; height: 32px;"></li>
+    <li id="navDashboard" class="nav active">
+        <a href="<?php echo $this->baseUrl('dashboard'); ?>" style="font-weight:bold;"><span class="glyphicon glyphicon-indent-left"></span> Quicklinks</a>				
+    </li>
+    <?php //if ($acl->checkPermission('Client', ACTION_LIST)) { ?>	
+    <li class="nav dropdown">
+        <a class="gonowhere"><span class="glyphicon glyphicon-user"></span> Manage Clients</a>
+        <ul class="subNav client">
+            <li><a href="<?php echo $this->baseUrl('client/list'); ?>">Clients</a></li>
+            <?php //if ($acl->checkPermission('Client', ACTION_CREATE)) { ?>	
+            <li><a href="<?php echo $this->baseUrl('client'); ?>" class="xaddpopup" title="New Client" rel="New Client" formtitle="indexform" successurl="<?php echo $this->baseUrl('client/list'); ?>" action="<?php echo $this->baseUrl('client/create/successurl/'.encode($this->baseUrl('index/addsuccess'))); ?>">New Client</a></li>
+            <?php //} ?>
+        </ul>						
+    </li>
+    <?php //} ?>
+    <?php //if ($acl->checkPermission('Application Settings', ACTION_LIST)) { ?>
+    <li class="nav dropdown">
+        <a class="gonowhere"><span class="glyphicon glyphicon-cog"></span> System </a>
+        <ul class="subNav">
+            <?php //if ($acl->checkPermission('User Account', ACTION_CREATE)) { ?>	
+            	<li><a href="<?php echo $this->baseUrl('profile'); ?>" class="gonowhere" title="New User" rel="New User" formtitle="indexform" successurl="<?php echo $this->baseUrl('profile/list'); ?>" action="<?php echo $this->baseUrl('profile/create/successurl/'.encode($this->baseUrl('index/addsuccess'))); ?>">New User</a></li>
+            <?php //} ?>
+            <li><a href="<?php echo $this->baseUrl('profile/list'); ?>" class="gonowhere">User Profiles</a></li>
+            <li><a href="<?php echo $this->baseUrl('role/list'); ?>" class="gonowhere">User Roles</a></li>
+            <li><a href="<?php echo $this->baseUrl('appconfig/variables'); ?>" class="gonowhere">System Variables</a></li>
+            <li><a href="<?php echo $this->baseUrl('appconfig/globalconfig'); ?>" class="gonowhere">Global Config</a></li>
+        </ul>	
+    </li>
+    <?php //} ?>
+</ul>

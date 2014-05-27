@@ -1,0 +1,279 @@
+/* ========================================================
+* ENTS Custom
+*
+* File: ents.css
+* Description: General template styles, overriden bootstrap styles
+* Version: 1.0 
+* ======================================================== */
+
+/* Bootstrap overrides */
+
+/* Global application custom init */
+.body {
+	overflow-x:hidden;
+}
+/* Header custom */
+#headercontainer.navbar {
+	margin-bottom:0;
+}
+#headercontainer #headermenu li a {
+	padding-top:10px;
+	padding-bottom:12px;
+	min-width:115px;
+}
+#headercontainer #headermenu li a .menutext {
+	margin-top:10px;
+	display:block;
+	text-align:center;
+}
+#headercontainer #headermenu .glyphicon {
+	font-size:48px;
+	display:block;
+	text-align:center;
+}
+#headercontainer #headermenu li a:hover {
+	background-image: linear-gradient(to bottom, #EBEBEB 0%, #F3F3F3 100%);
+	background-repeat: repeat-x;
+	box-shadow: 0 3px 9px rgba(0, 0, 0, 0.075) inset;
+} 
+#headercontainer .userloggedinfo ul  {
+    list-style: none outside none;
+	margin:0;
+    margin-top: 5px;
+	width:auto;
+}
+#headercontainer .userloggedinfo ul li {
+    display: block;
+    font-size: 12px;
+    line-height: normal;
+    margin-bottom: 1px;
+	width:100%;
+}
+#headercontainer .userloggedinfo ul li a {
+    background: none repeat scroll 0 0 rgba(255, 255, 255, 0.1);
+    display: block;
+    line-height: normal;
+    padding: 4px 5px 3px;
+}
+#headercontainer .userloggedinfo ul li a:hover {
+    background: none repeat scroll 0 0 rgba(255, 255, 255, 0.2);
+    text-decoration: none;
+}
+#headercontainer .userloggedinfo .userinfo {
+    float: none;
+    margin-left: 92px;
+}
+
+/* Left Navigation */
+#sidebar {
+    display: block;
+    float: left;
+    position: relative;
+    width: 260px;
+	min-height:550px;
+	background:url("../images/sidebarBg_over.png") repeat-y scroll 0 0 rgba(0, 0, 0, 0);
+}
+.sidebarBox {
+    color: #FFFFFF;
+    margin-bottom: 2em;
+    padding: 0 20px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+#sidebar hr {
+    border-bottom: 1px solid #858585;
+    border-top: 1px solid #4A4A4A;
+    margin-bottom: 2em;
+}
+#mainNav {
+    border-bottom: 1px solid #4e72af;
+	margin:0;
+    padding: 0;
+    width: 100%;
+}
+#mainNav li.nav {
+    /*border-bottom: 1px solid #4A4A4A;
+    border-top: 1px solid #858585;*/
+	border-bottom: 1px solid #40577B;
+    border-top: 1px solid #9BAFD2;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+#mainNav li.nav:first-child {
+    border-top: medium none;
+}
+#mainNav li.nav a {
+    color: #FFFFFF;
+    display: block;
+    font-size: 14px;
+    font-weight: normal;
+    padding: 18px 18px 18px 20px;
+    text-decoration: none;
+    width: auto;
+}
+#mainNav li.nav a span {
+	margin-right:15px;
+}
+#mainNav li.nav [class^="icon-"], #mainNav li.nav [class*=" icon-"] {
+    background-image: url("../images/sprite-16-white.png");
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 16px;
+    left: 16px;
+    margin-left: 0;
+    margin-right: 0;
+    opacity: 0.4;
+    position: absolute;
+    top: 20px;
+    width: 16px;
+}
+#mainNav li.nav a:hover {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0.075);
+}
+#mainNav li.nav.active {
+    border-top: medium none;
+}
+#mainNav li.nav.active a {
+    /*background: -moz-linear-gradient(center top , #344d78 0%, #5077ba 2%, #6a99ec 100%) repeat scroll 0 0 rgba(0, 0, 0, 0);*/
+	background:url("../images/sidebarBg.png") repeat-y scroll 0 0 rgba(0, 0, 0, 0);
+    border-top: medium none;
+}
+#mainNav li.nav.dropdown a {
+    /*padding-bottom: 12px;*/
+}
+#mainNav .dropdown .dropdownArrow {
+    border-left: 5px solid rgba(0, 0, 0, 0);
+    border-right: 5px solid rgba(0, 0, 0, 0);
+    border-top: 5px solid #000000;
+    display: inline-block;
+    height: 0;
+    position: absolute;
+    right: 20px;
+    top: 25px;
+    width: 0;
+}
+#mainNav .dropdown .dropdownArrow {
+    border-top-color: #f9f9f9;
+}
+#mainNav > li.dropdown ul.subNav {
+    background: none repeat scroll 0 0 #EEEEEE;
+    display: none;
+	list-style:none;
+	padding-left:0;
+}
+#mainNav > li.dropdown ul.subNav li {
+    border-bottom: 1px solid #DDDDDD;
+    border-right: 1px solid #DDDDDD;
+}
+#mainNav > li.dropdown ul.subNav li a {
+    background-image: url("../images/menuarrow.png");
+    background-position: 25px 12px;
+    background-repeat: no-repeat;
+    color: #333333;
+    display: block;
+    font-size: 13px;
+    padding: 7px 10px 7px 50px;
+}
+#mainNav > li.dropdown ul.subNav li.active a {
+    background-color: #FFFFFF;
+}
+#mainNav > li.dropdown ul.subNav li a:hover {
+    background-color: #FFFFFF;
+    text-decoration: none;
+}
+#mainNav > li.dropdown ul.subNav ul li {
+    border-right: 0 none;
+}
+#mainNav > li.dropdown ul.subNav ul li a {
+    background-position: 50px 12px;
+    padding-left: 70px;
+}
+#mainNav > li.dropdown ul.subNav ul li:first-child a {
+    border-top: 1px solid #DDDDDD;
+}
+
+/* Content area styles */
+.breadcrumbs {
+    background: none repeat scroll 0 0 #DDDDDD;
+    border-bottom: 1px solid #CCCCCC;
+    height: 32px;
+    list-style: none outside none;
+    padding: 0 5px 2px 5px;
+	margin:0;
+    position: relative;
+}
+.breadcrumbs > li {
+    color: #666666;
+    display: inline-block;
+    float: left;
+    font-size: 11px;
+    margin-right: 5px;
+}
+.breadcrumbs > li.right {
+    float: right;
+    margin: 0;
+    padding: 0;
+}
+.breadcrumbs > li:first-child a:hover {
+    color: #666666;
+    text-decoration: none;
+}
+.breadcrumbs > li.titlebreadcrumb {
+	padding-top:10px;
+}
+#contentcontainer {
+	margin:0;
+	margin-left:260px;
+	padding:0;
+}
+#contentcontainer .pageheader {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border-bottom: 1px solid #DDDDDD;
+    min-height: 68px;
+    padding: 15px;
+    position: relative;
+	z-index:0;
+}
+#contentcontainer .pageicon {
+    border: 2px solid #4a6694;
+    border-radius: 50px 50px 50px 50px;
+    color: #4a6694;
+    display: inline-block;
+    float: left;
+    font-size: 42px;
+    padding: 10px;
+    text-align: center;
+    width: 70px;
+	height: 70px;
+}
+#contentcontainer .pageicon img {
+	width:48px;
+	height:48px;
+	margin-left: -2px;
+    margin-top: -2px;
+}
+#contentcontainer .pagetitle {
+    margin-left: 10px;
+    padding-top: 0;
+	margin-top:-10px;
+}
+#contentcontainer .pagetitle h1 {
+	font-size:30px;
+}
+#contentcontainer #contentcontainer .pagetitle h1 {
+    font-size: 24px;
+    margin-left: 0;
+	padding:0;
+	line-height:normal;
+	font-weight:normal;
+}
+#contentcontainer .pagetitle h5 {
+    color: #999999;
+    font-size: 11px;
+    /*text-transform: uppercase;*/
+}
+#centercolumn {
+	padding:10px;
+	min-height:400px;
+}

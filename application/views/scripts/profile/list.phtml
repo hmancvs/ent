@@ -1,0 +1,494 @@
+<?php
+	require_once APPLICATION_PATH.'/includes/header.php';
+	
+	$listurl = $this->baseUrl('profile/list');
+	$title = $this->translate("profile_list_title");
+	$listitems = $this->translate("profile_list_items");
+	$description = getAppName().' User Directory';
+	$addurl = $this->baseUrl("profile");
+	$leveltwoname = 'All Profiles';
+	$moduleitem = 'User';
+	
+	$startdate = $request->startdate;
+	$enddate = $request->enddate;
+	if(!isEmptyString($startdate)){
+		$startdate = changeDateFromPageToMySQLFormat($startdate);
+		$allowclear = true;
+	}
+	$enddate = $request->getParam('enddate');
+	if(!isEmptyString($enddate)){
+		$enddate = changeDateFromPageToMySQLFormat($enddate);
+		$allowclear = true;
+	}
+	
+	if(isEmptyString($startdate)){
+		//$startdate = getFirstDayOfMonth(1, date('Y'));
+		//$request->setParam('startdate', date('j F, Y', strtotime(getFirstDayOfMonth(1, date('Y')))));
+	}
+	
+	if(isEmptyString($enddate)){
+		//$enddate = getLastDayOfCurrentMonth();
+		//$request->setParam('enddate', date('j F, Y', strtotime(getLastDayOfCurrentMonth())));
+	}
+	
+	$paginate = new Pagination();	
+	$paginate->setView($this);
+	# set the search columns to be used on this list
+	$paginate->setSearchColumns(array("u.firstname","u.lastname","u.othername","u.username","u.email","u.phone","u.phone2","u.email2","u.address","u.city","u.town","p.name"));
+	$paginate->setFilterColumns(array());
+	$paginate->setDefaultSortBy("u.datecreated");	
+	$paginate->setDefaultSortOrder("DESC");
+	// $paginate->setStartAndEndDateFilterColumn("u.datecreated"); 
+	$paginate->setItemCountPerPage("25");
+	
+	# define the letter to be clicked to ease navigation 
+	$where_query = " WHERE u.id <> '' ";
+	$allowclear = false;
+	
+	if(!isEmptyString($startdate)){
+		$where_query .= " AND (TO_DAYS(u.datecreated) >= TO_DAYS('".$startdate."')) ";
+	}
+	if(!isEmptyString($enddate)){
+		$where_query .= " AND (TO_DAYS(u.datecreated) <= TO_DAYS('".$enddate."')) ";
+	}
+		
+	if(!isEmptyString($request->letter)){
+		$where_query .= " AND (u.`firstname` LIKE '".$request->letter."%' OR u.`lastname` LIKE '".$request->letter."%') ";
+		$allowclear = true;
+	}
+	
+	# user status filter
+	/*if(isEmptyString($request->status)){
+		$request->setParam('status', 1);
+	}*/
+	$status = trim($request->status);
+	if(!isEmptyString($status)){
+		$where_query .= " AND (u.`isactive` = ".$status.") ";
+		$allowclear = true;
+	}
+	if(isPublicUser()){
+		$where_query .= " AND (u.`isactive` <> 2) ";
+	}
+	
+	$districtid = $request->districtid;
+	if(!isEmptyString($request->districtid)){
+		$where_query .= " AND u.districtid = '".$districtid."' ";	
+	}
+	
+	$marketid = $request->marketid;
+	if(!isEmptyString($request->marketid)){
+		$where_query .= " AND u.marketid = '".$marketid."' ";	
+	}
+	
+	$twohourago_timestamp = strtotime('-2 hour');
+	$logstatus = $request->isloggedin;
+	if(!isEmptyString($request->isloggedin)){
+		$loggedin_users_query = " SELECT GROUP_CONCAT(DISTINCT(a.userid) separator ',') as 'Users' FROM audittrail AS a WHERE UNIX_TIMESTAMP(a.transactiondate) >= ".$twohourago_timestamp." AND a.userid <> '' AND a.success = 'Y' AND a.transactiontype = 'user.login' ";	
+		$conn = Doctrine_Manager::connection(); 
+		$userslist = $conn->fetchOne($loggedin_users_query);
+		$user_array = explode(',',$userslist);
+		if(is_array($user_array) && count($user_array) > 0){
+			$online_string = "'".implode("','", $user_array)."'";
+			if($logstatus == 1){
+				$where_query .= " AND u.id IN(".$online_string.") ";	
+			} else { 
+				$where_query .= " AND u.id NOT IN(".$online_string.") ";	
+			}
+		}
+		// debugMessage($where_query);
+	}
+	
+	# user type filter
+	$type = trim($request->type);
+	$role = '';
+	$allroles = getUserType();
+	if(!isEmptyString($type)){
+		$where_query .= " AND (u.type = ".$type." || g.groupid = ".$type.") ";
+		$addurl = $this->baseUrl("profile/index/type/".$type);
+		$listurl = $this->baseUrl('profile/list/type/'.$type);
+		$leveltwoname = $allroles[$type];
+		$moduleitem = $leveltwoname;
+		$allowclear = true;
+		switch($type){
+			case 1:
+				$title = "System Administrators";
+				break;
+			case 2:
+				$title = "Data Clerks";	
+				break;
+			case 3:
+				$title = "AMIA Profiles";
+				break;
+			case 4:
+				$title = "Management Users";
+			case 5:
+				$title = "Radio Users";
+				break;
+			case 6:
+				$title = "Organisation Users";
+				break;
+			case 7:
+				$title = "FIT Staff";
+				break;
+			case 8:
+				$title = "Subscribers";
+				break;
+			default:
+				$title = $leveltwoname;
+				break;
+		}
+	}
+	
+	if(isPublicUser()){
+		$title = "AGMIS Member Directory";
+		$description = "";
+		$leveltwoname = "";
+		$where_query .= " AND u.type <> 1 ";
+	}
+	
+	if(!isEmptyString($request->searchterm)){
+		$allowclear = true;
+	}
+	
+	$order = trim($request->order);
+	$order_query = " ";
+	if(isEmptyString($order)){
+		$order = 1;
+	}
+	if($order == 1){
+		$order_query = " ORDER BY u.datecreated DESC ";
+	}
+	if($order == 2){
+		$order_query = " ORDER BY u.datecreated ASC ";
+	}
+	if($order == 3){
+		$order_query = " ORDER BY u.firstname ASC ";
+	}
+	if($order == 4){
+		$order_query = " ORDER BY u.lastname ASC ";
+	}
+	
+	$paginate->processPost($request->getParams());
+	$all_results_query = "SELECT u.*, u.type as usertype, u.email as email, u.phone as phone, u.phone2 as altphone, concat(a.firstname, ' ', a.lastname) as name, u.username as addedby, g.groupid as groupid, l.name as District, p.name as Market, o.name as companyname, acg.name as `Group`, u.isactive as `Status`, lg.id as auditid FROM useraccount u left join useraccount a on (u.createdby = a.id) left join aclusergroup as g ON (u.id = g.userid) left join aclgroup as acg ON (g.groupid = acg.id) left join location as l ON (u.districtid = l.id) left join pricesource as p ON (u.marketid = p.id) left join organisation as o ON (u.organisationid = o.id) left join audittrail lg on (lg.userid = u.id AND UNIX_TIMESTAMP(lg.transactiondate) <= ".$twohourago_timestamp." AND lg.userid <> '' AND lg.success = 'Y' AND lg.transactiontype = 'user.login')  ".$where_query." ".$paginate->getSearchAndFilterSQL()." GROUP BY u.id ".$order_query;
+	
+	// debugMessage($all_results_query);
+	$paginate->setItemCountFromSQLQuery($all_results_query);
+	$current_results_query = $all_results_query." ".$paginate->getSQLLimit();
+	
+	$conn = Doctrine_Manager::connection(); 
+	$result = $conn->fetchAll($current_results_query);
+	$has_no_data = (count($result) == 0) ? true : false;
+	// debugMessage($result);
+	$allstatus = getUserStatus();
+	$showsearch = false;
+	
+	$this->headTitle($title.$browserappend);
+?>
+<script>
+$(document).ready(function() {
+	// breadcrumb config
+	$("#levelone_icon").addClass('icon-user');
+	$("#levelone_link").attr('href', '<?php echo $listurl; ?>').html('<?php echo $listitems; ?>');
+	$("#leveltwo_link").html('<?php echo $leveltwoname; ?>');
+
+}); 
+</script>
+<!--=== Page Header ===-->
+<div class="page-header">
+    <div class="page-title">
+        <h3><?php echo $title; ?></h3>
+        <span><?php echo $description; ?></span>
+    </div>
+</div>
+<!--=== Responsive DataTable ===-->
+<div class="row">
+    <div class="col-md-12">
+    <form class="form margin0" action="<?php echo $this->baseUrl("profile/listsearch"); ?>" method="get" id="listform">
+		<?php if ($sessionhaserror) { ?>
+            <div class="alert alert-danger fade in"><i class="icon-remove close" data-dismiss="alert"></i><?php echo $session->getVar(ERROR_MESSAGE); ?></div>
+        <?php } ?>
+        <?php if (!isEmptyString($session->getVar(SUCCESS_MESSAGE))) { ?>
+            <div class="alert alert-success fade in"><i class="icon-remove close" data-dismiss="alert"></i><?php echo $session->getVar(SUCCESS_MESSAGE); ?></div>
+        <?php } ?>
+		<div class="widget box padding5">
+            <div class="row col-md-12 margin0 padding0">
+                <div class="col-md-9 padding0">
+                    <ul class="clearfix managelist">
+                    	<?php if(!isPublicUser()){ ?>
+							<?php if ($acl->checkPermission('User Account', ACTION_CREATE)) { ?>
+                                <li><a href="<?php echo $addurl ?>" title="New <?php echo $moduleitem; ?>" class="btn btn-info btn-sm"><i class="icon-plus icon-white"></i> New <?php echo $moduleitem; ?></a></li>
+                            <?php } ?>
+                            <li>
+                                <?php
+                                    $dropdown = new Zend_Form_Element_Select('type',
+                                                        array(
+                                                            'multiOptions' => array_merge_maintain_keys(array('' => 'All Types'), $allroles),
+                                                            'view' => new Zend_View(),
+                                                            'decorators' => array('ViewHelper'),
+                                                            'class' => array("autofilter", "form-control", 'chosen-select', 'width150')
+                                                        )
+                                    );  
+                                    $dropdown->setValue($request->getParam('type')); 
+                                    echo $dropdown->render();
+                                ?>
+                            </li>
+                            <li>
+                               <?php
+                                    $values = getDistricts();
+                                    $dropdown = new Zend_Form_Element_Select('districtid',
+                                                        array(
+                                                            'multiOptions' => array_merge_maintain_keys(array('' => 'All Districts'), $values),								
+                                                            'view' => new Zend_View(),
+                                                            'decorators' => array('ViewHelper'),
+                                                            'class' => array("autofilter", "form-control", 'chosen-select', 'width150')
+                                                        )
+                                                    );
+                                    $dropdown->setValue($districtid); 
+                                    echo $dropdown->render();
+                                ?> 
+                            </li>
+                            <li>
+                               <?php
+                                    $values = getAgmisMarkets();
+                                    $dropdown = new Zend_Form_Element_Select('marketid',
+                                                        array(
+                                                            'multiOptions' => array_merge_maintain_keys(array('' => 'All Markets'), $values),								
+                                                            'view' => new Zend_View(),
+                                                            'decorators' => array('ViewHelper'),
+                                                            'class' => array("autofilter", "form-control", 'chosen-select', 'width150')
+                                                        )
+                                                    );
+                                    $dropdown->setValue($marketid); 
+                                    echo $dropdown->render();
+                                ?> 
+                            </li>
+                            <li>
+                                <?php
+                                    $dropdown = new Zend_Form_Element_Select('status',
+                                                        array(
+                                                            'multiOptions' => array_merge_maintain_keys(array('' => 'All Statuses'), $allstatus),
+                                                            'view' => new Zend_View(),
+                                                            'decorators' => array('ViewHelper'),
+                                                            'class' => array("autofilter", "form-control", 'chosen-select', 'width150')
+                                                        )
+                                    );  
+                                    $dropdown->setValue($request->getParam('status')); 
+                                    echo $dropdown->render();
+                                ?>
+                            </li>
+                            <li>
+                                <?php
+                                    $dataarray = array('' => 'All Users', '1'=>'Online', '0'=>'Offline');
+                                    $dropdown = new Zend_Form_Element_Select('isloggedin',
+                                                        array(
+                                                            'multiOptions' => $dataarray,
+                                                            'view' => new Zend_View(),
+                                                            'decorators' => array('ViewHelper'),
+                                                            'class' => array("autofilter", "form-control", 'chosen-select', 'width150')
+                                                        )
+                                    );  
+                                    $dropdown->setValue($request->getParam('isloggedin')); 
+                                    echo $dropdown->render();
+                                ?>
+                            </li>
+                            <li>
+                                <?php
+                                    $allorders = array('1' => 'Latest First', '2'=>'Earliest First', '3'=>'Order By First Name','4'=>'Order By Last Name');
+                                    $ordersdropdown = new Zend_Form_Element_Select('order',
+                                                        array(
+                                                            'multiOptions' => $allorders,
+                                                            'view' => new Zend_View(),
+                                                            'decorators' => array('ViewHelper'),
+                                                            'class' => array("autofilter", "form-control", 'chosen-select', 'width150')
+                                                        )
+                                    );  
+                                    $ordersdropdown->setValue($request->getParam('order')); 
+                                    echo $ordersdropdown->render();
+                                ?>
+                            </li>
+                            <li><input type="text" name="startdate" id="startdate" class="form-control datepicker datefield input-width-medium" value="<?php echo $request->startdate; ?>" placeholder="From:" /><i class="icon-calendar calendar"></i></li>
+                            <li><input name="enddate" id="enddate" type="text" class="form-control datepicker datefield input-width-medium autofilter" placeholder="To:" value="<?php echo $request->enddate; ?>" /><i class="icon-calendar calendar"></i></li>
+                            <li><button type="submit" class="btn btn-default" style=""><i class="icon-filter"></i> Filter</button></li>
+                        <?php } ?>  
+                    </ul>
+                    <div class="errors"><div id="errormessage"></div></div>
+                </div>
+                <div class="col-md-3 padding0">
+                    <div class="input-group col-md-12 margin0 padding0 clearfix floatright">
+                        <input type="text" name="searchterm" id="searchterm" class="form-control" value="<?php echo $request->searchterm; ?>" placeholder="Search..." />
+                        <span class="input-group-btn searchbutton">
+                            <button type="submit" class="btn btn-default"><i class="icon-search"></i></button>
+                        </span>
+                    </div>
+                    <input type="hidden" name="letter" id="letter" value="<?php echo $request->getParam('letter'); ?>" />
+                    <a class="col-md-3 btn btn-xs searchclear" href="<?php echo $listurl; ?>" title="Clear search"><i class="icon-refresh"></i> Reset</a>
+                </div>
+            </div>
+            <?php if($has_no_data) { ?>
+                <div class="alert alert-warning fade in"><?php echo $this->translate("profile_list_norecords"); ?></div>
+            <?php } else { ?>
+                <?php echo $paginate->getAlphabetString(); ?>
+                <div class="divider10"></div>
+                <div class="row col-md-12 margin0 padding0 clearfix">
+                	<?php
+                    $counter = 1;			  		
+                    foreach($result as $line){
+                        $id = $line['id'];	
+						$name = $line['firstname']." ".$line['lastname']." ".$line['othername'];
+						$firstname = $line['firstname'];
+						$lastname = $line['lastname'];
+						$username = $line['username'];
+						$email = $line['email'];
+						$phone = $line['phone'];
+						
+						$hasprofileimage = false;
+						$real_path = APPLICATION_PATH.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."users".DIRECTORY_SEPARATOR."user_";
+						$real_path = $real_path.$id.DIRECTORY_SEPARATOR."avatar".DIRECTORY_SEPARATOR."medium_".$line['profilephoto'];
+						if(file_exists($real_path) && !isEmptyString($line['profilephoto'])){
+							$hasprofileimage = true;
+						}
+						$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+						$photo_path = $baseUrl.'/uploads/default/default_medium_male.jpg';
+						
+						if($line['gender'] == 2){
+							$photo_path = $baseUrl.'/uploads/default/default_thumbnail_female.jpg'; 
+						}
+						if($hasprofileimage){
+							$photo_path = $baseUrl.'/uploads/users/user_'.$id.'/avatar/medium_'.$line['profilephoto'];
+						}
+						
+						$viewurl =  $this->baseUrl("profile/view/id/".encode($line['id']));
+                        $counter_mod = $counter % 2;
+                        $modclass = '';
+                        // debugMessage('mod is '.$counter_mod);
+                        if($counter_mod == 0){
+                            $modclass = ' odd';
+                        }
+						
+						$statusclass = '';
+						switch($line['Status']){
+							case 0:
+								$statusclass = 'label-default';	
+								break;
+							case 1:
+								$statusclass = 'label-success';	
+								break;
+							case 2:
+								$statusclass = 'label-warning';	
+								break;
+							case 3:
+								$statusclass = 'label-danger';	
+								break;
+							default:
+								break;
+						}
+						$isloggedin = false;
+						if(!isEmptyString($line['auditid'])){
+							$isloggedin = true;
+						}
+						// debugMessage('>> '.$line['auditid']);
+                    ?>
+                    	<?php if($counter_mod == 1){ ?>
+                        <div class="row">
+                        <?php }?>
+                            <div class="col-md-6">
+                                <div class="widget box" style="margin-bottom:10px; padding-left:0; padding-right:0;">
+                                    <div class="widget-header">
+                                        <h4 class="col-md-10 padding0"><a href="<?php echo $viewurl; ?>"><?php echo $name?></a> 
+                                            	<?php if($isloggedin){ ?>
+                                            		<span class="pull-right" style="font-size:11px; font-weight:normal;"><i class="icon-circle" style="font-size:10px; color:#51A351;"></i>Online</span>
+                                                <?php } else { ?>
+                                                	<span class="pull-right" style="font-size:11px; font-weight:normal; color:#D4D4D4;"><i class="icon-circle" style="font-size:10px; color:#DDDDDD;"></i>Offline</span>
+                                                <?php } ?>
+                                            
+                                        </h4>
+                                        <div class="toolbar col-md-2 padding0 no-padding">
+                                            <div class="btn-group">
+                                                <span data-toggle="dropdown" class="btn btn-xs dropdown-toggle">
+                                                    Actions <i class="icon-angle-down"></i>
+                                                </span>
+                                                <ul class="dropdown-menu pull-right">
+                                                    <?php if ($acl->checkPermission('User Account', ACTION_VIEW)) { ?>
+                                                    	<li><a href="<?php echo $viewurl; ?>"><i class="icon-list"></i> View</a></li>
+                                                    <?php } ?>
+													<?php if ($acl->checkPermission('User Account', ACTION_EDIT)) { ?>
+                                                    	<?php if($userid == $line['id'] || isAdmin() || $acl->checkPermission('Market Price', ACTION_APPROVE)){ ?>
+                                                    		<li><a class="" href="<?php echo $this->baseUrl('profile/index/id/'.encode($line['id'])); ?>"><i class="icon-pencil icon-white"></i> Update</a></li>
+                                                        <?php } ?>
+                                                    <?php } ?>
+                                                    <?php if ($acl->checkPermission('User Account', ACTION_DELETE) && $line['isactive'] == 1 && $line['id'] != $userid) { ?>
+                                                        <li><a class="confirm-dialog deactivate" action="<?php echo $this->baseUrl("profile/updatestatus/id/".encode($line['id'])."/status/2/successmessage/profile_deactivate_success/successurl/".encode($this->viewurl)); ?>" message="<?php echo $this->translate('useraccount_profile_deactivate_confirmation'); ?>"><i class="icon-arrow-down"></i> Deactivate</a></li>
+                                                    <?php } ?>
+                                                    <?php if ($acl->checkPermission('User Account', ACTION_DELETE) && $line['isactive'] == 2 && $line['id'] != $userid) { ?>
+                                                        <li><a class="confirm-dialog deactivate" action="<?php echo $this->baseUrl("profile/updatestatus/id/".encode($line['id'])."/status/1/successmessage/profile_reactivate_success/successurl/".encode($this->viewurl)); ?>" message="<?php echo $this->translate('useraccount_profile_reactivate_confirmation'); ?>"><i class="icon-arrow-down"></i> Re-activate</a></li>
+                                                    <?php } ?>
+													<?php if ($acl->checkPermission('User Account', ACTION_DELETE) && $line['isactive'] != 1 && $line['id'] != $userid) { ?>
+                                                        <li><a class="deleteline gonowhere" action="<?php echo $this->baseUrl('profile/delete/id/'.encode($line['id'])."/entityname/UserAccount/successurl/".encode($this->viewurl)); ?>" message="<?php echo $this->translate('global_delete_confirm_message'); ?>"><i class="icon-trash"></i> Delete</a></li>
+                                                    <?php } ?>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="widget-content peoplelist">
+                                        <div class="peoplewrapper clearfix">
+                                            <div class="thumb" style="padding:5px 10px; height:115px;">
+                                            	<a href="<?php echo $viewurl; ?>"><img class="imagecontainer" src="<?php echo $photo_path; ?>" style="height:80px; width:70px" /></a>
+                                                <?php if(!isPublicUser()){ ?>
+                                            	<span class="label <?php echo $statusclass; ?>" style="padding:3px 8px; font-size:11px; display:block; margin:2px;"><?php echo $allstatus[$line['isactive']]; ?></span>
+                                                <?php } ?>
+                                            </div>
+                                            <div class="peopleinfo" style="margin-left:85px;">
+                                                <ul>
+                                                	<li><span class="bolded">Type:</span> <span class="on nullifempty"><?php echo $line['usertype'] == 3 ? 'AMIA' : $line['Group']; ?></span></li>
+													<?php if(!isPublicUser() || (isAMIA() && $line['usertype'] == 3) || ($line['showemail'] == 1 && isPublicUser())){ ?>
+                                                    	<li><span class="bolded">Email:</span> <span class="nullifempty"><?php echo $email; ?></span></li>
+                                                    <?php } ?>
+                                                    <?php if(!isPublicUser() || (isAMIA() && $line['usertype'] == 3) || ($line['showphone'] == 1 && isPublicUser())){ ?>
+                                                    	<li><span class="bolded">Phone:</span> <span class="nullifempty"><?php echo getShortPhone($phone); ?></span></li>
+                                                    <?php } ?>
+                                                    <li><span class="bolded">Username:</span> <span class="nullifempty"><?php echo $line['username']; ?></span></li>
+                                                    <li><span class="bolded">District:</span> <span class="nullifempty"><?php echo $line['District']; ?></span></li>
+                                                    <?php if($line['groupid'] == 3){ ?>
+                                                    	<li><span class="bolded">Market:</span> <span class="nullifempty"><?php echo $line['Market']; ?></span></li>
+                                                    <?php } ?>
+                                                    <?php if($line['usertype'] == 5 || $line['usertype'] == 6){ ?>
+                                                        <li><span class="bolded">Organisation:</span> <span class="nullifempty"><?php echo $line['companyname']; ?></span></li>
+                                                    <?php } ?>
+                                                    <?php if(!isPublicUser()){ ?>
+                                                    	<li><span class="bolded">Entry Date:</span> <span class="nullifempty"><?php echo formatDateAndTime($line['datecreated'], true); ?></span></li>
+                                                    <?php } ?>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php if($counter_mod == 0){ ?>
+                        </div>
+                        <?php }?>
+                    <?php $counter++; } ?>
+                </div>
+				<div class="row">
+                    <div class="table-footer">
+                        <div class="col-md-6 padding0" style="margin-bottom:10px;">
+                            <div class="table-actions">
+                                <div class="row col-md-12 margin0 padding0 clearfix">
+                                    <div class="col-md-6 padding0 floatleft"><?php echo $paginate->getListCountDropDown(); ?></div>
+                                    <div class="col-md-6 paddingleft5 rightalign" style="margin-bottom:5px;"><?php echo sprintf($this->translate("profile_list_counter"), $paginate->getItemCounterText()); ?></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 padding0">
+                            <?php echo $paginate->getPaginationLinks(); ?>
+                        </div>
+                    </div>
+                </div>
+            <?php } ?>
+        </div>
+	</form>
+    </div>
+</div>          
+<?php
+	$session->setVar(SUCCESS_MESSAGE, "");
+	require_once APPLICATION_PATH.'/includes/footer.php';
+?>

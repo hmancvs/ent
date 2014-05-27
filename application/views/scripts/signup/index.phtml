@@ -1,0 +1,372 @@
+<?php
+	require_once APPLICATION_PATH.'/includes/header.php';
+
+	$user = new UserAccount(); 
+	
+	$button_title = $this->translate("profile_button_signup");
+	$posturl = $this->baseUrl("signup/create"); 
+	$failureurl = $this->baseUrl('signup'); 
+	$successurl = $this->baseUrl('signup/confirm'); 
+	
+	// set all fields to empty string as default
+	$phone = ''; 
+	$user->setType(DEFAULT_USER_GROUP);
+	$id = decode($request->id);	
+	if(!isEmptyString($id)){
+		$user->populate($id);
+		$button_title = $this->translate("profile_button_activate");
+		$posturl = $this->baseUrl("signup/processinvite");
+		$failureurl = $this->baseUrl('signup/index/id/'.encode($formvalues['id'])); 
+		$successurl = $this->baseUrl('signup/inviteconfirmation/id/'.encode($formvalues['id']));
+	}
+	
+	// any errors occured in processing
+	if ($sessionhaserror) {
+		$formvalues = $session->getVar(FORM_VALUES);
+		// debugMessage($formvalues);
+		$phone = $formvalues['phone'];
+	}
+	
+	$title = $this->translate("useraccount_pagetitle_signup"); 
+	$this->headTitle($title.$browserappend); 
+?>
+<script>
+$(document).ready(function() {			
+	// define the validation rules
+	$("#signupform").validate({		
+		rules: {
+			gender: {
+				required: true
+			},
+			firstname: {
+				required: true
+			},
+			lastname: {
+				required: true
+			},
+			username: {
+				required: false, 
+				minlength: <?php echo $config->profile->usernameminlength; ?>,
+				maxlength: <?php echo $config->profile->usernamemaxlength; ?>
+			},
+			email: {
+				required: true, 
+				email: true
+			},
+			phone: {
+				required: true, 					
+				validnumber: true,
+				maxlength: <?php echo $config->country->phonemaxlength; ?>,
+				minlength: <?php echo $config->country->phoneminlength; ?>,
+				validate_ug: true
+			},
+			password: {
+				required: true,
+				minlength: <?php echo $config->profile->passwordminlength; ?>,
+				maxlength: <?php echo $config->profile->passwordmaxlength; ?>
+			},			
+			confirmpassword: {
+				required: true,
+				equalTo: "#password"
+			},
+			agreedtoterms: "required",
+			code: {
+				required: true,
+				validatecode: true					
+			}
+		}, 
+		// the messages for each of the fields being validated
+		messages: {	
+			gender: {
+				"required": "<?php echo $this->translate("profile_gender_error"); ?>"
+			}, 
+			firstname: {
+				"required": "<?php echo $this->translate("profile_firstname_error"); ?>"
+			},
+			lastname: {
+				"required": "<?php echo $this->translate("profile_lastname_error"); ?>"
+			},
+			username: {
+				required: "<?php echo $this->translate("profile_username_error"); ?>",
+				minlength: "<?php echo sprintf($this->translate("profile_username_error_minlength"), $config->profile->usernameminlength); ?>",
+				maxlength: "<?php echo sprintf($this->translate("profile_username_error_maxlength"), $config->profile->usernamemaxlength); ?>"
+			},
+			email: {
+				"required": "<?php echo $this->translate("profile_email_error"); ?>", 
+				"email": "<?php echo $this->translate("profile_email_invalid_error"); ?>"
+			},
+			phone: {
+				required: "<?php echo $this->translate("profile_phonenumber_error"); ?>", 					
+				maxlength: "<?php echo sprintf($this->translate("profile_phone_maxlength_error"), $config->country->phonemaxlength); ?>",
+				minlength: "<?php echo sprintf($this->translate("profile_phone_maxlength_error"), $config->country->phoneminlength); ?>",
+				validate_ug: "<?php echo $this->translate("globale_phonenumber_format"); ?>"
+			},
+			password: {
+				required: "<?php echo $this->translate("useraccount_password_error"); ?>",
+				minlength: "<?php echo sprintf($this->translate("useraccount_password_error_minlength"), $config->profile->passwordminlength); ?>",
+				maxlength: "<?php echo sprintf($this->translate("useraccount_password_error_maxlength"), $config->profile->passwordmaxlength); ?>"
+			},
+			confirmpassword: {
+				required: "<?php echo $this->translate("profile_confirmpassword_error"); ?>",
+				equalTo: "<?php echo $this->translate("profile_confirmpassword_error_equalto"); ?>"
+			},
+			agreedtoterms: "<?php echo $this->translate("profile_agreetoterms_error"); ?>",
+			code: {
+				required: "<?php echo $this->translate("profile_captcha_error"); ?>"
+			}
+		},
+		// custom error positions
+		errorPlacement: function(error, element) {
+			switch(element.attr("name")){					
+				default:
+					error.appendTo("#"+element.attr("name")+"_error")
+					break;
+			}			
+		}
+	});
+	
+	// validate captcha
+	$.validator.addMethod("validatecode", function(value, element, params) {
+		//alert('code is '+value); //alert('valid is '+$("#validcode").val());
+		if ($("#code").val().toLowerCase() == $("#validcode").val().toLowerCase()) {
+			return true; 
+		}
+		return false;        
+	}, "Captcha Invalid! <br />Re-enter code or refresh for a new one");
+	
+	$(".hastooltip").change();
+	
+	// prevent copy and paste in password fields
+	$('input.password').bind('copy paste', function (e) {
+	   e.preventDefault();
+	});
+		
+	// Email validation
+	$('#check_email_availability').click(function(){ 
+		check_email_availability();  
+	});
+	$('#email').change(function(){ 
+		check_email_availability();
+	});  
+	$('#email').keyup(function(){
+		this.value = this.value.toLowerCase();
+	});  
+	//function to check email availability  
+	function check_email_availability(){  
+		//get the username
+		var checking_html = 'Checking availability...';   
+		var email = $('#email').val();  
+		if(!isEmptyString(email) && validateEmail(email)){
+			$('#email_availability_result').html(checking_html);  
+			var userid = '<?php echo $user->getID(); ?>';
+			//use ajax to run the check  
+			$.post("<?php echo $this->baseUrl('signup/checkemail'); ?>", { email: email, userid: userid },  
+				function(result){  
+					//if the result is 1  
+					// alert(result); // return false;
+					if(result == 1){  
+						//show that the email is available
+						$('#email_availability_result').html(email + ' is NOT available!').addClass('alert').addClass('alert-error').removeClass('alert-success'); 
+					} else {  
+						//show that the email is NOT available  
+						$('#email_availability_result').html(email + ' is available').addClass('alert').addClass('alert-success').removeClass('alert-error');
+					}  
+			});  
+		}
+	}
+	
+	// Username validation
+	$('#check_username_availability').click(function(){ 
+		check_user_availability();  
+	});
+	$('#username').change(function(){ 
+		check_user_availability();  
+	});  
+	$('#username').keyup(function(){
+		this.value = this.value.toLowerCase();
+	});
+		
+	//function to check username availability  
+	function check_user_availability(){  
+		//get the username
+		var checking_html = 'Checking availability...';   
+		var username = $('#username').val();  
+		if(!isEmptyString(username) && username.length >= '<?php echo $config->username->minlength; ?>' && username.length <= '<?php echo $config->username->maxlength; ?>' && isAlpha(username)){
+			// alert('passed');
+			$('#username_availability_result').html(checking_html); 
+			var userid = '<?php echo $user->getID(); ?>';
+			//use ajax to run the check  
+			$.post("<?php echo $this->baseUrl('signup/checkusername'); ?>", { username: username, userid: userid },  
+				function(result){  
+					//if the result is 1  
+					// alert(result); // return false;
+					if(result == 1){  
+						//show that the username is available
+						$('#username_availability_result').html(username + ' is NOT available!').addClass('alert').addClass('alert-error').removeClass('alert-success'); 
+					} else {  
+						//show that the username is NOT available  
+						$('#username_availability_result').html(username + ' is available').addClass('alert').addClass('alert-success').removeClass('alert-error');
+					}  
+			});   
+		}
+	}
+	
+	// Phone validation 	
+	$('#check_phone_availability').click(function(){ 
+		check_phone_availability();  
+	});
+	$('#phone').change(function(){ 
+		check_phone_availability();  
+	});
+	//function to check phone availability  
+	function check_phone_availability(){  
+		//get the username
+		var checking_html = 'Checking availability...';   
+		var phone = $('#phone').val();  
+		if(!isEmptyString(phone) && isUgNumber(phone)){
+			$('#phone_availability_result').html(checking_html);  
+			var userid = '<?php echo $user->getID(); ?>';
+			//use ajax to run the check  
+			$.post("<?php echo $this->baseUrl('signup/checkphone'); ?>", { phone: phone, userid: userid },  
+				function(result){  
+					//if the result is 1  
+					// 
+					// alert(result); // return false;
+					if(result == 1){  
+						//show that the phone is available
+						$('#phone_availability_result').html(phone + ' is NOT available!').addClass('alert').addClass('alert-error').removeClass('alert-success'); 
+					} else {  
+						//show that the phone is NOT available  
+						$('#phone_availability_result').html(phone + ' is available').addClass('alert').addClass('alert-success').removeClass('alert-error');
+					}  
+			});  
+		}
+	} 
+	
+});	
+</script>
+<div id="login_user">
+	<h2><?php echo $title; ?></h2>
+	<form class="form-horizontal" id="signupform" action="<?php echo $posturl; ?>" method="post">
+		<?php if(!isEmptyString($session->getVar(SUCCESS_MESSAGE)) ){ ?>
+            <div class="alert alert-success"><?php echo $session->getVar(SUCCESS_MESSAGE); ?></div>
+        <?php } ?>	
+		<?php if($sessionhaserror) { ?>
+        	<div class="alert alert-error"><?php echo $session->getVar(ERROR_MESSAGE); ?></div>
+        <?php } ?>
+		<?php if($request->actkey == 'valid') { ?>
+        	<div class="alert alert-success"><?php echo $this->translate("profile_activation_message"); ?></div>
+        <?php } ?>
+        <table class="table">
+            <tr>
+            	<td colspan="2"><label class="control-label"><?php echo $this->translate("profile_gender_label"); ?>:<?php echo $this->translate("global_required_field_marker"); ?></label>
+				<?php						  
+                      $genderradio = new Zend_Form_Element_Radio('gender',
+                              array(
+                                      'multiOptions' => array('1' => 'Male', '2' => 'Female'), 
+                                      'view' => new Zend_View(),
+                                      'disableLoadDefaultDecorators' => true,
+                                      'separator' => '&nbsp;&nbsp;&nbsp;&nbsp;',
+                                      'decorators' => array('ViewHelper',
+                                                          array('HtmlTag', array('tag' => 'div', 'class' => array('inline', 'radio', 'zendradio')))
+                                                      )
+                              )
+                      );
+                      $genderradio->setValue($user->getGender());
+                      echo $genderradio->render();
+                  ?>
+                  <div id="gender_error"></div>
+                </td>
+            </tr>
+            <tr>
+                <td><label class="control-label"><?php echo $this->translate("profile_firstname_label"); ?>:<?php echo $this->translate("global_required_field_marker"); ?></label>
+                	<input name="firstname" id="firstname" type="text" class="span2 hastooltip max50content" value="<?php echo $user->getFirstName(); ?>" title="<?php echo $this->translate("profile_firstname_tooltip"); ?>" />
+                	<div id="firstname_error"></div>
+                </td>
+                <td><label class="control-label"><?php echo $this->translate("profile_lastname_label"); ?>:<?php echo $this->translate("global_required_field_marker"); ?></label>
+                	<input name="lastname" id="lastname" type="text" class="span2 hastooltip max50content" value="<?php echo $user->getLastName(); ?>" title="<?php echo $this->translate("profile_lastname_tooltip"); ?>" /><div id="lastname_error"></div>
+                </td>
+			</tr>
+            <tr>
+                <td colspan="2"><label class="control-label"><?php echo $this->translate("profile_email_label"); ?>:<?php echo $this->translate("global_required_field_marker"); ?></label>
+					<?php if(!isEmptyString($user->getEmail()) && !isEmptyString($id)){ ?>
+                        <?php echo $user->getEmail(); ?><input name="email" id="email" type="hidden" value="<?php echo $user->getEmail(); ?>" />
+                    <?php } else { ?>
+                        <input style="width:335px;" class="hastooltip validate_255_string" name="email" id="email" type="text" value="<?php echo $user->getEmail(); ?>" title="<?php echo $this->translate("profile_email_tooltip"); ?>" />
+                        <label class='lineblocked'><a href="javascript: void(0);" class="btn btn-primary btn-mini" id='check_email_availability' title="Check Availability">Check</a></label>
+                    <?php } ?>
+                    <div id="email_error"></div><div id="email_availability_result" style="margin-top:5px;"></div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><label class="control-label"><?php echo $this->translate("profile_username_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?>
+                	<span class="pagedescription lineblocked"></span></label>
+                	<input maxlength="<?php echo $config->username->maxlength; ?>" class="span2 strictalpha" name="username" id="username" type="text" value="<?php echo $user->getUsername(); ?>" />
+                	<label class='lineblocked'><a class="btn btn-primary btn-mini gonowhere" id='check_username_availability' title="Check Availability">Check</a></label>
+                	
+                    <div id="username_availability_result" style="margin-top:5px;"></div>
+                    <div id="username_error"></div>
+                </td>
+           	</tr>
+            <tr>
+                <td colspan="2"><label class="control-label phone"><?php echo $this->translate("profile_phone_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                	<div class="input-prepend">
+                		<span class="add-on"><?php echo '+'.getCountryCode(); ?></span><input name="phone" id="phone" type="text" maxlength="<?php echo $config->country->phonemaxlength; ?>" class="span2 hastooltip" value="<?php echo getShortPhone($user->getPhone()); ?>" title="<?php echo $this->translate("profile_phone_tooltip"); ?>"  />
+                	</div>
+                	<label class='lineblocked'><a href="javascript: void(0);" class="btn btn-primary btn-mini" id='check_phone_availability' title="Check Availability">Check</a></label>
+                    <label class="pagedescription" style="font-size:10px;">e.g &nbsp; <span class="green">0772123456</span></label>
+                	<div id="phone_availability_result" style="margin-top:5px;"></div>
+                    <div id="phone_error"></div>
+                </td>
+			</tr>
+            <tr>
+                <td><label class="control-label password"><?php echo $this->translate("useraccount_password_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                	<input name="password" id="password" type="password" autocomplete="off" class="span2 password hastooltip" onkeyup="passwordStrength(this.value)" value="" title="<?php echo $this->translate("profile_password_tooltip"); ?>" />
+                	<p style="display:inline-block; float:right;">
+                		<label for="passwordStrength" class="hidden">Password strength</label>
+                		<div id="passwordDescription" style="width:100px;">strength</div>
+                		<div id="passwordStrength" class="strength0"></div>
+               		</p>
+                	<div id="password_error"></div></td>
+                <td><label class="control-label confirmpassword"><?php echo $this->translate("useraccount_password_confirm_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                	<input name="confirmpassword" id="confirmpassword" autocomplete="off" type="password" class="span2 password hastooltip" value="" title="<?php echo $this->translate("profile_confirmpassword_tooltip"); ?>" />
+                	<div id="confirmpassword_error"></div></td>
+			</tr>
+            <tr id="terms">
+               <td colspan="2" style="padding-bottom:30px;"><input type="checkbox" name="agreedtoterms" id="agreedtoterms" value="1" class="<?php echo $user->getAgreedToTerms(); ?>" title="<?php echo $this->translate("useraccount_agreedtoterms_tooltip"); ?>" />
+                <?php echo sprintf($this->translate("useraccount_terms_accept_label"), '#', '#'); ?><?php echo $this->translate("global_required_field_marker"); ?><div id="agreedtoterms_error"></div></td>
+           	</tr>
+            <tr>
+                <td style="text-align:right;"><label class="control-label captcha" style="float:right; text-align:right; width:100%;">Captcha: </label>
+                <span class="pagedescription">(enter the code you see)</span></td>
+                <td>
+                    <div id="wrap" align="center">
+                        <label id="captcha"></label>
+                        <input name="code" type="text" id="code" style="width:80px;" maxlength="5" value="">
+                        <input name="validcode" type="hidden" id="validcode" value="">
+                    </div>
+                    <img src="<?php echo $this->baseUrl('images/refresh.jpg'); ?>" width="25" alt="" id="refresh" />
+                    <br clear="all" /><br clear="all" />
+                    <div id="code_error"></div>
+                </td>
+            </tr>
+            <tr>
+            	<td></td>
+                <td>
+                	<button type="submit" class="btn btn-primary btn-large finish" id="complete"><i class="icon-arrow-right icon-white"></i> <?php echo $button_title; ?></button>
+                    <input type="hidden" name="usecustomsave" id="usecustomsave" value="true" />
+                    <input type="hidden" name="entityname" id="entityname" value="UserAccount" />
+                    <input type="hidden" name="isactive" id="isactive" value="<?php echo $user->getIsActive(); ?>" />
+                    <input type="hidden" name="id" id="id" value="<?php echo encode($user->getID()); ?>" />
+                    <input type="hidden" name="createdby" id="createdby" value="<?php echo $user->getCreatedBy(); ?>" />
+                    <input type="hidden" name="type" id="type" value="<?php echo $user->getType(); ?>" />
+                    <input type="hidden" name="<?php echo URL_FAILURE; ?>" id="<?php echo URL_FAILURE; ?>" value="<?php echo encode($failureurl); ?>" />
+                    <input type="hidden" name="<?php echo URL_SUCCESS; ?>" id="<?php echo URL_SUCCESS; ?>" value="<?php echo encode($successurl); ?>" />
+                </td>
+            </tr>
+        </table>
+	</form>
+</div>            
+<?php
+	require_once APPLICATION_PATH.'/includes/footer.php';
+?>

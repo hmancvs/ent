@@ -1,0 +1,56 @@
+<?php
+	include APPLICATION_PATH.'/includes/header.php';
+	
+	$userid = $session->getVar("userid"); // debugMessage($userid);
+	
+	// $user->populate($userid);
+	
+?>
+<!-- Header -->
+<header class="navbar" id="headercontainer" style="height:100px;">
+   <nav class="navbar-wrapper navbar-default navbar-fixed-top" role="navigation">
+	  <div class="container-fluid headerwrapper"> 
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header margin0 padding0" style="width:245px; height:100px;">
+		  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse"> 
+			  <span class="sr-only">Toggle navigation</span> 
+			  <span class="icon-bar"></span> 
+			  <span class="icon-bar"></span> 
+			  <span class="icon-bar"></span> 
+		  </button>
+          <div class="divider10"></div>
+		  <a class="navbar-brand margin0 padding0 hidden-xs" href="#" style="xheight:90px;">
+          	<div class="divider10"></div>
+          	<img class="img-responsive col-md-5" src="<?php echo $this->baseUrl('images/logo.png'); ?>" />		
+		  	<span class="col-md-7 paddingleft0" style="font-size:2.5em;"><div class="divider20"></div><?php echo getAppName(); ?></span>
+          </a> 
+		</div>
+		
+		<!-- Collect the nav links, forms, and other content for toggling -->
+		<div class="collapse navbar-collapse navonlogin" style="height:100px;">
+		  <ul class="nav navbar-nav" id="headermenu">
+			<li class="active"><a href="<?php echo $this->baseUrl('dashboard'); ?>"><span class="glyphicon glyphicon-home"></span><span class="menutext">Dashboard</span></a></li> 
+			<li><a href="<?php echo $this->baseUrl('client'); ?>"><span class="glyphicon glyphicon-user"></span><span class="menutext">Manage Clients</span></a></li>
+            <li><a class="gonowhere"><span class="glyphicon glyphicon-list-alt"></span><span class="menutext">Employers</span></a></li>
+            <li><a class="gonowhere"><span class="glyphicon glyphicon-signal"></span><span class="menutext"> Reports</span></a></li>
+            <li><a class="gonowhere"><span class="glyphicon glyphicon-cog"></span><span class="menutext">Maintenance</span></a></li>
+		  </ul>
+		  
+		  <ul class="nav navbar-nav navbar-right" id="headerright">
+            <li style="xwidth:300px;" class="userloggedinfo">
+                <div class="row">
+                    <a class="padding0 col-md-3" href="<?php //echo $this->baseUrl("profile/view/id/".encode($user->getID())); ?>"><img src="<?php echo $user->getMediumPicturePath(); ?>" style="width:95px; padding:5px;" /></a>
+                    <ul class="padding0 col-md-9" style="width:250px; margin-left:2px;">
+                        <li class="btn-default"><a href="<?php echo $this->baseUrl("profile/view/id/".encode($user->getID())); ?>">My Profile</a></li>
+                        <li class="btn-default"><a>Change Password</a></li>
+                        <li class="btn-default"><a>Account Settings</a></li>
+                        <li class="btn-default"><a href="<?php echo $this->baseUrl("user/logout"); ?>">Sign Out</a></li>
+                    </ul>
+                </div>
+            </li>
+		  </ul>
+		</div>
+		<!-- /.navbar-collapse --> 
+	  </div>
+	</nav>
+</header>
