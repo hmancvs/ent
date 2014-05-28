@@ -714,5 +714,24 @@
 		return $result;
 		// return true;
 	}
-	
+	# return programs / service types
+	function getPrograms($value = ''){
+		$query = "SELECT s.id as optionvalue, s.alias as optiontext FROM servicetype s where s.type = 1 order by optiontext ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			return $array[$value];
+		}
+		return $array;
+	}
+	# check for funders
+	function getFunders($value = ''){
+		$query = "SELECT c.id as optionvalue, c.alias as optiontext FROM company c where c.type = 1 order by optiontext ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			return $array[$value];
+		}
+		return $array;
+	}
 ?>

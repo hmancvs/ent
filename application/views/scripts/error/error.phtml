@@ -2,6 +2,7 @@
 	require_once APPLICATION_PATH.'/includes/header.php';
 	$title = "Application Error";
 	$this->headTitle($title); 
+	$session = SessionWrapper::getInstance(); 
 ?>
 <h1><?php echo $title; ?></h1>
 <?php 

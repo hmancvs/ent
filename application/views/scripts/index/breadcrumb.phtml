@@ -1,22 +1,23 @@
 <?php
 	include APPLICATION_PATH.'/includes/header.php';
 ?>
-<ul class="breadcrumbs">
+
+<ol class="breadcrumbs">
     <li class="titlebreadcrumb"></li>
     <li class="right" style="max-width:330px;">
     	<div class="contentArea searchbar">
             <div class="input-group">
                 <input type="text" placeholder="Search ENT..." id="inputSearch" class="search" tabindex="1">
                 <span class="input-group-btn">
-                    <button style="padding:6px; position: absolute; right: -33px; top: -1px;" type="submit" class="submit"><!--<i class="glyphicon glyphicon-search"></i>--><img src="<?php echo $this->baseUrl('images/search.png'); ?>" /></button>
+                    <button style="padding:6px; position: absolute; right: -33px; top: -1px;" type="submit" class="submit"><img src="<?php echo $this->baseUrl('images/search.png'); ?>" /></button>
                 </span>
             </div>
             <ul id="divResult"></ul>
         </div>
     </li>
-</ul>
-<div class="pageheader" style="padding:10px 15px;">
-    <!--<div class="pageicon"></div>-->
+</ol>
+<div class="pageheader">
+    <div class="pageicon"></div>
     <div class="pagetitle">
         <h1 class="titlelabel"></h1>
         <h5 class="desclabel"></h5>

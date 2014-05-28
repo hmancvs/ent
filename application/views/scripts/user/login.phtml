@@ -29,16 +29,12 @@ $(document).ready(function() {
 		}
 	});
 	
-	$(".navonlogin, #sidebar").remove();
+	$(".navonlogin, #sidebar, .breadcrumbs li").remove();
 		
 }); 
 </script>
 <style>
-body {
-	background:none;	
-	background: url("<?php echo $this->baseUrl('images/loginbg.png'); ?>") repeat scroll 0 0 rgba(0, 0, 0, 0);
-}
-#mainNav, #sidebar, .breadcrumbs li, .pageheader, #headercontainer #headermenu, #headercontainer #headerright {
+.breadcrumbs li, .pageheader, #headercontainer #headermenu, #headercontainer #headerright {
 	display:none;
 }
 #contentcontainer {

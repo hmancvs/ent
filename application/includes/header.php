@@ -37,3 +37,4 @@ $action = $request->getActionName();
 
 $browserappend = " | ".getAppName();
 $showsearch = true;
+$homedir = 'System / ';

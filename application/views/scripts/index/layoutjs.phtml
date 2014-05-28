@@ -619,4 +619,11 @@ $(document).ready(function() {
 	
 });
 
+//Use window.load and not document.ready for effective equal heights
+$(window).load(function() {
+	//Make columns equal
+	equalHeight($("#sidebar, #contentcontainer"));
+	
+});
+
 </script>

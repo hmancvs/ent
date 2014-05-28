@@ -15,8 +15,9 @@ class UserAccount extends BaseEntity {
 		$this->hasColumn('email', 'string', 50/*, array('notnull' => true, 'notblank' => true)*/);
 		$this->hasColumn('email2', 'string', 50);
 		$this->hasColumn('username', 'string', 15/*, array('notnull' => true, 'notblank' => true)*/);
-		$this->hasColumn('phone', 'string', 15);
-		$this->hasColumn('phone2', 'string', 15);
+		$this->hasColumn('home', 'string', 15);
+		$this->hasColumn('work', 'string', 15);
+		$this->hasColumn('cell', 'string', 15);
 		
 		$this->hasColumn('gender', 'integer', null); # 1=Male, 2=Female, 3=Unknown
 		$this->hasColumn('dateofbirth','date');
@@ -29,21 +30,19 @@ class UserAccount extends BaseEntity {
 		$this->hasColumn('securityanswer', 'integer', null);
 		$this->hasColumn('bio', 'string', 1000);
 		$this->hasColumn('profilephoto', 'string', 50);
-		$this->hasColumn('country', 'string', 2, array('default' => 'ZA'));
-		$this->hasColumn('city', 'string', 50);
-		$this->hasColumn('town', 'string', 50);
-		$this->hasColumn('postalcode', 'string', 50);
-		$this->hasColumn('address', 'string', 255);
 		
-		$this->hasColumn('phone_isactivated', 'integer', null, array('default' => '0'));
-		$this->hasColumn('phone2_isactivated', 'integer', null, array('default' => '0'));
-		$this->hasColumn('phone_actkey', 'string', 15);
-		$this->hasColumn('phone2_actkey', 'string', 15);
+		$this->hasColumn('country', 'string', 2, array('default' => 'US'));
+		$this->hasColumn('state', 'string', 2);
+		$this->hasColumn('city', 'string', 50);
+		$this->hasColumn('county', 'integer', null);
+		$this->hasColumn('zipcode', 'string', 15);
+		$this->hasColumn('addressline1', 'string', 255);
+		$this->hasColumn('addressline2', 'string', 255);
+		
 		$this->hasColumn('isinvited', 'integer', null, array('default' => NULL));
 		$this->hasColumn('invitedbyid', 'integer', null);
 		$this->hasColumn('hasacceptedinvite', 'integer', null, array('default' => 0));
 		$this->hasColumn('dateinvited','date');
-		$this->hasColumn('departmentid', 'integer', null, array('default' => NULL));
 		
 		# override the not null and not blank properties for the createdby column in the BaseEntity
 		$this->hasColumn('createdby', 'integer', 11);
@@ -93,12 +92,6 @@ class UserAccount extends BaseEntity {
 		$this->hasOne('UserAccount as invitedby', 
 								array(
 									'local' => 'invitedbyid',
-									'foreign' => 'id',
-								)
-						);
-		$this->hasOne('Department as department', 
-								array(
-									'local' => 'departmentid',
 									'foreign' => 'id',
 								)
 						);
@@ -166,24 +159,6 @@ class UserAccount extends BaseEntity {
 		}
 		return true;
 	}
-	# determine if the refno has already been assigned to another organisation
-	function phoneExists($phone =''){
-		$conn = Doctrine_Manager::connection();
-		$id_check = "";
-		if(!isEmptyString($this->getID())){
-			$id_check = " AND u.id <> '".$this->getID()."' ";
-		}
-		
-		# unique phone
-		$phone_query = "SELECT u.id FROM useraccount as u WHERE (u.phone = '".$phone."' AND u.phone_isactivated = 1) ".$id_check;
-		// debugMessage($phone_query);
-		$result = $conn->fetchOne($phone_query);
-		// debugMessage($result);
-		if(isEmptyString($result)){
-			return false;
-		}
-		return true;
-	}
 	/**
 	 * Preprocess model data
 	 */
@@ -214,12 +189,6 @@ class UserAccount extends BaseEntity {
 		if(isArrayKeyAnEmptyString('type', $formvalues)){
 			unset($formvalues['type']); 
 		}
-		if(isArrayKeyAnEmptyString('phone_isactivated', $formvalues)){
-			unset($formvalues['phone_isactivated']); 
-		}
-		if(isArrayKeyAnEmptyString('phone2_isactivated', $formvalues)){
-			unset($formvalues['phone2_isactivated']); 
-		}
 		if(isArrayKeyAnEmptyString('isinvited', $formvalues)){
 			$formvalues['isinvited'] = NULL;
 		}
@@ -228,9 +197,6 @@ class UserAccount extends BaseEntity {
 		}
 		if(isArrayKeyAnEmptyString('dateinvited', $formvalues)){
 			unset($formvalues['dateinvited']); 
-		}
-		if(isArrayKeyAnEmptyString('departmentid', $formvalues)){
-			unset($formvalues['departmentid']); 
 		}
 		if(!isArrayKeyAnEmptyString('isinvited', $formvalues)){
 			if($formvalues['isinvited'] == 1){
@@ -533,48 +499,6 @@ class UserAccount extends BaseEntity {
 		}
    	}
    
-   	# change user's email
-	function changeEmailOnAccount($actkey) {
-		$session = SessionWrapper::getInstance(); 
-		# validate the activation key 
-		if($this->getActivationKey() != $actkey){
-			// debugMessage('failed');
-			# Log to audit trail when an invalid activation key is used to activate account
-			$this->getErrorStack()->add("profile.emailchangekey", "Invalid key specified for activation");
-			$session->setVar(ERROR_MESSAGE, "Invalid key specified for activation");
-			return false;
-		} else {
-			# set active to true and blank out activation key
-			$this->setActivationKey("");
-			$this->setEmail($this->getTempEmail());
-			$this->setTempEmail('');
-			
-			$this->save();
-			
-			return true;
-		}
-   }
-	# change user's email
-	function changePhoneOnAccount($actkey) {
-		$session = SessionWrapper::getInstance(); 
-		# validate the activation key 
-		if($this->getActivationKey() != $actkey){
-			// debugMessage('failed');
-			# Log to audit trail when an invalid activation key is used to activate account
-			$this->getErrorStack()->add("profile.emailchangekey", "Invalid key specified for activation");
-			$session->setVar(ERROR_MESSAGE, "Invalid key specified for activation");
-			return false;
-		} else {
-			# set active to true and blank out activation key
-			$this->setActivationKey("");
-			$this->setPhone($this->getTempPhone());
-			$this->setTempPhone('');
-			
-			$this->save();
-			
-			return true;
-		}
-   }
 	/**
     * Process the deactivation for an agent
     * 
@@ -643,13 +567,6 @@ class UserAccount extends BaseEntity {
 		$mail->clearFrom();
 		
 		return true;
-	}
-	# content of confirmation message upon confirmation
-	function getSignupAccountConfirmationContent(){
-		$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
-		$contactus_url = $baseUrl.'/contactus';
-		$password_url = $baseUrl.'/profile/view/id/'.encode($this->getID().'/tab/account');
-		return "Dear ".$this->getFirstName().", <br /><br />Your TBD Account has been successfully activated. You can now login anytime using either Email or Phone with the password you provided during registration. <br /><br /> You can also change your password anytime by <a href='".$password_url."' title='Change Password'>clicking here</a>.  <br /><br />For any help or assistance, <a href='".$contactus_url."'>Contact us</a> ";
 	}
 	# set activation code to change user's email
 	function triggerEmailChange($newemail) {
@@ -921,14 +838,6 @@ class UserAccount extends BaseEntity {
 		
 		return $result; 
 	}
-	# find user by phone
-	function populateByPhone($phone) {
-		$query = Doctrine_Query::create()->from('UserAccount u')
-		->where("u.phone = '".$phone."'");
-		//debugMessage($query->getSQLQuery());
-		$result = $query->execute();
-		return $result->get(0);
-	}
 	function findByUsername($username) {
 		# query active user details using email
 		$q = Doctrine_Query::create()->from('UserAccount u')->where('u.username = ?', $username);
@@ -1039,25 +948,6 @@ class UserAccount extends BaseEntity {
 			return 'Female';
 		}
 	}
-	/**
-	 * Return the user's gender reference, 'his' for Male and 'her' for female
-	 *
-	 * @return String The gender reference
-	 */
-	function getGenderString() {
-		$text = 'their';
-		switch ($this->getGender()) {
-			case 'M':
-				$text = 'his';
-				break;
-			case 'F':
-				$text = 'her';
-				break;
-			default:
-				$text = 'their';
-		}
-		return $text;
-	}
 	# Determine if user profile has been activated
 	function isActivated(){
 		return $this->getIsActive() == 1;
@@ -1091,15 +981,15 @@ class UserAccount extends BaseEntity {
     	return $this->getType() == 1 ? true : false; 
     }
 	# determine if is a subscriber
-	function isSubscriber(){
+	function isSupervisor(){
     	return $this->getType() == 2 ? true : false; 
     }
-	function isCustomerCare(){
-    	return $this->getType() == 2 ? true : false; 
+	function isDataClerk(){
+    	return $this->getType() == 3 ? true : false; 
     }
 	# determine if a department
-	function isDepartment(){
-    	return $this->getType() == 3 ? true : false; 
+	function isManageer(){
+    	return $this->getType() == 4 ? true : false; 
     }
  	# determine if person has not been invited
     function hasNotBeenInvited() {
@@ -1195,168 +1085,6 @@ class UserAccount extends BaseEntity {
 		}
 		# debugMessage($path);
 		return $path;
-	}
-	# check for user using password and phone number
-	function validateUserUsingPhone($password, $phone){
-		$formattedphone = getFullPhone($phone);
-		$conn = Doctrine_Manager::connection();
-		$query = "SELECT * from useraccount as u where u.phone = '".$formattedphone."' AND u.password = '".sha1($password)."' ";
-		// debugMessage($query);
-		$result = $conn->fetchRow($query);
-		// debugMessage($result);
-		return $result;
-	}
-	# check for user using password and phone number
-	function validateExistingPhone($phone){
-		$formattedphone = getFullPhone($phone);
-		$conn = Doctrine_Manager::connection();
-		$query = " ";
-		// debugMessage($query);
-		$result = $conn->fetchRow($query);
-		// debugMessage($result);
-		return $result;
-	}
-	# get phone from type
-	function getFormattedPhone($type = 1) {
-		$phone = $this->getPhone();
-		if($type == 2){
-			$phone = $this->getPhone2();
-		}
-		return getShortPhone($phone);
-	}
-	function getPhoneStatusLabel($type = 1){
-		$label = '&nbsp; <span class="pagedescription" style="color:#ca464c;">(Unconfirmed)</span';
-		$validated = false;
-		if($this->isValidated()){
-            $validated = true;                            
-            $label = '&nbsp; <span class="pagedescription" style="color:#55A411;">(Confirmed)</span';
-        }
-        return $label;
-	}
-	# determine if phone is validated
-	function isValidated($type = 1){
-		if($type == 2){
-			return $this->getPhone2_IsActivated() == 1 ? true : false;
-		} else {
-			return $this->getPhone_IsActivated() == 1 ? true : false;
-		}
-	}
-	function isValidKey($type = 1){
-		if($type == 2){
-			return strlen($this->getPhone2_ActKey()) == 6 ? true : false; 
-		} else {
-			return strlen($this->getPhone_ActKey()) == 6 ? true : false; 
-		}
-	}
-	# determine if phone is validated
-	function hasPendingActivation($type = 1){
-		if($type == 1){
-			$phone = $this->getPhone();
-			$actkey = $this->getPhone_ActKey();
-			$isvalidkey = $this->isValidKey(1);
-		}
-		if($type == 2){
-			$phone = $this->getPhone2();
-			$actkey = $this->getPhone2_ActKey();
-		}
-		return !isEmptyString($actkey) && $this->isValidKey($type) && !$this->isValidated($type) ? true : false;
-	}
-	# activate account by phone
-	function activatePhone($type = 1){
-		if($type == 1){
-			$this->setPhone_ActKey('');
-			$this->setPhone_IsActivated(1);
-		}
-		if($type == 2){
-			$this->setPhone2_ActKey('');
-			$this->setPhone2_IsActivated(1);
-		}
-		$this->save();
-		
-		return true;
-	}
-	# send signup activation confirmation to the user's mobile phone
-	function sendSignupConfirmationToMobile($type = 1) {
-		if($type == 1){
-			$phone = $this->getPhone();
-		}
-		if($type == 2){
-			$phone = $this->getPhone2();
-		} 
-		$message = "Dear ".$this->getFirstName().", \nYour TBD Account and Phone have been successfully activated. You can now login anytime using either Email or Phone";
-		// debugMessage($message);
-		$sendresult = sendSMSMessage($phone, $message);
-		// debugMessage($sendresult);
-		
-		return true;
-	}
-	# generate activation code
-	function generatePhoneActivationCode($type){
-		if($type == 1){
-			$this->setPhone_ActKey($this->generateActivationKey());
-			$this->setphone_isactivated(0);
-		}
-		if($type == 2){
-			$this->setPhone2_ActKey($this->generateActivationKey());
-			$this->setPhone2_isactivated(0);
-		} 
-		// debugMessage($this->toArray());
-		$this->save();
-		
-		return true;
-	}
-	# send activation code to the user's mobile phone
-	function sendActivationCodeToMobile($type) {
-		if($type == 1){
-			$code = $this->getPhone_ActKey();
-			$phone = $this->getPhone();
-		}
-		if($type == 2){
-			$code = $this->getPhone2_ActKey();
-			$phone = $this->getPhone2();
-		} 
-		
-		$message = "Dear ".$this->getFirstName().", \nYour mobile phone activation code is: ".$code;
-		// debugMessage($message);
-		$sendresult = sendSMSMessage($phone, $message);
-		// debugMessage($sendresult);
-		# saving of message to application inbox is not valid here
-		return true;
-	}
-	# determine the network provider for phone number
-	function getProvider($type){
-		if($type == 1){
-			$phone = $this->getFormattedPhone(1);
-		}
-		if($type == 2){
-			$phone = $this->getFormattedPhone(2);
-		} 
-		return getPhoneProvider($phone);
-	}
-	# verify that a code specified is valid for activation
-	function verifyPhone($code, $type){
-		if($type == 1){
-			$existingcode = $this->getPhone_ActKey();
-		}
-		if($type == 2){
-			$existingcode = $this->getPhone2_ActKey();
-		}
-		return $existingcode == $code ? true : false;
-	}
-	# send validation activation confirmation to the user's mobile phone
-	function sendActivationConfirmationToMobile($type) {
-		if($type == 1){
-			$phone = $this->getPhone();
-		}
-		if($type == 2){
-			$phone = $this->getPhone2();
-		}
-		$message = "Dear ".$this->getFirstName().", \nYour mobile phone ".getFullPhone($phone)." has been successfully validated.";
-		// debugMessage($message);
-		$sendresult = sendSMSMessage($phone, $message);
-		// debugMessage($sendresult);
-		
-		return true;
 	}
 	/**
 	 * Get the full name of the country from the two digit code
@@ -1457,7 +1185,5 @@ class UserAccount extends BaseEntity {
 		
 		return true;
 	}
-	# determine if user is a department type
-	# TODO write function to determine if user has atleast one department
 }
 ?>

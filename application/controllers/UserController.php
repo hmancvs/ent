@@ -79,36 +79,9 @@ class UserController extends IndexController  {
 			$useraccount->populate($user->id);
         }
 		
-        # if user is loggin with phone
-        if($credcolumn == 'phone'){
-        	$useracc = new UserAccount(); 
-        	$result = $useracc->validateUserUsingPhone($this->_getParam("password"), $this->_getParam("email"));
-        	// debugMessage($result); exit();
-        	if(!$result){
-        		$audit_values['transactiontype'] = USER_LOGIN;
-	    		$audit_values['success'] = "N";
-	    		$audit_values['transactiondetails'] = "Login for user with email '".$this->_getParam("email")."' failed. Invalid username or password";
-				// $this->notify(new sfEvent($this, USER_LOGIN, $audit_values));
-				
-				$session->setVar(ERROR_MESSAGE, "Invalid Email Address, Phone or Password. <br />Please Try Again."); 
-				$session->setVar(FORM_VALUES, $this->_getAllParams());
-				// return to the home page
-				if(!isArrayKeyAnEmptyString(URL_FAILURE, $formvalues)){
-					$this->_helper->redirector->gotoUrl(decode($this->_getParam(URL_FAILURE)));
-				} else {
-					$this->_helper->redirector->gotoSimple('login', "user");
-				}
-	    		
-	    		return false; 
-        	} else {
-        		$useraccount = new UserAccount(); 
-				$useraccount->populate($result['id']);
-        	}
-        }
 		/* debugMessage($useraccount->toArray());
 		exit(); */
 		$session->setVar("userid", $useraccount->getID());
-		$session->setVar("phone", $useraccount->getPhone());
 		$session->setVar("type", $useraccount->getType());
 
 		// clear user specific cache, before it is used again

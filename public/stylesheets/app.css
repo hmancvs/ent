@@ -10,8 +10,14 @@
 
 /* Global application custom init */
 .body {
-	overflow-x:hidden;
+	/*overflow-x:hidden;*/
+	background:none;	
+	background: url("../images/bodybg.png") repeat scroll 0 0 rgba(0, 0, 0, 0);
 }
+ul, ol {
+	padding-left:0;
+}
+
 /* Header custom */
 #headercontainer.navbar {
 	margin-bottom:0;
@@ -221,6 +227,7 @@
 }
 .breadcrumbs > li.titlebreadcrumb {
 	padding-top:10px;
+	padding-left:18px;
 }
 #contentcontainer {
 	margin:0;
@@ -231,7 +238,7 @@
     background: none repeat scroll 0 0 #FFFFFF;
     border-bottom: 1px solid #DDDDDD;
     min-height: 68px;
-    padding: 15px;
+    padding: 10px 15px 5px 30px;
     position: relative;
 	z-index:0;
 }
@@ -244,14 +251,17 @@
     font-size: 42px;
     padding: 10px;
     text-align: center;
-    width: 70px;
-	height: 70px;
+    width: 60px;
+	height: 60px;
 }
 #contentcontainer .pageicon img {
 	width:48px;
 	height:48px;
 	margin-left: -2px;
     margin-top: -2px;
+}
+#contentcontainer .pageicon span {
+	font-size:30px;
 }
 #contentcontainer .pagetitle {
     margin-left: 10px;
@@ -261,19 +271,89 @@
 #contentcontainer .pagetitle h1 {
 	font-size:30px;
 }
-#contentcontainer #contentcontainer .pagetitle h1 {
+#contentcontainer .pagetitle h1 {
     font-size: 24px;
     margin-left: 0;
-	padding:0;
+	padding-left:75px;
 	line-height:normal;
 	font-weight:normal;
 }
 #contentcontainer .pagetitle h5 {
     color: #999999;
     font-size: 11px;
+	padding-left:75px;
     /*text-transform: uppercase;*/
 }
+
+/* Overrides */
+.chosen-container-single .chosen-single {
+	height:30px;
+}
+
 #centercolumn {
 	padding:10px;
 	min-height:400px;
+	margin:10px;
+}
+#centercolumn .listform .headerbox {
+	position:absolute;
+	float:right;
+	right:15px; 
+	top:-60px;
+}
+#centercolumn .listform .headerbox .reset {
+	display:block; 
+	float:right; 
+	text-align:right; 
+	position:absolute; 
+	right:45px; 
+	top:5px;
+}
+#centercolumn .listform .glyphicon-list-search {
+	font-size: 20px;
+    margin-right: 10px;
+    margin-top: -28px;
+	float:right;
+}
+#centercolumn .alphabets {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border-bottom: 1px solid #CCCCCC;
+    border-right: 1px solid #CCCCCC;
+	border-left: 1px solid #CCCCCC;
+    border-top: 1px solid #CCCCCC;
+    list-style: none outside none;
+}
+#centercolumn .alphabets:after {
+    clear: both;
+    content: "";
+    display: block;
+}
+#centercolumn .alphabets li {
+    border-left: 1px solid #CCCCCC;
+    color: #999999;
+    display: inline-block;
+    float: left;
+    padding: 5px 10px;
+    width: auto;
+}
+#centercolumn.alphabets li:last-child, #centercolumn.alphabets li:first-child {
+    border-right: none;
+}
+.listfilter {
+    display: inline-block;
+    margin-bottom:5px;
+	padding-left:0;
+}
+.listfilter > li:not(.active-result) {
+    border-right: 1px solid #DDDDDD;
+    display: inline-block;
+    float: left;
+    padding: 0 10px;
+	margin-bottom:10px;
+}
+.listfilter > li:first-child {
+    padding-left: 0;
+}
+.listfilter > li:last-child {
+    border-right: 0 none;
 }

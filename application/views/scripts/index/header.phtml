@@ -29,11 +29,15 @@
 		<!-- Collect the nav links, forms, and other content for toggling -->
 		<div class="collapse navbar-collapse navonlogin" style="height:100px;">
 		  <ul class="nav navbar-nav" id="headermenu">
-			<li class="active"><a href="<?php echo $this->baseUrl('dashboard'); ?>"><span class="glyphicon glyphicon-home"></span><span class="menutext">Dashboard</span></a></li> 
-			<li><a href="<?php echo $this->baseUrl('client'); ?>"><span class="glyphicon glyphicon-user"></span><span class="menutext">Manage Clients</span></a></li>
-            <li><a class="gonowhere"><span class="glyphicon glyphicon-list-alt"></span><span class="menutext">Employers</span></a></li>
-            <li><a class="gonowhere"><span class="glyphicon glyphicon-signal"></span><span class="menutext"> Reports</span></a></li>
-            <li><a class="gonowhere"><span class="glyphicon glyphicon-cog"></span><span class="menutext">Maintenance</span></a></li>
+			<?php if ($acl->checkPermission('Client', ACTION_LIST)) { ?>
+            	<li class="<?php echo $controller == 'dashboard' ? 'active' : ''; ?>"><a href="<?php echo $this->baseUrl('dashboard'); ?>"><span class="glyphicon glyphicon-home"></span><span class="menutext">Dashboard</span></a></li> 
+            <?php } ?>
+            <?php if ($acl->checkPermission('Client', ACTION_LIST)) { ?>
+				<li class="<?php echo $controller == 'client' ? 'active' : ''; ?>"><a href="<?php echo $this->baseUrl('client/list'); ?>"><span class="glyphicon glyphicon-list-alt"></span><span class="menutext">Manage Clients</span></a></li>
+            <?php } ?>
+            <li><a class="xgonowhere"><span class="glyphicon glyphicon-user"></span><span class="menutext">ENT Employees</span></a></li>
+            <li><a class="xgonowhere"><span class="glyphicon glyphicon-signal"></span><span class="menutext"> Reports</span></a></li>
+            <li><a class="xgonowhere"><span class="glyphicon glyphicon-cog"></span><span class="menutext">Maintenance</span></a></li>
 		  </ul>
 		  
 		  <ul class="nav navbar-nav navbar-right" id="headerright">
