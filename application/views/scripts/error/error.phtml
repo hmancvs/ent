@@ -1,10 +1,24 @@
 <?php
-	require_once APPLICATION_PATH.'/includes/header.php';
+	include APPLICATION_PATH.'/includes/header.php';
+	
 	$title = "Application Error";
-	$this->headTitle($title); 
-	$session = SessionWrapper::getInstance(); 
+	$description = "Runtime error occured. Contact Admin";
+	
+	print_r('Error is : ');
+	debugMessage($session->getVar(APPLICATION_ERROR_PAGE_MESSAGE));
+	print_r($session);
+	
+	$this->headTitle($title.$browserappend); 
 ?>
-<h1><?php echo $title; ?></h1>
+<script>
+	$(document).ready(function() {
+		$('.titlebreadcrumb').html('<?php echo $homedir.'Error'; ?>');
+		$('.titlelabel').html('<?php echo $title; ?>');
+		$('.desclabel').html('<?php echo $description; ?>');
+		$('.pageicon').html('<span class="glyphicon glyphicon-cog"></span>');
+		
+	});
+</script>
 <?php 
 	echo $session->getVar(APPLICATION_ERROR_PAGE_MESSAGE); 
 	require_once APPLICATION_PATH.'/includes/footer.php';

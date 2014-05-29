@@ -97,7 +97,8 @@ class UserController extends IndexController  {
 		
 		if (isEmptyString($this->_getParam("redirecturl"))) {
 			# forward to the dashboard
-			$this->_helper->redirector->gotoSimple("index", "dashboard");
+			// $this->_helper->redirector->gotoSimple("index", "dashboard");
+			$this->_helper->redirector->gotoSimple("list", "client");
 		} else {
 			# redirect to the page the user was coming from
 			if(!isEmptyString($this->_getParam(SUCCESS_MESSAGE))) {

@@ -1,0 +1,478 @@
+<?php
+	require_once APPLICATION_PATH.'/includes/header.php';
+	
+	$client = new Client();
+    $client->populate(decode($request->id));
+	$id = $client->getID();
+	// debugMessage($client->toArray());
+	
+	$tab = $request->tab;
+	$tabtitle = 'Profile';
+	if(isEmptyString($request->tab)){
+		$request->setParam('tab', 'profile'); 
+		$tab = 'profile';
+	}
+
+	$section = $request->section;
+	if($tab == 'profile'){
+		if(isEmptyString($request->section)){
+			$request->setParam('section', 'bio');
+			$section = 'bio';
+		}
+	}
+	
+	$title = $client->getName();
+	$description = 'Profile Details';	
+	$this->headTitle($title.$browserappend);
+?>
+<script>
+	$(document).ready(function() {
+		$('.titlebreadcrumb').html('<?php echo $homedir.'Clients / '.$client->getName(); ?>');
+		$('.titlelabel').html('<?php echo $title; ?>');
+		$('.desclabel').html('<?php echo $description; ?>');
+		$('.pageicon').html('<span class="glyphicon glyphicon-list-alt"></span>');
+		
+		var tab = '<?php echo $tab; ?>';
+		$("#tabtitle").html($("#tab_"+tab+" a."+tab).html());
+	});
+</script>
+<div class="row-fluid margin0 view">
+    <div class="col-md-12 padding0">
+    	<div class="headerbox">
+            <table class="table border0 nohover margin0">                       
+               <tr>		                    
+                    <td class="padding2">
+                        <?php if ($acl->checkPermission('Client', ACTION_LIST)) { ?>	
+                            <a class="btn btn-default btn-sm" href="<?php echo $this->baseUrl('client/list'); ?>"><i class="glyphicon glyphicon-list"></i> Clients</a>
+                        <?php } ?>
+                    </td>
+               </tr>
+            </table>
+        </div>
+    </div>
+    <?php if ($sessionhaserror) { ?>
+        <div class="alert alert-danger"><?php echo $session->getVar(ERROR_MESSAGE); ?></div>
+    <?php } ?>
+    <?php if (!isEmptyString($session->getVar(SUCCESS_MESSAGE))) { ?>
+        <div class="alert alert-success alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> <?php echo $session->getVar(SUCCESS_MESSAGE); ?></div>
+    <?php } ?>
+    <div id="tabs">
+        <?php require APPLICATION_PATH."/views/scripts/client/leftcolumn.phtml"; ?>
+        <div class="col-md-9 tab-content makerelative padding0 xtestborder clearfix" id="center">
+        	<h4 id="tabtitle"></h4>
+        	<div id="profile">
+                <form id="form-profile" class="form-horizontal profile" role="form">
+					<div class="panel-group" id="accordion">
+  
+					<?php if($tab == 'profile'){ ?>
+                		<div class="panel-group" id="accordion">
+                        	<div class="panel panel-primary" id="bio">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse_bio">Bio Data</a> </h4>
+                                </div>
+                                <div id="collapse_bio" class="panel-collapse collapse <?php echo $section == 'bio' ? 'in' : '' ; ?>">
+                                	<div class="panel-body">
+                                    	<div class="row-fluid margin0">
+                                            <div class="col-md-12 padding0">
+                                                <p class="floatright margin0">
+                                                    <button type="button" class="btn btn-default btn-xs"><i class="glyphicon glyphicon-pencil"></i> Update</button>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    	<fieldset class="fieldsetcontainer">
+                                            <legend>About</legend>
+                                            <div class="panel-body well-sm">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5 control-label">First Name:</label>
+                                                        <div class="col-sm-7">
+                                                          
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5 control-label">Last Name:</label>
+                                                        <div class="col-sm-7">
+                                                          
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5 control-label">Initial:</label>
+                                                        <div class="col-sm-7">
+                                                          
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5 control-label">Gender:</label>
+                                                        <div class="col-sm-7">
+                                                          
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5 control-label">SSN:</label>
+                                                        <div class="col-sm-7">
+                                                          
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5 control-label">Date of Birth:</label>
+                                                        <div class="col-sm-7">
+                                                          
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5 control-label">Marital Status:</label>
+                                                        <div class="col-sm-7">
+                                                          
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5 control-label">Race:</label>
+                                                        <div class="col-sm-7">
+                                                          
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                        <div class="divider10"></div>
+                                        <div class="row-fluid margin0">
+                                            <div class="col-md-6 paddingleft0">
+                                                <fieldset class="fieldsetcontainer">
+                                                    <legend>Location</legend>
+                                                    <div class="panel-body well-sm">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label class="col-sm-5 control-label">State:</label>
+                                                                <div class="col-sm-7">
+                                                                  
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-sm-5 control-label">County:</label>
+                                                                <div class="col-sm-7">
+                                                                  
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-sm-5 control-label">City:</label>
+                                                                <div class="col-sm-7">
+                                                                  
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-sm-5 control-label">Zipcode:</label>
+                                                                <div class="col-sm-7">
+                                                                  
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-sm-5 control-label">Addressline 1:</label>
+                                                                <div class="col-sm-7">
+                                                                  
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-sm-5 control-label">Addressline 2:</label>
+                                                                <div class="col-sm-7">
+                                                                  
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </fieldset>
+                                            </div>
+                                            <div class="col-md-6 padding0">
+                                                <fieldset class="fieldsetcontainer">
+                                                    <legend>Contact</legend>
+                                                    <div class="panel-body well-sm">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label class="col-sm-5 control-label">Home Phone:</label>
+                                                                <div class="col-sm-7">
+                                                                  
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-sm-5 control-label">Cell Phone:</label>
+                                                                <div class="col-sm-7">
+                                                                  
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-sm-5 control-label">Work Phone:</label>
+                                                                <div class="col-sm-7">
+                                                                  
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-sm-5 control-label">Work Ext:</label>
+                                                                <div class="col-sm-7">
+                                                                  
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-sm-5 control-label">Email:</label>
+                                                                <div class="col-sm-7">
+                                                                  
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-sm-5 control-label">&nbsp;</label>
+                                                                <div class="col-sm-7">&nbsp;</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </fieldset>
+                                            </div>
+                                        </div>
+                                    </div>
+                            	</div>
+                            </div>
+                            <div class="panel panel-primary" id="referral">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title"> <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse_referral"> Referral Information</a> </h4>
+                                </div>
+                            	<div id="collapse_referral" class="panel-collapse collapse <?php echo $section == 'referral' ? 'in' : '' ; ?>">
+                                	<div class="panel-body">
+                                    	<div class="row-fluid margin0">
+                                            <div class="col-md-12 padding0">
+                                                <p class="floatright margin0">
+                                                    <button type="button" class="btn btn-default btn-xs"><i class="glyphicon glyphicon-pencil"></i> Update</button>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    	<fieldset class="fieldsetcontainer">
+                                            <legend>Initial Service Package</legend>
+                                            <div class="panel-body well-sm">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5 control-label">Program:</label>
+                                                        <div class="col-sm-7">
+                                                          
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5 control-label">Funder:</label>
+                                                        <div class="col-sm-7">
+                                                          
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5 control-label">Initial Units:</label>
+                                                        <div class="col-sm-7">
+                                                          
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5 control-label">Voucher Rate:</label>
+                                                        <div class="col-sm-7">
+                                                          
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5 control-label">Voucher Code:</label>
+                                                        <div class="col-sm-7">
+                                                          
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5 control-label">Resume:</label>
+                                                        <div class="col-sm-7">
+                                                          
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5 control-label">Cover Letter:</label>
+                                                        <div class="col-sm-7">
+                                                          
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5 control-label">Request Date:</label>
+                                                        <div class="col-sm-7">
+                                                          
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-5 control-label">Authourized By (DVRS Counsellor):</label>
+                                                        <div class="col-sm-7">
+                                                          
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                        <div class="divider15"></div>
+                                        <fieldset class="fieldsetcontainer">
+                                            <legend>Client Assessment</legend>
+                                            <div class="panel-body well-sm">
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label class="col-sm-12 control-label">Primary Disability and Cause:</label>
+                                                        <div class="col-sm-12">
+                                                          &nbsp;
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-12 control-label">Secondary Disability and Cause:</label>
+                                                        <div class="col-sm-12">
+                                                          &nbsp;
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-12 control-label">Vocational Objective:</label>
+                                                        <div class="col-sm-12">
+                                                          &nbsp;
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-12 control-label">Needs Assessment <small class="notbolded"><em>(Important Medical, Behaviour or Special Needs Information)</em></small>:</label>
+                                                        <div class="col-sm-12">
+                                                          &nbsp;
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-12 control-label">Allergies:</label>
+                                                        <div class="col-sm-12">
+                                                          &nbsp;
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-12 control-label">Criminal Information:</label>
+                                                        <div class="col-sm-12">
+                                                          &nbsp;
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel panel-primary" id="assign">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse_assign">Assignment History</a> </h4>
+                                </div>
+                                <div id="collapse_assign" class="panel-collapse collapse <?php echo $section == 'assign' ? 'in' : '' ; ?>">
+                                    <div class="panel-body">
+                                        <div class="row-fluid margin0">
+                                            <div class="col-md-12 padding0">
+                                                <div class="btn-group pull-right">
+                                                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                                                        Actions <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a href="#">Assign User</a></li>
+                                                        <li><a href="#">Deassign User</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="divider5"></div>
+                                    	<table class="table table-condensed table-striped table-responsive viewtable">
+                                            <thead>
+                                                <tr>
+                                                    <th class="centeralign" style="width:15px;">#</th>
+                                                    <th>Name of User</th>
+                                                    <th style="width:10%;">Role</th>
+                                                    <th style="width:20%;">Duration</th>
+                                                    <th style="width:10%;">Status</th>
+                                                    <th style="width:20%;">Assigned By</th>
+                                                    <th style="width:15%;">Date Assigned</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="centeralign">1</td>
+                                                    <td>Mark Otto</td>
+                                                    <td>Supervisor</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="centeralign">2</td>
+                                                    <td>Jacob Thornton</td>
+                                                    <td>Data Entry</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel panel-primary" id="emergency">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse_emergency">Emergency Information </a> </h4>
+                                </div>
+                                <div id="collapse_emergency" class="panel-collapse collapse <?php echo $section == 'emergency' ? 'in' : '' ; ?>">
+                                    <div class="panel-body minheight250">
+                                    
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel panel-primary" id="status">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title"><a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse_status">Discontinuation</a> </h4>
+                                </div>
+                                <div id="collapse_status" class="panel-collapse collapse <?php echo $section == 'status' ? 'in' : '' ; ?>">
+                                    <div class="panel-body minheight250">
+                                    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                  
+                	<?php } ?>
+                </form>
+			</div> 
+            <div id="employment">
+                <form id="form-employment" class="form-horizontal employment">
+				<?php if($request->tab == 'employment'){ ?>
+                
+                <?php } ?>
+                </form>
+			</div>
+            <div id="voucher">
+                <form id="form-voucher" class="form-horizontal voucher">
+				<?php if($request->tab == 'voucher'){ ?>
+                
+                <?php } ?>
+                </form>
+			</div>
+            <div id="activity">
+                <form id="form-activity" class="form-horizontal activity">
+				<?php if($request->tab == 'activity'){ ?>
+                
+                <?php } ?>
+                </form>
+			</div>
+            <div id="finance">
+                <form id="form-finance" class="form-horizontal finance">
+                <?php if($request->tab == 'activity'){ ?>
+                
+                <?php } ?>
+                </form>
+			</div>
+            <div id="report">
+                <form id="form-report" class="form-horizontal report">
+                <?php if($request->tab == 'report'){ ?>
+                
+                <?php } ?>
+                </form>
+			</div>
+     	</div> 
+    </div>
+</div>    
+<?php
+	require_once APPLICATION_PATH.'/includes/footer.php';
+?>

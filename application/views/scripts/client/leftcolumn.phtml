@@ -1,0 +1,66 @@
+<?php
+	require_once APPLICATION_PATH.'/includes/header.php';
+
+	$controller = $request->getControllerName();
+	$action = $request->getActionName();
+	if($controller == 'client' && isEmptyString($request->tab)){
+		$request->setParam('tab', 'profile'); 
+	}
+	
+?>
+<script>
+$(document).ready(function() {
+	// override default tab
+	<?php if(!isEmptyString($request->tab)){ ?>
+		$("#tabs").tabs({ selected:'<?php echo $request->tab; ?>', fx: {opacity: 'toggle'} });	   
+	<?php } ?>
+	
+	$('#tabs').tabs({
+		// the selected tab
+		selected: '<?php echo $request->tab; ?>'
+	});
+	
+	$("#tabs ul#leftnav li a").click(function(e){
+		var url = '';
+		var controller = '<?php echo $controller; ?>';
+		var action = '<?php echo $action; ?>';
+		var currentclass = $(this).attr('class');
+		var oldclass = '<?php echo $request->tab; ?>';
+		//alert(currentclass);
+		//alert(oldclass);
+		
+		$(".form-horizontal."+currentclass).html("<a id='loading' class='xhidden' style='text-align:center; display:block; margin-top:50px;'><span style='display:block; margin-bottom:15px; font-weight:bold;'>Loading...</span><img style='margin-left:-10px;' src='<?php echo $this->baseUrl('images/loader.gif'); ?>' /></a>").css({'display':'block'});
+		var url = '';
+		var controller = '<?php echo $controller; ?>';
+		var action = '<?php echo $action; ?>';
+		if(controller == 'client' && action == 'index'){
+			var url = "<?php echo $this->baseUrl("client/index/id/".encode($client->getID())."/tab/"); ?>"+currentclass;
+		}
+		if(controller == 'client' && action == 'view'){
+			var url = "<?php echo $this->baseUrl("client/view/id/".encode($client->getID())."/tab/"); ?>"+currentclass;
+		}
+		if(!isEmptyString(url)){
+			location.href = url;  
+		}
+	});
+	
+	$("#tabs").tabs().addClass('ui-tabs-vertical ui-helper-clearfix');
+	$("#tabs li").removeClass('ui-corner-top').addClass('ui-corner-left');
+	
+}); 
+</script>
+<div class="col-md-3 marginleft0" id="left">    
+    <div class="well" id="profiletop">
+        <div id="profileinfo"> 
+       		<img id="profileimage" src="<?php echo $user->getMediumPicturePath(); ?>" />
+        </div>
+    </div>
+    <ul id="leftnav" style="width:100%;">
+		<li id="tab_profile"><a href="#profile" class="profile">Profile</a></li>
+		<li id="tab_employment"><a href="#employment" class="employment">Employment</a></li>  
+        <li id="tab_voucher"><a href="#voucher" class="voucher">Voucher History</a></li>
+        <li id="tab_activity"><a href="#activity" class="activity">Activities and Intervention</a></li>
+        <li id="tab_finance"><a href="#finance" class="finance">Invoices and Payments</a></li>
+        <li id="tab_report"><a href="#report" class="report">Reports</a></li>  
+    </ul>
+</div>

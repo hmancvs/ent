@@ -8,8 +8,8 @@
 ?>
 <script>
 	$(document).ready(function() {
-		$('.titlebreadcrumb').html('<?php echo 'Dashboard / '.$role; ?>');
-		$('.titlelabel').html('<?php echo 'Dashboard'; ?>');
+		$('.titlebreadcrumb').html('<?php // echo $homedir.'Client / '.$client->getName(); ?>');
+		$('.titlelabel').html('<?php echo $title; ?>');
 		$('.desclabel').html('<?php echo $description; ?>');
 		$('.pageicon').html('<span class="glyphicon glyphicon-list-alt"></span>');
 		

@@ -1,15 +1,6 @@
 <?php
 
-class ClientController extends SecureController  {
-	
-	/**
-	 * @see SecureController::getResourceForACL()
-	 *
-	 * @return String
-	 */
-	function getResourceForACL() {
-		return "Client";
-	}
+class ClientController extends IndexController  {
 	
 	/**
 	 * Override unknown actions to enable ACL checking 
@@ -20,13 +11,7 @@ class ClientController extends SecureController  {
 	 */
 	public function getActionforACL() {
 	 	$action = strtolower($this->getRequest()->getActionName()); 
-		if($action == "picture" || $action == "processpicture" || $action == "uploadpicture" || $action == "croppicture"){
-			return ACTION_VIEW;
-		}
-		if($action == "updatestatus"){
-			return ACTION_DELETE;
-		}
+		
 		return parent::getActionforACL();
     }
-    
 }

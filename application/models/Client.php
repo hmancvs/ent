@@ -190,5 +190,13 @@ class Client extends BaseEntity {
 		# debugMessage($path);
 		return $path;
 	}
+	/**
+	 * Return the user's full names, which is a concatenation of the first and last names
+	 *
+	 * @return String The full name of the user
+	 */
+	function getName() {
+		return $this->getFirstName()." ".$this->getLastName();
+	}
 }
 ?>

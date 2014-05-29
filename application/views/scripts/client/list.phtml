@@ -21,6 +21,17 @@
 		$allowclear = true;
 	}
 	
+	$program = $request->program;
+	if(!isEmptyString($program)){
+		$where_query .= " AND (cs.program = ".$program.") ";
+	}
+	
+	$status = $request->status;
+	if(!isEmptyString($status)){
+		$where_query .= " AND (cs.status = ".$status.") ";
+		$allowclear = true;
+	}
+	
 	$order = trim($request->order);
 	$order_query = " ";
 	if(isEmptyString($order)){
@@ -42,7 +53,7 @@
 	// f.orgname as fundername, concat(u.firstname,' ',u.lastname) as supervisorname
 	$paginate->processPost($request->getParams());
 	$all_results_query = "SELECT 
-		c.id as id, c.firstname, c.lastname, c.ssn,
+		c.id as cid, c.firstname, c.lastname, c.ssn,
 		c.home, c.cell, 
 		c.profilephoto, c.gender,
 		c.city, c.addressline1, c.addressline2, c.country, c.county, c.city, c.state, c.zipcode, 
@@ -53,7 +64,7 @@
 	 left join `case` as cs on (c.id = cs.clientid)
 	 ".$where_query." ".$paginate->getSearchAndFilterSQL()." GROUP BY c.id ".$order_query;
 	
-	// debugMessage($all_results_query); exit;
+	// debugMessage($all_results_query); // exit;
 	$paginate->setItemCountFromSQLQuery($all_results_query);
 	$current_results_query = $all_results_query." ".$paginate->getSQLLimit();
 	
@@ -68,7 +79,7 @@
 		
 	$title = "Clients";
 	$moduleitem = "Client";
-	$description = 'ENT Consumers (description goes here)';
+	$description = '';
 	$icon = $this->baseUrl('images/icon_home.png');
 	
 	$programs = getPrograms(); // debugMessage($programs);
@@ -98,19 +109,19 @@
         	<div class="col-md-9 paddingleft0">
             	<ul class="listfilter">
 					<?php if ($acl->checkPermission('Client', ACTION_CREATE)) { ?>
-                        <li><a href="<?php echo $addurl ?>" title="New <?php echo $moduleitem; ?>" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-plus"></i> New <?php echo $moduleitem; ?></a></li>
+                        <li><a title="New <?php echo $moduleitem; ?>" class="btn btn-primary btn-sm gonowhere"><i class="glyphicon glyphicon-plus"></i> New <?php echo $moduleitem; ?></a></li>
                     <?php } ?>
                     <li>
                         <?php
-                            $dropdown = new Zend_Form_Element_Select('type',
+                            $dropdown = new Zend_Form_Element_Select('program',
                                     array(
-                                        'multiOptions' => array_merge_maintain_keys(array('' => 'All Types'), array('0'=>'Tbd value 1', '1'=>'Tbd value 1')),
+                                        'multiOptions' => array_merge_maintain_keys(array('' => 'All Programs'), $programs),
                                         'view' => new Zend_View(),
                                         'decorators' => array('ViewHelper'),
                                         'class' => array("autofilter", "form-control", 'chosen-select', 'width150')
                                     )
                             );  
-                            $dropdown->setValue($request->getParam('type')); 
+                            $dropdown->setValue($request->getParam('program')); 
                             echo $dropdown->render();
                         ?>
                     </li>
@@ -118,7 +129,7 @@
                         <?php
                             $dropdown = new Zend_Form_Element_Select('status',
                                     array(
-                                        'multiOptions' => array_merge_maintain_keys(array('' => 'All Status'), array('1'=>'Active', '0'=>'In-active')),
+                                        'multiOptions' => array_merge_maintain_keys(array('' => 'All Statuses'), array('1'=>'Open', '0'=>'Closed')),
                                         'view' => new Zend_View(),
                                         'decorators' => array('ViewHelper'),
                                         'class' => array("autofilter", "form-control", 'chosen-select', 'width150')
@@ -143,14 +154,14 @@
         <?php echo $paginate->getAlphabetString(); ?>
 		<?php if ($has_no_data) { ?>
             <div class="divider30"></div>
-            <div style="clear:both;" class="alert alert-info margin5"><?php echo $this->translate("client_list_norecords"); ?></div>
+            <div style="clear:both;" class="alert alert-warning margin5"><?php echo $this->translate("global_list_noentries"); ?></div>
         <?php } else { ?>
         	<div class="row-fluid peoplelist clearfix">
             	<div class="divider10"></div>
             	<?php
 					$counter = 1; 				  		
 					foreach($result as $line){
-						$id = $line['id'];	
+						$id = $line['cid'];	
 						$phone = $line['cell']; $phone2 = $line['home'];
 						$addressline1 = $line['addressline1']; 
 						$addressline1 = $line['addressline2'];
@@ -173,7 +184,7 @@
 						
 						$viewurl = $this->baseUrl('client/view/id/'.encode($id));
 						//$line['fundername'] = 'DVRS';
-						$line['currentstatus'] = 'Active';
+						$line['currentstatus'] = 'Open';
 					?>
                     	 <div class="col-xs-12 col-sm-6 xpaddingleft0">
                             <div class="peoplewrapper">

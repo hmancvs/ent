@@ -245,6 +245,9 @@ ul, ol {
 #contentcontainer .pageicon {
     border: 2px solid #4a6694;
     border-radius: 50px 50px 50px 50px;
+	-webkit-border-radius: 50px;
+	-moz-border-radius: 50px;
+	border-radius: 50px;
     color: #4a6694;
     display: inline-block;
     float: left;
@@ -267,9 +270,7 @@ ul, ol {
     margin-left: 10px;
     padding-top: 0;
 	margin-top:-10px;
-}
-#contentcontainer .pagetitle h1 {
-	font-size:30px;
+	min-height:60px;
 }
 #contentcontainer .pagetitle h1 {
     font-size: 24px;
@@ -290,6 +291,35 @@ ul, ol {
 	height:30px;
 }
 
+.panel-title .accordion-toggle {
+	display:block;
+	padding-left:0;
+	text-decoration:none;
+}
+.panel-heading .accordion-toggle:after {
+    /* symbol for "opening" panels */
+    font-family: 'Glyphicons Halflings';  /* essential for enabling glyphicon */
+    content: "\e114";    /* adjust as needed, taken from bootstrap.css */
+    float: left;        /* adjust as needed */
+    color: white;         /* adjust as needed */
+	font-size:14px;
+	margin-right:15px;
+}
+.panel-heading .accordion-toggle.collapsed:after {
+    /* symbol for "collapsed" panels */
+    content: "\e080";    /* adjust as needed, taken from bootstrap.css */
+}
+#centercolumn .panel-primary > .panel-heading + .panel-collapse .panel-body {
+	border-top:none;
+}
+.form-horizontal .control-label {
+	text-align:left;
+}
+
+.view .form-group {
+	margin-bottom:12px;
+}
+/* Content  */
 #centercolumn {
 	padding:10px;
 	min-height:400px;
@@ -339,21 +369,44 @@ ul, ol {
 #centercolumn.alphabets li:last-child, #centercolumn.alphabets li:first-child {
     border-right: none;
 }
-.listfilter {
+#centercolumn .listfilter {
     display: inline-block;
     margin-bottom:5px;
 	padding-left:0;
 }
-.listfilter > li:not(.active-result) {
+#centercolumn .listfilter > li:not(.active-result) {
     border-right: 1px solid #DDDDDD;
     display: inline-block;
     float: left;
     padding: 0 10px;
 	margin-bottom:10px;
 }
-.listfilter > li:first-child {
+#centercolumn .listfilter > li:first-child {
     padding-left: 0;
 }
-.listfilter > li:last-child {
+#centercolumn .listfilter > li:last-child {
     border-right: 0 none;
+}
+
+#centercolumn .headerbox {
+	position:absolute;
+	float:right;
+	right:15px; 
+	top:-75px;
+}
+#centercolumn .headerbox .reset {
+	display:block; 
+	float:right; 
+	text-align:right; 
+	position:absolute; 
+	right:45px; 
+	top:5px;
+}
+
+#centercolumn .table.viewtable th, #centercolumn .table.viewtable td {
+	font-size:12px;
+}
+#accordion .panel-body {
+	min-height:150px;
+	padding-top:5px;
 }

@@ -617,6 +617,9 @@ $(document).ready(function() {
 	var controller = '<?php echo $request->getControllerName(); ?>';
 	$('#mainNav ul.subNav.'+controller).show();
 	
+	// UI tabs
+	$("#tabs").tabs();
+	
 });
 
 //Use window.load and not document.ready for effective equal heights

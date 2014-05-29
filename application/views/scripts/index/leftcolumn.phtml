@@ -18,7 +18,7 @@
             <ul class="subNav client">
                 <li><a href="<?php echo $this->baseUrl('client/list'); ?>">Clients</a></li>
                 <?php if ($acl->checkPermission('Client', ACTION_CREATE)) { ?>	
-                	<li><a href="<?php echo $this->baseUrl('client'); ?>" title="New Client" rel="New Client" formtitle="indexform" successurl="<?php echo $this->baseUrl('client/list'); ?>" action="<?php echo $this->baseUrl('client/create/successurl/'.encode($this->baseUrl('index/addsuccess'))); ?>">New Client</a></li>
+                	<li><a class="gonowhere">New Client</a></li>
                 <?php } ?>
             </ul>						
         </li>
@@ -30,10 +30,10 @@
                 <?php if ($acl->checkPermission('User Account', ACTION_CREATE)) { ?>	
                     <li><a>New User</a></li>
                 <?php } ?>
-                <li><a >User Profiles</a></li>
-                <li><a >User Roles</a></li>
-                <li><a >System Variables</a></li>
-                <li><a >Global Config</a></li>
+                <li><a>User Profiles</a></li>
+                <!--<li><a >User Roles</a></li>-->
+                <!--<li><a >Variable Maintenance</a></li>
+                <li><a >Global Configuration</a></li>-->
             </ul>	
         </li>
     <?php } ?>

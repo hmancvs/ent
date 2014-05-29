@@ -906,7 +906,8 @@ function getStyleIncludes(){
 		# major css to run application
 		// 'stylesheets/bootstrap-3.1.1.css', ## due to breaking of minificaition, this file is appended directly in the layout script
 		'stylesheets/bootstrap-theme.css',
-		
+		'stylesheets/jquery.ui.1.8.14.css',
+			
 		# append all plugins and extensions styles to end of plugins.css so as to keep includes to minimal
 		'stylesheets/plugins.css',
 		
@@ -921,6 +922,8 @@ function getJsIncludes(){
 		# major javascript to run application
 		'javascript/jquery-1.11.1.min.js',
 		'javascript/bootstrap-3.1.1.min.js',
+		'javascript/plugins/jquery-ui-1.8.14.custom.min.js',
+		'javascript/jquery-migrate-1.0.0.js',
 		
 		# include here all plugins and extensions
 		'javascript/plugins/jquery.validate-1.11.1.min.js',

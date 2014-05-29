@@ -2,7 +2,7 @@
 	require_once APPLICATION_PATH.'/includes/header.php';
 	
 	$title = sprintf($this->translate("useraccount_pagetitle_login"), getAppName());
-	$this->headTitle($title);  
+	$this->headTitle($title.$browserappend);
 	
 	$useraccount = new UserAccount();
 	if ($sessionhaserror) {
