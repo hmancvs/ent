@@ -29,29 +29,47 @@ class Client extends BaseEntity {
 		$this->hasColumn('dateofbirth','date', null);
 		$this->hasColumn('bio', 'string', 1000);
 		$this->hasColumn('profilephoto', 'string', 50);
-		
-		$this->hasColumn('program', 'integer', null);
 		$this->hasColumn('ssn', 'string', 15);
 		$this->hasColumn('communication', 'integer', null);
 		$this->hasColumn('race', 'integer', null);
 		$this->hasColumn('maritalstatus', 'integer', null);
 		$this->hasColumn('housing', 'integer', null);
-		$this->hasColumn('initialservicedate', 'integer', null);
-		$this->hasColumn('allergies', 'string', 500);
-		$this->hasColumn('iscriminal', 'integer', null);
-		$this->hasColumn('criminalhistory', 'string', 1000);
 		$this->hasColumn('educationlevel', 'integer', null);
 		$this->hasColumn('bio', 'string', 100);
 		$this->hasColumn('profilephoto', 'string', 255);
+		$this->hasColumn('resumefilename', 'string', 255);
+		$this->hasColumn('coverletterfilename', 'string', 255);
 		
+		$this->hasColumn('programid', 'integer', null);
+		$this->hasColumn('funderid', 'integer', null);
+		$this->hasColumn('servicetypeid', 'integer', null);
+		$this->hasColumn('initialvoucherid', 'integer', null);
+		$this->hasColumn('startdate','date', null);
+		$this->hasColumn('status', 'integer', null, array('default' => '1'));
+		$this->hasColumn('dvrsref', 'string', 15);
+		$this->hasColumn('dddref', 'string', 15);
+		$this->hasColumn('dvrscounselor', 'string', 255);
+		$this->hasColumn('allergies', 'string', 500);
+		$this->hasColumn('iscriminal', 'integer', null);
+		$this->hasColumn('criminalhistory', 'string', 1000);
+		$this->hasColumn('primarydiagnosis', 'integer', null);
+		$this->hasColumn('primarycause', 'integer', null);
+		$this->hasColumn('secondarydiagnosis', 'integer', null);
+		$this->hasColumn('secondarycause', 'integer', null);
+		$this->hasColumn('needsassessment', 'string', 255);
+		$this->hasColumn('employmentgoal', 'string', 255);
 		
+		$this->hasColumn('contactperson', 'string', 255);
+		$this->hasColumn('relationship', 'string', 255);
+		$this->hasColumn('contactphone', 'string', 15);
+		$this->hasColumn('contactemail', 'string', 255);
 	}
 	
 	# Contructor method for custom initialization
 	public function construct() {
 		parent::construct();
 		
-		$this->addDateFields(array("dateofbirth","initialservicedate"));
+		$this->addDateFields(array("dateofbirth","startdate"));
 		
 		# set the custom error messages
        	$this->addCustomErrorMessages(array(
@@ -64,6 +82,12 @@ class Client extends BaseEntity {
 	public function setUp() {
 		parent::setUp(); 
 		
+		$this->hasOne('Voucher as initialvoucher',
+				array(
+						'local' => 'initialvoucherid',
+						'foreign' => 'id'
+				)
+		);
 	}
 	/**
 	 * Custom model validation
@@ -103,14 +127,38 @@ class Client extends BaseEntity {
 		if(isArrayKeyAnEmptyString('housing', $formvalues)){
 			unset($formvalues['housing']);
 		}
-		if(isArrayKeyAnEmptyString('initialservicedate', $formvalues)){
-			unset($formvalues['initialservicedate']);
+		if(isArrayKeyAnEmptyString('startdate', $formvalues)){
+			unset($formvalues['startdate']);
 		}
 		if(isArrayKeyAnEmptyString('iscriminal', $formvalues)){
 			unset($formvalues['iscriminal']);
 		}
 		if(isArrayKeyAnEmptyString('educationlevel', $formvalues)){
 			unset($formvalues['educationlevel']);
+		}
+		if(isArrayKeyAnEmptyString('initialvoucherid', $formvalues)){
+			unset($formvalues['initialvoucherid']);
+		}
+		if(isArrayKeyAnEmptyString('startdate', $formvalues)){
+			unset($formvalues['startdate']);
+		}
+		if(isArrayKeyAnEmptyString('enddate', $formvalues)){
+			unset($formvalues['enddate']);
+		}
+		if(isArrayKeyAnEmptyString('status', $formvalues)){
+			unset($formvalues['status']);
+		}
+		if(isArrayKeyAnEmptyString('primarydiagnosis', $formvalues)){
+			unset($formvalues['primarydiagnosis']);
+		}
+		if(isArrayKeyAnEmptyString('secondarydiagnosis', $formvalues)){
+			unset($formvalues['secondarydiagnosis']);
+		}
+		if(isArrayKeyAnEmptyString('primarycause', $formvalues)){
+			unset($formvalues['primarycause']);
+		}
+		if(isArrayKeyAnEmptyString('secondarycause', $formvalues)){
+			unset($formvalues['secondarycause']);
 		}
 		// debugMessage($formvalues); // exit();
 		parent::processPost($formvalues);
@@ -197,6 +245,14 @@ class Client extends BaseEntity {
 	 */
 	function getName() {
 		return $this->getFirstName()." ".$this->getLastName();
+	}
+	# Determine gender text depending on the gender
+	function getGenderText(){
+		if($this->isMale()){
+			return 'Male';
+		} else {
+			return 'Female';
+		}
 	}
 }
 ?>

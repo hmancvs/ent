@@ -714,9 +714,19 @@
 		return $result;
 		// return true;
 	}
-	# return programs / service types
+	# return programs
 	function getPrograms($value = ''){
-		$query = "SELECT s.id as optionvalue, s.alias as optiontext FROM servicetype s where s.type = 1 order by optiontext ";
+		$query = "SELECT s.id as optionvalue, s.alias as optiontext FROM service s where s.type = 1 order by optiontext ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			return $array[$value];
+		}
+		return $array;
+	}
+	# return service types
+	function getServiceTypes($value = ''){
+		$query = "SELECT s.id as optionvalue, s.alias as optiontext FROM service s where s.type = 2 order by optiontext ";
 		// debugMessage($query); exit();
 		$array = getOptionValuesFromDatabaseQuery($query);
 		if(!isEmptyString($value)){
@@ -727,6 +737,56 @@
 	# check for funders
 	function getFunders($value = ''){
 		$query = "SELECT c.id as optionvalue, c.alias as optiontext FROM company c where c.type = 1 order by optiontext ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			return $array[$value];
+		}
+		return $array;
+	}
+	# determine the marital statuses
+	function getAllMaritalStatuses($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'MARITAL_STATUS_VALUES'";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			return $array[$value];
+		}
+		return $array;
+	}
+	# determine the client races
+	function getAllRaces($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'RACES' order by optiontext ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			return $array[$value];
+		}
+		return $array;
+	}
+	# determine the counties in new jersey
+	function getAllCounties($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'NEW_JERSEY_COUNTIES' order by optiontext ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			return $array[$value];
+		}
+		return $array;
+	}
+	# disability diagnosis codes
+	function getDisabilityDiagnosisCodes($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'DISABILITY_DIAGNOSIS_CODES' order by optiontext ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			return $array[$value];
+		}
+		return $array;
+	}
+	# disability cause codes
+	function getDisabilityCauseCodes($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'DISABILITY_CAUSE_CODES' order by optiontext ";
 		// debugMessage($query); exit();
 		$array = getOptionValuesFromDatabaseQuery($query);
 		if(!isEmptyString($value)){

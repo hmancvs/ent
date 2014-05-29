@@ -314,6 +314,8 @@ ul, ol {
 }
 .form-horizontal .control-label {
 	text-align:left;
+	font-size:12px;
+	padding-right:0;
 }
 
 .view .form-group {
