@@ -776,7 +776,7 @@
 	}
 	# disability diagnosis codes
 	function getDisabilityDiagnosisCodes($value = ''){
-		$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'DISABILITY_DIAGNOSIS_CODES' order by optiontext ";
+		$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.alias,' - ',l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'DISABILITY_DIAGNOSIS_CODES' order by ABS(l.alias) ";
 		// debugMessage($query); exit();
 		$array = getOptionValuesFromDatabaseQuery($query);
 		if(!isEmptyString($value)){
@@ -786,7 +786,27 @@
 	}
 	# disability cause codes
 	function getDisabilityCauseCodes($value = ''){
-		$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'DISABILITY_CAUSE_CODES' order by optiontext ";
+		$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.alias,' - ',l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'DISABILITY_CAUSE_CODES' order by ABS(l.alias) ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			return $array[$value];
+		}
+		return $array;
+	}
+	# determine the education levels
+	function getEducationLevels($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'EDUCATION_LEVELS' order by optionvalue ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			return $array[$value];
+		}
+		return $array;
+	}
+	# determine the communication
+	function getCommunicationLevels($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'EDUCATION_LEVELS' order by optionvalue ";
 		// debugMessage($query); exit();
 		$array = getOptionValuesFromDatabaseQuery($query);
 		if(!isEmptyString($value)){

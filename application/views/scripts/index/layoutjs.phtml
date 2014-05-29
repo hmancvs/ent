@@ -16,11 +16,11 @@ var datepickerOpts = {
 		changeYear: true,
 		minDate: '-<?php echo $config->dateandtime->mindate; ?>Y',
 		maxDate: '+<?php echo $config->dateandtime->maxdate; ?>Y',
-		dateFormat: '<?php echo $config->dateandtime->javascriptmediumformat; ?>',
+		dateFormat: '<?php echo $config->dateandtime->datepickerformat; ?>',
 		hideIfNoPrevNext: true,
 		showButtonPanel: true, 
 		currentText: 'Now'		
-	}; 
+	}; 	
 $(document).ready(function() {
 	
 	// make the datefields readonly

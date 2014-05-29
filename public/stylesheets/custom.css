@@ -338,6 +338,12 @@ label.error {
 a.link, .link {
 	color:#4D7496;
 }
+.minheight100 {
+	min-height:100px;
+}
+.minheight200 {
+	min-height:200px;
+}
 .minheight250 {
 	min-height:250px;
 }
@@ -823,4 +829,12 @@ li.display_box.selected {
 	padding-right:5px;
 	border:none;
 	font-weight:bold;
+}
+img.ui-datepicker-trigger {
+	margin-left:0;
+	vertical-align:middle;
+}
+.datefield {
+	z-index:1500;
+	display:inline;
 }

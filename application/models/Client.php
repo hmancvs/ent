@@ -160,7 +160,7 @@ class Client extends BaseEntity {
 		if(isArrayKeyAnEmptyString('secondarycause', $formvalues)){
 			unset($formvalues['secondarycause']);
 		}
-		// debugMessage($formvalues); // exit();
+		debugMessage($formvalues); // exit();
 		parent::processPost($formvalues);
 	}
 	
@@ -248,11 +248,13 @@ class Client extends BaseEntity {
 	}
 	# Determine gender text depending on the gender
 	function getGenderText(){
-		if($this->isMale()){
+		if($this->getGender() == 1){
 			return 'Male';
-		} else {
+		} 
+		if($this->getGender() == 2){
 			return 'Female';
 		}
+		return '';
 	}
 }
 ?>

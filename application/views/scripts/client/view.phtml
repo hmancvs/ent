@@ -6,6 +6,9 @@
 	$id = $client->getID();
 	// debugMessage($client->toArray());
 	
+	$posturl = $this->baseUrl("client/edit"); 
+	$successmessage = $this->translate('global_update_success');
+	
 	$tab = $request->tab;
 	$tabtitle = 'Profile';
 	if(isEmptyString($request->tab)){
@@ -14,13 +17,19 @@
 	}
 
 	$section = $request->section;
+	$step = $request->step;
 	if($tab == 'profile'){
 		if(isEmptyString($request->section)){
 			$request->setParam('section', 'bio');
 			$section = 'bio';
 		}
+		if(isEmptyString($request->step)){
+			$request->setParam('step', 'view');
+			$step = 'view';
+		}
 		
 		$maritalstatuses = getAllMaritalStatuses();
+		$educationlevels = getEducationLevels();
 		$races = getAllRaces();
 		$states = getStates();
 		$counties = getAllCounties();
@@ -45,20 +54,95 @@
 		var tab = '<?php echo $tab; ?>';
 		$("#tabtitle").html($("#tab_"+tab+" a."+tab).html());
 		
+		<?php if($step == 'view'){ ?>
+			$('.edit').addClass('hidden').removeClass('show');
+			$('.view').addClass('show').removeClass('hidden');
+			$('.update_trigger').addClass('show').removeClass('hidden');
+			$('.save_trigger, .cancel_trigger').addClass('hidden').removeClass('show');
+		<?php } ?>
+		<?php if($step == 'edit'){ ?>
+			$('.edit').addClass('show').removeClass('hidden');
+			$('.view').addClass('hidden').removeClass('show');
+			$('.update_trigger').addClass('hidden').removeClass('show');
+			$('.save_trigger, .cancel_trigger').addClass('show').removeClass('hidden');
+		<?php } ?>
+		
+		$(".update_trigger").click(function(){
+			var clickedtab = $(this).attr('tab');
+			$('#collapse_'+clickedtab+' .edit').addClass('show').removeClass('hidden');
+			$('#collapse_'+clickedtab+' .view').addClass('hidden').removeClass('show');
+			$('#collapse_'+clickedtab+' .update_trigger').addClass('hidden').removeClass('show');
+			$('#collapse_'+clickedtab+' .save_trigger, #collapse_'+clickedtab+' .cancel_trigger').addClass('show').removeClass('hidden');
+		});
+		$(".cancel_trigger").click(function(){
+			var clickedtab = $(this).attr('tab');
+			$('#collapse_'+clickedtab+' .edit').addClass('hidden').removeClass('show');
+			$('#collapse_'+clickedtab+' .view').addClass('show').removeClass('hidden');
+			$('#collapse_'+clickedtab+' .update_trigger').addClass('show').removeClass('hidden');
+			$('#collapse_'+clickedtab+' .save_trigger, #collapse_'+clickedtab+' .cancel_trigger').addClass('hidden').removeClass('show');
+		});
+		$(".save_trigger").click(function(e){
+			// e.preventDefault();
+			var clickedtab = $(this).attr('tab');
+			$("#successurl").val(base64_encode('<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/'.$tab.'/section/'); ?>'+clickedtab));
+			$("#failureurl").val(base64_encode('<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/'.$tab.'/step/edit/section/'); ?>'+clickedtab));
+		});
+		
 		// equalHeight($("#contact, #location"));
+		$("#form-profile").validate({		
+			// define the validation rules one field at a time
+			rules: {
+				firstname: {
+					required: true
+				}
+
+			}, 
+			// the messages for each of the fields being validated
+			messages: {		
+				firstname: {
+					required: "<?php echo $this->translate("client_firstname_error"); ?>"
+				}
+				
+			},
+			// custom error positions
+			errorPlacement: function(error, element) {
+				switch(element.attr("name")){					
+					default:
+						if(element.hasClass("useid_error")){
+							error.appendTo("#"+element.attr("id")+"_error");
+						} else {
+							error.appendTo("#"+element.attr("name")+"_error");
+						}
+						break;
+				}			
+			},
+			ignore: ":hidden:not(select)"
+		});
+		
+		// custom date picker options
+		var dateofbirthOpts = datepickerOpts;
+		var startfrom = '<?php echo date('Y'); ?>';
+		dateofbirthOpts.yearRange = "-<?php echo date('Y')-1900; ?>:-0"; 
+		dateofbirthOpts.minDate = "-<?php echo date('Y'); ?>Y";
+		datepickerOpts.maxDate = new Date("Dec 31, "+startfrom);	
+		$("#dateofbirth").datepicker(dateofbirthOpts);
+		
+		dateofbirthOpts.yearRange = "-<?php echo date('Y')-2010; ?>:-0"; 
+		datepickerOpts.maxDate = new Date();
+		$("#dateapproved").datepicker(dateofbirthOpts);
 	});
 </script>
 <div class="row-fluid margin0 view">
     <div class="col-md-12 padding0">
     	<div class="headerbox">
             <table class="table border0 nohover margin0">                       
-               <tr>		                    
+                <tr>		                    
                     <td class="padding2">
                         <?php if ($acl->checkPermission('Client', ACTION_LIST)) { ?>	
                             <a class="btn btn-default btn-sm" href="<?php echo $this->baseUrl('client/list'); ?>"><i class="glyphicon glyphicon-list"></i> Clients</a>
                         <?php } ?>
                     </td>
-               </tr>
+                </tr>
             </table>
         </div>
     </div>
@@ -73,9 +157,14 @@
         <div class="col-md-9 tab-content makerelative padding0 xtestborder clearfix" id="center">
         	<h4 id="tabtitle"></h4>
         	<div id="profile">
-                <form id="form-profile" class="form-horizontal profile" role="form">
+                <form id="form-profile" class="form-horizontal profile" role="form" action="<?php echo $posturl; ?>" method="post" enctype="multipart/form-data">
 					<div class="panel-group" id="accordion">
-  
+  					<input type="hidden" id="entityname" name="entityname" value="Client" />
+                    <input type="hidden" id="id" name="id" value="<?php echo encode($client->getID()); ?>" />
+                    <input type="hidden" class="successurl" id="<?php echo URL_SUCCESS; ?>" name="<?php echo URL_SUCCESS; ?>" value="" />
+                    <input type="hidden" class="failureurl" id="<?php echo URL_FAILURE; ?>" name="<?php echo URL_FAILURE; ?>" value="" />
+                    <input type="hidden" id="<?php echo SUCCESS_MESSAGE; ?>" name="<?php echo SUCCESS_MESSAGE; ?>" value="<?php echo $successmessage; ?>" />
+                    <input type="hidden" id="nosuccessid" name="nosuccessid" value="1" />
 					<?php if($tab == 'profile'){ ?>
                 		<div class="panel-group" id="accordion">
                         	<div class="panel panel-primary" id="bio">
@@ -85,9 +174,15 @@
                                 <div id="collapse_bio" class="panel-collapse collapse <?php echo $section == 'bio' ? 'in' : '' ; ?>">
                                 	<div class="panel-body">
                                     	<div class="row-fluid margin0">
-                                            <div class="col-md-12 padding0">
-                                                <p class="floatright margin0">
-                                                    <button type="button" class="btn btn-default btn-xs"><i class="glyphicon glyphicon-pencil"></i> Update</button>
+                                            <div class="col-md-12 padding0 pull-right rightalign">
+                                                <p class="margin0 lineblocked">
+                                                    <button type="button" class="btn btn-default btn-xs gonowhere update_trigger" tab="bio"><i class="glyphicon glyphicon-pencil"></i> Update</button>
+                                                </p>
+                                                <p class="margin0 lineblocked">
+                                                    <button type="submit" class="btn btn-success btn-xs button-submit save_trigger" tab="bio" name="save"><i class="glyphicon glyphicon-ok"></i> Save Changes</button>
+                                                </p>
+                                                <p class="margin0 lineblocked">
+                                                    <button type="button" class="btn btn-default btn-xs gonowhere cancel_trigger" tab="bio"><i class="glyphicon glyphicon-remove"></i> <?php echo $this->translate('global_button_cancel'); ?></button>
                                                 </p>
                                             </div>
                                         </div>
@@ -96,57 +191,122 @@
                                             <div class="panel-body well-sm">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label class="col-sm-4 control-label">First Name:</label>
+                                                        <label class="col-sm-4 control-label" for="firstname"><?php echo $this->translate("client_firstname_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                                                         <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty"><?php echo $client->getFirstName(); ?></p>
+                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getFirstName(); ?></p>
+                                                            <div class="edit">
+                                                            	<input type="text" class="form-control input-sm" id="firstname" name="firstname" value="<?php echo $client->getFirstName(); ?>" />
+                                                            	<div id="firstname_error"></div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-4 control-label">Last Name:</label>
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_lastname_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                                                         <div class="col-sm-8">
-                                                          	<p class="form-control-static nullifempty"><?php echo $client->getLastName(); ?></p>
+                                                          	<p class="form-control-static nullifempty view"><?php echo $client->getLastName(); ?></p>
+                                                            <div class="edit">
+	                                                            <input type="text" class="form-control input-sm" id="lastname" name="lastname" value="<?php echo $client->getLastName(); ?>" />
+                                                                <div id="lastname_error"></div>
+                                                          	</div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-4 control-label">Initial:</label>
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_initial_label"); ?>: </label>
                                                         <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty"><?php echo $client->getInitial(); ?></p>
+                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getInitial(); ?></p>
+                                                            <div class="edit"><input type="text" class="form-control input-sm width75" id="initial" name="initial" value="<?php echo $client->getInitial(); ?>" />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-4 control-label">Gender:</label>
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_gender_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                                                         <div class="col-sm-8">
-                                                       		<p class="form-control-static nullifempty"><?php echo $client->getGenderText(); ?></p>
+                                                       		<p class="form-control-static nullifempty view"><?php echo $client->getGenderText(); ?></p>
+                                                            <div class="edit">
+                                                              <label class="radio-inline"><input type="radio" name="gender" id="male" value="1" class="<?php echo $client->getGender() == '1'? 1 : 0; ?>"> Male</label>
+                                                              <label class="radio-inline"><input type="radio" name="gender" id="female" value="2" class="<?php echo $client->getGender() == '2'? 1 : 0; ?>"> Female</label>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                    
+                                                    <div class="form-group">
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_dob_label"); ?>:</label>
+                                                        <div class="col-sm-8">
+                                                        	<p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($client->getDateofBirth()); ?></p>
+                                                            <div class="edit"><div class="divider5"></div>
+                                                            	<input type="text" class="form-control input-sm datefield readonly width100" name="dateofbirth" id="dateofbirth" value="<?php echo changeMySQLDateToPageFormat($client->getDateofBirth()); ?>" />
+                                                            </div>                                                            
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label class="col-sm-4 control-label">SSN:</label>
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_ssn_label"); ?>:</label>
                                                         <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty"><?php echo $client->getSSN(); ?></p>
+                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getSSN(); ?></p>
+                                                            <div class="edit"><input type="text" class="form-control input-sm" id="ssn" name="ssn" value="<?php echo $client->getSSN(); ?>" />
+                                                            </div>
+                                                        </div>
+                                                    </div>                                                    
+                                                    <div class="form-group">
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_maritalstatus_label"); ?>:</label>
+                                                        <div class="col-sm-8">
+                                                        	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getMaritalStatus(), $maritalstatuses) ? '': $maritalstatuses[$client->getMaritalStatus()]; ?></p>
+                                                            <div class="edit">
+                                                            	<?php
+																	$dropdown = new Zend_Form_Element_Select('maritalstatus',
+																						array(
+																							'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $maritalstatuses),
+																							'view' => new Zend_View(),
+																							'decorators' => array('ViewHelper'),
+																							'class' => array('form-control','input-sm')
+																						)
+																	);  
+																	$dropdown->setValue($client->getMaritalStatus()); 
+																	echo $dropdown->render();
+																?>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-4 control-label">Date of Birth:</label>
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_race_label"); ?>:</label>
                                                         <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty"><?php echo changeMySQLDateToPageFormat($client->getDateofBirth()); ?></p>  
+                                                          	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getRace(), $races) ? '': $races[$client->getRace()]; ?></p>
+                                                            <div class="edit">
+                                                            	<?php
+																	$dropdown = new Zend_Form_Element_Select('race',
+																						array(
+																							'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $races),
+																							'view' => new Zend_View(),
+																							'decorators' => array('ViewHelper'),
+																							'class' => array('form-control','input-sm')
+																						)
+																	);  
+																	$dropdown->setValue($client->getRace()); 
+																	echo $dropdown->render();
+																?>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-4 control-label">Marital Status:</label>
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_education_label"); ?>:</label>
                                                         <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty"><?php echo isArrayKeyAnEmptyString($client->getMaritalStatus(), $maritalstatuses) ? '': $maritalstatuses[$client->getMaritalStatus()]; ?></p>  
+                                                          	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getEducationLevel(), $educationlevels) ? '': $educationlevels[$client->getEducationLevel()]; ?></p>
+                                                            <div class="edit">
+                                                            	<?php
+																	$dropdown = new Zend_Form_Element_Select('educationlevel',
+																						array(
+																							'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $educationlevels),
+																							'view' => new Zend_View(),
+																							'decorators' => array('ViewHelper'),
+																							'class' => array('form-control','input-sm')
+																						)
+																	);  
+																	$dropdown->setValue($client->getEducationLevel()); 
+																	echo $dropdown->render();
+																?>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label">Race:</label>
-                                                        <div class="col-sm-8">
-                                                          	<p class="form-control-static nullifempty"><?php echo isArrayKeyAnEmptyString($client->getRace(), $races) ? '': $races[$client->getRace()]; ?></p>
-                                                        </div>
-                                                    </div>
-                                                    
                                                 </div>
                                             </div>
                                         </fieldset>
@@ -158,39 +318,80 @@
                                                     <div class="panel-body well-sm">
                                                         <div class="col-md-12">
                                                             <div class="form-group">
-                                                                <label class="col-sm-4 control-label">State:</label>
+                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_state_label"); ?>:</label>
                                                                 <div class="col-sm-8">
-                                                                	<p class="form-control-static nullifempty"><?php echo isArrayKeyAnEmptyString($client->getState(), $states) ? '': $states[$client->getState()]; ?></p>  
+                                                                	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getState(), $states) ? '': $states[$client->getState()]; ?></p>  
+                                                                    <div class="edit">
+                                                                    	<?php
+																			$dropdown = new Zend_Form_Element_Select('state',
+																								array(
+																									'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $states),
+																									'view' => new Zend_View(),
+																									'decorators' => array('ViewHelper'),
+																									'class' => array('form-control','input-sm','disabledfield')
+																								)
+																			);  
+																			$dropdown->setValue($client->getState()); 
+																			echo $dropdown->render();
+																		?>
+                                                                        <input type="hidden" name="state" id="state" value="<?php echo $client->getState(); ?>" />
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <div class="form-group">
-                                                                <label class="col-sm-4 control-label">County:</label>
+                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_county_label"); ?>:</label>
                                                                 <div class="col-sm-8">
-                                                                 	<p class="form-control-static nullifempty"><?php echo isArrayKeyAnEmptyString($client->getCounty(), $counties) ? '': $counties[$client->getCounty()]; ?></p>  
+                                                                 	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getCounty(), $counties) ? '': $counties[$client->getCounty()]; ?></p>  
+                                                                    <div class="edit">
+                                                                    	<?php
+																			$dropdown = new Zend_Form_Element_Select('county',
+																								array(
+																									'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $counties),
+																									'view' => new Zend_View(),
+																									'decorators' => array('ViewHelper'),
+																									'class' => array('form-control','input-sm',)
+																								)
+																			);  
+																			$dropdown->setValue($client->getCounty()); 
+																			echo $dropdown->render();
+																		?>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <div class="form-group">
-                                                                <label class="col-sm-4 control-label">City:</label>
+                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_city_label"); ?>:</label>
                                                                 <div class="col-sm-8">
-                                                                	<p class="form-control-static nullifempty"><?php echo $client->getCity(); ?></p>
+                                                                	<p class="form-control-static nullifempty view"><?php echo $client->getCity(); ?></p>
+                                                                    <div class="edit">
+                                                                    	<input type="text" class="form-control input-sm" id="city" name="city" value="<?php echo $client->getCity(); ?>" />
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <div class="form-group">
-                                                                <label class="col-sm-4 control-label">Zipcode:</label>
+                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_zipcode_label"); ?>:</label>
                                                                 <div class="col-sm-8">
-                                                                	<p class="form-control-static nullifempty"><?php echo $client->getZipCode(); ?></p>
+                                                                	<p class="form-control-static nullifempty view"><?php echo $client->getZipCode(); ?></p>
+                                                                    <div class="edit">
+                                                                    	<input type="text" class="form-control input-sm width100" id="zipcode" name="zipcode" value="<?php echo $client->getZipCode(); ?>" />
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <div class="form-group">
-                                                                <label class="col-sm-4 control-label">Addressline 1:</label>
+                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_addressline1_label"); ?>:</label>
                                                                 <div class="col-sm-8">
-                                                                	<p class="form-control-static nullifempty"><?php echo $client->getAddressline1(); ?></p>
+                                                                	<p class="form-control-static nullifempty view"><?php echo $client->getAddressline1(); ?></p>
+                                                                    <div class="edit">
+                                                                    	<input type="text" class="form-control input-sm" id="addressline1" name="addressline1" value="<?php echo $client->getAddressline1(); ?>" />
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <div class="form-group">
-                                                                <label class="col-sm-4 control-label">Addressline 2:</label>
+                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_addressline2_label"); ?>:</label>
                                                                 <div class="col-sm-8">
-                                                               		<p class="form-control-static nullifempty"><?php echo $client->getAddressline2(); ?></p>
+                                                               		<p class="form-control-static nullifempty view"><?php echo $client->getAddressline2(); ?></p>
+                                                                    <div class="edit">
+                                                                    	<input type="text" class="form-control input-sm" id="addressline2" name="addressline2" value="<?php echo $client->getAddressline2(); ?>" />
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -203,33 +404,48 @@
                                                     <div class="panel-body well-sm">
                                                         <div class="col-md-12">
                                                             <div class="form-group">
-                                                                <label class="col-sm-4 control-label">Home Phone:</label>
+                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_homephone_label"); ?>:</label>
                                                                 <div class="col-sm-8">
-                                                                	<p class="form-control-static nullifempty"><?php echo $client->getHome(); ?></p>
+                                                                	<p class="form-control-static nullifempty view"><?php echo $client->getHome(); ?></p>
+                                                                    <div class="edit">
+                                                                    	<input type="text" class="form-control input-sm" id="home" name="home" value="<?php echo $client->getHome(); ?>" />
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <div class="form-group">
-                                                                <label class="col-sm-4 control-label">Cell Phone:</label>
+                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_cellphone_label"); ?>:</label>
                                                                 <div class="col-sm-8">
-                                                                	<p class="form-control-static nullifempty"><?php echo $client->getCell(); ?></p>
+                                                                	<p class="form-control-static nullifempty view"><?php echo $client->getCell(); ?></p>
+                                                                    <div class="edit">
+                                                                    	<input type="text" class="form-control input-sm" id="cell" name="cell" value="<?php echo $client->getCell(); ?>" />
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <div class="form-group">
-                                                                <label class="col-sm-4 control-label">Work Phone:</label>
+                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_workphone_label"); ?>:</label>
                                                                 <div class="col-sm-8">
-                                                                	<p class="form-control-static nullifempty"><?php echo $client->getWork(); ?></p>
+                                                                	<p class="form-control-static nullifempty view"><?php echo $client->getWork(); ?></p>
+                                                                    <div class="edit">
+                                                                    	<input type="text" class="form-control input-sm" id="work" name="work" value="<?php echo $client->getWork(); ?>" />
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <div class="form-group">
-                                                                <label class="col-sm-4 control-label">Work Ext:</label>
+                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_workext_label"); ?>:</label>
                                                                 <div class="col-sm-8">
-                                                                	<p class="form-control-static nullifempty"><?php echo $client->getExt(); ?></p>  
+                                                                	<p class="form-control-static nullifempty view"><?php echo $client->getExt(); ?></p>  
+                                                                    <div class="edit">
+                                                                    	<input type="text" class="form-control input-sm" id="ext" name="ext" value="<?php echo $client->getExt(); ?>" />
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <div class="form-group">
-                                                                <label class="col-sm-4 control-label">Email:</label>
+                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_email_label"); ?>:</label>
                                                                 <div class="col-sm-8">
-                                                                	<p class="form-control-static nullifempty"><?php echo $client->getEmail(); ?></p> 
+                                                                	<p class="form-control-static nullifempty view"><?php echo $client->getEmail(); ?></p> 
+                                                                    <div class="edit">
+                                                                    	<input type="text" class="form-control input-sm" id="email" name="email" value="<?php echo $client->getEmail(); ?>" />
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <div class="form-group">
@@ -251,9 +467,15 @@
                             	<div id="collapse_referral" class="panel-collapse collapse <?php echo $section == 'referral' ? 'in' : '' ; ?>">
                                 	<div class="panel-body">
                                     	<div class="row-fluid margin0">
-                                            <div class="col-md-12 padding0">
-                                                <p class="floatright margin0">
-                                                    <button type="button" class="btn btn-default btn-xs"><i class="glyphicon glyphicon-pencil"></i> Update</button>
+                                            <div class="col-md-12 padding0 pull-right rightalign">
+                                                <p class="margin0 lineblocked">
+                                                    <button type="button" class="btn btn-default btn-xs gonowhere update_trigger" tab="referral"><i class="glyphicon glyphicon-pencil"></i> Update</button>
+                                                </p>
+                                                <p class="margin0 lineblocked">
+                                                    <button type="submit" class="btn btn-success btn-xs button-submit save_trigger" tab="referral" name="save"><i class="glyphicon glyphicon-ok"></i> Save Changes</button>
+                                                </p>
+                                                <p class="margin0 lineblocked">
+                                                    <button type="button" class="btn btn-default btn-xs gonowhere cancel_trigger" tab="referral"><i class="glyphicon glyphicon-remove"></i> <?php echo $this->translate('global_button_cancel'); ?></button>
                                                 </p>
                                             </div>
                                         </div>
@@ -262,77 +484,146 @@
                                             <div class="panel-body well-sm">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Program:</label>
-                                                        <div class="col-sm-7">
-                                                        	<p class="form-control-static nullifempty"><?php echo isArrayKeyAnEmptyString($client->getProgramID(), $programs) ? '': $programs[$client->getProgramID()]; ?></p>
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_program_label"); ?>:</label>
+                                                        <div class="col-sm-8">
+                                                        	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getProgramID(), $programs) ? '': $programs[$client->getProgramID()]; ?></p>
+                                                            <div class="edit">
+																<?php
+                                                                    $dropdown = new Zend_Form_Element_Select('programid',
+                                                                                        array(
+                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $programs),
+                                                                                            'view' => new Zend_View(),
+                                                                                            'decorators' => array('ViewHelper'),
+                                                                                            'class' => array('form-control','input-sm',)
+                                                                                        )
+                                                                    );  
+                                                                    $dropdown->setValue($client->getProgramID()); 
+                                                                    echo $dropdown->render();
+                                                                ?>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Funder:</label>
-                                                        <div class="col-sm-7">
-                                                        	<p class="form-control-static nullifempty"><?php echo isArrayKeyAnEmptyString($client->getFunderID(), $funders) ? '': $funders[$client->getFunderID()]; ?></p>
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_funder_label"); ?>:</label>
+                                                        <div class="col-sm-8">
+                                                        	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getFunderID(), $funders) ? '': $funders[$client->getFunderID()]; ?></p>
+                                                            <div class="edit">
+																<?php
+                                                                    $dropdown = new Zend_Form_Element_Select('funderid',
+                                                                                        array(
+                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $funders),
+                                                                                            'view' => new Zend_View(),
+                                                                                            'decorators' => array('ViewHelper'),
+                                                                                            'class' => array('form-control','input-sm',)
+                                                                                        )
+                                                                    );  
+                                                                    $dropdown->setValue($client->getFunderID()); 
+                                                                    echo $dropdown->render();
+                                                                ?>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Service Type:</label>
-                                                        <div class="col-sm-7">
-                                                        	<p class="form-control-static nullifempty"><?php echo isArrayKeyAnEmptyString($client->getServiceTypeID(), $services) ? '': $services[$client->getServiceTypeID()]; ?></p>
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_servicetype_label"); ?>:</label>
+                                                        <div class="col-sm-8">
+                                                        	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getServiceTypeID(), $services) ? '': $services[$client->getServiceTypeID()]; ?></p>
+                                                            <div class="edit">
+																<?php
+                                                                    $dropdown = new Zend_Form_Element_Select('servicetypeid',
+                                                                                        array(
+                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $services),
+                                                                                            'view' => new Zend_View(),
+                                                                                            'decorators' => array('ViewHelper'),
+                                                                                            'class' => array('form-control','input-sm',)
+                                                                                        )
+                                                                    );  
+                                                                    $dropdown->setValue($client->getServiceTypeID()); 
+                                                                    echo $dropdown->render();
+                                                                ?>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Initial Units:</label>
-                                                        <div class="col-sm-7">
-                                                        	<p class="form-control-static nullifempty"><?php echo $client->getInitialVoucher()->getHours(); ?></p> 
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_units_label"); ?>:</label>
+                                                        <div class="col-sm-8">
+                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getInitialVoucher()->getHours(); ?></p> 
+                                                            <div class="edit">
+                                                                <input type="text" class="form-control input-sm width100" id="hours" name="hours" value="<?php echo $client->getInitialVoucher()->getHours(); ?>" />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Voucher Rate:</label>
-                                                        <div class="col-sm-7">
-                                                        	<p class="form-control-static nullifempty"><?php echo isEmptyString($client->getInitialVoucher()->getRate()) ? '' : $config->country->currencysymbol.$client->getInitialVoucher()->getRate().'/Hr'; ?></p> 
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_voucherrate_label"); ?>:</label>
+                                                        <div class="col-sm-8">
+                                                        	<p class="form-control-static nullifempty view"><?php echo isEmptyString($client->getInitialVoucher()->getRate()) ? '' : $config->country->currencysymbol.$client->getInitialVoucher()->getRate().'/Hr'; ?></p> 
+                                                            <div class="edit">
+                                                                <input type="text" class="form-control input-sm width100" id="rate" name="rate" value="<?php echo $client->getInitialVoucher()->getRate(); ?>" />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Voucher ID#:</label>
-                                                        <div class="col-sm-7">
-                                                        	<p class="form-control-static nullifempty"><?php echo $client->getInitialVoucher()->getVoucherNo(); ?></p>  
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_voucherid_label"); ?>:</label>
+                                                        <div class="col-sm-8">
+                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getInitialVoucher()->getVoucherNo(); ?></p>
+                                                            <div class="edit">
+                                                                <input type="text" class="form-control input-sm width100" id="voucherno" name="voucherno" value="<?php echo $client->getInitialVoucher()->getVoucherNo(); ?>" />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Resume:</label>
-                                                        <div class="col-sm-7">
-                                                        	<p class="form-control-static nullifempty"><?php echo $client->getResumeFilename(); ?></p>    
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_resume_label"); ?>:</label>
+                                                        <div class="col-sm-8">
+                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getResumeFilename(); ?></p>    
+                                                            <div class="edit">
+                                                                <input type="text" class="form-control input-sm" id="resumefilename" name="resumefilename" value="<?php echo $client->getResumeFilename(); ?>" />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Cover Letter:</label>
-                                                        <div class="col-sm-7">
-                                                        	<p class="form-control-static nullifempty"><?php echo $client->getCoverLetterFilename(); ?></p>  
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_cover_label"); ?>:</label>
+                                                        <div class="col-sm-8">
+                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getCoverLetterFilename(); ?></p>  
+                                                            <div class="edit">
+                                                                <input type="text" class="form-control input-sm" id="coverletterfilename" name="coverletterfilename" value="<?php echo $client->getCoverLetterFilename(); ?>" />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Request Date:</label>
-                                                        <div class="col-sm-7">
-                                                          	<p class="form-control-static nullifempty"><?php echo changeMySQLDateToPageFormat($client->getInitialVoucher()->getDateApproved()); ?></p>
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_dateapproved_label"); ?>:</label>
+                                                        <div class="col-sm-8">
+                                                          	<p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($client->getInitialVoucher()->getDateApproved()); ?></p>
+                                                            <div class="edit"><div class="divider5"></div>
+                                                            	<input type="text" class="form-control input-sm datefield readonly width100" name="dateapproved" id="dateapproved" value="<?php echo changeMySQLDateToPageFormat($client->getInitialVoucher()->getDateApproved()); ?>" />
+                                                            </div>      
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Authourized By <small class="blocked">(DVRS Counsellor):</small></label>
-                                                        <div class="col-sm-7">
-                                                        	<p class="form-control-static nullifempty"><?php echo $client->getDvrsCounselor(); ?></p> 
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_authorizedby_label"); ?> <small class="blocked">(DVRS Counsellor):</small></label>
+                                                        <div class="col-sm-8">
+                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getDvrsCounselor(); ?></p> 
+                                                            <div class="edit">
+                                                                <input type="text" class="form-control input-sm" id="dvrscounselor" name="dvrscounselor" value="<?php echo $client->getDvrsCounselor(); ?>" />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-5 control-label">DVRS CaseID:</label>
-                                                        <div class="col-sm-7">
-                                                        	<p class="form-control-static nullifempty"><?php echo $client->getDvrsRef(); ?></p> 
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_dvrsref_label"); ?>:</label>
+                                                        <div class="col-sm-8">
+                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getDvrsRef(); ?></p> 
+                                                            <div class="edit">
+                                                                <input type="text" class="form-control input-sm" id="dvrsref" name="dvrsref" value="<?php echo $client->getDvrsRef(); ?>" />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-5 control-label">DDD Serial#:</label>
-                                                        <div class="col-sm-7">
-                                                        	<p class="form-control-static nullifempty"><?php echo $client->getDDDRef(); ?></p> 
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_dddref_label"); ?>:</label>
+                                                        <div class="col-sm-8">
+                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getDDDRef(); ?></p> 
+                                                            <div class="edit">
+                                                                <input type="text" class="form-control input-sm" id="dddref" name="dddref" value="<?php echo $client->getDDDRef(); ?>" />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -344,44 +635,104 @@
                                             <div class="panel-body well-sm">
                                                 <div class="col-md-12 padding0">
                                                 	<div class="col-md-6 padding0">
-                                                    	<label class="col-sm-12 control-label">Primary Disability:</label>
+                                                    	<label class="col-sm-12 control-label"><?php echo $this->translate("client_pdiagnosis_label"); ?>:</label>
                                                         <div class="col-sm-12">
-                                                        	<p class="form-control-static nullifempty"><?php echo isArrayKeyAnEmptyString($client->getPrimaryDiagnosis(), $disabilitycodes) ? '': '<small class="bolded">Impairment</small>: '.$disabilitycodes[$client->getPrimaryDiagnosis()]; ?></p>
-                                                            <p class="form-control-static nullifempty"><?php echo isArrayKeyAnEmptyString($client->getPrimaryCause(), $causecodes) ? '': '<small class="bolded">Cause</small>: '.$causecodes[$client->getPrimaryCause()]; ?></p>
+                                                        	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getPrimaryDiagnosis(), $disabilitycodes) ? '': '<small class="bolded">Impairment</small>: '.$disabilitycodes[$client->getPrimaryDiagnosis()]; ?></p>
+                                                            <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getPrimaryCause(), $causecodes) ? '': '<small class="bolded">Cause</small>: '.$causecodes[$client->getPrimaryCause()]; ?></p>
+                                                            <div class="edit">
+                                                            	<div class="divider5"></div>
+                                                            	<?php
+                                                                    $dropdown = new Zend_Form_Element_Select('primarydiagnosis',
+                                                                                        array(
+                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select an Impairment >'), $disabilitycodes),
+                                                                                            'view' => new Zend_View(),
+                                                                                            'decorators' => array('ViewHelper'),
+                                                                                            'class' => array('form-control','input-sm',)
+                                                                                        )
+                                                                    );  
+                                                                    $dropdown->setValue($client->getPrimaryDiagnosis()); 
+                                                                    echo $dropdown->render();
+                                                                ?>
+                                                                <div class="divider5"></div>
+                                                                <?php
+                                                                    $dropdown = new Zend_Form_Element_Select('primarycause',
+                                                                                        array(
+                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select a Cause>'), $causecodes),
+                                                                                            'view' => new Zend_View(),
+                                                                                            'decorators' => array('ViewHelper'),
+                                                                                            'class' => array('form-control','input-sm',)
+                                                                                        )
+                                                                    );  
+                                                                    $dropdown->setValue($client->getPrimaryCause()); 
+                                                                    echo $dropdown->render();
+                                                                ?>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6 padding0">
-                                                    	<label class="col-sm-12 control-label">Secondary Disability:</label>
+                                                    	<label class="col-sm-12 control-label"><?php echo $this->translate("client_sdiagnosis_label"); ?>:</label>
                                                         <div class="col-sm-12">
-                                                            <p class="form-control-static nullifempty"><?php echo isArrayKeyAnEmptyString($client->getSecondaryDiagnosis(), $disabilitycodes) ? '': '<small class="bolded">Impairment</small>: '.$disabilitycodes[$client->getSecondaryDiagnosis()]; ?></p>
-                                                            <p class="form-control-static nullifempty"><?php echo isArrayKeyAnEmptyString($client->getSecondaryCause(), $causecodes) ? '': '<small class="bolded">Cause</small>: '.$causecodes[$client->getSecondaryCause()]; ?></p>
+                                                            <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getSecondaryDiagnosis(), $disabilitycodes) ? '': '<small class="bolded">Impairment</small>: '.$disabilitycodes[$client->getSecondaryDiagnosis()]; ?></p>
+                                                            <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getSecondaryCause(), $causecodes) ? '': '<small class="bolded">Cause</small>: '.$causecodes[$client->getSecondaryCause()]; ?></p>
+                                                            <div class="edit">
+                                                            	<div class="divider5"></div>
+                                                            	<?php
+                                                                    $dropdown = new Zend_Form_Element_Select('secondarydiagnosis',
+                                                                                        array(
+                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select an Impairment >'), $disabilitycodes),
+                                                                                            'view' => new Zend_View(),
+                                                                                            'decorators' => array('ViewHelper'),
+                                                                                            'class' => array('form-control','input-sm',)
+                                                                                        )
+                                                                    );  
+                                                                    $dropdown->setValue($client->getSecondaryDiagnosis()); 
+                                                                    echo $dropdown->render();
+                                                                ?>
+                                                                <div class="divider5"></div>
+                                                                <?php
+                                                                    $dropdown = new Zend_Form_Element_Select('secondarycause',
+                                                                                        array(
+                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select a Cause>'), $causecodes),
+                                                                                            'view' => new Zend_View(),
+                                                                                            'decorators' => array('ViewHelper'),
+                                                                                            'class' => array('form-control','input-sm',)
+                                                                                        )
+                                                                    );  
+                                                                    $dropdown->setValue($client->getSecondaryCause()); 
+                                                                    echo $dropdown->render();
+                                                                ?>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="divider15"></div>
                                                 <div class="col-md-12">
                                                     <div class="form-group">
-                                                        <label class="col-sm-12 control-label">Vocational Objective:</label>
+                                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_objective_label"); ?>:</label>
                                                         <div class="col-sm-12">
-                                                        	<p class="form-control-static nullifempty"><?php echo $client->getEmploymentGoal(); ?></p> 
+                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getEmploymentGoal(); ?></p> 
+                                                            <div class="edit"><textarea class="form-control expanding" id="employmentgoal" name="employmentgoal"><?php echo $client->getEmploymentGoal(); ?></textarea></div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-12 control-label">Needs Assessment <small class="notbolded"><em>(Important Medical, Behaviour or Special Needs Information)</em></small>:</label>
+                                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_needs_label"); ?><small class="notbolded"><em>(Important Medical, Behaviour or Special Needs Information)</em></small>:</label>
                                                         <div class="col-sm-12">
-                                                        	<p class="form-control-static nullifempty"><?php echo $client->getNeedsAssessment(); ?></p>
+                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getNeedsAssessment(); ?></p>
+                                                            <div class="edit"><textarea class="form-control expanding" id="needsassessment" name="needsassessment"><?php echo $client->getNeedsAssessment(); ?></textarea></div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-12 control-label">Allergies:</label>
+                                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_allergy_label"); ?>:</label>
                                                         <div class="col-sm-12">
-                                                        	<p class="form-control-static nullifempty"><?php echo $client->getAllergies(); ?></p>
+                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getAllergies(); ?></p>
+                                                            <div class="edit"><textarea class="form-control expanding" id="allergies" name="allergies"><?php echo $client->getAllergies(); ?></textarea></div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-12 control-label">Criminal Information:</label>
+                                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_criminal_label"); ?>:</label>
                                                         <div class="col-sm-12">
-                                                        	<p class="form-control-static nullifempty"><?php echo $client->getCriminalHistory(); ?></p>
+                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getCriminalHistory(); ?></p>
+                                                            <div class="edit"><textarea class="form-control expanding" id="criminalhistory" name="criminalhistory"><?php echo $client->getCriminalHistory(); ?></textarea></div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -397,9 +748,15 @@
                                 <div id="collapse_emergency" class="panel-collapse collapse <?php echo $section == 'emergency' ? 'in' : '' ; ?>">
                                     <div class="panel-body">
                                     	<div class="row-fluid margin0">
-                                            <div class="col-md-12 padding0">
-                                                <p class="floatright margin0">
-                                                    <button type="button" class="btn btn-default btn-xs"><i class="glyphicon glyphicon-pencil"></i> Update</button>
+                                            <div class="col-md-12 padding0 pull-right rightalign">
+                                                <p class="margin0 lineblocked">
+                                                    <button type="button" class="btn btn-default btn-xs gonowhere update_trigger" tab="emergency"><i class="glyphicon glyphicon-pencil"></i> Update</button>
+                                                </p>
+                                                <p class="margin0 lineblocked">
+                                                    <button type="submit" class="btn btn-success btn-xs button-submit save_trigger" tab="emergency" name="save"><i class="glyphicon glyphicon-ok"></i> Save Changes</button>
+                                                </p>
+                                                <p class="margin0 lineblocked">
+                                                    <button type="button" class="btn btn-default btn-xs gonowhere cancel_trigger" tab="emergency"><i class="glyphicon glyphicon-remove"></i> <?php echo $this->translate('global_button_cancel'); ?></button>
                                                 </p>
                                             </div>
                                         </div>
@@ -408,27 +765,39 @@
                                             <div class="panel-body well-sm">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Contact Person:</label>
+                                                        <label class="col-sm-5 control-label"><?php echo $this->translate("client_contactperson_label"); ?>:</label>
                                                         <div class="col-sm-7">
-                                                          	<p class="form-control-static nullifempty"><?php echo $client->getContactPerson(); ?></p>
+                                                          	<p class="form-control-static nullifempty view"><?php echo $client->getContactPerson(); ?></p>
+                                                            <div class="edit">
+                                                                <input type="text" class="form-control input-sm" id="contactperson" name="contactperson" value="<?php echo $client->getContactPerson(); ?>" />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Relationship:</label>
+                                                        <label class="col-sm-5 control-label"><?php echo $this->translate("client_relationship_label"); ?>:</label>
                                                         <div class="col-sm-7">
-                                                        	<p class="form-control-static nullifempty"><?php echo $client->getRelationship(); ?></p>
+                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getRelationship(); ?></p>
+                                                            <div class="edit">
+                                                                <input type="text" class="form-control input-sm" id="relationship" name="relationship" value="<?php echo $client->getRelationship(); ?>" />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Phone:</label>
+                                                        <label class="col-sm-5 control-label"><?php echo $this->translate("client_phone_label"); ?>:</label>
                                                         <div class="col-sm-7">
-                                                        	<p class="form-control-static nullifempty"><?php echo $client->getContactPhone(); ?></p>
+                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getContactPhone(); ?></p>
+                                                            <div class="edit">
+                                                                <input type="text" class="form-control input-sm" id="contactphone" name="contactphone" value="<?php echo $client->getContactPhone(); ?>" />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Email:</label>
+                                                        <label class="col-sm-5 control-label"><?php echo $this->translate("client_email_label"); ?>:</label>
                                                         <div class="col-sm-7">
-                                                         	<p class="form-control-static nullifempty"><?php echo $client->getContactEmail(); ?></p> 
+                                                         	<p class="form-control-static nullifempty view"><?php echo $client->getContactEmail(); ?></p> 
+                                                            <div class="edit">
+                                                                <input type="text" class="form-control input-sm" id="email" name="email" value="<?php echo $client->getContactEmail(); ?>" />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
