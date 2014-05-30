@@ -129,14 +129,18 @@ function changeMySQLDateToPageFormat($mysqldate) {
  * @param String $pagedate The string representing the date
  * @return String The MYSQL datetime format or NULL if the provided date is an empty string or the string NULL 
  */
-function changeDateFromPageToMySQLFormat($pagedate) {
+function changeDateFromPageToMySQLFormat($pagedate, $ignoretime = true) {
 	if ($pagedate == "NULL") {
 		return NULL;
 	}
 	if (isEmptyString($pagedate)) {
 		return NULL;
 	} else {
-		return date("Y-m-d H:i:s", strtotime($pagedate));
+		if($ignoretime){
+			return date("Y-m-d", strtotime($pagedate));
+		} else {
+			return date("Y-m-d H:i:s", strtotime($pagedate));
+		}
 	}
 }
 
@@ -932,7 +936,8 @@ function getJsIncludes(){
 		'javascript/plugins/jquery.elastic.source.1.6.11.js',		
 		'javascript/plugins/jquery.placeholder.min.js',				
 		'javascript/plugins/bootbox-4.2.0.min.js',
-		
+		'javascript/plugins/jquery.blockUI.js',
+			
 		//'javascript/jquery.form.min.js',
 		//'javascript/pdfobject.js',
 		//'javascript/jquery.qtip.min.js',

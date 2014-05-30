@@ -18,7 +18,7 @@ class Client extends BaseEntity {
 		# $this->hasColumn('userid', 'integer', null); # client might login at a future date 
 		
 		$this->hasColumn('country', 'string', 2, array('default' => 'US'));
-		$this->hasColumn('state', 'string', 2);
+		$this->hasColumn('state', 'string', 2, array('default' => 'NJ'));
 		$this->hasColumn('city', 'string', 50);
 		$this->hasColumn('county', 'integer', null);
 		$this->hasColumn('zipcode', 'string', 15);
@@ -103,67 +103,206 @@ class Client extends BaseEntity {
 	 */
 	function processPost($formvalues){
 		$session = SessionWrapper::getInstance();
-		if(isArrayKeyAnEmptyString('county', $formvalues)){
-			unset($formvalues['county']);
-		}
-		if(isArrayKeyAnEmptyString('dateofbirth', $formvalues)){
-			unset($formvalues['dateofbirth']); 
-		}
+		// about 
 		if(isArrayKeyAnEmptyString('gender', $formvalues)){
 			unset($formvalues['gender']);
 		}
-		if(isArrayKeyAnEmptyString('program', $formvalues)){
-			unset($formvalues['program']);
-		}
-		if(isArrayKeyAnEmptyString('communication', $formvalues)){
-			unset($formvalues['communication']);
-		}
-		if(isArrayKeyAnEmptyString('race', $formvalues)){
-			unset($formvalues['race']);
+		if(isArrayKeyAnEmptyString('dateofbirth', $formvalues)){
+			unset($formvalues['dateofbirth']);
 		}
 		if(isArrayKeyAnEmptyString('maritalstatus', $formvalues)){
-			unset($formvalues['maritalstatus']);
+			if(isArrayKeyAnEmptyString('maritalstatus_old', $formvalues)){
+				unset($formvalues['maritalstatus']);
+			} else {
+				$formvalues['maritalstatus'] = NULL;
+			}
 		}
-		if(isArrayKeyAnEmptyString('housing', $formvalues)){
-			unset($formvalues['housing']);
+		if(isArrayKeyAnEmptyString('race', $formvalues)){
+			if(isArrayKeyAnEmptyString('race_old', $formvalues)){
+				unset($formvalues['race']);
+			} else {
+				$formvalues['race'] = NULL;
+			}
 		}
+		if(isArrayKeyAnEmptyString('educationlevel', $formvalues)){
+			if(isArrayKeyAnEmptyString('educationlevel_old', $formvalues)){
+				unset($formvalues['educationlevel']);
+			} else {
+				$formvalues['educationlevel'] = NULL;
+			}
+		}
+		if(isArrayKeyAnEmptyString('county', $formvalues)){
+			if(isArrayKeyAnEmptyString('county_old', $formvalues)){
+				unset($formvalues['county']);
+			} else {
+				$formvalues['county'] = NULL;
+			}
+		}
+		
+		// referral
+		if(isArrayKeyAnEmptyString('initialvoucherid', $formvalues)){
+			unset($formvalues['initialvoucherid']);
+		}
+		if(isArrayKeyAnEmptyString('programid', $formvalues)){
+			unset($formvalues['programid']);
+		}
+		if(isArrayKeyAnEmptyString('funderid', $formvalues)){
+			unset($formvalues['funderid']);
+		}
+		if(isArrayKeyAnEmptyString('servicetypeid', $formvalues)){
+			unset($formvalues['servicetypeid']);
+		}
+		if(isArrayKeyAnEmptyString('units', $formvalues)){
+			unset($formvalues['units']);
+		}
+		if(isArrayKeyAnEmptyString('rate', $formvalues)){
+			unset($formvalues['rate']);
+		}
+		
 		if(isArrayKeyAnEmptyString('startdate', $formvalues)){
 			unset($formvalues['startdate']);
+		}
+		if(!isArrayKeyAnEmptyString('datereceived', $formvalues)){
+			$formvalues['startdate'] = $formvalues['datereceived'];
 		}
 		if(isArrayKeyAnEmptyString('iscriminal', $formvalues)){
 			unset($formvalues['iscriminal']);
 		}
-		if(isArrayKeyAnEmptyString('educationlevel', $formvalues)){
-			unset($formvalues['educationlevel']);
+		
+		if(isArrayKeyAnEmptyString('communication', $formvalues)){
+			if(isArrayKeyAnEmptyString('communication_old', $formvalues)){
+				unset($formvalues['communication']);
+			} else {
+				$formvalues['communication'] = NULL;
+			}
 		}
-		if(isArrayKeyAnEmptyString('initialvoucherid', $formvalues)){
-			unset($formvalues['initialvoucherid']);
-		}
-		if(isArrayKeyAnEmptyString('startdate', $formvalues)){
-			unset($formvalues['startdate']);
-		}
-		if(isArrayKeyAnEmptyString('enddate', $formvalues)){
-			unset($formvalues['enddate']);
+		if(isArrayKeyAnEmptyString('housing', $formvalues)){
+			if(isArrayKeyAnEmptyString('housing_old', $formvalues)){
+				unset($formvalues['housing']);
+			} else {
+				$formvalues['housing'] = NULL;
+			}
 		}
 		if(isArrayKeyAnEmptyString('status', $formvalues)){
 			unset($formvalues['status']);
 		}
 		if(isArrayKeyAnEmptyString('primarydiagnosis', $formvalues)){
-			unset($formvalues['primarydiagnosis']);
+			if(isArrayKeyAnEmptyString('primarydiagnosis_old', $formvalues)){
+				unset($formvalues['primarydiagnosis']);
+			} else {
+				$formvalues['primarydiagnosis'] = NULL;
+			}
 		}
 		if(isArrayKeyAnEmptyString('secondarydiagnosis', $formvalues)){
-			unset($formvalues['secondarydiagnosis']);
+			if(isArrayKeyAnEmptyString('secondarydiagnosis_old', $formvalues)){
+				unset($formvalues['secondarydiagnosis']);
+			} else {
+				$formvalues['secondarydiagnosis'] = NULL;
+			}
 		}
 		if(isArrayKeyAnEmptyString('primarycause', $formvalues)){
-			unset($formvalues['primarycause']);
+			if(isArrayKeyAnEmptyString('primarycause_old', $formvalues)){
+				unset($formvalues['primarycause']);
+			} else {
+				$formvalues['primarycause'] = NULL;
+			}
 		}
 		if(isArrayKeyAnEmptyString('secondarycause', $formvalues)){
-			unset($formvalues['secondarycause']);
+			if(isArrayKeyAnEmptyString('secondarycause_old', $formvalues)){
+				unset($formvalues['secondarycause']);
+			} else {
+				$formvalues['secondarycause'] = NULL;
+			}
 		}
-		debugMessage($formvalues); // exit();
+		
+		$initialvoucher = array();
+		if(!isArrayKeyAnEmptyString('programid', $formvalues) && !isArrayKeyAnEmptyString('servicetypeid', $formvalues) 
+		 && !isArrayKeyAnEmptyString('rate', $formvalues) && !isArrayKeyAnEmptyString('hours', $formvalues)){
+			if(!isArrayKeyAnEmptyString('id', $formvalues)){
+				$formvalues['initialvoucher']['clientid'] = $formvalues['id'];
+			}
+			if(!isArrayKeyAnEmptyString('servicetypeid', $formvalues)){
+				$formvalues['initialvoucher']['servicetypeid'] = $formvalues['servicetypeid'];
+			}
+			if(!isArrayKeyAnEmptyString('dateapproved', $formvalues)){
+				$formvalues['initialvoucher']['dateapproved'] = changeDateFromPageToMySQLFormat($formvalues['dateapproved']);
+			}
+			if(!isArrayKeyAnEmptyString('datereceived', $formvalues)){
+				$formvalues['initialvoucher']['datereceived'] = changeDateFromPageToMySQLFormat($formvalues['datereceived']);
+			}
+			if(!isArrayKeyAnEmptyString('status', $formvalues)){
+				$formvalues['initialvoucher']['status'] = $formvalues['status'];
+			} else {
+				$formvalues['initialvoucher']['status'] = 1;
+			}
+			if(!isArrayKeyAnEmptyString('hours', $formvalues)){
+				$formvalues['initialvoucher']['hours'] = $formvalues['hours'];
+			}
+			if(!isArrayKeyAnEmptyString('rate', $formvalues)){
+				$formvalues['initialvoucher']['rate'] = $formvalues['rate'];
+			}
+			$formvalues['initialvoucher']['voucherno'] = $formvalues['voucherno'];
+			
+		}
+		// debugMessage($formvalues); // exit();
 		parent::processPost($formvalues);
 	}
 	
+	function afterSave(){
+		$conn = Doctrine_Manager::connection();
+		$session = SessionWrapper::getInstance();
+		
+		// base path for uploaded
+		$path = APPLICATION_PATH.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR.PUBLICFOLDER.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR;
+		$clientfolder = "client_".$this->getID();
+		
+		// check if file was uploaded to client temp area and move it to the right folder (resume). If creating, file will be at root of clients while edit it will be at client_folderid
+		// check for resume
+		if(file_exists($path."temp".DIRECTORY_SEPARATOR.$this->getResumeFilename()) && !isEmptyString($this->getResumeFilename())){
+			if(!is_dir($path.$clientfolder)){
+				mkdir($path.$clientfolder, 0777);
+			}
+			if(!is_dir($path.$clientfolder.DIRECTORY_SEPARATOR."resume")){
+				mkdir($path.$clientfolder.DIRECTORY_SEPARATOR."resume", 0777);
+			}
+			rename($path."temp".DIRECTORY_SEPARATOR.$this->getResumeFilename(), $path.$clientfolder.DIRECTORY_SEPARATOR."resume".DIRECTORY_SEPARATOR.$this->getResumeFilename());
+		}
+		if(file_exists($path.$clientfolder.DIRECTORY_SEPARATOR.$this->getResumeFilename()) && !isEmptyString($this->getResumeFilename())){
+			if(!is_dir($path.$clientfolder)){
+				mkdir($path.$clientfolder, 0777);
+			}
+			if(!is_dir($path.$clientfolder.DIRECTORY_SEPARATOR."resume")){
+				mkdir($path.$clientfolder.DIRECTORY_SEPARATOR."resume", 0777);
+			}
+			rename($path.$clientfolder.DIRECTORY_SEPARATOR.$this->getResumeFilename(), $path.$clientfolder.DIRECTORY_SEPARATOR."resume".DIRECTORY_SEPARATOR.$this->getResumeFilename());
+		}
+		
+		// check for cover letter
+		if(file_exists($path."temp".DIRECTORY_SEPARATOR.$this->getCoverletterFilename()) && !isEmptyString($this->getCoverletterFilename())){
+			if(!is_dir($path.$clientfolder)){
+				mkdir($path.$clientfolder, 0777);
+			}
+			if(!is_dir($path.$clientfolder.DIRECTORY_SEPARATOR."cover")){
+				mkdir($path.$clientfolder.DIRECTORY_SEPARATOR."cover", 0777);
+			}
+			rename($path."temp".DIRECTORY_SEPARATOR.$this->getCoverletterFilename(), $path.$clientfolder.DIRECTORY_SEPARATOR."cover".DIRECTORY_SEPARATOR.$this->getCoverletterFilename());
+		}
+		if(file_exists($path.$clientfolder.DIRECTORY_SEPARATOR.$this->getCoverletterFilename()) && !isEmptyString($this->getCoverletterFilename())){
+			if(!is_dir($path.$clientfolder)){
+				mkdir($path.$clientfolder, 0777);
+			}
+			if(!is_dir($path.$clientfolder.DIRECTORY_SEPARATOR."cover")){
+				mkdir($path.$clientfolder.DIRECTORY_SEPARATOR."cover", 0777);
+			}
+			rename($path.$clientfolder.DIRECTORY_SEPARATOR.$this->getCoverletterFilename(), $path.$clientfolder.DIRECTORY_SEPARATOR."cover".DIRECTORY_SEPARATOR.$this->getCoverletterFilename());
+		}
+		
+		return true;
+	}
+	
+	function afterUpdate() {
+		return $this->afterSave();
+	}
 	# relative path to profile image
 	function hasProfileImage(){
 		$real_path = APPLICATION_PATH.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR."client_";
@@ -255,6 +394,66 @@ class Client extends BaseEntity {
 			return 'Female';
 		}
 		return '';
+	}
+	
+	# path to resume absolute path
+	function getResumePath(){
+		$path = APPLICATION_PATH.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR.PUBLICFOLDER.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR."client_".$this->getID().DIRECTORY_SEPARATOR."resume".DIRECTORY_SEPARATOR.$this->getResumeFilename();
+		return $path;
+	}
+	# check if client has a resume
+	function hasResume(){
+		if(file_exists($this->getResumePath()) && !isEmptyString($this->getResumefilename())){
+			return true;
+		}
+		return false;
+	}
+	# path to resume download url
+	function getResumeDownloadLink(){
+		$view = new Zend_View();
+		$path = '';
+		if($this->hasResume()){
+			$path = $view->serverUrl($view->baseUrl('download/index/filename/'.encode($this->getResumeFilename()).'/path/'.encode($this->getResumePath())));
+		}
+		return $path;
+	}
+	# display resume as a link
+	function getResumeLink() {
+		$path = '';
+		if($this->hasResume()){
+			$path = '<a href="'.$this->getResumeDownloadLink().'" target="_blank"><span class="glyphicon glyphicon-file"></span> '.$this->getResumefilename().'</a>';
+		}
+		return $path;
+	}
+	
+	# path to cover absolute path
+	function getCoverletterPath(){
+		$path = APPLICATION_PATH.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR.PUBLICFOLDER.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR."client_".$this->getID().DIRECTORY_SEPARATOR."cover".DIRECTORY_SEPARATOR.$this->getCoverletterFilename();
+		return $path;
+	}
+	# check if client has a cover
+	function hasCoverletter(){
+		if(file_exists($this->getCoverletterPath()) && !isEmptyString($this->getCoverletterfilename())){
+			return true;
+		}
+		return false;
+	}
+	# path to cover download url
+	function getCoverletterDownloadLink(){
+		$view = new Zend_View();
+		$path = '';
+		if($this->hasCoverletter()){
+			$path = $view->serverUrl($view->baseUrl('download/index/filename/'.encode($this->getCoverletterFilename()).'/path/'.encode($this->getCoverletterPath())));
+		}
+		return $path;
+	}
+	# display cover as a link
+	function getCoverletterLink() {
+		$path = '';
+		if($this->hasCoverletter()){
+			$path = '<a href="'.$this->getCoverletterDownloadLink().'" target="_blank"><span class="glyphicon glyphicon-file"></span> '.$this->getCoverletterfilename().'</a>';
+		}
+		return $path;
 	}
 }
 ?>

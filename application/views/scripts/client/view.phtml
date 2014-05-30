@@ -7,7 +7,7 @@
 	// debugMessage($client->toArray());
 	
 	$posturl = $this->baseUrl("client/edit"); 
-	$successmessage = $this->translate('global_update_success');
+	$successmessage = $this->translate('profile_update_success');
 	
 	$tab = $request->tab;
 	$tabtitle = 'Profile';
@@ -28,6 +28,7 @@
 			$step = 'view';
 		}
 		
+		// dropdown data
 		$maritalstatuses = getAllMaritalStatuses();
 		$educationlevels = getEducationLevels();
 		$races = getAllRaces();
@@ -38,12 +39,15 @@
 		$services = getServiceTypes();
 		$disabilitycodes = getDisabilityDiagnosisCodes();
 		$causecodes = getDisabilityCauseCodes();
+		$communicationtypes = getCommunicationLevels();
+		$housingtypes = getHousingTypes();
 	}
 	
 	$title = $client->getName();
 	$description = 'Profile Details';	
 	$this->headTitle($title.$browserappend);
 ?>
+<script type="text/javascript" src="<?php echo $this->serverUrl($this->baseUrl('javascript/plugins/jquery.form.min.js')); ?>"></script>
 <script>
 	$(document).ready(function() {
 		$('.titlebreadcrumb').html('<?php echo $homedir.'Clients / '.$client->getName(); ?>');
@@ -54,55 +58,166 @@
 		var tab = '<?php echo $tab; ?>';
 		$("#tabtitle").html($("#tab_"+tab+" a."+tab).html());
 		
-		<?php if($step == 'view'){ ?>
-			$('.edit').addClass('hidden').removeClass('show');
-			$('.view').addClass('show').removeClass('hidden');
-			$('.update_trigger').addClass('show').removeClass('hidden');
-			$('.save_trigger, .cancel_trigger').addClass('hidden').removeClass('show');
-		<?php } ?>
+		// hide edit controls by default
+		$('.edit, .requiredmark, .save_trigger, .cancel_trigger').addClass('hidden');
+		
 		<?php if($step == 'edit'){ ?>
-			$('.edit').addClass('show').removeClass('hidden');
-			$('.view').addClass('hidden').removeClass('show');
-			$('.update_trigger').addClass('hidden').removeClass('show');
-			$('.save_trigger, .cancel_trigger').addClass('show').removeClass('hidden');
+			var section = '<?php echo $section; ?>';
+			$('#collapse_'+section+' .edit, #collapse_'+section+' .requiredmark, #collapse_'+section+' .save_trigger, #collapse_'+section+' .cancel_trigger').removeClass('hidden');
+			$('#collapse_'+section+' .view, #collapse_'+section+' .update_trigger').addClass('hidden');
+			
+			$('#collapse_'+section+' .edit .form-control').attr('readonly', false).attr('disabled', false);
+			$('.panel-collapse .edit .form-control:not(#collapse_'+section+' .edit .form-control)').attr('readonly', true).attr('disabled', true);
+			// maintain settings disable and readonly settings for dateofbirth, state, dateapproved
+			if(section == 'bio'){
+				$("#dateofbirth").attr('readonly', true);
+				$("#state").attr('readonly', true).attr('disabled', true);
+			}
+			if(section == 'referral'){
+				$("#dateapproved, #datereceived").attr('readonly', true);
+			}
 		<?php } ?>
 		
+		// on trigger update, show update fields for a particular section. also cancel any other open fields for update in other sections
 		$(".update_trigger").click(function(){
-			var clickedtab = $(this).attr('tab');
-			$('#collapse_'+clickedtab+' .edit').addClass('show').removeClass('hidden');
-			$('#collapse_'+clickedtab+' .view').addClass('hidden').removeClass('show');
-			$('#collapse_'+clickedtab+' .update_trigger').addClass('hidden').removeClass('show');
-			$('#collapse_'+clickedtab+' .save_trigger, #collapse_'+clickedtab+' .cancel_trigger').addClass('show').removeClass('hidden');
-		});
-		$(".cancel_trigger").click(function(){
-			var clickedtab = $(this).attr('tab');
-			$('#collapse_'+clickedtab+' .edit').addClass('hidden').removeClass('show');
-			$('#collapse_'+clickedtab+' .view').addClass('show').removeClass('hidden');
-			$('#collapse_'+clickedtab+' .update_trigger').addClass('show').removeClass('hidden');
-			$('#collapse_'+clickedtab+' .save_trigger, #collapse_'+clickedtab+' .cancel_trigger').addClass('hidden').removeClass('show');
-		});
-		$(".save_trigger").click(function(e){
-			// e.preventDefault();
-			var clickedtab = $(this).attr('tab');
-			$("#successurl").val(base64_encode('<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/'.$tab.'/section/'); ?>'+clickedtab));
-			$("#failureurl").val(base64_encode('<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/'.$tab.'/step/edit/section/'); ?>'+clickedtab));
+			var section = $(this).attr('section');
+			$('#collapse_'+section+' .edit, #collapse_'+section+' .requiredmark, #collapse_'+section+' .save_trigger, #collapse_'+section+' .cancel_trigger').removeClass('hidden');
+			$('#collapse_'+section+' .view, #collapse_'+section+' .update_trigger').addClass('hidden');
+			$('#collapse_'+section+' .edit .form-control').attr('readonly', false).attr('disabled', false);
+			$('.panel-collapse .cancel_trigger:not(#collapse_'+section+' .cancel_trigger)').click();
+			// maintain settings disable and readonly settings for dateofbirth, state, dateapproved
+			if(section == 'bio'){
+				$("#dateofbirth").attr('readonly', true);
+				$("#state").attr('readonly', true).attr('disabled', true);
+			}
+			if(section == 'referral'){
+				$("#dateapproved, #datereceived").attr('readonly', true);
+			}
 		});
 		
-		// equalHeight($("#contact, #location"));
+		// on trigger cancel, hide edit fields and show view for each section. 
+		$(".cancel_trigger").click(function(){
+			var section = $(this).attr('section');
+			$('#collapse_'+section+' .edit, #collapse_'+section+' .requiredmark, #collapse_'+section+' .save_trigger, #collapse_'+section+' .cancel_trigger').addClass('hidden');
+			$('#collapse_'+section+' .view, #collapse_'+section+' .update_trigger').removeClass('hidden');
+			$('#collapse_'+section+' .edit .form-control').attr('readonly', true).attr('disabled', true);
+		});
+		
+		// save changes
+		$(".save_trigger").click(function(e){
+			e.preventDefault();
+			var section = $(this).attr('section');
+			$("#successurl").val(base64_encode('<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/'.$tab.'/section/'); ?>'+section));
+			$("#failureurl").val(base64_encode('<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/'.$tab.'/step/edit/section/'); ?>'+section));
+			if ($("#form-profile").valid()) {
+				$.blockUI({ message: '<?php echo $blockcontent; ?>' }); 
+				$("#form-profile").submit();
+			}
+		});
+		
+		// validation 
 		$("#form-profile").validate({		
 			// define the validation rules one field at a time
 			rules: {
 				firstname: {
 					required: true
+				},
+				lastname: {
+					required: true
+				},
+				gender: {
+					required: true
+				},
+				ssn: {
+					required: true
+				},
+				programid: {
+					required: true
+				},
+				funderid: {
+					required: true
+				},
+				servicetypeid: {
+					required: true
+				},
+				hours: {
+					required: true
+				},
+				rate: {
+					required: true
+				},
+				voucherno: {
+					required: true
+				},
+				resumefilename: {
+					required: true
+				},		
+				dateapproved: {
+					required: true
+				},
+				datereceived: {
+					required: true
+				},
+				primarydiagnosis: {
+					required: true
+				},
+				primarycause: {
+					required: true
+				},
+				employmentgoal: {
+					required: true
 				}
-
 			}, 
 			// the messages for each of the fields being validated
 			messages: {		
 				firstname: {
 					required: "<?php echo $this->translate("client_firstname_error"); ?>"
+				},
+				lastname: {
+					required: "<?php echo $this->translate("client_lastname_error"); ?>"
+				},
+				gender: {
+					required: "<?php echo $this->translate("client_gender_error"); ?>"
+				},
+				ssn: {
+					required: "<?php echo $this->translate("client_ssn_error"); ?>"
+				},
+				programid: {
+					required: "<?php echo $this->translate("client_programid_error"); ?>"
+				},
+				funderid: {
+					required: "<?php echo $this->translate("client_funderid_error"); ?>"
+				},
+				servicetypeid: {
+					required: "<?php echo $this->translate("client_servicetypeid_error"); ?>"
+				},
+				hours: {
+					required: "<?php echo $this->translate("client_hours_error"); ?>"
+				},
+				rate: {
+					required: "<?php echo $this->translate("client_rate_error"); ?>"
+				},
+				voucherno: {
+					required: "<?php echo $this->translate("client_voucherno_error"); ?>"
+				},
+				resumefilename: {
+					required: "<?php echo $this->translate("client_resumefilename_error"); ?>"
+				},				
+				dateapproved: {
+					required: "<?php echo $this->translate("client_dateapproved_error"); ?>"
+				},
+				datereceived: {
+					required: "<?php echo $this->translate("client_datereceived_error"); ?>"
+				},
+				primarydiagnosis: {
+					required: "<?php echo $this->translate("client_primarydiagnosis_error"); ?>"
+				},
+				primarycause: {
+					required: "<?php echo $this->translate("client_primarycause_error"); ?>"
+				},
+				employmentgoal: {
+					required: "<?php echo $this->translate("client_employmentgoal_error"); ?>"
 				}
-				
 			},
 			// custom error positions
 			errorPlacement: function(error, element) {
@@ -129,7 +244,56 @@
 		
 		dateofbirthOpts.yearRange = "-<?php echo date('Y')-2010; ?>:-0"; 
 		datepickerOpts.maxDate = new Date();
-		$("#dateapproved").datepicker(dateofbirthOpts);
+		$("#dateapproved, #datereceived").datepicker(dateofbirthOpts);
+		
+		// show or hide containers for resume and cover documents 
+		<?php if($client->hasResume()){ ?>
+			$("#aftersave_resume").addClass('show').removeClass('hidden');
+			$("#beforesave_resume").addClass('hidden').removeClass('show');
+		<?php } ?>
+		<?php if($client->hasCoverletter()){ ?>
+			$("#aftersave_cover").addClass('show').removeClass('hidden');
+			$("#beforesave_cover").addClass('hidden').removeClass('show');
+		<?php } ?>
+		
+		// add filename of selected file in background of input to indicate that a file has been selected.
+		$("#resumefilename").change(function(){
+			if(!isEmptyString($(this).val())){
+				$("#beforesave_resume .fileinput-preview").html($(this).val());
+			}
+		});
+		$("#coverletterfilename").change(function(){
+			if(!isEmptyString($(this).val())){
+				$("#beforesave_cover .fileinput-preview").html($(this).val());
+			}
+		});
+		
+		$(".reupload").click(function(e){
+			e.preventDefault();
+			var type = $(this).attr('rel');
+			var message = '<label class="small centeralign blocked">Note that Re-Uploading this file while delete and replace the existing one. <br /><br /> Click <b>OK</b> to continue or <b>Cancel</b> to ignore</label>';
+			bootbox.confirm(message, function(confirmed) {
+				if(confirmed){
+					// remove the file via ajax
+					$(this).hide();
+					$("#loading_"+type).removeClass('hidden');
+					
+					$.get("<?php echo $this->baseUrl('client/removeupload/id/'.$client->getID().'/'); ?>type/"+type, 
+					   {                        
+						cachebuster: new Date().getTime()},                            
+						function(data){                        
+							// alert(data);      
+							$("#beforesave_"+type+"").addClass('show').removeClass('hidden');                  
+							$("#aftersave_"+type+", #reupload_"+type+", #loading_"+type).addClass('hidden').removeClass('show');
+						}
+					);
+				} else {
+					bootbox.hideAll();
+					return false;
+				}
+			});
+			
+		});
 	});
 </script>
 <div class="row-fluid margin0 view">
@@ -165,24 +329,25 @@
                     <input type="hidden" class="failureurl" id="<?php echo URL_FAILURE; ?>" name="<?php echo URL_FAILURE; ?>" value="" />
                     <input type="hidden" id="<?php echo SUCCESS_MESSAGE; ?>" name="<?php echo SUCCESS_MESSAGE; ?>" value="<?php echo $successmessage; ?>" />
                     <input type="hidden" id="nosuccessid" name="nosuccessid" value="1" />
+                    <input type="hidden" id="status" name="status" value="<?php echo $client->getStatus(); ?>" />
 					<?php if($tab == 'profile'){ ?>
                 		<div class="panel-group" id="accordion">
                         	<div class="panel panel-primary" id="bio">
                                 <div class="panel-heading">
-                                    <h4 class="panel-title"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse_bio">Bio Data</a> </h4>
+                                    <h4 class="panel-title"><a class="accordion-toggle <?php echo $section == 'bio' ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_bio">Bio Data</a> </h4>
                                 </div>
                                 <div id="collapse_bio" class="panel-collapse collapse <?php echo $section == 'bio' ? 'in' : '' ; ?>">
                                 	<div class="panel-body">
                                     	<div class="row-fluid margin0">
                                             <div class="col-md-12 padding0 pull-right rightalign">
                                                 <p class="margin0 lineblocked">
-                                                    <button type="button" class="btn btn-default btn-xs gonowhere update_trigger" tab="bio"><i class="glyphicon glyphicon-pencil"></i> Update</button>
+                                                    <button type="button" class="btn btn-default btn-xs gonowhere update_trigger" section="bio"><i class="glyphicon glyphicon-pencil"></i> Update</button>
                                                 </p>
                                                 <p class="margin0 lineblocked">
-                                                    <button type="submit" class="btn btn-success btn-xs button-submit save_trigger" tab="bio" name="save"><i class="glyphicon glyphicon-ok"></i> Save Changes</button>
+                                                    <button type="submit" class="btn btn-success btn-xs button-submit save_trigger" section="bio" name="save"><i class="glyphicon glyphicon-ok"></i> Save Changes</button>
                                                 </p>
                                                 <p class="margin0 lineblocked">
-                                                    <button type="button" class="btn btn-default btn-xs gonowhere cancel_trigger" tab="bio"><i class="glyphicon glyphicon-remove"></i> <?php echo $this->translate('global_button_cancel'); ?></button>
+                                                    <button type="button" class="btn btn-default btn-xs gonowhere cancel_trigger" section="bio"><i class="glyphicon glyphicon-remove"></i> <?php echo $this->translate('global_button_cancel'); ?></button>
                                                 </p>
                                             </div>
                                         </div>
@@ -223,8 +388,9 @@
                                                         <div class="col-sm-8">
                                                        		<p class="form-control-static nullifempty view"><?php echo $client->getGenderText(); ?></p>
                                                             <div class="edit">
-                                                              <label class="radio-inline"><input type="radio" name="gender" id="male" value="1" class="<?php echo $client->getGender() == '1'? 1 : 0; ?>"> Male</label>
-                                                              <label class="radio-inline"><input type="radio" name="gender" id="female" value="2" class="<?php echo $client->getGender() == '2'? 1 : 0; ?>"> Female</label>
+                                                              <label class="radio-inline"><input type="radio" name="gender" id="male" value="1" class="xform-control <?php echo $client->getGender() == '1'? 1 : 0; ?>"> Male</label>
+                                                              <label class="radio-inline"><input type="radio" name="gender" id="female" value="2" class="xform-control <?php echo $client->getGender() == '2'? 1 : 0; ?>"> Female</label>
+                                                              <div id="gender_error"></div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -240,10 +406,12 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_ssn_label"); ?>:</label>
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_ssn_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                                                         <div class="col-sm-8">
                                                         	<p class="form-control-static nullifempty view"><?php echo $client->getSSN(); ?></p>
-                                                            <div class="edit"><input type="text" class="form-control input-sm" id="ssn" name="ssn" value="<?php echo $client->getSSN(); ?>" />
+                                                            <div class="edit">
+                                                            	<input type="text" class="form-control input-sm" id="ssn" name="ssn" value="<?php echo $client->getSSN(); ?>" />
+                                                            	<div id="ssn_error"></div>
                                                             </div>
                                                         </div>
                                                     </div>                                                    
@@ -264,6 +432,7 @@
 																	$dropdown->setValue($client->getMaritalStatus()); 
 																	echo $dropdown->render();
 																?>
+                                                                <input type="hidden" class="form-control" name="maritalstatus_old" id="maritalstatus_old" value="<?php echo $client->getMaritalStatus(); ?>" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -284,6 +453,7 @@
 																	$dropdown->setValue($client->getRace()); 
 																	echo $dropdown->render();
 																?>
+                                                                <input type="hidden" class="form-control" name="race_old" id="race_old" value="<?php echo $client->getRace(); ?>" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -304,6 +474,7 @@
 																	$dropdown->setValue($client->getEducationLevel()); 
 																	echo $dropdown->render();
 																?>
+                                                                <input type="hidden" class="form-control" name="educationlevel_old" id="educationlevel_old" value="<?php echo $client->getEducationLevel(); ?>" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -334,7 +505,7 @@
 																			$dropdown->setValue($client->getState()); 
 																			echo $dropdown->render();
 																		?>
-                                                                        <input type="hidden" name="state" id="state" value="<?php echo $client->getState(); ?>" />
+                                                                        <input type="hidden" class="form-control" name="state" id="state" value="<?php echo $client->getState(); ?>" />
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -354,7 +525,7 @@
 																			);  
 																			$dropdown->setValue($client->getCounty()); 
 																			echo $dropdown->render();
-																		?>
+																		?><input type="hidden" class="form-control" name="county_old" id="county_old" value="<?php echo $client->getCounty(); ?>" />
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -462,20 +633,20 @@
                             </div>
                             <div class="panel panel-primary" id="referral">
                                 <div class="panel-heading">
-                                    <h4 class="panel-title"> <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse_referral"> Referral Information</a> </h4>
+                                    <h4 class="panel-title"> <a class="accordion-toggle <?php echo $section == 'referral' ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_referral"> Referral Information</a> </h4>
                                 </div>
                             	<div id="collapse_referral" class="panel-collapse collapse <?php echo $section == 'referral' ? 'in' : '' ; ?>">
                                 	<div class="panel-body">
                                     	<div class="row-fluid margin0">
                                             <div class="col-md-12 padding0 pull-right rightalign">
                                                 <p class="margin0 lineblocked">
-                                                    <button type="button" class="btn btn-default btn-xs gonowhere update_trigger" tab="referral"><i class="glyphicon glyphicon-pencil"></i> Update</button>
+                                                    <button type="button" class="btn btn-default btn-xs gonowhere update_trigger" section="referral"><i class="glyphicon glyphicon-pencil"></i> Update</button>
                                                 </p>
                                                 <p class="margin0 lineblocked">
-                                                    <button type="submit" class="btn btn-success btn-xs button-submit save_trigger" tab="referral" name="save"><i class="glyphicon glyphicon-ok"></i> Save Changes</button>
+                                                    <button type="submit" class="btn btn-success btn-xs button-submit save_trigger" section="referral" name="save"><i class="glyphicon glyphicon-ok"></i> Save Changes</button>
                                                 </p>
                                                 <p class="margin0 lineblocked">
-                                                    <button type="button" class="btn btn-default btn-xs gonowhere cancel_trigger" tab="referral"><i class="glyphicon glyphicon-remove"></i> <?php echo $this->translate('global_button_cancel'); ?></button>
+                                                    <button type="button" class="btn btn-default btn-xs gonowhere cancel_trigger" section="referral"><i class="glyphicon glyphicon-remove"></i> <?php echo $this->translate('global_button_cancel'); ?></button>
                                                 </p>
                                             </div>
                                         </div>
@@ -484,7 +655,7 @@
                                             <div class="panel-body well-sm">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_program_label"); ?>:</label>
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_program_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                                                         <div class="col-sm-8">
                                                         	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getProgramID(), $programs) ? '': $programs[$client->getProgramID()]; ?></p>
                                                             <div class="edit">
@@ -500,11 +671,14 @@
                                                                     $dropdown->setValue($client->getProgramID()); 
                                                                     echo $dropdown->render();
                                                                 ?>
+                                                                <input type="hidden" class="form-control" name="initialvoucherid" id="initialvoucherid" value="<?php echo $client->getInitialVoucherID(); ?>" />
+                                                                
+                                                                <div id="programid_error"></div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_funder_label"); ?>:</label>
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_funder_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                                                         <div class="col-sm-8">
                                                         	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getFunderID(), $funders) ? '': $funders[$client->getFunderID()]; ?></p>
                                                             <div class="edit">
@@ -520,11 +694,12 @@
                                                                     $dropdown->setValue($client->getFunderID()); 
                                                                     echo $dropdown->render();
                                                                 ?>
+                                                                <div id="funderid_error"></div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_servicetype_label"); ?>:</label>
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_servicetype_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                                                         <div class="col-sm-8">
                                                         	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getServiceTypeID(), $services) ? '': $services[$client->getServiceTypeID()]; ?></p>
                                                             <div class="edit">
@@ -540,71 +715,39 @@
                                                                     $dropdown->setValue($client->getServiceTypeID()); 
                                                                     echo $dropdown->render();
                                                                 ?>
+                                                                <div id="servicetypeid_error"></div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_units_label"); ?>:</label>
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_units_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                                                         <div class="col-sm-8">
                                                         	<p class="form-control-static nullifempty view"><?php echo $client->getInitialVoucher()->getHours(); ?></p> 
                                                             <div class="edit">
-                                                                <input type="text" class="form-control input-sm width100" id="hours" name="hours" value="<?php echo $client->getInitialVoucher()->getHours(); ?>" />
+                                                                <input type="text" class="form-control input-sm width100 isdecimal" id="hours" name="hours" value="<?php echo $client->getInitialVoucher()->getHours(); ?>" />
+                                                                <input type="hidden" class="form-control" name="hours_old" id="hours_old" value="<?php echo $client->getInitialVoucher()->getHours(); ?>" />
+                                                                <div id="hours_error"></div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_voucherrate_label"); ?>:</label>
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_voucherrate_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                                                         <div class="col-sm-8">
                                                         	<p class="form-control-static nullifempty view"><?php echo isEmptyString($client->getInitialVoucher()->getRate()) ? '' : $config->country->currencysymbol.$client->getInitialVoucher()->getRate().'/Hr'; ?></p> 
                                                             <div class="edit">
-                                                                <input type="text" class="form-control input-sm width100" id="rate" name="rate" value="<?php echo $client->getInitialVoucher()->getRate(); ?>" />
+                                                                <input type="text" class="form-control input-sm width100 isdecimal" id="rate" name="rate" value="<?php echo $client->getInitialVoucher()->getRate(); ?>" />
+                                                                <input type="hidden" class="form-control" name="rate_old" id="rate_old" value="<?php echo $client->getInitialVoucher()->getRate(); ?>" />
+                                                                <div id="rate_error"></div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_voucherid_label"); ?>:</label>
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_voucherid_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                                                         <div class="col-sm-8">
                                                         	<p class="form-control-static nullifempty view"><?php echo $client->getInitialVoucher()->getVoucherNo(); ?></p>
                                                             <div class="edit">
-                                                                <input type="text" class="form-control input-sm width100" id="voucherno" name="voucherno" value="<?php echo $client->getInitialVoucher()->getVoucherNo(); ?>" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_resume_label"); ?>:</label>
-                                                        <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getResumeFilename(); ?></p>    
-                                                            <div class="edit">
-                                                                <input type="text" class="form-control input-sm" id="resumefilename" name="resumefilename" value="<?php echo $client->getResumeFilename(); ?>" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_cover_label"); ?>:</label>
-                                                        <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getCoverLetterFilename(); ?></p>  
-                                                            <div class="edit">
-                                                                <input type="text" class="form-control input-sm" id="coverletterfilename" name="coverletterfilename" value="<?php echo $client->getCoverLetterFilename(); ?>" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_dateapproved_label"); ?>:</label>
-                                                        <div class="col-sm-8">
-                                                          	<p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($client->getInitialVoucher()->getDateApproved()); ?></p>
-                                                            <div class="edit"><div class="divider5"></div>
-                                                            	<input type="text" class="form-control input-sm datefield readonly width100" name="dateapproved" id="dateapproved" value="<?php echo changeMySQLDateToPageFormat($client->getInitialVoucher()->getDateApproved()); ?>" />
-                                                            </div>      
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_authorizedby_label"); ?> <small class="blocked">(DVRS Counsellor):</small></label>
-                                                        <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getDvrsCounselor(); ?></p> 
-                                                            <div class="edit">
-                                                                <input type="text" class="form-control input-sm" id="dvrscounselor" name="dvrscounselor" value="<?php echo $client->getDvrsCounselor(); ?>" />
+                                                                <input type="text" class="form-control input-sm" id="voucherno" name="voucherno" value="<?php echo $client->getInitialVoucher()->getVoucherNo(); ?>" />
+                                                                <div id="voucherno_error"></div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -617,15 +760,93 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                </div>
+                                                <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_dddref_label"); ?>:</label>
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_authorizedby_label"); ?> <small class="blocked">(DVRS Counsellor):</small></label>
                                                         <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getDDDRef(); ?></p> 
+                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getDvrsCounselor(); ?></p> 
                                                             <div class="edit">
-                                                                <input type="text" class="form-control input-sm" id="dddref" name="dddref" value="<?php echo $client->getDDDRef(); ?>" />
+                                                                <input type="text" class="form-control input-sm" id="dvrscounselor" name="dvrscounselor" value="<?php echo $client->getDvrsCounselor(); ?>" />
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_dateapproved_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                                        <div class="col-sm-8">
+                                                          	<p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($client->getInitialVoucher()->getDateApproved()); ?></p>
+                                                            <div class="edit"><div class="divider5"></div>
+                                                            	<input type="text" class="form-control input-sm datefield readonly width100" name="dateapproved" id="dateapproved" value="<?php echo changeMySQLDateToPageFormat($client->getInitialVoucher()->getDateApproved()); ?>" />
+                                                                <div id="dateapproved_error"></div>
+                                                            </div>      
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_datereceived_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                                        <div class="col-sm-8">
+                                                          	<p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($client->getInitialVoucher()->getDateReceived()); ?></p>
+                                                            <div class="edit"><div class="divider5"></div>
+                                                            	<input type="text" class="form-control input-sm datefield readonly width100" name="datereceived" id="datereceived" value="<?php echo changeMySQLDateToPageFormat($client->getInitialVoucher()->getDateReceived()); ?>" />
+                                                                <div id="datereceived_error"></div>
+                                                            </div>      
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_resume_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                                        <div class="col-sm-8">
+                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getResumeLink(); ?></p>    
+                                                            <div class="edit" id="resume">
+                                                                <div id="beforesave_resume">
+                                                                	<label class="blocked small">Upload a file (Max size <?php echo formatBytes($config->uploads->docmaximumfilesize); ?>)</label>
+                                                                    <div class="fileinput-holder input-group col-md-12 padding0">
+                                                                        <div id="filenamedisplay" class="fileinput-preview uneditable-input form-control">No file selected..</div>
+                                                                        <div class="input-group-btn">
+                                                                            <span class="fileinput-btn btn btn-default">Browse
+                                                                                <input type="file" name="resumefilename" id="resumefilename" class="form-control file input-sm inline" data-style="fileinput" />
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div id="aftersave_resume">
+                                                                	<input type="text" name="resumefilename_old" id="resumefilename_old" class="hidden" value="<?php echo $client->getResumeFilename(); ?>" />
+                                                                    <p class="form-control-static nullifempty"><?php echo $client->getResumeFilename(); ?></p> 
+                                                                </div>
+                                                                <?php if($client->hasResume()){ ?>
+                                                                	<div class="divider5"></div>
+                                                                	<a class="gonowhere btn btn-default btn-xs reupload" id="reupload_resume" rel="resume"><span class="glyphicon glyphicon-refresh"></span> Re-upload</a> <img src="<?php echo $this->baseUrl('images/loader.gif'); ?>" class="hidden" id="loading_resume" />
+                                                                <?php } ?>
+                                                                <div id="resumefilename_error"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_cover_label"); ?>:</label>
+                                                        <div class="col-sm-8">
+                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getCoverletterLink(); ?></p>  
+                                                            <div class="edit" id="cover">
+                                                                <div id="beforesave_cover">
+                                                                	<label class="blocked small">Upload a file (Max size <?php echo formatBytes($config->uploads->docmaximumfilesize); ?>)</label>
+                                                                    <div class="fileinput-holder input-group col-md-12 padding0">
+                                                                        <div id="filenamedisplay" class="fileinput-preview uneditable-input form-control">No file selected..</div>
+                                                                        <div class="input-group-btn">
+                                                                            <span class="fileinput-btn btn btn-default">Browse
+                                                                                <input type="file" name="coverletterfilename" id="coverletterfilename" class="form-control file input-sm inline" data-style="fileinput" />
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div id="aftersave_cover">
+                                                                	<input type="text" name="coverletterfilename_old" id="coverletterfilename_old" class="hidden" value="<?php echo $client->getCoverLetterFilename(); ?>" />
+                                                                    <p class="form-control-static nullifempty"><?php echo $client->getCoverLetterFilename(); ?></p> 
+                                                                </div>
+                                                                <?php if($client->getCoverletterLink()){ ?>
+                                                                	<div class="divider5"></div>
+                                                                	<a class="gonowhere btn btn-default btn-xs reupload" id="reupload_cover" rel="cover"><span class="glyphicon glyphicon-refresh"></span> Re-upload</a> <img src="<?php echo $this->baseUrl('images/loader.gif'); ?>" class="hidden" id="loading_cover" />
+                                                                <?php } ?>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
                                                 </div>
                                             </div>
                                         </fieldset>
@@ -635,7 +856,7 @@
                                             <div class="panel-body well-sm">
                                                 <div class="col-md-12 padding0">
                                                 	<div class="col-md-6 padding0">
-                                                    	<label class="col-sm-12 control-label"><?php echo $this->translate("client_pdiagnosis_label"); ?>:</label>
+                                                    	<label class="col-sm-12 control-label"><?php echo $this->translate("client_pdiagnosis_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                                                         <div class="col-sm-12">
                                                         	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getPrimaryDiagnosis(), $disabilitycodes) ? '': '<small class="bolded">Impairment</small>: '.$disabilitycodes[$client->getPrimaryDiagnosis()]; ?></p>
                                                             <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getPrimaryCause(), $causecodes) ? '': '<small class="bolded">Cause</small>: '.$causecodes[$client->getPrimaryCause()]; ?></p>
@@ -653,7 +874,9 @@
                                                                     $dropdown->setValue($client->getPrimaryDiagnosis()); 
                                                                     echo $dropdown->render();
                                                                 ?>
+                                                                <input type="hidden" name="primarydiagnosis_old" id="primarydiagnosis_old" value="<?php echo $client->getPrimaryDiagnosis(); ?>" />
                                                                 <div class="divider5"></div>
+                                                                <div id="primarydiagnosis_error"></div>
                                                                 <?php
                                                                     $dropdown = new Zend_Form_Element_Select('primarycause',
                                                                                         array(
@@ -666,6 +889,8 @@
                                                                     $dropdown->setValue($client->getPrimaryCause()); 
                                                                     echo $dropdown->render();
                                                                 ?>
+                                                                <input type="hidden" name="primarycause_old" id="primarycause_old" value="<?php echo $client->getPrimaryCause(); ?>" />
+                                                                <div id="primarycause_error"></div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -688,6 +913,7 @@
                                                                     $dropdown->setValue($client->getSecondaryDiagnosis()); 
                                                                     echo $dropdown->render();
                                                                 ?>
+                                                                <input type="hidden" name="secondarydiagnosis_old" id="secondarydiagnosis_old" value="<?php echo $client->getSecondaryDiagnosis(); ?>" />
                                                                 <div class="divider5"></div>
                                                                 <?php
                                                                     $dropdown = new Zend_Form_Element_Select('secondarycause',
@@ -701,6 +927,7 @@
                                                                     $dropdown->setValue($client->getSecondaryCause()); 
                                                                     echo $dropdown->render();
                                                                 ?>
+                                                                <input type="hidden" name="secondarycause_old" id="secondarycause_old" value="<?php echo $client->getSecondaryCause(); ?>" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -708,10 +935,11 @@
                                                 <div class="divider15"></div>
                                                 <div class="col-md-12">
                                                     <div class="form-group">
-                                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_objective_label"); ?>:</label>
+                                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_objective_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                                                         <div class="col-sm-12">
                                                         	<p class="form-control-static nullifempty view"><?php echo $client->getEmploymentGoal(); ?></p> 
                                                             <div class="edit"><textarea class="form-control expanding" id="employmentgoal" name="employmentgoal"><?php echo $client->getEmploymentGoal(); ?></textarea></div>
+                                                            <div id="employmentgoal_error"></div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
@@ -735,6 +963,46 @@
                                                             <div class="edit"><textarea class="form-control expanding" id="criminalhistory" name="criminalhistory"><?php echo $client->getCriminalHistory(); ?></textarea></div>
                                                         </div>
                                                     </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_communication_label"); ?>:</label>
+                                                        <div class="col-sm-4">
+                                                        	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getCommunication(), $communicationtypes) ? '': $communicationtypes[$client->getCommunication()]; ?></p>
+                                                            <div class="edit">
+																<?php
+                                                                    $dropdown = new Zend_Form_Element_Select('communication',
+                                                                                        array(
+                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $communicationtypes),
+                                                                                            'view' => new Zend_View(),
+                                                                                            'decorators' => array('ViewHelper'),
+                                                                                            'class' => array('form-control','input-sm',)
+                                                                                        )
+                                                                    );  
+                                                                    $dropdown->setValue($client->getCommunication()); 
+                                                                    echo $dropdown->render();
+                                                                ?><input type="hidden" name="communication_old" id="communication_old" value="<?php echo $client->getCommunication(); ?>" />
+                                                        	</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_housing_label"); ?>:</label>
+                                                        <div class="col-sm-4">
+                                                        	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getHousing(), $housingtypes) ? '': $housingtypes[$client->getHousing()]; ?></p>
+                                                            <div class="edit">
+																<?php
+                                                                    $dropdown = new Zend_Form_Element_Select('housing',
+                                                                                        array(
+                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $housingtypes),
+                                                                                            'view' => new Zend_View(),
+                                                                                            'decorators' => array('ViewHelper'),
+                                                                                            'class' => array('form-control','input-sm',)
+                                                                                        )
+                                                                    );  
+                                                                    $dropdown->setValue($client->getHousing()); 
+                                                                    echo $dropdown->render();
+                                                                ?><input type="hidden" name="housing_old" id="housing_old" value="<?php echo $client->getHousing(); ?>" />
+                                                        	</div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </fieldset>
@@ -743,20 +1011,20 @@
                             </div>
                             <div class="panel panel-primary" id="emergency">
                                 <div class="panel-heading">
-                                    <h4 class="panel-title"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse_emergency">Emergency Information </a> </h4>
+                                    <h4 class="panel-title"><a class="accordion-toggle <?php echo $section == 'emergency' ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_emergency">Emergency Information </a> </h4>
                                 </div>
                                 <div id="collapse_emergency" class="panel-collapse collapse <?php echo $section == 'emergency' ? 'in' : '' ; ?>">
                                     <div class="panel-body">
                                     	<div class="row-fluid margin0">
                                             <div class="col-md-12 padding0 pull-right rightalign">
                                                 <p class="margin0 lineblocked">
-                                                    <button type="button" class="btn btn-default btn-xs gonowhere update_trigger" tab="emergency"><i class="glyphicon glyphicon-pencil"></i> Update</button>
+                                                    <button type="button" class="btn btn-default btn-xs gonowhere update_trigger" section="emergency"><i class="glyphicon glyphicon-pencil"></i> Update</button>
                                                 </p>
                                                 <p class="margin0 lineblocked">
-                                                    <button type="submit" class="btn btn-success btn-xs button-submit save_trigger" tab="emergency" name="save"><i class="glyphicon glyphicon-ok"></i> Save Changes</button>
+                                                    <button type="submit" class="btn btn-success btn-xs button-submit save_trigger" section="emergency" name="save"><i class="glyphicon glyphicon-ok"></i> Save Changes</button>
                                                 </p>
                                                 <p class="margin0 lineblocked">
-                                                    <button type="button" class="btn btn-default btn-xs gonowhere cancel_trigger" tab="emergency"><i class="glyphicon glyphicon-remove"></i> <?php echo $this->translate('global_button_cancel'); ?></button>
+                                                    <button type="button" class="btn btn-default btn-xs gonowhere cancel_trigger" section="emergency"><i class="glyphicon glyphicon-remove"></i> <?php echo $this->translate('global_button_cancel'); ?></button>
                                                 </p>
                                             </div>
                                         </div>
@@ -810,7 +1078,7 @@
                             </div>
                             <div class="panel panel-primary" id="assign">
                                 <div class="panel-heading">
-                                    <h4 class="panel-title"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse_assign">Assignment History</a> </h4>
+                                    <h4 class="panel-title"><a class="accordion-toggle <?php echo $section == 'assign' ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_assign">Assignment History</a> </h4>
                                 </div>
                                 <div id="collapse_assign" class="panel-collapse collapse <?php echo $section == 'assign' ? 'in' : '' ; ?>">
                                     <div class="panel-body">
@@ -867,7 +1135,7 @@
                             
                             <div class="panel panel-primary" id="status">
                                 <div class="panel-heading">
-                                    <h4 class="panel-title"><a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse_status">Account Information</a> </h4>
+                                    <h4 class="panel-title"><a class="accordion-toggle <?php echo $section == 'status' ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_status">Account Information</a> </h4>
                                 </div>
                                 <div id="collapse_status" class="panel-collapse collapse <?php echo $section == 'status' ? 'in' : '' ; ?>">
                                     <div class="panel-body">

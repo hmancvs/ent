@@ -322,6 +322,7 @@ label.error {
     font-weight: normal;
     font-size: 12px;
 	width:98%;
+	min-height:25px;
 }
 .alert-danger {
 	background-image: url("../images/cross.png");
@@ -837,4 +838,88 @@ img.ui-datepicker-trigger {
 .datefield {
 	z-index:1500;
 	display:inline;
+}
+
+#upload-wrapper {
+	width: 50%;
+	margin-right: auto;
+	margin-left: auto;
+	margin-top: 50px;
+	background: #3D91A2;
+	padding: 50px;
+	border-radius: 10px;
+}
+#upload-wrapper h3 {
+	padding: 0px 0px 10px 0px;
+	margin: 0px 0px 20px 0px;
+	margin-top: -30px;
+	border-bottom: 1px dotted #DDD;
+}
+#upload-wrapper input[type=file] {
+	padding: 6px;
+	background: #FFF;
+	border-radius: 5px;
+}
+#upload-wrapper #submit-btn {
+	border: none;
+	padding: 10px;
+	background: #61BAE4;
+	border-radius: 5px;
+	color: #FFF;
+}
+#output{
+	padding: 5px;
+	font-size: 12px;
+	margin-top:5px;
+}
+
+/* prograss bar */
+#progressbox {
+	border: 1px solid #51A351;
+	padding: 1px; 
+	position:relative;
+	width:100%;
+	border-radius: 3px;
+	margin-top:10px;
+	margin-bottom:5px;
+	display:none;
+	text-align:left;
+}
+#progressbar {
+	height:20px;
+	/*background-color: #CAF2FF;*/
+	width:1%;
+	background-color: #51A351;
+	background-image: -gradient(45deg, rgba(255, 255, 255, 0.15) 25%, rgba(0, 0, 0, 0) 25%, rgba(0, 0, 0, 0) 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, rgba(0, 0, 0, 0) 75%, rgba(0, 0, 0, 0));
+}
+#statustxt {
+	top:3px;
+	left:50%;
+	position:absolute;
+	display:inline-block;
+	color: #FFFFFF;
+}
+#filenamedisplay {
+	cursor: text; 
+	text-overflow: ellipsis; 
+	padding:4px 0 0px 8px; 
+	height:28px;
+	max-width:135px;
+}
+.form-control.file {
+	position: absolute; 
+	top: 0px; 
+	right: 0px; 
+	margin: 0px; 
+	cursor: pointer; 
+	font-size: 99px; 
+	opacity: 0;
+}
+.fileinput-btn {
+	overflow: hidden; 
+	position: relative; 
+	cursor: pointer; 
+	margin:0; 
+	padding-top:3px; 
+	padding-bottom:3px;
 }

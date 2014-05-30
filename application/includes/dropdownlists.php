@@ -806,7 +806,17 @@
 	}
 	# determine the communication
 	function getCommunicationLevels($value = ''){
-		$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'EDUCATION_LEVELS' order by optionvalue ";
+		$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'COMMUNICATION_LEVELS' order by optionvalue ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			return $array[$value];
+		}
+		return $array;
+	}
+	# determine the housing
+	function getHousingTypes($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'HOUSING_TYPES' order by optionvalue ";
 		// debugMessage($query); exit();
 		$array = getOptionValuesFromDatabaseQuery($query);
 		if(!isEmptyString($value)){

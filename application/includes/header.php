@@ -38,3 +38,4 @@ $action = $request->getActionName();
 $browserappend = " | ".getAppName();
 $showsearch = true;
 $homedir = 'System / ';
+$blockcontent = '<h4><img src="'.$this->baseUrl('images/loader.gif').'" /> Please wait...</h4>';
