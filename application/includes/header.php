@@ -39,3 +39,7 @@ $browserappend = " | ".getAppName();
 $showsearch = true;
 $homedir = 'System / ';
 $blockcontent = '<h4><img src="'.$this->baseUrl('images/loader.gif').'" /> Please wait...</h4>';
+
+error_reporting(E_ALL);
+ini_set('error_reporting', E_ALL);
+ini_set('display_errors', 1);

@@ -824,4 +824,14 @@
 		}
 		return $array;
 	}
+	# determine the client skills
+	function getAllClientSkills($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_SKILLS' order by optiontext ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			return $array[$value];
+		}
+		return $array;
+	}
 ?>

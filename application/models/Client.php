@@ -88,6 +88,13 @@ class Client extends BaseEntity {
 						'foreign' => 'id'
 				)
 		);
+		$this->hasMany('ClientSkill as skills',
+				array(
+						'local' => 'id',
+						'foreign' => 'clientid'
+				)
+		);
+		
 	}
 	/**
 	 * Custom model validation
@@ -244,8 +251,66 @@ class Client extends BaseEntity {
 			$formvalues['initialvoucher']['voucherno'] = $formvalues['voucherno'];
 			
 		}
-		// debugMessage($formvalues); // exit();
+		
+		/* if(!isArrayKeyAnEmptyString('skillids', $formvalues)) {
+			$ids = $formvalues['skillids']; 
+			$typelist = ''; 
+			if(count($ids) > 0){
+				$typelist = createHTMLCommaListFromArray($ids, ",");
+			}
+			$formvalues['skills'] = $typelist; 
+			# remove the usergroups_groupid array, it will be ignored, but to be on the safe side
+			unset($formvalues['skillids']); 
+		} else {
+			if(!isArrayKeyAnEmptyString('skillids_old', $formvalues)){
+				$formvalues['skills'] = NULL;
+			} else {
+				unset($formvalues['skills']); 
+			}
+		} */
+		
+		if(!isArrayKeyAnEmptyString('skillids', $formvalues)) {
+			foreach ($formvalues['skillids'] as $key => $skill) {
+				if(!isEmptyString($formvalues['id'])){
+					// place back existing agentgenre ids
+					$existing_skills = $this->getSkillsForClient($formvalues['id'], $skill);
+					// debugMessage($existing_skills);
+					// debugMessage($existing_agentgenres['id']);
+					if(!isEmptyString($existing_skills['id'])){
+						$skills[$existing_skills['id']]['id'] = $existing_skills['id'];
+						$skills[$existing_skills['id']]['clientid'] = $formvalues['id'];
+						$skills[$existing_skills['id']]['skill'] = $skill;
+					} else {
+						// debugMessage($key);
+						$skills[md5($key)]['clientid'] = $formvalues['id'];
+						$skills[md5($key)]['skill'] = $skill;
+					}
+				}
+			}
+			$formvalues['skills']= $skills;
+		} else {
+			if(!isArrayKeyAnEmptyString('skillids_old', $formvalues)){
+				if($formvalues['skillids_old'] != 0){
+					$formvalues['skills'] = NULL;
+				}
+			} else {
+				unset($formvalues['skills']);
+			}
+		}
+		debugMessage($formvalues); // exit(); 
 		parent::processPost($formvalues);
+	}
+	
+	/**
+	 * Return skill entry for client/skill combination
+	 * @return $array
+	 */
+	function getSkillsForClient($clientid, $skill) {
+		$conn = Doctrine_Manager::connection();
+		$existing_query = "SELECT * from clientskill as s where s.clientid = '".$clientid."' AND s.skill = '".$skill."' ";
+		// debugMessage($existing_query);
+		$result = $conn->fetchRow($existing_query);
+		return $result;
 	}
 	
 	function afterSave(){
@@ -454,6 +519,43 @@ class Client extends BaseEntity {
 			$path = '<a href="'.$this->getCoverletterDownloadLink().'" target="_blank"><span class="glyphicon glyphicon-file"></span> '.$this->getCoverletterfilename().'</a>';
 		}
 		return $path;
+	}
+	# get client skills
+	function getClientSkills() {
+		$query = Doctrine_Query::create()->from('ClientSkill s')
+		->innerJoin('s.client c')
+		->where("s.clientid = '".$this->getID()."'");
+		//debugMessage($query->getSQLQuery());
+		$result = $query->execute();
+		return $result;
+	}
+	# Return an array containing the IDs of the skills
+	function getSkillIDs(){
+		$ids = array();
+		$skills = $this->getClientSkills(); //debugMessage($skills->toArray());
+		 
+		foreach($skills as $skill) {
+			$ids[] = $skill->getSkill();
+		}
+		return $ids;
+	}
+	# return the list of client skills
+	function getSkillsList(){
+		$text = '';
+		$allskills = getAllClientSkills();
+		$list_array = array();
+		$skillset = $this->getClientSkills();
+		if(count($skillset) > 0){
+			foreach ($skillset as $skill){
+				if(!isArrayKeyAnEmptyString($skill->getSkill(), $allskills)){
+					$list_array[] = $allskills[$skill->getSkill()];
+				}
+			}
+		}
+		if(count($list_array) > 0){
+			$text = createHTMLCommaListFromArray($list_array, ', ');
+		}
+		return $text;
 	}
 }
 ?>

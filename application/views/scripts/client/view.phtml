@@ -41,6 +41,8 @@
 		$causecodes = getDisabilityCauseCodes();
 		$communicationtypes = getCommunicationLevels();
 		$housingtypes = getHousingTypes();
+		$skills = getAllClientSkills();
+		// debugMessage($client->getSkillsList());
 	}
 	
 	$title = $client->getName();
@@ -961,6 +963,28 @@
                                                         <div class="col-sm-12">
                                                         	<p class="form-control-static nullifempty view"><?php echo $client->getCriminalHistory(); ?></p>
                                                             <div class="edit"><textarea class="form-control expanding" id="criminalhistory" name="criminalhistory"><?php echo $client->getCriminalHistory(); ?></textarea></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_skills_label"); ?>:</label>
+                                                        <div class="col-sm-12">
+                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getSkillsList(); ?></p>
+                                                            <div class="edit">
+                                                            	<?php
+                                                                    $listdropdown = new Zend_Form_Element_Multiselect('skillids',
+                                                                        array(
+                                                                              'multiOptions' => $skills,
+                                                                              'view' => new Zend_View(),
+                                                                              'decorators' => array(array('ViewHelper')),
+                                                                              'class' => array('form-control', 'chosen-select','multipleselect')
+                                                                        )
+                                                                    );
+                                                                    
+                                                                    $listdropdown->setValue($client->getSkillIDs());
+                                                                    $listdropdown->setAttrib("data-placeholder", 'Select all in category');
+                                                                    echo $listdropdown->render();
+                                                                  ?><input type="hidden" name="skillids_old" id="skillids_old" value="<?php echo count($client->getSkillIDs()); ?>" />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">

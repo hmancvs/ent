@@ -21,7 +21,7 @@ class ClientController extends IndexController  {
     	$config = Zend_Registry::get("config");
     	$this->_translate = Zend_Registry::get("translate");
     	$session = SessionWrapper::getInstance();
-    	$formvalues = $this->_getAllParams(); debugMessage($formvalues); // exit();
+    	$formvalues = $this->_getAllParams(); // debugMessage($formvalues); // exit();
     	$id = decode($this->_getParam('id'));
     	
     	// if id exists use action edit
