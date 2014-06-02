@@ -6,6 +6,9 @@
 	$id = $client->getID();
 	// debugMessage($client->toArray());
 	
+	$posturl = $this->baseUrl("client/create"); 
+	$successmessage = $this->translate('profile_add_success');
+	
 	$tab = $request->tab;
 	$tabtitle = 'Profile';
 	if(isEmptyString($request->tab)){
@@ -14,550 +17,801 @@
 	}
 
 	$section = $request->section;
+	$step = $request->step;
 	if($tab == 'profile'){
 		if(isEmptyString($request->section)){
 			$request->setParam('section', 'bio');
 			$section = 'bio';
 		}
+		if(isEmptyString($request->step)){
+			$request->setParam('step', 'view');
+			$step = 'view';
+		}
+		
+		// dropdown data
+		$maritalstatuses = getAllMaritalStatuses();
+		$educationlevels = getEducationLevels();
+		$races = getAllRaces();
+		$states = getStates();
+		$counties = getAllCounties();
+		$programs = getPrograms();
+		$funders = getFunders();
+		$services = getServiceTypes();
+		$disabilitycodes = getDisabilityDiagnosisCodes();
+		$causecodes = getDisabilityCauseCodes();
+		$communicationtypes = getCommunicationLevels();
+		$housingtypes = getHousingTypes();
+		$skills = getAllClientSkills();
+		// debugMessage($client->getSkillsList());
 	}
 	
-	$title = $client->getName();
-	$description = 'Profile Details';	
+	#in case of errors in session, populate the fields from session
+	if(!isEmptyString($session->getVar(ERROR_MESSAGE))){ 
+		$client->processPost($session->getVar(FORM_VALUES));
+		
+	}
+	
+	$title = 'New Client';
+	$description = 'Complete the 4 Steps below to setup a new client. Fields marked with '.$this->translate("global_required_field_marker").' are mandatory.';	
 	$this->headTitle($title.$browserappend);
 ?>
+<script type="text/javascript" src="<?php echo $this->serverUrl($this->baseUrl('javascript/plugins/jquery.stepy.js')); ?>"></script>
 <script>
 	$(document).ready(function() {
-		$('.titlebreadcrumb').html('<?php echo $homedir.'Clients / '.$client->getName(); ?>');
+		$('.titlebreadcrumb').html('<?php echo $homedir.'Clients / New Client'; ?>');
 		$('.titlelabel').html('<?php echo $title; ?>');
 		$('.desclabel').html('<?php echo $description; ?>');
 		$('.pageicon').html('<span class="glyphicon glyphicon-list-alt"></span>');
 		
 		var tab = '<?php echo $tab; ?>';
-		$("#tabtitle").html($("#tab_"+tab+" a."+tab).html());
+		
+		// form wizard
+		$('#indexform').stepy({
+			block: true,
+			validate: true,
+			errorImage:	false,
+			titleClick:	true,
+			backLabel: '<span class="glyphicon glyphicon-arrow-left"></span> Back',
+			nextLabel: 'Next <span class="glyphicon glyphicon-arrow-right"></span>',
+			next: function(index) {
+				
+			},
+			finish: function() {
+				if ($("#indexform").valid()) {
+					$.blockUI({ message: '<?php echo $blockcontent; ?>' }); 
+				}
+			}
+		});
+		
+		$(".button-back").addClass('btn btn-default');
+		$(".button-next").addClass('btn btn-primary'); 
+		$(".finish").html('').prepend('<span class="glyphicon glyphicon-ok"></span> Finish').addClass('btn btn-success');
+		$(".step legend").hide();
+		
+		// validation 
+		$("#indexform").validate({		
+			// define the validation rules one field at a time
+			rules: {
+				firstname: {
+					required: true
+				},
+				lastname: {
+					required: true
+				},
+				gender: {
+					required: true
+				},
+				ssn: {
+					required: true
+				},
+				programid: {
+					required: true
+				},
+				funderid: {
+					required: true
+				},
+				servicetypeid: {
+					required: true
+				},
+				hours: {
+					required: true
+				},
+				rate: {
+					required: true
+				},
+				voucherno: {
+					required: true
+				},
+				resumefilename: {
+					required: true
+				},		
+				dateapproved: {
+					required: true
+				},
+				datereceived: {
+					required: true
+				},
+				primarydiagnosis: {
+					required: true
+				},
+				primarycause: {
+					required: true
+				},
+				employmentgoal: {
+					required: true
+				}
+			}, 
+			// the messages for each of the fields being validated
+			messages: {		
+				firstname: {
+					required: "<?php echo $this->translate("client_firstname_error"); ?>"
+				},
+				lastname: {
+					required: "<?php echo $this->translate("client_lastname_error"); ?>"
+				},
+				gender: {
+					required: "<?php echo $this->translate("client_gender_error"); ?>"
+				},
+				ssn: {
+					required: "<?php echo $this->translate("client_ssn_error"); ?>"
+				},
+				programid: {
+					required: "<?php echo $this->translate("client_programid_error"); ?>"
+				},
+				funderid: {
+					required: "<?php echo $this->translate("client_funderid_error"); ?>"
+				},
+				servicetypeid: {
+					required: "<?php echo $this->translate("client_servicetypeid_error"); ?>"
+				},
+				hours: {
+					required: "<?php echo $this->translate("client_hours_error"); ?>"
+				},
+				rate: {
+					required: "<?php echo $this->translate("client_rate_error"); ?>"
+				},
+				voucherno: {
+					required: "<?php echo $this->translate("client_voucherno_error"); ?>"
+				},
+				resumefilename: {
+					required: "<?php echo $this->translate("client_resumefilename_error"); ?>"
+				},				
+				dateapproved: {
+					required: "<?php echo $this->translate("client_dateapproved_error"); ?>"
+				},
+				datereceived: {
+					required: "<?php echo $this->translate("client_datereceived_error"); ?>"
+				},
+				primarydiagnosis: {
+					required: "<?php echo $this->translate("client_primarydiagnosis_error"); ?>"
+				},
+				primarycause: {
+					required: "<?php echo $this->translate("client_primarycause_error"); ?>"
+				},
+				employmentgoal: {
+					required: "<?php echo $this->translate("client_employmentgoal_error"); ?>"
+				}
+			},
+			// custom error positions
+			errorPlacement: function(error, element) {
+				switch(element.attr("name")){					
+					default:
+						if(element.hasClass("useid_error")){
+							error.appendTo("#"+element.attr("id")+"_error");
+						} else {
+							error.appendTo("#"+element.attr("name")+"_error");
+						}
+						break;
+				}			
+			}
+		});
+		
+		// custom date picker options
+		var dateofbirthOpts = datepickerOpts;
+		var startfrom = '<?php echo date('Y'); ?>';
+		dateofbirthOpts.yearRange = "-<?php echo date('Y')-1900; ?>:-0"; 
+		dateofbirthOpts.minDate = "-<?php echo date('Y'); ?>Y";
+		datepickerOpts.maxDate = new Date("Dec 31, "+startfrom);	
+		$("#dateofbirth").datepicker(dateofbirthOpts);
+		
+		dateofbirthOpts.yearRange = "-<?php echo date('Y')-2010; ?>:-0"; 
+		datepickerOpts.maxDate = new Date();
+		$("#dateapproved, #datereceived").datepicker(dateofbirthOpts);
+		
+		// add filename of selected file in background of input to indicate that a file has been selected.
+		$("#resumefilename").change(function(){
+			if(!isEmptyString($(this).val())){
+				$("#theresume .fileinput-preview").html($(this).val());
+			}
+		});
+		$("#coverletterfilename").change(function(){
+			if(!isEmptyString($(this).val())){
+				$("#thecover .fileinput-preview").html($(this).val());
+			}
+		});
+		
 	});
+	
 </script>
+<style>
+#center {
+	float:left;
+}
+</style>
 <div class="row-fluid margin0 view">
-    <div class="col-md-12 padding0">
-    	<div class="headerbox">
-            <table class="table border0 nohover margin0">                       
-               <tr>		                    
-                    <td class="padding2">
-                        <?php if ($acl->checkPermission('Client', ACTION_LIST)) { ?>	
-                            <a class="btn btn-default btn-sm" href="<?php echo $this->baseUrl('client/list'); ?>"><i class="glyphicon glyphicon-list"></i> Clients</a>
-                        <?php } ?>
-                    </td>
-               </tr>
-            </table>
-        </div>
-    </div>
     <?php if ($sessionhaserror) { ?>
         <div class="alert alert-danger"><?php echo $session->getVar(ERROR_MESSAGE); ?></div>
     <?php } ?>
     <?php if (!isEmptyString($session->getVar(SUCCESS_MESSAGE))) { ?>
         <div class="alert alert-success alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> <?php echo $session->getVar(SUCCESS_MESSAGE); ?></div>
     <?php } ?>
-    <div id="tabs">
-        <?php require APPLICATION_PATH."/views/scripts/client/leftcolumn.phtml"; ?>
-        <div class="col-md-9 tab-content makerelative padding0 xtestborder clearfix" id="center">
+    <div id="tabs" class="clearfix" style="min-height:500px;">
+        <?php // require APPLICATION_PATH."/views/scripts/client/leftcolumn.phtml"; ?>
+        <div class="col-md-9 tab-content clearfix" id="center">
         	<h4 id="tabtitle"></h4>
         	<div id="profile">
-                <form id="form-profile" class="form-horizontal profile" role="form">
-					<div class="panel-group" id="accordion">
-  
-					<?php if($tab == 'profile'){ ?>
-                		<div class="panel-group" id="accordion">
-                        	<div class="panel panel-primary" id="bio">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse_bio">Bio Data</a> </h4>
-                                </div>
-                                <div id="collapse_bio" class="panel-collapse collapse <?php echo $section == 'bio' ? 'in' : '' ; ?>">
-                                	<div class="panel-body">
-                                    	<div class="row-fluid margin0">
-                                            <div class="col-md-12 padding0">
-                                                <p class="floatright margin0">
-                                                    <button type="button" class="btn btn-default btn-xs"><i class="glyphicon glyphicon-pencil"></i> Update</button>
-                                                </p>
-                                            </div>
-                                        </div>
-                                    	<fieldset class="fieldsetcontainer">
-                                            <legend>About</legend>
-                                            <div class="panel-body well-sm">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label">First Name:</label>
-                                                        <div class="col-sm-7">
-                                                          
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Last Name:</label>
-                                                        <div class="col-sm-7">
-                                                          
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Initial:</label>
-                                                        <div class="col-sm-7">
-                                                          
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Gender:</label>
-                                                        <div class="col-sm-7">
-                                                          
-                                                        </div>
-                                                    </div>
-                                                    
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label">SSN:</label>
-                                                        <div class="col-sm-7">
-                                                          
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Date of Birth:</label>
-                                                        <div class="col-sm-7">
-                                                          
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Marital Status:</label>
-                                                        <div class="col-sm-7">
-                                                          
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Race:</label>
-                                                        <div class="col-sm-7">
-                                                          
-                                                        </div>
-                                                    </div>
-                                                    
-                                                </div>
-                                            </div>
-                                        </fieldset>
-                                        <div class="divider10"></div>
-                                        <div class="row-fluid margin0">
-                                            <div class="col-md-6 paddingleft0">
-                                                <fieldset class="fieldsetcontainer">
-                                                    <legend>Location</legend>
-                                                    <div class="panel-body well-sm">
-                                                        <div class="col-md-12">
-                                                            <div class="form-group">
-                                                                <label class="col-sm-5 control-label">State:</label>
-                                                                <div class="col-sm-7">
-                                                                  
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label class="col-sm-5 control-label">County:</label>
-                                                                <div class="col-sm-7">
-                                                                  
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label class="col-sm-5 control-label">City:</label>
-                                                                <div class="col-sm-7">
-                                                                  
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label class="col-sm-5 control-label">Zipcode:</label>
-                                                                <div class="col-sm-7">
-                                                                  
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label class="col-sm-5 control-label">Addressline 1:</label>
-                                                                <div class="col-sm-7">
-                                                                  
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label class="col-sm-5 control-label">Addressline 2:</label>
-                                                                <div class="col-sm-7">
-                                                                  
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </fieldset>
-                                            </div>
-                                            <div class="col-md-6 padding0">
-                                                <fieldset class="fieldsetcontainer">
-                                                    <legend>Contact</legend>
-                                                    <div class="panel-body well-sm">
-                                                        <div class="col-md-12">
-                                                            <div class="form-group">
-                                                                <label class="col-sm-5 control-label">Home Phone:</label>
-                                                                <div class="col-sm-7">
-                                                                  
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label class="col-sm-5 control-label">Cell Phone:</label>
-                                                                <div class="col-sm-7">
-                                                                  
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label class="col-sm-5 control-label">Work Phone:</label>
-                                                                <div class="col-sm-7">
-                                                                  
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label class="col-sm-5 control-label">Work Ext:</label>
-                                                                <div class="col-sm-7">
-                                                                  
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label class="col-sm-5 control-label">Email:</label>
-                                                                <div class="col-sm-7">
-                                                                  
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label class="col-sm-5 control-label">&nbsp;</label>
-                                                                <div class="col-sm-7">&nbsp;</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </fieldset>
-                                            </div>
+                <form id="indexform" class="form-horizontal profile" role="form" action="<?php echo $posturl; ?>" method="post" enctype="multipart/form-data">
+  					<input type="hidden" id="entityname" name="entityname" value="Client" />
+                    <input type="hidden" id="id" name="id" value="" />
+                    <input type="hidden" class="successurl" id="<?php echo URL_SUCCESS; ?>" name="<?php echo URL_SUCCESS; ?>" value="" />
+                    <input type="hidden" class="failureurl" id="<?php echo URL_FAILURE; ?>" name="<?php echo URL_FAILURE; ?>" value="" />
+                    <input type="hidden" id="<?php echo SUCCESS_MESSAGE; ?>" name="<?php echo SUCCESS_MESSAGE; ?>" value="<?php echo $successmessage; ?>" />
+                    <input type="hidden" id="status" name="status" value="1" />
+					
+                    <fieldset title="Bio Data" id="account">
+                        <legend>Step 1</legend>
+                        <fieldset class="fieldsetcontainer">
+                            <legend>About</legend>
+                            <div class="panel-body well-sm">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label" for="firstname"><?php echo $this->translate("client_firstname_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control input-sm" id="firstname" name="firstname" value="<?php echo $client->getFirstName(); ?>" /><div id="firstname_error"></div>
                                         </div>
                                     </div>
-                            	</div>
-                            </div>
-                            <div class="panel panel-primary" id="referral">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title"> <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse_referral"> Referral Information</a> </h4>
-                                </div>
-                            	<div id="collapse_referral" class="panel-collapse collapse <?php echo $section == 'referral' ? 'in' : '' ; ?>">
-                                	<div class="panel-body">
-                                    	<div class="row-fluid margin0">
-                                            <div class="col-md-12 padding0">
-                                                <p class="floatright margin0">
-                                                    <button type="button" class="btn btn-default btn-xs"><i class="glyphicon glyphicon-pencil"></i> Update</button>
-                                                </p>
-                                            </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_lastname_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control input-sm" id="lastname" name="lastname" value="<?php echo $client->getLastName(); ?>" /><div id="lastname_error"></div>
                                         </div>
-                                    	<fieldset class="fieldsetcontainer">
-                                            <legend>Initial Service Package</legend>
-                                            <div class="panel-body well-sm">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Program:</label>
-                                                        <div class="col-sm-7">
-                                                          
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Funder:</label>
-                                                        <div class="col-sm-7">
-                                                          
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Initial Units:</label>
-                                                        <div class="col-sm-7">
-                                                          
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Voucher Rate:</label>
-                                                        <div class="col-sm-7">
-                                                          
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Voucher Code:</label>
-                                                        <div class="col-sm-7">
-                                                          
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Resume:</label>
-                                                        <div class="col-sm-7">
-                                                          
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Cover Letter:</label>
-                                                        <div class="col-sm-7">
-                                                          
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Request Date:</label>
-                                                        <div class="col-sm-7">
-                                                          
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Authourized By (DVRS Counsellor):</label>
-                                                        <div class="col-sm-7">
-                                                          
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </fieldset>
-                                        <div class="divider15"></div>
-                                        <fieldset class="fieldsetcontainer">
-                                            <legend>Client Assessment</legend>
-                                            <div class="panel-body well-sm">
-                                                <div class="col-md-12">
-                                                    <div class="form-group">
-                                                        <label class="col-sm-12 control-label">Primary Disability and Cause:</label>
-                                                        <div class="col-sm-12">
-                                                          &nbsp;
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-12 control-label">Secondary Disability and Cause:</label>
-                                                        <div class="col-sm-12">
-                                                          &nbsp;
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-12 control-label">Vocational Objective:</label>
-                                                        <div class="col-sm-12">
-                                                          &nbsp;
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-12 control-label">Needs Assessment <small class="notbolded"><em>(Important Medical, Behaviour or Special Needs Information)</em></small>:</label>
-                                                        <div class="col-sm-12">
-                                                          &nbsp;
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-12 control-label">Allergies:</label>
-                                                        <div class="col-sm-12">
-                                                          &nbsp;
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-12 control-label">Criminal Information:</label>
-                                                        <div class="col-sm-12">
-                                                          &nbsp;
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </fieldset>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_initial_label"); ?>: </label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control input-sm width75" id="initial" name="initial" value="<?php echo $client->getInitial(); ?>" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_gender_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                        <div class="col-sm-8">
+                                            <label class="radio-inline"><input type="radio" name="gender" id="male" value="1" class="xform-control <?php echo $client->getGender() == '1'? 1 : 0; ?>"> Male</label>
+                                            <label class="radio-inline"><input type="radio" name="gender" id="female" value="2" class="xform-control <?php echo $client->getGender() == '2'? 1 : 0; ?>"> Female</label>
+                                            <div id="gender_error"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_dob_label"); ?>:</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control input-sm datefield readonly width100" name="dateofbirth" id="dateofbirth" value="<?php echo changeMySQLDateToPageFormat($client->getDateofBirth()); ?>" />                                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_ssn_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control input-sm" id="ssn" name="ssn" value="<?php echo $client->getSSN(); ?>" />
+                                            <div id="ssn_error"></div>
+                                        </div>
+                                    </div>                                                    
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_maritalstatus_label"); ?>:</label>
+                                        <div class="col-sm-8">
+                                            <?php
+                                                $dropdown = new Zend_Form_Element_Select('maritalstatus',
+                                                                    array(
+                                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $maritalstatuses),
+                                                                        'view' => new Zend_View(),
+                                                                        'decorators' => array('ViewHelper'),
+                                                                        'class' => array('form-control','input-sm')
+                                                                    )
+                                                );  
+                                                $dropdown->setValue($client->getMaritalStatus()); 
+                                                echo $dropdown->render();
+                                            ?>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_race_label"); ?>:</label>
+                                        <div class="col-sm-8">
+                                            <?php
+                                                $dropdown = new Zend_Form_Element_Select('race',
+                                                                    array(
+                                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $races),
+                                                                        'view' => new Zend_View(),
+                                                                        'decorators' => array('ViewHelper'),
+                                                                        'class' => array('form-control','input-sm')
+                                                                    )
+                                                );  
+                                                $dropdown->setValue($client->getRace()); 
+                                                echo $dropdown->render();
+                                            ?>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_education_label"); ?>:</label>
+                                        <div class="col-sm-8">
+                                            <?php
+                                                $dropdown = new Zend_Form_Element_Select('educationlevel',
+                                                                    array(
+                                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $educationlevels),
+                                                                        'view' => new Zend_View(),
+                                                                        'decorators' => array('ViewHelper'),
+                                                                        'class' => array('form-control','input-sm')
+                                                                    )
+                                                );  
+                                                $dropdown->setValue($client->getEducationLevel()); 
+                                                echo $dropdown->render();
+
+                                            ?>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="panel panel-primary" id="emergency">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse_emergency">Emergency Information </a> </h4>
-                                </div>
-                                <div id="collapse_emergency" class="panel-collapse collapse <?php echo $section == 'emergency' ? 'in' : '' ; ?>">
-                                    <div class="panel-body">
-                                    	<div class="row-fluid margin0">
-                                            <div class="col-md-12 padding0">
-                                                <p class="floatright margin0">
-                                                    <button type="button" class="btn btn-default btn-xs"><i class="glyphicon glyphicon-pencil"></i> Update</button>
-                                                </p>
+                        </fieldset>
+                        <div class="divider10"></div>
+                        <div class="row-fluid margin0">
+                            <div class="col-md-6 paddingleft0">
+                                <fieldset class="fieldsetcontainer clearfix" id="location" style="min-height:300px;">
+                                    <legend>Location</legend>
+                                    <div class="panel-body well-sm">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_state_label"); ?>:</label>
+                                                <div class="col-sm-8">
+                                                    <?php
+                                                        $dropdown = new Zend_Form_Element_Select('state',
+                                                                            array(
+                                                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $states),
+                                                                                'view' => new Zend_View(),
+                                                                                'decorators' => array('ViewHelper'),
+                                                                                'class' => array('form-control','input-sm','disabledfield')
+                                                                            )
+                                                        );  
+                                                        $dropdown->setValue($client->getState()); 
+                                                        echo $dropdown->render();
+                                                    ?>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_county_label"); ?>:</label>
+                                                <div class="col-sm-8">
+                                                    <?php
+                                                        $dropdown = new Zend_Form_Element_Select('county',
+                                                                            array(
+                                                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $counties),
+                                                                                'view' => new Zend_View(),
+                                                                                'decorators' => array('ViewHelper'),
+                                                                                'class' => array('form-control','input-sm',)
+                                                                            )
+                                                        );  
+                                                        $dropdown->setValue($client->getCounty()); 
+                                                        echo $dropdown->render();
+                                                    ?>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_city_label"); ?>:</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" class="form-control input-sm" id="city" name="city" value="<?php echo $client->getCity(); ?>" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_zipcode_label"); ?>:</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" class="form-control input-sm width100" id="zipcode" name="zipcode" value="<?php echo $client->getZipCode(); ?>" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_addressline1_label"); ?>:</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" class="form-control input-sm" id="addressline1" name="addressline1" value="<?php echo $client->getAddressline1(); ?>" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_addressline2_label"); ?>:</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" class="form-control input-sm" id="addressline2" name="addressline2" value="<?php echo $client->getAddressline2(); ?>" />
+                                                </div>
                                             </div>
                                         </div>
-                                    	<fieldset class="fieldsetcontainer">
-                                            <legend>Emergency Contact</legend>
-                                            <div class="panel-body well-sm">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Contact Person:</label>
-                                                        <div class="col-sm-7">
-                                                          
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Relationship:</label>
-                                                        <div class="col-sm-7">
-                                                          
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Phone:</label>
-                                                        <div class="col-sm-7">
-                                                          
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label">Email:</label>
-                                                        <div class="col-sm-7">
-                                                          
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="col-md-6 padding0">
+                                <fieldset class="fieldsetcontainer clearfix" id="contact" style="min-height:300px;">
+                                    <legend>Contact</legend>
+                                    <div class="panel-body well-sm">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_homephone_label"); ?>:</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" class="form-control input-sm" id="home" name="home" value="<?php echo $client->getHome(); ?>" />
                                                 </div>
                                             </div>
-                                        </fieldset>
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_cellphone_label"); ?>:</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" class="form-control input-sm" id="cell" name="cell" value="<?php echo $client->getCell(); ?>" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_workphone_label"); ?>:</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" class="form-control input-sm" id="work" name="work" value="<?php echo $client->getWork(); ?>" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_workext_label"); ?>:</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" class="form-control input-sm" id="ext" name="ext" value="<?php echo $client->getExt(); ?>" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_email_label"); ?>:</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" class="form-control input-sm" id="email" name="email" value="<?php echo $client->getEmail(); ?>" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-5 control-label">&nbsp;</label>
+                                                <div class="col-sm-7">&nbsp;</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="divider15"></div>
+                    </fieldset>
+                    <fieldset title="Referral Information">
+                        <legend>Step 2</legend>
+                        <fieldset class="fieldsetcontainer">
+                            <legend>Initial Service Package</legend>
+                            <div class="panel-body well-sm">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_program_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                        <div class="col-sm-8">
+                                            <?php
+                                                $dropdown = new Zend_Form_Element_Select('programid',
+                                                                    array(
+                                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $programs),
+                                                                        'view' => new Zend_View(),
+                                                                        'decorators' => array('ViewHelper'),
+                                                                        'class' => array('form-control','input-sm',)
+                                                                    )
+                                                );  
+                                                $dropdown->setValue($client->getProgramID()); 
+                                                echo $dropdown->render();
+                                            ?>
+                                            <div id="programid_error"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_funder_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                        <div class="col-sm-8">
+                                            <?php
+                                                $dropdown = new Zend_Form_Element_Select('funderid',
+                                                                    array(
+                                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $funders),
+                                                                        'view' => new Zend_View(),
+                                                                        'decorators' => array('ViewHelper'),
+                                                                        'class' => array('form-control','input-sm',)
+                                                                    )
+                                                );  
+                                                $dropdown->setValue($client->getFunderID()); 
+                                                echo $dropdown->render();
+                                            ?>
+                                            <div id="funderid_error"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_servicetype_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                        <div class="col-sm-8">
+                                            <?php
+                                                $dropdown = new Zend_Form_Element_Select('servicetypeid',
+                                                                    array(
+                                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $services),
+                                                                        'view' => new Zend_View(),
+                                                                        'decorators' => array('ViewHelper'),
+                                                                        'class' => array('form-control','input-sm',)
+                                                                    )
+                                                );  
+                                                $dropdown->setValue($client->getServiceTypeID()); 
+                                                echo $dropdown->render();
+                                            ?>
+                                            <div id="servicetypeid_error"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_units_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control input-sm width100 isdecimal" id="hours" name="hours" value="<?php echo $client->getInitialVoucher()->getHours(); ?>" />
+                                            <div id="hours_error"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_voucherrate_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control input-sm width100 isdecimal" id="rate" name="rate" value="<?php echo $client->getInitialVoucher()->getRate(); ?>" /><div id="rate_error"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_voucherid_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control input-sm" id="voucherno" name="voucherno" value="<?php echo $client->getInitialVoucher()->getVoucherNo(); ?>" /><div id="voucherno_error"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_dvrsref_label"); ?>:</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control input-sm" id="dvrsref" name="dvrsref" value="<?php echo $client->getDvrsRef(); ?>" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_authorizedby_label"); ?> <small class="blocked">(DVRS Counsellor):</small></label>
+                                        <div class="col-sm-8">
+                                             <input type="text" class="form-control input-sm" id="dvrscounselor" name="dvrscounselor" value="<?php echo $client->getDvrsCounselor(); ?>" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_dateapproved_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control input-sm datefield readonly width100" name="dateapproved" id="dateapproved" value="<?php echo changeMySQLDateToPageFormat($client->getInitialVoucher()->getDateApproved()); ?>" /><div id="dateapproved_error"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_datereceived_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control input-sm datefield readonly width100" name="datereceived" id="datereceived" value="<?php echo changeMySQLDateToPageFormat($client->getInitialVoucher()->getDateReceived()); ?>" /><div id="datereceived_error"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_resume_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                        <div class="col-sm-8">
+                                            <label class="blocked small">Upload a file (Max size <?php echo formatBytes($config->uploads->docmaximumfilesize); ?>)</label>
+                                            <div class="fileinput-holder input-group col-md-12 padding0" id="theresume">
+                                                <div id="filenamedisplay" class="fileinput-preview uneditable-input form-control">No file selected..</div>
+                                                <div class="input-group-btn">
+                                                    <span class="fileinput-btn btn btn-default">Browse
+                                                        <input type="file" name="resumefilename" id="resumefilename" class="form-control file input-sm inline" data-style="fileinput" />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div id="resumefilename_error"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_cover_label"); ?>:</label>
+                                        <div class="col-sm-8">
+                                            <label class="blocked small">Upload a file (Max size <?php echo formatBytes($config->uploads->docmaximumfilesize); ?>)</label>
+                                            <div class="fileinput-holder input-group col-md-12 padding0" id="thecover">
+                                                <div id="filenamedisplay" class="fileinput-preview uneditable-input form-control">No file selected..</div>
+                                                <div class="input-group-btn">
+                                                    <span class="fileinput-btn btn btn-default">Browse
+                                                        <input type="file" name="coverletterfilename" id="coverletterfilename" class="form-control file input-sm inline" data-style="fileinput" />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="panel panel-primary" id="assign">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title"><a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse_assign">Assignment History</a> </h4>
-                                </div>
-                                <div id="collapse_assign" class="panel-collapse collapse <?php echo $section == 'assign' ? 'in' : '' ; ?>">
-                                    <div class="panel-body">
-                                        <div class="row-fluid margin0">
-                                            <div class="col-md-12 padding0">
-                                                <div class="btn-group pull-right">
-                                                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-                                                        Actions <span class="caret"></span>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a href="#">Assign User</a></li>
-                                                        <li><a href="#">Deassign User</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="divider5"></div>
-                                    	<table class="table table-condensed table-striped table-responsive viewtable">
-                                            <thead>
-                                                <tr>
-                                                    <th class="centeralign" style="width:15px;">#</th>
-                                                    <th>Name of User</th>
-                                                    <th style="width:10%;">Role</th>
-                                                    <th style="width:20%;">Duration</th>
-                                                    <th style="width:10%;">Status</th>
-                                                    <th style="width:20%;">Assigned By</th>
-                                                    <th style="width:15%;">Date Assigned</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td class="centeralign">1</td>
-                                                    <td>Mark Otto</td>
-                                                    <td>Supervisor</td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="centeralign">2</td>
-                                                    <td>Jacob Thornton</td>
-                                                    <td>Data Entry</td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="panel panel-primary" id="status">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title"><a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse_status">Account Information</a> </h4>
-                                </div>
-                                <div id="collapse_status" class="panel-collapse collapse <?php echo $section == 'status' ? 'in' : '' ; ?>">
-                                    <div class="panel-body">
-                                    	<fieldset class="fieldsetcontainer">
-                                            <legend>Status History</legend>	
-                                            <div class="row-fluid margin0">
-                                                <div class="col-md-12">
-                                                    <p class="floatright margin0">
-                                                        <button type="button" class="btn btn-default btn-xs"><i class="glyphicon glyphicon-remove-sign"></i> Discontinue Account</button>
-                                                        <button type="button" class="btn btn-default btn-xs"><i class="glyphicon glyphicon-refresh"></i> Re-Open Account</button>
-                                                    </p>
-                                                </div>
-                                            </div>
+                        </fieldset>
+                        <div class="divider15"></div>
+                        <fieldset class="fieldsetcontainer">
+                            <legend>Client Assessment</legend>
+                            <div class="panel-body well-sm">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_pdiagnosis_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                        <div class="col-sm-12">
                                             <div class="divider5"></div>
-                                            <div class="col-md-12">
-                                                <table class="table table-condensed table-striped table-responsive viewtable">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="centeralign" style="width:15px;">#</th>
-                                                            <th>Service Start Date</th>
-                                                            <th>Service End Date</th>
-                                                            <th style="width:10%;">Status</th>
-                                                            <th style="width:20%;">Opened / Closed By</th>
-                                                            <th style="width:25%;">Comments</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td class="centeralign">1</td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="centeralign">2</td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                    	</fieldset>
+											<?php
+                                                $dropdown = new Zend_Form_Element_Select('primarydiagnosis',
+                                                                    array(
+                                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select an Impairment >'), $disabilitycodes),
+                                                                        'view' => new Zend_View(),
+                                                                        'decorators' => array('ViewHelper'),
+                                                                        'class' => array('form-control','input-sm',)
+                                                                    )
+                                                );  
+                                                $dropdown->setValue($client->getPrimaryDiagnosis()); 
+                                                echo $dropdown->render();
+                                            ?>
+                                            <input type="hidden" name="primarydiagnosis_old" id="primarydiagnosis_old" value="<?php echo $client->getPrimaryDiagnosis(); ?>" />                                   
+                                            <div id="primarydiagnosis_error"></div>
+                                            <div class="divider5"></div>
+                                            <?php
+                                                $dropdown = new Zend_Form_Element_Select('primarycause',
+                                                                    array(
+                                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select a Cause>'), $causecodes),
+                                                                        'view' => new Zend_View(),
+                                                                        'decorators' => array('ViewHelper'),
+                                                                        'class' => array('form-control','input-sm',)
+                                                                    )
+                                                );  
+                                                $dropdown->setValue($client->getPrimaryCause()); 
+                                                echo $dropdown->render();
+                                            ?>
+                                            <input type="hidden" name="primarycause_old" id="primarycause_old" value="<?php echo $client->getPrimaryCause(); ?>" />
+                                            <div id="primarycause_error"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_objective_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                        <div class="col-sm-12">
+                                            <textarea class="form-control expanding" id="employmentgoal" name="employmentgoal"><?php echo $client->getEmploymentGoal(); ?></textarea><div id="employmentgoal_error"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_skills_label"); ?>:</label>
+                                        <div class="col-sm-12">
+                                            <?php
+												$listdropdown = new Zend_Form_Element_Multiselect('skillids',
+													array(
+														  'multiOptions' => $skills,
+														  'view' => new Zend_View(),
+														  'decorators' => array(array('ViewHelper')),
+														  'class' => array('form-control', 'chosen-select','multipleselect')
+													)
+												);
+												
+												$listdropdown->setValue($client->getSkillIDs());
+												$listdropdown->setAttrib("data-placeholder", 'Select all in category');
+												echo $listdropdown->render();
+											  ?><input type="hidden" name="skillids_old" id="skillids_old" value="<?php echo count($client->getSkillIDs()); ?>" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_allergy_label"); ?>:</label>
+                                        <div class="col-sm-12">
+                                            <textarea class="form-control expanding" id="allergies" name="allergies"><?php echo $client->getAllergies(); ?></textarea>
+                                        </div>
+                                    </div>
+                                
+                                    <div class="form-group">
+                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_criminal_label"); ?>:</label>
+                                        <div class="col-sm-12">
+                                            <textarea class="form-control expanding" id="criminalhistory" name="criminalhistory"><?php echo $client->getCriminalHistory(); ?></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_sdiagnosis_label"); ?>:</label>
+                                        <div class="col-sm-12">
+                                            <div class="divider5"></div>
+											<?php
+                                                $dropdown = new Zend_Form_Element_Select('secondarydiagnosis',
+                                                                    array(
+                                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select an Impairment >'), $disabilitycodes),
+                                                                        'view' => new Zend_View(),
+                                                                        'decorators' => array('ViewHelper'),
+                                                                        'class' => array('form-control','input-sm',)
+                                                                    )
+                                                );  
+                                                $dropdown->setValue($client->getSecondaryDiagnosis()); 
+                                                echo $dropdown->render();
+                                            ?>
+                                            <input type="hidden" name="secondarydiagnosis_old" id="secondarydiagnosis_old" value="<?php echo $client->getSecondaryDiagnosis(); ?>" />
+                                            <div class="divider5"></div>
+                                            <?php
+                                                $dropdown = new Zend_Form_Element_Select('secondarycause',
+                                                                    array(
+                                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select a Cause>'), $causecodes),
+                                                                        'view' => new Zend_View(),
+                                                                        'decorators' => array('ViewHelper'),
+                                                                        'class' => array('form-control','input-sm',)
+                                                                    )
+                                                );  
+                                                $dropdown->setValue($client->getSecondaryCause()); 
+                                                echo $dropdown->render();
+                                            ?>
+                                            <input type="hidden" name="secondarycause_old" id="secondarycause_old" value="<?php echo $client->getSecondaryCause(); ?>" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_needs_label"); ?><small class="notbolded"><em>( Medical, Behaviour or Special Needs)</em></small>:</label>
+                                        <div class="col-sm-12">
+                                            <textarea class="form-control expanding" id="needsassessment" name="needsassessment"><?php echo $client->getNeedsAssessment(); ?></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_communication_label"); ?>:</label>
+                                        <div class="col-sm-8">
+                                            <?php
+												$dropdown = new Zend_Form_Element_Select('communication',
+																	array(
+																		'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $communicationtypes),
+																		'view' => new Zend_View(),
+																		'decorators' => array('ViewHelper'),
+																		'class' => array('form-control','input-sm',)
+																	)
+												);  
+												$dropdown->setValue($client->getCommunication()); 
+												echo $dropdown->render();
+											?><input type="hidden" name="communication_old" id="communication_old" value="<?php echo $client->getCommunication(); ?>" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_housing_label"); ?>:</label>
+                                        <div class="col-sm-8">
+                                            <?php
+												$dropdown = new Zend_Form_Element_Select('housing',
+																	array(
+																		'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $housingtypes),
+																		'view' => new Zend_View(),
+																		'decorators' => array('ViewHelper'),
+																		'class' => array('form-control','input-sm',)
+																	)
+												);  
+												$dropdown->setValue($client->getHousing()); 
+												echo $dropdown->render();
+											?><input type="hidden" name="housing_old" id="housing_old" value="<?php echo $client->getHousing(); ?>" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>                  
-                	<?php } ?>
+                        </fieldset>
+                        <div class="divider10"></div>
+                    </fieldset>
+                    <fieldset title="Emergency ">
+                        <legend>Step 3</legend>
+                    	<fieldset class="fieldsetcontainer">
+                            <legend>Emergency Contact</legend>
+                            <div class="panel-body well-sm">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-5 control-label"><?php echo $this->translate("client_contactperson_label"); ?>:</label>
+                                        <div class="col-sm-7"><input type="text" class="form-control input-sm" id="contactperson" name="contactperson" value="<?php echo $client->getContactPerson(); ?>" /></div>
+                                        
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-5 control-label"><?php echo $this->translate("client_relationship_label"); ?>:</label>
+                                        <div class="col-sm-7"><input type="text" class="form-control input-sm" id="relationship" name="relationship" value="<?php echo $client->getRelationship(); ?>" /></div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-5 control-label"><?php echo $this->translate("client_phone_label"); ?>:</label>
+                                        <div class="col-sm-7"><input type="text" class="form-control input-sm" id="contactphone" name="contactphone" value="<?php echo $client->getContactPhone(); ?>" /></div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-5 control-label"><?php echo $this->translate("client_email_label"); ?>:</label>
+                                        <div class="col-sm-7"><input type="text" class="form-control input-sm" id="contactemail" name="contactemail" value="<?php echo $client->getContactEmail(); ?>" /></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div class="divider10"></div>
+                    </fieldset>
+                    <fieldset title="Assign to User">
+                        <legend>Step 4</legend>
+                    	<div class="divider10"></div>
+                    </fieldset>
+                    <button type="submit" class="btn btn-primary finish" id="complete"><i class="icon-arrow-right icon-white"></i> Complete</button>
+                    
                 </form>
 			</div> 
-            <div id="employment">
-                <form id="form-employment" class="form-horizontal employment">
-				<?php if($request->tab == 'employment'){ ?>
-                
-                <?php } ?>
-                </form>
-			</div>
-            <div id="voucher">
-                <form id="form-voucher" class="form-horizontal voucher">
-				<?php if($request->tab == 'voucher'){ ?>
-                
-                <?php } ?>
-                </form>
-			</div>
-            <div id="activity">
-                <form id="form-activity" class="form-horizontal activity">
-				<?php if($request->tab == 'activity'){ ?>
-                
-                <?php } ?>
-                </form>
-			</div>
-            <div id="finance">
-                <form id="form-finance" class="form-horizontal finance">
-                <?php if($request->tab == 'activity'){ ?>
-                
-                <?php } ?>
-                </form>
-			</div>
-            <div id="report">
-                <form id="form-report" class="form-horizontal report">
-                <?php if($request->tab == 'report'){ ?>
-                
-                <?php } ?>
-                </form>
-			</div>
+            
      	</div> 
     </div>
-</div>    
+</div>
 <?php
 	require_once APPLICATION_PATH.'/includes/footer.php';
 ?>

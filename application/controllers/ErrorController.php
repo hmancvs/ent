@@ -3,9 +3,16 @@
 class ErrorController extends Zend_Controller_Action
 {
 
-    public function errorAction()
-    {
-        $errors = $this->_getParam('error_handler');
+    public function errorAction() {
+    	// $this->_helper->layout->disableLayout();
+    	
+    	// debugMessage($this->toArray());
+        $errors = $this->_getParam('error_handler'); 
+        $exception = $errors->exception; // debugMessage($exception);
+        $vars = get_object_vars($exception );
+        $error_list = createHTMLCommaListFromArray($vars);
+        
+        // exit();
         
         if (!$errors) {
             $this->view->message = 'You have reached the error page';
@@ -23,22 +30,34 @@ class ErrorController extends Zend_Controller_Action
                 break;
             default:
                 // application error
-                $this->getResponse()->setHttpResponseCode(500);
-                $this->view->message = 'Application error'.$errors->exception;
+               	$this->getResponse()->setHttpResponseCode(500);
+                // $this->view->message = 'Application error'.$errors->exception;
+            	$this->view->message = $error_list;
+            	/* $string = '<div class="divider30"></div>
+			<div class="row-fluid">
+				<div class="col-md-12">
+					<div class="alert alert-danger">Application Runtime Error</div>
+					<p class="bg-warning padding10">'.$error_list.'></p>
+			    </div>
+			</div> ';
+            	debugMessage($string); */
                 break;
         }
         
         // Log exception, if logger available
-        if ($log = $this->getLog()) {
-            $log->crit($this->view->message, $errors->exception);
+        $log = $this->getLog();
+        if($log) {
+            $log->crit($this->view->message, $error_list);
         }
         
         // conditionally display exceptions
         if ($this->getInvokeArg('displayExceptions') == true) {
-            $this->view->exception = $errors->exception;
+            // $this->view->exception = $errors->exception;
+            $this->view->exception = $error_list;
         }
         
-        $this->view->request   = $errors->request;
+        $this->view->request   = $errors->request; /**/
+         
     }
 
     public function getLog()

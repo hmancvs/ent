@@ -1,0 +1,178 @@
+<?php
+	require_once APPLICATION_PATH.'/includes/header.php';
+	
+	$id = $request->id;
+	$clientid = $request->clientid;
+	$assignment = new Assignment();
+	$client = new Client();
+	if(!isEmptyString($clientid)){
+		$client->populate($clientid);
+	}
+	
+	$alreadyassigned = implode(',', $client->getAssignedUsersArray()); //debugMessage();
+	if(isEmptyString($client->getStartDate())){
+		$client->setStartDate(date('Y-m-d'));
+	}
+	
+	if(isEmptyString($id)){
+		$assignment->setClientID($clientid);
+		$assignment->setRole(1);
+		$assignment->setStartdate($client->getStartDate());
+		$assignment->setStatus(1);
+		$assignment->setRole(1);
+	} else {
+		$assignment->populate($id);	
+	}
+	
+	if($request->type == 'end'){
+		$assignment->setEndDate(date('Y-m-d'));
+		$assignment->setStatus(0);
+	}
+	$successurl = encode($this->baseUrl('index/addsuccess'));
+	$failureurl = encode($this->baseUrl('profile/adderror'));
+	
+	
+?>
+<script>
+	$(document).ready(function() {
+		$("#indexform").validate({		
+			// define the validation rules one field at a time
+			rules: {
+				userid: "required",
+				role: "required",
+				startdate: "required",
+				reason: "required"
+			}, 
+			// the messages for each of the fields being validated
+			messages: {		
+				userid: "<?php echo $this->translate("client_userid_error"); ?>",
+				role: "<?php echo $this->translate("client_assign_role_error"); ?>",
+				startdate: "<?php echo $this->translate("client_assign_startdate_error"); ?>",
+				reason: "<?php echo $this->translate("client_assign_reason_error"); ?>"
+			},
+			// custom error positions
+			errorPlacement: function(error, element) {
+				switch(element.attr("name")){					
+					default:
+						error.appendTo("#"+element.attr("name")+"_error")
+						break;
+				}			
+			}
+		});
+		
+		// reset tab index
+		var tabindex = 1;
+		$('input,select').each(function() {
+			if (this.type != "hidden") {
+				var $input = $(this);
+				$input.attr("tabindex", tabindex);
+				tabindex++;
+			}
+		});
+		
+		var dateOpts = datepickerOpts;
+		var startfrom = '<?php echo date('Y', strtotime($client->getStartDate())); ?>';
+		dateOpts.yearRange = "-<?php echo date('Y')- date('Y', strtotime($client->getStartDate())); ?>:-0"; 
+		dateOpts.minDate = new Date("<?php echo $client->getStartDate(); ?>");
+		dateOpts.maxDate = new Date("Dec 31, "+startfrom);	
+		$("#startdate").datepicker(dateOpts);
+		
+		$(".readonly").each(function(){
+			$(this).attr('readonly','readonly');
+		});
+		$(".disabledfield").each(function(){
+			$(this).attr('readonly', true).attr('disabled', true);
+		});
+	}); 
+</script>
+<form class="form-horizontal well" id="indexform" method="post" action="<?php echo $this->baseUrl("assignment/create"); ?>" >
+	<input type="hidden" name="clientid" id="clientid" value="<?php echo $assignment->getClientID(); ?>" />
+    <input type="hidden" name="status" id="status" value="<?php echo $assignment->getStatus(); ?>" />
+    <input type="hidden" name="entityname" value="Assignment" />
+    <input type="hidden" id="id" name="id" value="<?php echo encode($assignment->getID()); ?>" />
+    <input type="hidden" name="<?php echo URL_SUCCESS; ?>" value="<?php echo $successurl; ?>" />
+    <input type="hidden" name="<?php echo URL_FAILURE; ?>" value="<?php echo $failureurl; ?>" />
+	<div class="row">
+    	<div class="col-md-12">
+            <?php if($request->type == 'start'){ ?>
+                <div class="form-group">
+                    <label class="col-md-3 control-label" for="userid"><?php echo $this->translate("client_userid_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                    <div class="col-md-4 padding0">
+                        <?php
+                            $allvalues = getUsers(2, '', 1, $alreadyassigned);
+                            $dropdown = new Zend_Form_Element_Select('userid',
+                                                array(
+                                                    'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $allvalues),
+                                                    'view' => new Zend_View(),
+                                                    'decorators' => array('ViewHelper'),
+                                                    'class' => array('form-control','input-sm'),
+                                                )
+                            );  
+                            $dropdown->setValue($assignment->getUserID()); 
+                            echo $dropdown->render();
+                        ?>
+                    </div>
+                    <div id="userid_error" class="col-md-offset-3"></div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label" for="role"><?php echo $this->translate("client_assign_role_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                    <div class="col-md-4 padding0">
+                        <?php
+                            $dropdown = new Zend_Form_Element_Select('role',
+                                                array(
+                                                    'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), array('1'=>'Supervisor')),
+                                                    'view' => new Zend_View(),
+                                                    'decorators' => array('ViewHelper'),
+                                                    'class' => array('form-control','input-sm')
+                                                )
+                            );  
+                            $dropdown->setValue($assignment->getRole()); 
+                            echo $dropdown->render();
+                        ?>
+                    </div>
+                    <div id="role_error" class="col-md-offset-3"></div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label"><?php echo $this->translate("client_assign_startdate_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                    <div class="col-sm-4 padding0">
+                        <input type="text" class="form-control input-sm datefield readonly width100" name="startdate" id="startdate" value="<?php echo changeMySQLDateToPageFormat($assignment->getStartDate()); ?>" /><div id="startdate_error"></div>
+                    </div>
+                </div>
+           	<?php } ?>
+            <?php if($request->type == 'end'){ ?>
+            	<input type="hidden" name="enddate" id="enddate" value="<?php echo $assignment->getEnddate(); ?>" />
+                <input type="hidden" name="deassignedbyid" id="deassignedbyid" value="<?php echo $userid; ?>" />
+            	<div class="form-group">
+                    <label class="col-md-3 control-label" for="userid"><?php echo $this->translate("client_userid_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                    <div class="col-md-4 padding0">
+                        <?php
+                            $allvalues = getUsersAssignedToClient($client->getID(), 1);
+							reset($allvalues);
+							$defaultuserid = key($allvalues);
+                            $dropdown = new Zend_Form_Element_Select('userid',
+                                                array(
+                                                    'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $allvalues),
+                                                    'view' => new Zend_View(),
+                                                    'decorators' => array('ViewHelper'),
+                                                    'class' => array('form-control','input-sm'),
+                                                )
+                            );  
+                            $dropdown->setValue($defaultuserid); 
+                            echo $dropdown->render();
+                        ?>
+                    </div>
+                    <div id="userid_error" class="col-md-offset-3"></div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label" for="userid"><?php echo $this->translate("client_assign_reason_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                    <div class="col-md-9 paddingleft0">
+                    	<textarea class="form-control expanding" id="reason" name="reason"></textarea><div id="reason_error"></div>
+                    </div>
+                </div>
+            <?php } ?>
+        </div>
+    </div>    
+</form>
+<?php
+	require_once APPLICATION_PATH.'/includes/footer.php';
+?>

@@ -94,7 +94,12 @@ class Client extends BaseEntity {
 						'foreign' => 'clientid'
 				)
 		);
-		
+		$this->hasMany('Assignment as assignments',
+				array(
+						'local' => 'id',
+						'foreign' => 'clientid'
+				)
+		);
 	}
 	/**
 	 * Custom model validation
@@ -252,23 +257,8 @@ class Client extends BaseEntity {
 			
 		}
 		
-		/* if(!isArrayKeyAnEmptyString('skillids', $formvalues)) {
-			$ids = $formvalues['skillids']; 
-			$typelist = ''; 
-			if(count($ids) > 0){
-				$typelist = createHTMLCommaListFromArray($ids, ",");
-			}
-			$formvalues['skills'] = $typelist; 
-			# remove the usergroups_groupid array, it will be ignored, but to be on the safe side
-			unset($formvalues['skillids']); 
-		} else {
-			if(!isArrayKeyAnEmptyString('skillids_old', $formvalues)){
-				$formvalues['skills'] = NULL;
-			} else {
-				unset($formvalues['skills']); 
-			}
-		} */
-		
+		// process skills to be mapped to the clientskills relationship
+		$skills = array();
 		if(!isArrayKeyAnEmptyString('skillids', $formvalues)) {
 			foreach ($formvalues['skillids'] as $key => $skill) {
 				if(!isEmptyString($formvalues['id'])){
@@ -287,7 +277,9 @@ class Client extends BaseEntity {
 					}
 				}
 			}
-			$formvalues['skills']= $skills;
+			if(count($skills) > 0){
+				$formvalues['skills'] = $skills;
+			}
 		} else {
 			if(!isArrayKeyAnEmptyString('skillids_old', $formvalues)){
 				if($formvalues['skillids_old'] != 0){
@@ -297,7 +289,7 @@ class Client extends BaseEntity {
 				unset($formvalues['skills']);
 			}
 		}
-		debugMessage($formvalues); // exit(); 
+		// debugMessage($formvalues); // exit(); 
 		parent::processPost($formvalues);
 	}
 	
@@ -362,6 +354,12 @@ class Client extends BaseEntity {
 			rename($path.$clientfolder.DIRECTORY_SEPARATOR.$this->getCoverletterFilename(), $path.$clientfolder.DIRECTORY_SEPARATOR."cover".DIRECTORY_SEPARATOR.$this->getCoverletterFilename());
 		}
 		
+		if(!isEmptyString($this->getInitialVoucherID())){
+			if(isEmptyString($this->getInitialVoucher()->getClientID())){
+				$this->getInitialVoucher()->setClientID($this->getID());
+				$this->getInitialVoucher()->save();
+			}
+		}
 		return true;
 	}
 	
@@ -556,6 +554,27 @@ class Client extends BaseEntity {
 			$text = createHTMLCommaListFromArray($list_array, ', ');
 		}
 		return $text;
+	}
+	# get assignments for the client
+	function getClientAssignments() {
+		$query = Doctrine_Query::create()->from('Assignment a')
+		->where("a.clientid = '".$this->getID()."'");
+		//debugMessage($query->getSQLQuery());
+		$result = $query->execute();
+		return $result;
+	}
+	# get array of users already assigned to a client
+	function getAssignedUsersArray(){
+		$users = array();
+		$assignments = $this->getClientAssignments();
+		if($assignments){
+			if($assignments->count() > 0){
+				foreach ($assignments as $assignline){
+					$users[] = $assignline->getUserID();
+				}
+			}
+		}
+		return $users;
 	}
 }
 ?>

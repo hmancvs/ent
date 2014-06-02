@@ -18,7 +18,7 @@
             <ul class="subNav client">
                 <li><a href="<?php echo $this->baseUrl('client/list'); ?>">Clients</a></li>
                 <?php if ($acl->checkPermission('Client', ACTION_CREATE)) { ?>	
-                	<li><a class="gonowhere">New Client</a></li>
+                	<li><a href="<?php echo $this->baseUrl('client'); ?>">New Client</a></li>
                 <?php } ?>
             </ul>						
         </li>

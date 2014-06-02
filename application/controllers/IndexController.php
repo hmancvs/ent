@@ -91,6 +91,7 @@ class IndexController extends Zend_Controller_Action  {
     		$new_object->populate($this->_getParam('id'));
     		$this->_setParam('lastupdatedby', $session->getVar('userid'));
     	}
+    	
     	// populate the object with data from the post and validate the object
     	// to ensure that its wellformed 
     	$new_object->processPost($this->_getAllParams());

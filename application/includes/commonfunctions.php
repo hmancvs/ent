@@ -931,6 +931,7 @@ function getJsIncludes(){
 		
 		# include here all plugins and extensions
 		'javascript/plugins/jquery.validate-1.11.1.min.js',
+		'javascript/plugins/jquery.validate.min.js',
 		'javascript/plugins/select-chain.js',
 		'javascript/plugins/chosen.jquery-1.0.0.min.js',
 		'javascript/plugins/jquery.elastic.source.1.6.11.js',		
@@ -1160,5 +1161,11 @@ function getClientUrl (Zend_Http_Client $client)
         $string = substr ($string, 4, strpos ($string, "HTTP/1.1\r\n") - 5);
     }
     return $client->getUri (true) . $string;
+}
+function fileUploaded() {
+	if(empty($_FILES)) {
+		return false;
+	}
+	return true;
 }
 ?>

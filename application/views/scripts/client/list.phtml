@@ -108,7 +108,7 @@
         	<div class="col-md-9 paddingleft0">
             	<ul class="listfilter">
 					<?php if ($acl->checkPermission('Client', ACTION_CREATE)) { ?>
-                        <li><a title="New <?php echo $moduleitem; ?>" class="btn btn-primary btn-sm gonowhere"><i class="glyphicon glyphicon-plus"></i> New <?php echo $moduleitem; ?></a></li>
+                        <li><a title="New <?php echo $moduleitem; ?>" class="btn btn-primary btn-sm" href="<?php echo $this->baseUrl('client'); ?>"><i class="glyphicon glyphicon-plus"></i> New <?php echo $moduleitem; ?></a></li>
                     <?php } ?>
                     <li>
                         <?php

@@ -324,13 +324,7 @@ label.error {
 	width:98%;
 	min-height:25px;
 }
-.alert-danger {
-	background-image: url("../images/cross.png");
-	background-position: 8px 12px;
-    background-repeat: no-repeat;
-	padding-left:25px;
-	padding-top:8px;
-}
+
 
 .noimglink, .noimgbutton {
 	display:inline-block; 
@@ -904,7 +898,10 @@ img.ui-datepicker-trigger {
 	text-overflow: ellipsis; 
 	padding:4px 0 0px 8px; 
 	height:28px;
-	max-width:135px;
+	min-width:140px;
+	max-width:145px;
+	z-index:1;
+	overflow:hidden;
 }
 .form-control.file {
 	position: absolute; 

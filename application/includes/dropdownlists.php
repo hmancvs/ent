@@ -660,16 +660,22 @@
 		$all_users = $conn->fetchAll("SELECT u.id as id, concat(u.firstname, ' ', u.lastname, ' ', u.othername) as name FROM useraccount AS u WHERE u.type = 8 order by u.datecreated DESC limit ".$limit);
 		return $all_users;
 	}
-	function getUsers($type = '', $limit = ''){
+	function getUsers($type = '', $limit = '', $ignoretype = '', $ignorelist = ''){
 		$custom_query = '';
 		if(!isEmptyString($type)){
 			$custom_query .= " AND u.type = '".$type."' ";
+		}
+		if(!isEmptyString($ignoretype)){
+			$custom_query .= " AND u.type != '".$ignoretype."' ";
+		}
+		if(!isEmptyString($ignorelist)){
+			$custom_query .= " AND u.id NOT IN(".$ignorelist.") ";
 		}
 		$limit_query = '';
 		if(!isEmptyString($limit)){
 			$limit_query= ' LIMIT '.$limit;
 		}
-		$valuesquery = "SELECT u.id AS optionvalue, concat(u.firstname, ' ', u.lastname) as optiontext FROM useraccount as u WHERE u.id <> '' AND u.isactive = 1 ".$custom_query." GROUP BY u.id ORDER BY optiontext ASC ".$limit_query;
+		$valuesquery = "SELECT u.id AS optionvalue, concat(u.firstname, ' ', u.lastname) as optiontext FROM useraccount as u WHERE u.id <> '' ".$custom_query." GROUP BY u.id ORDER BY optiontext ASC ".$limit_query;
 		// debugMessage($valuesquery);
 		return getOptionValuesFromDatabaseQuery($valuesquery);
 	}
@@ -833,5 +839,23 @@
 			return $array[$value];
 		}
 		return $array;
+	}
+	# get users assigned to a client
+	function getUsersAssignedToClient($clientid, $isactive = true){
+		$custom_query = '';
+		if(!isEmptyString($isactive)){
+			$custom_query = " AND a.status = 1 ";
+		}
+		$query = "SELECT a.userid as optionvalue, concat(u.firstname, ' ', u.lastname) as optiontext FROM assignment AS a INNER JOIN useraccount AS u ON a.userid = u.id WHERE a.clientid = '".$clientid."' ".$custom_query." GROUP BY a.userid  order by optiontext ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		return $array;
+	}
+	# get users assigned to a client
+	function getAssignmentIDForUser($userid, $clientid){
+		$conn = Doctrine_Manager::connection();
+		$query = "SELECT a.id FROM assignment AS a WHERE a.clientid = '".$clientid."' AND a.userid = '".$userid."' ";
+		$data = $conn->fetchOne($query);
+		return $data;
 	}
 ?>

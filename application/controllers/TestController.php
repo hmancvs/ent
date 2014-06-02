@@ -24,8 +24,18 @@ class TestController extends IndexController  {
     	$this->_helper->layout->disableLayout();
 	    $this->_helper->viewRenderer->setNoRender(TRUE);
     	
-    	$user = new UserAccount();
-    	$user->populate(1);
-    	debugMessage($user->toArray());
+    	$test = array(
+    		"clientid" => 12,
+    		"status" => 1,
+    		"userid" => 4,
+    		"role" => 1,
+    		"startdate" => "Mar 4, 2014"
+    	);
+    	$ass = new Assignment();
+    	$ass->processPost($test);
+    	debugMessage($ass->toArray());
+    	debugMessage($ass->getErrorStackAsString());
+    	
+    	// $ass->save();
     }
 }

@@ -253,16 +253,18 @@ $(document).ready(function() {
 		var hasconfirm = false;
 		// alert(posturl);
 		// popup title
-		$(".modal-header h3").html(title);
+		$(".modal-header h4").html(title);
 		// load content
 		$("#dialogcontent").html($("#dialogbody #loading").html());
 		$("#dialogcontent").load(href);  	
 		// then show it after the changes have been made
 		$('#dialog').modal('toggle');
+		$('.modal-dialog').css({'padding-top':'0'});
+		$('.modal-dialog').css({'overflow':'hidden'});
 		
 		// check for default submit button text
 		if(!isEmptyString(submittext)){
-			$("#new #save").html('<i class="icon-ok icon-white"></i> '+submittext);
+			$("#new #save").html('<i class="glyphicon glyphicon-ok"></i> '+submittext);
 		}
 		if(!isEmptyString(addconfirm)){
 			hasconfirm = true;
@@ -307,12 +309,13 @@ $(document).ready(function() {
 						$("#"+formid).serialize(),  
 						function(data){
 							// alert(data); return false;
-							var url = successurl;    
-							$(location).attr('href',url);
+							$.blockUI({ message: '<h4><img src="<?php echo $this->baseUrl('images/loader.gif'); ?>" /> Please wait...</h4>' }); 
+							var url = successurl;
+							$(location).attr('href',url);							
 						}  
 					); // close the $.post
-					$("#dialogcontent").hide(); 										
-					$("#dialogbody #loading").show();
+					// $("#dialogcontent").hide(); 										
+					$("#dialogbody").html('<img style="margin-left:50%;" src="<?php echo $this->baseUrl('images/loader.gif'); ?>" />');
 				}
 			}
 		});

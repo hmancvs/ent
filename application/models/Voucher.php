@@ -8,7 +8,7 @@ class Voucher extends BaseEntity {
 		
 		$this->setTableName('voucher');
 		$this->hasColumn('parentid', 'integer', null);
-		$this->hasColumn('clientid', 'integer', null, array('notblank' => true));
+		$this->hasColumn('clientid', 'integer', null);
 		$this->hasColumn('servicetypeid', 'integer', null, array('notblank' => true));
 		$this->hasColumn('voucherno', 'string', 50);
 		$this->hasColumn('dateapproved','date', null);
@@ -29,7 +29,7 @@ class Voucher extends BaseEntity {
 		
 		# set the custom error messages
        	$this->addCustomErrorMessages(array(
-       									"clientid.notblank" => $this->translate->_("voucher_clientid_error"),
+       									// "clientid.notblank" => $this->translate->_("voucher_clientid_error"),
        									"servicetypeid.notblank" => $this->translate->_("voucher_servicetypeid_error"),
        									"hours.notblank" => $this->translate->_("voucher_hours_error"),
        									"rate.notblank" => $this->translate->_("voucher_rate_error")
@@ -40,6 +40,12 @@ class Voucher extends BaseEntity {
 	public function setUp() {
 		parent::setUp(); 
 		
+		$this->hasOne('Clientid as client',
+				array(
+						'local' => 'clientid',
+						'foreign' => 'id',
+				)
+		);
 		
 	}
 	/**
@@ -58,6 +64,9 @@ class Voucher extends BaseEntity {
 		$session = SessionWrapper::getInstance();
 		if(isArrayKeyAnEmptyString('parentid', $formvalues)){
 			unset($formvalues['parentid']);
+		}
+		if(isArrayKeyAnEmptyString('clientid', $formvalues)){
+			unset($formvalues['clientid']);
 		}
 		if(isArrayKeyAnEmptyString('dateapproved', $formvalues)){
 			unset($formvalues['dateapproved']);
