@@ -66,6 +66,7 @@
 		var tab = '<?php echo $tab; ?>';
 		
 		// form wizard
+		/**/
 		$('#indexform').stepy({
 			block: true,
 			validate: true,
@@ -139,7 +140,10 @@
 				},
 				employmentgoal: {
 					required: true
-				}
+				},
+				userid: "required",
+				role: "required",
+				assignstartdate: "required"
 			}, 
 			// the messages for each of the fields being validated
 			messages: {		
@@ -190,7 +194,10 @@
 				},
 				employmentgoal: {
 					required: "<?php echo $this->translate("client_employmentgoal_error"); ?>"
-				}
+				},
+				userid: "<?php echo $this->translate("client_userid_error"); ?>",
+				role: "<?php echo $this->translate("client_assign_role_error"); ?>",
+				assignstartdate: "<?php echo $this->translate("client_assign_startdate_error"); ?>"
 			},
 			// custom error positions
 			errorPlacement: function(error, element) {
@@ -216,7 +223,7 @@
 		
 		dateofbirthOpts.yearRange = "-<?php echo date('Y')-2010; ?>:-0"; 
 		datepickerOpts.maxDate = new Date();
-		$("#dateapproved, #datereceived").datepicker(dateofbirthOpts);
+		$("#dateapproved, #datereceived, #assignstartdate").datepicker(dateofbirthOpts);
 		
 		// add filename of selected file in background of input to indicate that a file has been selected.
 		$("#resumefilename").change(function(){
@@ -238,7 +245,7 @@
 	float:left;
 }
 </style>
-<div class="row-fluid margin0 view">
+<div class="row-fluid margin0">
     <?php if ($sessionhaserror) { ?>
         <div class="alert alert-danger"><?php echo $session->getVar(ERROR_MESSAGE); ?></div>
     <?php } ?>
@@ -364,7 +371,7 @@
                         <div class="row-fluid margin0">
                             <div class="col-md-6 paddingleft0">
                                 <fieldset class="fieldsetcontainer clearfix" id="location" style="min-height:300px;">
-                                    <legend>Location</legend>
+                                    <legend>Address</legend>
                                     <div class="panel-body well-sm">
                                         <div class="col-md-12">
                                             <div class="form-group">
@@ -699,7 +706,7 @@
 											<?php
                                                 $dropdown = new Zend_Form_Element_Select('secondarydiagnosis',
                                                                     array(
-                                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select an Impairment >'), $disabilitycodes),
+                                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select an Impairment>'), $disabilitycodes),
                                                                         'view' => new Zend_View(),
                                                                         'decorators' => array('ViewHelper'),
                                                                         'class' => array('form-control','input-sm',)
@@ -802,13 +809,63 @@
                     </fieldset>
                     <fieldset title="Assign to User">
                         <legend>Step 4</legend>
-                    	<div class="divider10"></div>
+                    	<fieldset class="fieldsetcontainer">
+                            <legend>Supervisor</legend>
+                            <div class="panel-body well-sm">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-5 control-label"><?php echo $this->translate("client_userid_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                        <div class="col-sm-7">
+                                        	<?php
+												$allvalues = getUsers(2, '', 1);
+												$dropdown = new Zend_Form_Element_Select('userid',
+																	array(
+																		'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $allvalues),
+																		'view' => new Zend_View(),
+																		'decorators' => array('ViewHelper'),
+																		'class' => array('form-control','input-sm'),
+																	)
+												);  
+												$dropdown->setValue(''); 
+												echo $dropdown->render();
+											?>
+                                            <div id="userid_error"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-5 control-label"><?php echo $this->translate("client_assign_role_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                        <div class="col-sm-7">
+                                            <?php
+                                                $dropdown = new Zend_Form_Element_Select('role',
+                                                                    array(
+                                                                        'multiOptions' => array('1'=>'Supervisor'),
+                                                                        'view' => new Zend_View(),
+                                                                        'decorators' => array('ViewHelper'),
+                                                                        'class' => array('form-control','input-sm')
+                                                                    )
+                                                );  
+                                                $dropdown->setValue('1'); 
+                                                echo $dropdown->render();
+                                            ?>
+                                        </div>
+                                        <div id="role_error" class="col-md-offset-3"></div>
+                                    </div>
+                                    <div class="form-group">
+                                         <label class="col-sm-5 control-label"><?php echo $this->translate("client_assign_startdate_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control input-sm datefield readonly width100" name="assignstartdate" id="assignstartdate" value="" /><div id="assignstartdate_error"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div class="divider10"></div>
                     </fieldset>
-                    <button type="submit" class="btn btn-primary finish" id="complete"><i class="icon-arrow-right icon-white"></i> Complete</button>
-                    
+                    <button type="submit" class="btn btn-primary finish" id="complete"><i class="glyphicon glyphicon-arrow-right"></i> Complete</button>
                 </form>
 			</div> 
-            
      	</div> 
     </div>
 </div>

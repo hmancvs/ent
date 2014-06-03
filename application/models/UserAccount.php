@@ -11,13 +11,17 @@ class UserAccount extends BaseEntity {
 		$this->hasColumn('firstname', 'string', 255, array('notblank' => true));
 		$this->hasColumn('lastname', 'string', 255, array('notblank' => true));
 		$this->hasColumn('othernames', 'string', 255);
+		$this->hasColumn('initial', 'string', 6);
 		$this->hasColumn('password', 'string', 50);
+		$this->hasColumn('trx', 'string', 50);
 		$this->hasColumn('email', 'string', 50/*, array('notnull' => true, 'notblank' => true)*/);
 		$this->hasColumn('email2', 'string', 50);
 		$this->hasColumn('username', 'string', 15/*, array('notnull' => true, 'notblank' => true)*/);
 		$this->hasColumn('home', 'string', 15);
 		$this->hasColumn('work', 'string', 15);
 		$this->hasColumn('cell', 'string', 15);
+		$this->hasColumn('ext', 'string', 6);
+		$this->hasColumn('ssn', 'string', 15);
 		
 		$this->hasColumn('gender', 'integer', null); # 1=Male, 2=Female, 3=Unknown
 		$this->hasColumn('dateofbirth','date');
@@ -48,17 +52,69 @@ class UserAccount extends BaseEntity {
 		$this->hasColumn('createdby', 'integer', 11);
 	}
 	
+	protected $oldpassword;
+	protected $newpassword;
+	protected $confirmpassword;
+	protected $trx;
+	protected $oldemail;
+	protected $changeemail;
+	protected $isinvited;
+	protected $isphoneinvited;
+	
+	function getOldPassword(){
+		return $this->oldpassword;
+	}
+	function setOldPassword($oldpassword) {
+		$this->oldpassword = $oldpassword;
+	}
+	function getNewPassword(){
+		return $this->newpassword;
+	}
+	function setNewPassword($newpassword) {
+		$this->newpassword = $newpassword;
+	}
+	function getConfirmPassword(){
+		return $this->confirmpassword;
+	}
+	function setConfirmPassword($confirmpassword) {
+		$this->confirmpassword = $confirmpassword;
+	}
+	function getTrx(){
+		return $this->trx;
+	}
+	function setTrx($trx) {
+		$this->trx = $trx;
+	}
+	function getOldEmail(){
+		return $this->oldemail;
+	}
+	function setOldEmail($oldemail) {
+		$this->oldemail = $oldemail;
+	}
+	function getChangeEmail(){
+		return $this->changeemail;
+	}
+	function setChangeEmail($changeemail) {
+		$this->changeemail = $changeemail;
+	}
+	function getIsinvited(){
+		return $this->isinvited;
+	}
+	function setIsinvited($isinvited) {
+		$this->isinvited = $isinvited;
+	}
+	
 	# Contructor method for custom initialization
 	public function construct() {
 		parent::construct();
 		
-		$this->addDateFields(array("activationdate","dateinvited"));
+		$this->addDateFields(array("dateofbirth","activationdate","dateinvited"));
 		
 		# set the custom error messages
        	$this->addCustomErrorMessages(array(
-       									"type.notblank" => $this->translate->_("useraccount_type_error"),
-       									"firstname.notblank" => $this->translate->_("useraccount_firstname_error"),
-       									"lastname.notblank" => $this->translate->_("useraccount_lastname_error")
+       									"type.notblank" => $this->translate->_("profile_type_error"),
+       									"firstname.notblank" => $this->translate->_("profile_firstname_error"),
+       									"lastname.notblank" => $this->translate->_("profile_lastname_error")
        	       						));
 	}
 	
@@ -105,16 +161,25 @@ class UserAccount extends BaseEntity {
 		// debugMessage($this->toArray(true));
 		# validate that username is unique
 		if($this->usernameExists()){
-			$this->getErrorStack()->add("username.unique", sprintf($this->translate->_("useraccount_username_unique_error"), $this->getUsername()));	
+			$this->getErrorStack()->add("username.unique", sprintf($this->translate->_("profile_username_unique_error"), $this->getUsername()));	
 		}
 		# validate that email is unique
 		if($this->emailExists()){
-			$this->getErrorStack()->add("email.unique", sprintf($this->translate->_("useraccount_email_unique_error"), $this->getEmail()));
+			$this->getErrorStack()->add("email.unique", sprintf($this->translate->_("profile_email_unique_error"), $this->getEmail()));
 		}
 		
 		# check that at least one group has been specified
 		if ($this->getUserGroups()->count() == 0) {
-			$this->getErrorStack()->add("groups", $this->translate->_("useraccount_group_error"));
+			$this->getErrorStack()->add("groups", $this->translate->_("profile_group_error"));
+		}
+		
+		# validate attempt to change password with an invalid current password
+		if(!isEmptyString($this->getNewPassword())){
+			if(!isEmptyString($this->getOldPassword()) && sha1($this->getOldPassword()) != $this->getTrx()){
+				$this->getErrorStack()->add("oldpassword", $this->translate->_("profile_oldpassword_invalid_error"));
+			} else {
+				$this->setPassword(sha1($this->getNewPassword()));
+			}
 		}
 	}
 	# determine if the username has already been assigned
@@ -170,9 +235,31 @@ class UserAccount extends BaseEntity {
 		} else {
 			$formvalues['password'] = sha1($formvalues['password']); 
 		}
+		if(!isArrayKeyAnEmptyString('oldpassword', $formvalues)){
+			$this->setoldpassword($formvalues['oldpassword']);
+		}
+		if(!isArrayKeyAnEmptyString('confirmpassword', $formvalues)){
+			$this->setconfirmpassword($formvalues['confirmpassword']);
+		}
+		if(!isArrayKeyAnEmptyString('trx', $formvalues)){
+			$this->settrx($formvalues['trx']);
+		}
+		if(!isArrayKeyAnEmptyString('newpassword', $formvalues)){
+			$this->setNewPassword($formvalues['newpassword']);
+			$formvalues['password'] = sha1($formvalues['newpassword']); 
+		}
 		/*if(!isArrayKeyAnEmptyString('phone', $formvalues)){
 			$formvalues['phone'] = str_pad(ltrim($formvalues['phone'], '0'), 12, getCountryCode(), STR_PAD_LEFT); 
 		}*/
+		if(!isArrayKeyAnEmptyString('email', $formvalues) && !isArrayKeyAnEmptyString('oldemail', $formvalues) && !isArrayKeyAnEmptyString('isactive', $formvalues)){
+			if($formvalues['email'] != $formvalues['oldemail'] && $session->getVar('userid') == $formvalues['id']){
+				$this->setChangeEmail('1');
+				$this->setOldEmail($formvalues['oldemail']);
+				$formvalues['email2'] = $formvalues['email'];
+				$formvalues['email'] = $formvalues['oldemail'];
+				$formvalues['activationkey'] = $this->generateActivationKey();
+			}
+		}
 		# force setting of default none string column values. enum, int and date 	
 		if(isArrayKeyAnEmptyString('isactive', $formvalues)){
 			unset($formvalues['isactive']); 
@@ -182,6 +269,9 @@ class UserAccount extends BaseEntity {
 		}
 		if(isArrayKeyAnEmptyString('gender', $formvalues)){
 			unset($formvalues['gender']); 
+		}
+		if(isArrayKeyAnEmptyString('dateofbirth', $formvalues)){
+			unset($formvalues['dateofbirth']);
 		}
 		if(isArrayKeyAnEmptyString('activationdate', $formvalues)){
 			unset($formvalues['activationdate']); 
@@ -205,14 +295,25 @@ class UserAccount extends BaseEntity {
 				$formvalues['hasacceptedinvite'] = 0;
 			}
 		}
+		if(isArrayKeyAnEmptyString('county', $formvalues)){
+			if(isArrayKeyAnEmptyString('county_old', $formvalues)){
+				unset($formvalues['county']);
+			} else {
+				$formvalues['county'] = NULL;
+			}
+		}
 		
 		# move the data from $formvalues['usergroups_groupid'] into $formvalues['usergroups'] array
 		# the key for each group has to be the groupid
 		if(isArrayKeyAnEmptyString('id', $formvalues)) {
 			if(!isArrayKeyAnEmptyString('type', $formvalues)) {
-				// if($formvalues['type'] != 2){
-					// $formvalues['usergroups_groupid'] = array($formvalues['type']);
-				//}
+				if(!isArrayKeyAnEmptyString('type', $formvalues)) {
+					$formvalues['usergroups_groupid'] = array($formvalues['type']);
+				}
+				if(isArrayKeyAnEmptyString('createdby', $formvalues)) {
+					$formvalues['createdby'] = DEFAULT_ID;
+				}
+				$formvalues['activationkey'] = $this->generateActivationKey();
 			}
 		}
 		
@@ -240,7 +341,7 @@ class UserAccount extends BaseEntity {
 			} 
 		}
 		
-		// debugMessage($formvalues); // exit();
+		// debugMessage($formvalues); exit();
 		parent::processPost($formvalues);
 	}
 	/*
@@ -255,18 +356,8 @@ class UserAccount extends BaseEntity {
 			$conn->beginTransaction();
 			# initial save
 			$this->save();
-			
-			if(isEmptyString($this->getCreatedBy())){
-				$this->setCreatedBy($this->getID());
-			}
-			
-			# set activation key
-			$this->setActivationKey($this->generateActivationKey());
-			
-			# save current profile changes
-			$this->save();
-			
-		 	# commit changes
+				
+			# commit changes
 			$conn->commit();
 		} catch(Exception $e){
 			$conn->rollback();
@@ -274,43 +365,28 @@ class UserAccount extends BaseEntity {
 			throw new Exception($e->getMessage());
 		}
 		
-		# send signup notification to email
-		// $this->sendSignupNotification();
-		
 		// find any duplicates and delete them
-    	$duplicates = $this->getDuplicates();
+		$duplicates = $this->getDuplicates();
 		if($duplicates->count() > 0){
 			$duplicates->delete();
 		}
 		
-	 	if($this->getIsInvited() == 1){
-	 		$this->setActivationKey($this->generateActivationKey());
-	 		$this->setDateInvited(date('Y-m-d'));
-			$this->setIsInvited('1');
-			$this->setHasAcceptedInvite('0');
-			$this->save();
-			
-        	if($this->sendProfileInvitationNotification()){
-				$session->setVar('invitesuccess', "Email Invitation sent to ".$this->getEmail());        		
-        	}
-        }
+		// invite via email
+		if($this->getIsinvited() == 1){
+			$this->inviteViaEmail();
+		}
 		
 		return true;
 	}
-	# update after
+# update after
 	function afterUpdate(){
 		$session = SessionWrapper::getInstance();
-		if($this->getIsInvited() == 1 && !$this->isActivated()){
-	 		$this->setActivationKey($this->generateActivationKey());
-	 		$this->setDateInvited(date('Y-m-d'));
-			$this->setIsInvited('1');
-			$this->setHasAcceptedInvite('0');
-			$this->save();
-			
-        	if($this->sendProfileInvitationNotification()){
-				$session->setVar('invitesuccess', "Email Invitation sent to ".$this->getEmail());       		
-        	}
+		// invite via email
+	 	if($this->getIsinvited() == 1){
+	 		$this->inviteViaEmail();
         }
+       	 
+        return true;
 	}
 	# find duplicates after save
 	function getDuplicates(){
@@ -318,6 +394,15 @@ class UserAccount extends BaseEntity {
 		
 		$result = $q->execute();
 		return $result;
+	}
+	# invite user to activate via email
+	function inviteViaEmail(){
+		$session = SessionWrapper::getInstance();
+		if($this->sendProfileInvitationNotification()){
+			$session->setVar('invitesuccess', "Email Invitation sent to ".$this->getEmail());
+		}
+	
+		return true;
 	}
 	/**
 	 * Reset the password for  the user. All checks and validations have been completed
@@ -424,7 +509,7 @@ class UserAccount extends BaseEntity {
 		// set the send of the email address
 		$mail->setFrom($this->config->notification->emailmessagesender, $this->config->notification->notificationsendername);
 		
-		$mail->setSubject($this->translate->_('useraccount_email_subject_recoverpassword'));
+		$mail->setSubject($this->translate->_('profile_email_subject_recoverpassword'));
 		// render the view as the body of the email
 		$mail->setBodyHtml($template->render('recoverpassword.phtml'));
 		// debugMessage($template->render('recoverpassword.phtml')); 
@@ -458,7 +543,7 @@ class UserAccount extends BaseEntity {
 			$audit_values = array("executedby" => $this->getID(), "transactiontype" => USER_SIGNUP, "success" => "N");
 			$audit_values["transactiondetails"] = "Invalid Activation Code specified for User(".$this->getID().") (".$this->getEmail()."). "; 
 			// $this->notify(new sfEvent($this, USER_SIGNUP, $audit_values));
-			$this->getErrorStack()->add("user.activationkey", $this->translate->_("useraccount_invalid_actkey_error"));
+			$this->getErrorStack()->add("user.activationkey", $this->translate->_("profile_invalid_actkey_error"));
 			return false;
 		}
 		
@@ -488,7 +573,7 @@ class UserAccount extends BaseEntity {
 			return true;
 			
 		} catch (Exception $e){
-			$this->getErrorStack()->add("user.activation", $this->translate->_("useraccount_activation_error"));
+			$this->getErrorStack()->add("user.activation", $this->translate->_("profile_activation_error"));
 			$this->logger->err("Error activating useraccount ".$this->getEmail()." ".$e->getMessage());
 			// debugMessage($e->getMessage());
 			# log to audit trail when an error occurs in updating payee details on user account
@@ -515,7 +600,7 @@ class UserAccount extends BaseEntity {
 		// $this->setActivationDate(NULL);
 		if($this->getusergroups()->count() == 0){
 			$this->getusergroups()->get(1)->setUserID($this->getID());
-			$this->getusergroups()->get(1)->setGroupID(2);
+			$this->getusergroups()->get(1)->setGroupID($this->getType());
 		}
 		
 		$this->save();
@@ -547,7 +632,7 @@ class UserAccount extends BaseEntity {
 		# configure base stuff
 		$mail->addTo($this->getEmail(), $this->getName());
 		# set the send of the email address
-		$subject = sprintf($this->translate->_('useraccount_email_subject_signup'), getAppName());
+		$subject = sprintf($this->translate->_('profile_email_subject_signup'), getAppName());
 		$mail->setFrom($this->config->notification->emailmessagesender, $this->config->notification->notificationsendername);
 		
 		$mail->setSubject($subject);
@@ -600,7 +685,7 @@ class UserAccount extends BaseEntity {
 		// set the send of the email address
 		$mail->setFrom($this->config->notification->emailmessagesender, $this->config->notification->notificationsendername);
 		
-		$mail->setSubject($this->translate->_('useraccount_email_subject_changeemail'));
+		$mail->setSubject($this->translate->_('profile_email_subject_changeemail'));
 		// render the view as the body of the email
 		$mail->setBodyHtml($template->render('emailchangenotification.phtml'));
 		// debugMessage($template->render('emailchangenotification.phtml')); exit();
@@ -764,10 +849,10 @@ class UserAccount extends BaseEntity {
 		// set the send of the email address
 		$mail->setFrom($this->config->notification->emailmessagesender, $this->config->notification->notificationsendername);
 		
-		$mail->setSubject(sprintf($this->translate->_('useraccount_email_subject_invite_user'), getAppName()));
+		$mail->setSubject(sprintf($this->translate->_('profile_email_subject_invite_user'), getAppName()));
 		// render the view as the body of the email
 		$mail->setBodyHtml($template->render('invitenotification.phtml'));
-		// debugMessage($template->render('invitenotification.phtml')); // exit();
+		// debugMessage($template->render('invitenotification.phtml')); exit();
 		
 		try {
 			$mail->send();
@@ -812,7 +897,7 @@ class UserAccount extends BaseEntity {
 		# check if the user exists 
 		if(!$result){
 			# user with specified email does not exist, therefore is valid
-			$this->getErrorStack()->add("user.invalid", $this->translate->_("useraccount_user_invalid_error"));
+			$this->getErrorStack()->add("user.invalid", $this->translate->_("profile_user_invalid_error"));
 			return false;
 		}
 		
@@ -923,7 +1008,13 @@ class UserAccount extends BaseEntity {
      * @return String the gender
      */
     function getGenderLabel(){
-    	return $this->getGender() == '1' ? 'Male' : 'Female'; 
+    	if($this->isMale()){
+			return 'Male';
+		}
+		if($this->isFemale()){		
+			return 'Female';
+		}
+		return '';
     }
  	/**
      * Determine if a person is male
@@ -944,9 +1035,11 @@ class UserAccount extends BaseEntity {
 	function getGenderText(){
 		if($this->isMale()){
 			return 'Male';
-		} else {		
+		}
+		if($this->isFemale()){		
 			return 'Female';
 		}
+		return '';
 	}
 	# Determine if user profile has been activated
 	function isActivated(){
@@ -991,13 +1084,20 @@ class UserAccount extends BaseEntity {
 	function isManageer(){
     	return $this->getType() == 4 ? true : false; 
     }
- 	# determine if person has not been invited
+    # determine if person has not been invited
     function hasNotBeenInvited() {
     	return $this->getIsInvited() == 0 ? true : false;
     }
-	# determine if person has been invited
+    # determine if person has been invited
     function hasBeenInvited() {
     	return $this->getIsInvited() == 1 ? true : false;
+    }
+    function hasAcceptedInvitation() {
+    	return $this->getHasAcceptedInvite() == 1 ? true : false;
+    }
+    # determine if user has pending activation
+    function hasPendingActivation() {
+   		return $this->isUserInActive() ? true : false;
     }
 	/**
 	 * Return the date of birth 
@@ -1134,7 +1234,7 @@ class UserAccount extends BaseEntity {
 		// set the send of the email address
 		$mail->setFrom($this->config->notification->emailmessagesender, $this->config->notification->notificationsendername);
 		
-		$subject = sprintf($this->translate->_('useraccount_email_subject_invite_confirmation'), getAppName());
+		$subject = sprintf($this->translate->_('profile_email_subject_invite_confirmation'), getAppName());
 		$mail->setSubject($subject);
 		// render the view as the body of the email
 		$mail->setBodyHtml($template->render('inviteconfirmation.phtml'));

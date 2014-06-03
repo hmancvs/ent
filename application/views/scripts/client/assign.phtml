@@ -120,7 +120,7 @@
                         <?php
                             $dropdown = new Zend_Form_Element_Select('role',
                                                 array(
-                                                    'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), array('1'=>'Supervisor')),
+                                                    'multiOptions' => array('1'=>'Supervisor'),
                                                     'view' => new Zend_View(),
                                                     'decorators' => array('ViewHelper'),
                                                     'class' => array('form-control','input-sm')

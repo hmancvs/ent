@@ -1,22 +1,23 @@
 <?php
 
-class Assignment extends BaseRecord  {
+class ClientHistory extends BaseRecord  {
 	public function setTableDefinition() {
 		parent::setTableDefinition();
 		
-		$this->setTableName('assignment');
+		$this->setTableName('clienthistory');
 		$this->hasColumn('id', 'integer', null, array('primary' => true, 'autoincrement' => true));
 		$this->hasColumn('clientid', 'integer', null);
-		$this->hasColumn('userid', 'integer', null, array('notblank' => true));
 		$this->hasColumn('startdate', 'date', null, array('notblank' => true));
 		$this->hasColumn('enddate', 'date', null);
-		$this->hasColumn('role', 'integer', null);
-		$this->hasColumn('notes', 'string', 255);
+		$this->hasColumn('isgoalreached', 'integer', null);
+		$this->hasColumn('reason', 'string', 1000);
+		$this->hasColumn('goaldetails', 'string', 1000);
+		$this->hasColumn('comments', 'string', 1000);
+		$this->hasColumn('assessedbyid', 'date', null);
 		$this->hasColumn('datecreated', 'timestamp');
 		$this->hasColumn('createdby', 'integer', 11);
-		$this->hasColumn('datedeassigned', 'date', null);
-		$this->hasColumn('deassignedbyid', 'date', null);
-		$this->hasColumn('reason', 'string', 500);
+		$this->hasColumn('dateclosed', 'date', null);
+		$this->hasColumn('closedbyid', 'date', null);
 		$this->hasColumn('status', 'integer', null);
 	}
 	
@@ -42,13 +43,6 @@ class Assignment extends BaseRecord  {
 				)
 		);
 		
-		$this->hasOne('UserAccount as user',
-				array(
-						'local' => 'userid',
-						'foreign' => 'id',
-				)
-		);
-		
 		$this->hasOne('UserAccount as creator',
 				array(
 						'local' => 'createdby',
@@ -56,9 +50,9 @@ class Assignment extends BaseRecord  {
 				)
 		);
 		
-		$this->hasOne('UserAccount as deassignee',
+		$this->hasOne('UserAccount as closer',
 				array(
-						'local' => 'deassignedbyid',
+						'local' => 'closedbyid',
 						'foreign' => 'id'
 				)
 		);
@@ -74,6 +68,7 @@ class Assignment extends BaseRecord  {
 		
 		// set the custom error messages
        	$this->addCustomErrorMessages(array(
+       									"clientid.notblank" => $this->translate->_("client_assignment_clientid_error"),
        									"userid.notblank" => $this->translate->_("client_assignment_userid_error"),
        									"startdate.notblank" => $this->translate->_("client_assignment_userid_error"),
        									"role.notblank" => $this->translate->_("client_assignment_role_error")
@@ -86,9 +81,6 @@ class Assignment extends BaseRecord  {
 		# force setting of default none string column values. enum, int and date 	
 		if(isArrayKeyAnEmptyString('datedeassigned', $formvalues)){
 			unset($formvalues['datedeassigned']); 
-		}
-		if(isArrayKeyAnEmptyString('clientid', $formvalues)){
-			unset($formvalues['clientid']);
 		}
 		if(isArrayKeyAnEmptyString('role', $formvalues)){
 			unset($formvalues['role']); 
@@ -108,5 +100,13 @@ class Assignment extends BaseRecord  {
 		
 		// debugMessage($formvalues); // exit();
 		parent::processPost($formvalues);
+	}
+	# determine client status
+	function isActive(){
+		$status = false;
+		if($this->getStatus() == 1 && isEmptyString($this->getEndDate())){
+			$status = true;
+		}
+		return $status;
 	}
 }

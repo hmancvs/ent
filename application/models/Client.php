@@ -40,6 +40,7 @@ class Client extends BaseEntity {
 		$this->hasColumn('resumefilename', 'string', 255);
 		$this->hasColumn('coverletterfilename', 'string', 255);
 		
+		$this->hasColumn('coachid', 'integer', null); # main couch
 		$this->hasColumn('programid', 'integer', null);
 		$this->hasColumn('funderid', 'integer', null);
 		$this->hasColumn('servicetypeid', 'integer', null);
@@ -88,6 +89,12 @@ class Client extends BaseEntity {
 						'foreign' => 'id'
 				)
 		);
+		$this->hasOne('UserAccount as user',
+				array(
+						'local' => 'coachid',
+						'foreign' => 'id',
+				)
+		);
 		$this->hasMany('ClientSkill as skills',
 				array(
 						'local' => 'id',
@@ -95,6 +102,12 @@ class Client extends BaseEntity {
 				)
 		);
 		$this->hasMany('Assignment as assignments',
+				array(
+						'local' => 'id',
+						'foreign' => 'clientid'
+				)
+		);
+		$this->hasMany('ClientHistory as history',
 				array(
 						'local' => 'id',
 						'foreign' => 'clientid'
@@ -157,6 +170,9 @@ class Client extends BaseEntity {
 		}
 		if(isArrayKeyAnEmptyString('programid', $formvalues)){
 			unset($formvalues['programid']);
+		}
+		if(isArrayKeyAnEmptyString('coachid', $formvalues)){
+			unset($formvalues['coachid']);
 		}
 		if(isArrayKeyAnEmptyString('funderid', $formvalues)){
 			unset($formvalues['funderid']);
@@ -289,7 +305,34 @@ class Client extends BaseEntity {
 				unset($formvalues['skills']);
 			}
 		}
-		// debugMessage($formvalues); // exit(); 
+		
+		// if adding new client
+		if(isArrayKeyAnEmptyString('id', $formvalues) && !isArrayKeyAnEmptyString('userid', $formvalues)){
+			// check if adding new client so as to set supervisor assignment
+			$formvalues['coachid'] = $formvalues['userid'];
+			$assignments = array(
+					1 => array(
+						'userid'=> $formvalues['userid'], 
+						'status'=> $formvalues['status'], 
+						'startdate' => changeDateFromPageToMySQLFormat($formvalues['assignstartdate']), 
+						'createdby'=> $formvalues['createdby'],
+						'role'=> $formvalues['role']						
+					)
+			);
+			$formvalues['assignments'] = $assignments;
+			
+			// check if adding new client so as to set initial entry to client history
+			$clienthistory = array(
+					1 => array(
+						'status'=> $formvalues['status'],
+						'startdate' => changeDateFromPageToMySQLFormat($formvalues['startdate']),
+						'createdby'=> $formvalues['createdby'],
+					)
+			);
+			$formvalues['history'] = $clienthistory;
+		}
+		
+		// debugMessage($formvalues); exit(); 
 		parent::processPost($formvalues);
 	}
 	
@@ -458,7 +501,20 @@ class Client extends BaseEntity {
 		}
 		return '';
 	}
-	
+	/**
+	 * Determine if a person is male
+	 * @return bool
+	 */
+	function isMale(){
+		return $this->getGender() == '1' ? true : false;
+	}
+	/**
+	 * Determine if a person is female
+	 * @return bool
+	 */
+	function isFemale(){
+		return $this->getGender() == '2' ? true : false;
+	}
 	# path to resume absolute path
 	function getResumePath(){
 		$path = APPLICATION_PATH.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR.PUBLICFOLDER.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR."client_".$this->getID().DIRECTORY_SEPARATOR."resume".DIRECTORY_SEPARATOR.$this->getResumeFilename();
@@ -575,6 +631,38 @@ class Client extends BaseEntity {
 			}
 		}
 		return $users;
+	}
+	# get history entries for the client
+	function getClientHistory($latest = false) {
+		if($latest == false){
+			$query = Doctrine_Query::create()->from('ClientHistory h')
+			->where("h.clientid = '".$this->getID()."'");
+			//debugMessage($query->getSQLQuery());
+			$result = $query->execute();
+			return $result;
+		} else {
+			$query = Doctrine_Query::create()->from('ClientHistory h')
+			->where("h.clientid = '".$this->getID()."'")->orderBy("h.id desc")->limit('1');
+			//debugMessage($query->getSQLQuery());
+			$result = $query->fetchOne();
+			return $result;
+		}
+	}
+	# determine client status
+	function isActive(){
+		$status = false;
+		if($this->getStatus() == 1){
+			$status = true;
+		}
+		return $status;
+	}
+	# get latest status entry in client history
+	function getLatestInHistory() {
+		$query = Doctrine_Query::create()->from('ClientHistory h')
+		->where("h.clientid = '".$this->getID()."'");
+		//debugMessage($query->getSQLQuery());
+		$result = $query->execute();
+		return $result;
 	}
 }
 ?>

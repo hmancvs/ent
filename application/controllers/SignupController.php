@@ -2,19 +2,6 @@
 
 class SignupController extends IndexController {
 	
-	function indexAction(){
-		$url = $this->view->baseUrl("user/login/tab/signup");
-		if(!isEmptyString($this->_getParam('id'))){
-			$url = $this->view->baseUrl("user/login/tab/signup/id/".$this->_getParam('id'));
-			if($this->_getParam('complete') == '1'){
-				$url = $this->view->baseUrl("user/login/tab/signup/id/".$this->_getParam('id')."/complete/1");
-			}
-			if($this->_getParam('reactivate') == '1'){
-				$url = $this->view->baseUrl("user/login/tab/signup/id/".$this->_getParam('id')."/reactivate/1");
-			}
-		}
-		$this->_helper->redirector->gotoUrl($url);
-	}
 	function createAction() {
 		// the group to which the user is to be added
 		$formvalues = $this->_getAllParams();
@@ -41,50 +28,33 @@ class SignupController extends IndexController {
 		
 		$formvalues = $this->_getAllParams();
 		$session = SessionWrapper::getInstance(); 
-		// debugMessage($formvalues); exit();
+		$id = decode($formvalues['id']);
+		$formvalues['id'] = $id;
+		// debugMessage($formvalues);
 		
-		// debugMessage($this->_getAllParams()); 
 		$user = new UserAccount();
-		$user->populate(decode($formvalues['id']));
+		$user->populate($id);
+		$user->processPost($formvalues);
 		
-		$this->_setParam("action", ACTION_EDIT);
-		$this->_setParam('isactive', 1);
-		$this->_setParam('activationkey', '');
-		$this->_setParam('activationdate', DEFAULT_DATETIME);
-		// $this->_setParam('usergroups', array(array("groupid" => $formvalues['type'])));
-		$this->_setParam('hasacceptedinvite', 1);
-		$this->_setParam('isinvited', NULL);
-		$this->_setParam('id', trim(decode($formvalues['id'])));
-		if(isEmptyString($this->_getParam('createdby'))){
-			$this->_setParam('createdby', decode($formvalues['id']));
-		}
-		$this->_setParam('reactivatedsubscriber', 1);
-		$successurl = $this->view->baseUrl('user/checklogin/email/'.$this->_getParam('email').'/password/'.$this->_getParam('password').'/hashed/1');
-		// debugMessage($successurl);
+		// debugMessage('error > '.$user->getErrorStackAsString()); debugMessage($user->toArray()); exit();
+		$user->setPassword(sha1($formvalues['password']));
+		$user->setActivationDate(date('Y-m-d H:i:s'));
+		$user->setActivationKey('');
+		$user->setIsActive(1);
+		$user->setAgreedToTerms(1);
+		// debugMessage($user->toArray());
+		$user->save();
 		
-		$user->processPost($this->_getAllParams());
-		/*debugMessage('error: '.$user->getErrorStackAsString());
-		debugMessage($user->toArray()); exit();*/
-		if($user->hasError()){
-			// debugMessage('process errors are '.$user->getErrorStackAsString()); exit();
-			$session->setVar(FORM_VALUES, $this->_getAllParams());
-    		$session->setVar(ERROR_MESSAGE, $user->getErrorStackAsString()); 
-			$this->_helper->redirector->gotoUrl(decode($this->_getParam(URL_FAILURE)));
-		}
+		$session->setVar(SUCCESS_MESSAGE, "You can now login using your Username or Password");
 		
-		try {
-			$user->save(); // debugMessage($user->toArray());
-			$user->afterActivation();
-			// $session->setVar(SUCCESS_MESSAGE, 'Your account on has been successfully activated. Login below to get started.');
-			// $this->_helper->redirector->gotoUrl(decode($this->_getParam(URL_SUCCESS)));
-			$session->setVar(SUCCESS_MESSAGE, 'Your AGMIS Account has been successfully activated.');
-			$this->_helper->redirector->gotoUrl($successurl); 
-		} catch (Exception $e) {
-			$session->setVar(FORM_VALUES, $this->_getAllParams());
-    		$session->setVar(ERROR_MESSAGE, $e->getMessage()); 
-    		// debugMessage('save errors are '.$e->getMessage());
-			$this->_helper->redirector->gotoUrl(decode($this->_getParam(URL_FAILURE)));
-		}
+		// exit();
+		$this->clearSession();
+		$session->setVar(SUCCESS_MESSAGE, "You can now login using your Username/Email and Password");
+		// $loginurl = $this->view->baseUrl("user/checklogin/email/".$user->getEmail().'/password/'.$formvalues['password']);
+		$loginurl = $this->view->baseUrl("user/login");
+		$this->_helper->redirector->gotoUrl($loginurl);
+		
+		return false;
 	}
 	
 	function activateAction() {
@@ -151,50 +121,6 @@ class SignupController extends IndexController {
 		}
 	}
 	
-	function mobileactivateAction() {
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender(TRUE);
-		
-		$formvalues = $this->_getAllParams();
-		$session = SessionWrapper::getInstance();
-		// debugMessage($formvalues);
-		$key = trim($formvalues['actkey']);
-		$user = new UserAccount();
-		$useraccount = new UserAccount();
-		
-		if(!isEmptyString($this->_getParam('phone'))){
-			$useraccount = $user->populateByPhone(getFullPhone($formvalues['phone']), $key);
-		} else {
-			if(!isEmptyString($this->_getParam('id'))){
-				$useraccount->populate(decode($formvalues['id']));
-			}
-		}
-		
-		// debugMessage($useraccount->toArray()); exit();
-		# check if user with specified phone exists
-		if(!isEmptyString($useraccount->getID())){
-			# now validate user's activation code specified
-			if($useraccount->getActivationKey() == $key){
-				if(!isEmptyString($this->_getParam('id'))){
-					try {
-						$useraccount->activateAccount($key, 1);
-						$session->setVar(SUCCESS_MESSAGE, 'Activation Code successfully validated. Please login to continue');
-					} catch (Exception $e) {
-						$session->setVar(ERROR_MESSAGE, $e->getMessage());
-						$this->_helper->redirector->gotoUrl(decode($this->_getParam(URL_FAILURE)));
-					}
-				}
-				if(!isEmptyString($this->_getParam('phone'))){
-					$session->setVar(SUCCESS_MESSAGE, 'Activation Code successfully validated. Please complete your profile to continue.');
-				}
-				//$this->_helper->redirector->gotoUrl($this->view->baseUrl("user/login/tab/signup/id/".encode($useraccount->getID()).'/actkey/valid'));
-				$this->_helper->redirector->gotoUrl(decode($this->_getParam(URL_SUCCESS))); 
-			}
-		}
-		// $session->setVar(ERROR_MESSAGE, 'Invalid Phone or Activation Code');
-		$session->setVar(ERROR_MESSAGE, 'Invalid Activation Code specified. Please try again');
-		$this->_helper->redirector->gotoUrl(decode($this->_getParam(URL_FAILURE)));
-	}
 	
 	function confirmAction() {
 		
@@ -247,16 +173,6 @@ class SignupController extends IndexController {
 		}
 	}
 	
-	function testAction() {
-		$this->_helper->layout->disableLayout();
-	    $this->_helper->viewRenderer->setNoRender(true);
-		$user = new UserAccount();
-		$user->populate(decode($this->_getParam('id')));
-		$user->transactionSave();
-		//debugMessage($user->toArray());
-		//debugMessage($user->getFarmer()->getNextRegNo());
-	}
-	
 	function checkusernameAction(){
 		$this->_helper->layout->disableLayout();
 	    $this->_helper->viewRenderer->setNoRender(true);
@@ -292,27 +208,5 @@ class SignupController extends IndexController {
 		} else {
 			echo '0';
 		}
-	}
-	
-	function checkphoneAction(){
-		$this->_helper->layout->disableLayout();
-	    $this->_helper->viewRenderer->setNoRender(true);
-	    
-		$formvalues = $this->_getAllParams();
-		$phone = trim($formvalues['phone']);
-		// debugMessage($formvalues);
-		$user = new UserAccount();
-		if(!isArrayKeyAnEmptyString('userid', $formvalues)){
-			$user->populate($formvalues['userid']);
-		}
-		if($user->phoneExists(getFullPhone($phone))){
-			echo '1';
-		} else {
-			echo '0';
-		}
-	}
-	
-	function pricingAction(){
-		
 	}
 }

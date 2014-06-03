@@ -21,6 +21,8 @@ var datepickerOpts = {
 		showButtonPanel: true, 
 		currentText: 'Now'		
 	}; 	
+var uiblockcontent = '<h4><img src="<?php echo $this->baseUrl('images/loader.gif'); ?>" /> Please wait...</h4>';
+
 $(document).ready(function() {
 	
 	// make the datefields readonly
@@ -309,7 +311,7 @@ $(document).ready(function() {
 						$("#"+formid).serialize(),  
 						function(data){
 							// alert(data); return false;
-							$.blockUI({ message: '<h4><img src="<?php echo $this->baseUrl('images/loader.gif'); ?>" /> Please wait...</h4>' }); 
+							$.blockUI({ message: uiblockcontent }); 
 							var url = successurl;
 							$(location).attr('href',url);							
 						}  
@@ -438,9 +440,9 @@ $(document).ready(function() {
 			}
 		});
 	}
-	$("a.confirm-dialog").click(function(e) {
+	$(".confirm-dialog").click(function(e) {
 		e.preventDefault();
-		var message = '<label class="blockcontainer">Are you sure? <br /><br /> Click <b>OK</b> to confirm, and <b>Cancel</b> to ignore</label>';
+		var message = '<label class="blockcontainer small">Are you sure? <br /><br /> Click <b>OK</b> to confirm, and <b>Cancel</b> to ignore</label>';
 		var custom_msg = $(this).attr('message');
 		if(!isEmptyString(custom_msg) && custom_msg != 'undefined'){
 			var message = '<label class="blockcontainer">'+custom_msg+' <br /><br /> Click <b>OK</b> to confirm, and <b>Cancel</b> to ignore</label>';
@@ -449,7 +451,7 @@ $(document).ready(function() {
 		confirmDialog(message, url);
 	});
 	
-	$("a.confirm-prompt").click(function(e) {
+	$(".confirm-prompt").click(function(e) {
 		e.preventDefault();
 		var message = $(this).attr('message');
 		var url = $(this).attr('action');
@@ -458,7 +460,7 @@ $(document).ready(function() {
 	
 	$('.bootbox').css({'z-index':'10000'});
 	
-	$(".alert-dialog").click(function(e) { alert('clicked');
+	$(".alert-dialog").click(function(e) {
 		e.preventDefault();
 		var message = '<label class="blockcontainer"></label>';
 		var custom_msg = $(this).attr('message');
@@ -623,6 +625,11 @@ $(document).ready(function() {
 	// UI tabs
 	$("#tabs").tabs();
 	
+	$("#indexform").submit(function(){
+		if ($(this).valid()) {
+			$.blockUI({ message: uiblockcontent}); 
+		}
+	});
 });
 
 //Use window.load and not document.ready for effective equal heights

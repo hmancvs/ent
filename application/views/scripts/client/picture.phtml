@@ -3,24 +3,18 @@
 	
 	$id = decode($request->id);
 	if(isEmptyString($id)){
-		$id = $userid;
+		$id = $clientid;
 	}
 	
-	$user = new UserAccount();
-	$user->populate($id);
+	$client = new Client();
+	$client->populate($id);
 	
-	# profile for one viewing
-	$isme = false;
-	if($userid == $user->getID()){
-		$isme = true;
-	}
-	
-	$title = $user->getName(); $subtitle = "Upload Profile Photo";
+	$title = $client->getName(); $subtitle = "Upload Profile Photo";
 	if(!isEmptyString($request->crop)){
 		$subtitle = "Crop Profile Photo"; 
 	}
-	// debugMessage($user->getMediumPicturePath());
-	$posturl = $this->baseUrl("profile/processpicture");
+	// debugMessage($client->getMediumPicturePath());
+	$posturl = $this->baseUrl("client/processpicture");
 	$this->headTitle($title.$browserappend);
 	$description = 'Upload a profile Image';
 	
@@ -29,10 +23,16 @@
 ?>
 <script>
 $(document).ready(function() {
-	$('.titlebreadcrumb').html('<?php echo $homedir.'Users / '.$user->getName()." / Upload Photo"; ?>');
+	$('.titlebreadcrumb').html('<?php echo $homedir.'Clients / '.$client->getName()." / Upload Photo"; ?>');
 	$('.titlelabel').html('<?php echo $title; ?>');
 	$('.desclabel').html('<?php echo $description; ?>');
 	$('.pageicon').html('<span class="glyphicon glyphicon-user"></span>');
+	
+	$("#profileimage").change(function(){
+		if(!isEmptyString($(this).val())){
+			$(".fileinput-preview").html($(this).val());
+		}
+	});
 	
 	<?php if(isEmptyString($request->crop)){ ?>
 		// form validation
@@ -64,7 +64,7 @@ $(document).ready(function() {
 			handles: true,
 			fadeSpeed: 200, 
 			minWidth: 100,
-			maxWidth: 350,
+			maxWidth: 380,
 			x1: 0, y1: 0, x2: 200, y2: 200,
 			/*onSelectChange: preview,*/
 			onSelectEnd: function (img, selection) {
@@ -96,7 +96,7 @@ $(document).ready(function() {
                             <div class="col-md-3">
                             	<h6 class="well-legend">Current Photo</h6>
                                 <div id="profileinfo" style="margin-top:15px;">
-                                    <img id="xprofileimage" src="<?php echo $user->getMediumPicturePath(); ?>" />
+                                    <img id="xprofileimage" src="<?php echo $client->getMediumPicturePath(); ?>" />
                                 </div>
                             </div>
                             <div class="col-md-9">
@@ -114,26 +114,26 @@ $(document).ready(function() {
                                                 </div>
                                             </div>
                                         </div>
-                                        <input type="hidden" id="id" name="id" value="<?php echo encode($user->getID()); ?>" />
-                                        <input type="hidden" class="successurl" id="<?php echo URL_SUCCESS; ?>" name="<?php echo URL_SUCCESS; ?>" value="<?php echo $this->baseUrl('profile/view/id/'.encode($user->getID())); ?>" />
-                                        <input type="hidden" class="failureurl" id="<?php echo URL_FAILURE; ?>" name="<?php echo URL_FAILURE; ?>" value="<?php echo $this->baseUrl('profile/picture/id/'.encode($user->getID())); ?>" />
+                                        <input type="hidden" id="id" name="id" value="<?php echo encode($client->getID()); ?>" />
+                                        <input type="hidden" class="successurl" id="<?php echo URL_SUCCESS; ?>" name="<?php echo URL_SUCCESS; ?>" value="<?php echo $this->baseUrl('client/view/id/'.encode($client->getID())); ?>" />
+                                        <input type="hidden" class="failureurl" id="<?php echo URL_FAILURE; ?>" name="<?php echo URL_FAILURE; ?>" value="<?php echo $this->baseUrl('client/picture/id/'.encode($client->getID())); ?>" />
                                         <div id="profileimage_error"></div>
                                         <div class="divider30"></div>
-                                        <button style="" type="submit" class="btn btn-primary" id="upload" name="submit"><i class="glyphicon glyphicon-upload"></i>&nbsp; Upload</button> or <a href="<?php echo $this->baseUrl("profile/view/id/".encode($user->getID())); ?>"><?php echo $this->translate('global_button_cancel'); ?></a>&nbsp;
+                                        <button style="" type="submit" class="btn btn-primary" id="upload" name="submit"><i class="glyphicon glyphicon-upload"></i>&nbsp; Upload</button> or <a href="<?php echo $this->baseUrl("client/view/id/".encode($client->getID())); ?>"><?php echo $this->translate('global_button_cancel'); ?></a>&nbsp;
                                 	</form>  
                               	<?php } else { ?>
-                                	<form action="<?php echo $this->baseUrl("profile/croppicture"); ?>" id="indexform" method="post" role="form">
+                                	<form action="<?php echo $this->baseUrl("client/croppicture"); ?>" id="indexform" method="post" role="form">
                                     	<div class="divider30"></div>
                                         <h4>Resize/Crop Photo</h4>
                                         <div class="divider10"></div>
-                                        <img src="<?php echo $user->getLargePicturePath(); ?>" id="photo" />
+                                        <img src="<?php echo $client->getLargePicturePath(); ?>" id="photo" />
                                         <input type="hidden" name="x1" value="0" />
                                         <input type="hidden" name="y1" value="0" />
                                         <input type="hidden" name="x2" value="200" />
                                         <input type="hidden" name="y2" value="200" />
                                         <input type='hidden' name='w' value='200' />
                                         <input type='hidden' name='h' value='200' />
-                                        <input type="hidden" id="id" name="id" value="<?php echo encode($user->getID()); ?>" />
+                                        <input type="hidden" id="id" name="id" value="<?php echo encode($client->getID()); ?>" />
                                         <input type="hidden" id="type" name="type" value="<?php echo $type; ?>" />
                                         <div class="divider30"></div>
                                         <button type="submit" id="startcrop" class="btn btn-primary"><i class="glyphicon glyphicon-ok"></i> Crop Photo</button>

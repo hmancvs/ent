@@ -8,13 +8,13 @@ class UserController extends IndexController  {
     	// debugMessage($formvalues); 
     	# check that an email has been provided
 		if (isEmptyString(trim($this->_getParam("email")))) {
-			$session->setVar(ERROR_MESSAGE, $this->_translate->translate("useraccount_email_error")); 
+			$session->setVar(ERROR_MESSAGE, $this->_translate->translate("profile_email_error")); 
 			$session->setVar(FORM_VALUES, $this->_getAllParams());
 			// return to the home page
     		$this->_helper->redirector->gotoSimpleAndExit('login', "user");
 		}
 		if (isEmptyString(trim($this->_getParam("password")))) {
-			$session->setVar(ERROR_MESSAGE, $this->_translate->translate("useraccount_password_error")); 
+			$session->setVar(ERROR_MESSAGE, $this->_translate->translate("profile_password_error")); 
 			$session->setVar(FORM_VALUES, $this->_getAllParams());
 			// return to the home page
     		$this->_helper->redirector->gotoSimpleAndExit('login', "user");
@@ -81,7 +81,7 @@ class UserController extends IndexController  {
 		
 		/* debugMessage($useraccount->toArray());
 		exit(); */
-		$session->setVar("userid", $useraccount->getID());
+		$session->setVar("userid", $user->id);
 		$session->setVar("type", $useraccount->getType());
 
 		// clear user specific cache, before it is used again
@@ -182,7 +182,7 @@ class UserController extends IndexController  {
     			// send an error message that no user with that email was found 
     			$session = SessionWrapper::getInstance(); 
     			$session->setVar(FORM_VALUES, $this->_getAllParams()); 
-    			$session->setVar(ERROR_MESSAGE, $this->_translate->translate("useraccount_user_invalid_error"));
+    			$session->setVar(ERROR_MESSAGE, $this->_translate->translate("profile_user_invalid_error"));
     			$this->_helper->redirector->gotoUrl($this->view->baseUrl("user/recoverpassword"));
     		}
     	}

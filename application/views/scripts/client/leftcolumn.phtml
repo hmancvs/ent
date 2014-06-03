@@ -52,7 +52,11 @@ $(document).ready(function() {
 <div class="col-md-3 marginleft0" id="left">    
     <div class="well" id="profiletop">
         <div id="profileinfo"> 
-       		<img id="profileimage" src="<?php echo $user->getMediumPicturePath(); ?>" />
+            <?php if ($acl->checkPermission('Client', ACTION_EDIT)) { ?>
+                <a href="<?php echo $this->baseUrl('client/picture/id/'.encode($client->getID())); ?>" class="editpic clearfix" title="Update Photo"><img id="profileimage" class="img-thumbnail img-responsive" src="<?php echo $client->getMediumPicturePath(); ?>" /></a>
+            <?php } else { ?>
+                <img id="profileimage" class="img-thumbnail img-responsive" src="<?php echo $client->getMediumPicturePath(); ?>" />
+            <?php } ?>
         </div>
     </div>
     <ul id="leftnav" style="width:100%;">

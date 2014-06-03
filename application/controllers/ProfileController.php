@@ -66,15 +66,6 @@ class ProfileController extends SecureController  {
 	}
 	
 	public function indexAction(){
-		$session = SessionWrapper::getInstance(); 
-		$id = $this->_getParam('id'); 
-		if(!isEmptyString($id)){
-			$user = new UserAccount();
-			$user->populate(decode($id));
-			if(isPublicUser() && $user->getID() != $session->getVar('userid')){
-				$this->_helper->redirector->gotoUrl($this->view->baseUrl("index/accessdenied"));
-			}
-		}
 	}
 	
 	function changepasswordAction()  {
@@ -112,7 +103,7 @@ class ProfileController extends SecureController  {
 	    	// debugMessage($user->toArray());
 	    	
 	    	if($user->usernameExists($formvalues['username'])){
-	    		$session->setVar(ERROR_MESSAGE, sprintf($this->_translate->translate("useraccount_username_unique_error"), $formvalues['username']));
+	    		$session->setVar(ERROR_MESSAGE, sprintf($this->_translate->translate("profile_username_unique_error"), $formvalues['username']));
 	    		return false;
 	    	}
 	    	# save new username
@@ -163,7 +154,7 @@ class ProfileController extends SecureController  {
 	    	// debugMessage($user->toArray());
 	    	
 	    	if($user->emailExists($formvalues['email'])){
-	    		$session->setVar(ERROR_MESSAGE, sprintf($this->_translate->translate("useraccount_email_unique_error"), $formvalues['email']));
+	    		$session->setVar(ERROR_MESSAGE, sprintf($this->_translate->translate("profile_email_unique_error"), $formvalues['email']));
 	    		return false;
 	    	}
 	    	# save new username
@@ -234,7 +225,7 @@ class ProfileController extends SecureController  {
 		    	$session->setVar(SUCCESS_MESSAGE, $successmessage);
 	    	} else {
 	    		if($user->phoneExists($formvalues['phone'])){
-		    		$session->setVar(ERROR_MESSAGE, sprintf($this->_translate->translate("useraccount_phone_unique_error"), $formvalues['phone']));
+		    		$session->setVar(ERROR_MESSAGE, sprintf($this->_translate->translate("profile_phone_unique_error"), $formvalues['phone']));
 		    		return false;
 		    	}
 		    	# save new phone
@@ -264,7 +255,7 @@ class ProfileController extends SecureController  {
     	$user->sendNewEmailNotification($user->getEmail2());
     	$successmessage = "A new activation code has been sent to your new email address. If you are still having any problems please do contact us";
     	$session->setVar(SUCCESS_MESSAGE, $successmessage);
-   		$this->_redirect($this->view->baseUrl('profile/view/id/'.encode($user->getID()).'/tab/account'));
+   		$this->_redirect($this->view->baseUrl('profile/view/id/'.encode($user->getID())));
     }
     
 	function resetpasswordAction(){
@@ -278,7 +269,7 @@ class ProfileController extends SecureController  {
     	$user->setEmail($user->getEmail());
     	
     	if ($user->recoverPassword()) {
-       		$session->setVar(SUCCESS_MESSAGE, sprintf($this->_translate->translate('useraccount_change_password_admin_confirmation'), $user->getName()));
+       		$session->setVar(SUCCESS_MESSAGE, sprintf($this->_translate->translate('profile_change_password_admin_confirmation'), $user->getName()));
    			// send a link to enable the user to recover their password 
    			// debugMessage('no error found ');
     	} else {
@@ -388,7 +379,7 @@ class ProfileController extends SecureController  {
 		// determine if user has destination avatar folder. Else user is editing there picture
 		if(!is_dir($destination_path.$user->getID())){
 			// no folder exits. Create the folder
-			mkdir($destination_path.$user->getID(), 0755);
+			mkdir($destination_path.$user->getID(), 0777);
 		} 
 		
 		// set the destination path for the image
@@ -396,12 +387,12 @@ class ProfileController extends SecureController  {
 		$destination_path = $destination_path.$profilefolder.DIRECTORY_SEPARATOR."avatar";
 		
 		if(!is_dir($destination_path)){
-			mkdir($destination_path, 0755);
+			mkdir($destination_path, 0777);
 		}
 		// create archive folder for each user
 		$archivefolder = $destination_path.DIRECTORY_SEPARATOR."archive";
 		if(!is_dir($archivefolder)){
-			mkdir($archivefolder, 0755);
+			mkdir($archivefolder, 0777);
 		}
 		
 		$oldfilename = $user->getProfilePhoto();
@@ -474,15 +465,11 @@ class ProfileController extends SecureController  {
 				}
 				
 				$session->setVar(SUCCESS_MESSAGE, $this->_translate->translate("global_update_success"));
-				if(isMobile()){
-					$this->_helper->redirector->gotoUrl($this->view->baseUrl("profile/view/id/".encode($user->getID())));
-				} else {
-					$this->_helper->redirector->gotoUrl($this->view->baseUrl("profile/index/id/".encode($user->getID()).'/crop/1/tab/picture'));
-				}
+				$this->_helper->redirector->gotoUrl($this->view->baseUrl("profile/picture/id/".encode($user->getID()).'/crop/1'));
 			} catch (Exception $e) {
 				$session->setVar(ERROR_MESSAGE, $e->getMessage());
 				$session->setVar(FORM_VALUES, $this->_getAllParams());
-				$this->_helper->redirector->gotoUrl($this->view->baseUrl('profile/index/id/'.encode($user->getID()).'/tab/picture'));
+				$this->_helper->redirector->gotoUrl($this->view->baseUrl('profile/picture/id/'.encode($user->getID())));
 			}
 		} else {
 			// debugMessage($upload->getMessages());
@@ -492,21 +479,21 @@ class ProfileController extends SecureController  {
 				$customerrors['fileUploadErrorNoFile'] = "Please browse for image on computer";
 			}
 			if(!isArrayKeyAnEmptyString('fileExtensionFalse', $uploaderrors)){
-				$custom_exterr = sprintf($this->_translate->translate('upload_invalid_ext_error'), $config->uploads->photoallowedformats);
+				$custom_exterr = sprintf($this->_translate->translate('global_invalid_ext_error'), $config->uploads->photoallowedformats);
 				$customerrors['fileExtensionFalse'] = $custom_exterr;
 			}
 			if(!isArrayKeyAnEmptyString('fileUploadErrorIniSize', $uploaderrors)){
-				$custom_exterr = sprintf($this->_translate->translate('upload_invalid_size_error'), formatBytes($config->uploads->photomaximumfilesize,0));
+				$custom_exterr = sprintf($this->_translate->translate('global_invalid_size_error'), formatBytes($config->uploads->photomaximumfilesize,0));
 				$customerrors['fileUploadErrorIniSize'] = $custom_exterr;
 			}
 			if(!isArrayKeyAnEmptyString('fileSizeTooBig', $uploaderrors)){
-				$custom_exterr = sprintf($this->_translate->translate('upload_invalid_size_error'), formatBytes($config->uploads->photomaximumfilesize,0));
+				$custom_exterr = sprintf($this->_translate->translate('global_invalid_size_error'), formatBytes($config->uploads->photomaximumfilesize,0));
 				$customerrors['fileSizeTooBig'] = $custom_exterr;
 			}
 			$session->setVar(ERROR_MESSAGE, 'The following errors occured <ul><li>'.implode('</li><li>', $customerrors).'</li></ul>');
 			$session->setVar(FORM_VALUES, $this->_getAllParams());
 			
-			$this->_helper->redirector->gotoUrl($this->view->baseUrl('profile/index/id/'.encode($user->getID()).'/tab/picture'));
+			$this->_helper->redirector->gotoUrl($this->view->baseUrl('profile/picture/id/'.encode($user->getID())));
 		}
 		// exit();
 	}
@@ -537,12 +524,12 @@ class ProfileController extends SecureController  {
 		// exit();
 		$image = WideImage::load($src);
 		$cropped1 = $image->crop($formvalues['x1'], $formvalues['y1'], $formvalues['w'], $formvalues['h']);
-		$resized_1 = $cropped1->resize(240, 300, 'fill');
+		$resized_1 = $cropped1->resize(300, 300, 'fill');
 		$resized_1->saveToFile($newlargefilename);
-		
+			
 		//$image2 = WideImage::load($src);
 		$cropped2 = $image->crop($formvalues['x1'], $formvalues['y1'], $formvalues['w'], $formvalues['h']);
-		$resized_2 = $cropped2->resize(132, 165, 'fill');
+		$resized_2 = $cropped2->resize(165, 165, 'fill');
 		$resized_2->saveToFile($newmediumfilename);
 		
 		$user->setProfilePhoto($currenttime_file);
@@ -727,7 +714,7 @@ class ProfileController extends SecureController  {
 			}
 		} else {
 			// debugMessage($formvalues);
-			$this->_helper->redirector->gotoUrl($this->view->baseUrl('profile/index/id/'.encode($formvalues['userid']).'/tab/picture/crop/1'));
+			$this->_helper->redirector->gotoUrl($this->view->baseUrl('profile/picture/id/'.encode($formvalues['userid']).'/crop/1'));
 		}
     }
 }

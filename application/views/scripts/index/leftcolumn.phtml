@@ -1,6 +1,7 @@
 <?php
 	include APPLICATION_PATH.'/includes/header.php';
 	
+	$userid = $session->getVar("userid"); // debugMessage($userid);
 	$pageid = $request->id;
 	$module = $request->module;
 	$user = new UserAccount();
@@ -28,9 +29,9 @@
             <a class="gonowhere"><span class="glyphicon glyphicon-cog"></span> System </a>
             <ul class="subNav">
                 <?php if ($acl->checkPermission('User Account', ACTION_CREATE)) { ?>	
-                    <li><a>New User</a></li>
+                    <li><a href="<?php echo $this->baseUrl('profile'); ?>">New User</a></li>
                 <?php } ?>
-                <li><a>User Profiles</a></li>
+                <li href="<?php echo $this->baseUrl('profile/list'); ?>"><a>User Profiles</a></li>
                 <!--<li><a >User Roles</a></li>-->
                 <!--<li><a >Variable Maintenance</a></li>
                 <li><a >Global Configuration</a></li>-->

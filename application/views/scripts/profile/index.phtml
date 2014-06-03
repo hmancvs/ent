@@ -2,47 +2,24 @@
 	require_once APPLICATION_PATH.'/includes/header.php';
 	
 	$user = new UserAccount();
-	$clientid = decode(trim($request->clientid));
 	$type = trim($request->type);
-	$tab = trim($request->tab);	
-	if(isEmptyString($tab)){
-		$tab = 'profile';
-	}
 	$allroles = getUserType();
 	$successurl = encode($this->baseUrl('profile/view'));
-	$gotosuccess = false; 
-	$showtypeselect = false;
-	$showorgselect = false;
-	$showmarketselect = false;
-	
-	if($acl->checkPermission('User Account', ACTION_CREATE)){
-		$showtypeselect = true;
-		$showorgselect = true;
-		$showmarketselect = true;
-	}
 	
 	if (isEmptyString($request->id)) {
-		$title = $this->translate("useraccount_pagetitle_new");  // default title
+		$title = "New User";  // default title
 		$posturl = $this->baseUrl("profile/create");
 		$button_title = $this->translate("global_button_save");
 		$successmessage = $this->translate('global_save_success');
 		$failureurl =  encode($this->baseUrl('profile/index'));
-		if(!isEmptyString($clientid)){
-			$client = new Organisation();
-			$client->populate($clientid);
-			$user->setOrganisationID($client->getID());
-			$type = $client->getUsersType();
-			$user->setDistrictID($client->getDistrictID());
-		}
 		if(isEmptyString($type)){
 			$type = DEFAULT_USER_GROUP;
 		}
-		$user->setType($type);
+		// $user->setType($type);
 		$title = isEmptyString($request->type) ? "New User": "New ".$allroles[$type];
-		$leveltwoname = "New User";
-		
+		$breadcrumbtitle = 'New User'; 
 	} else {
-		$title = "Update Profile"; 
+		$title = "Update Profile"; 		
 		$user->populate(decode($request->id));		
 		$posturl = $this->baseUrl("profile/edit"); 
 		$button_title = $this->translate('global_button_save_changes'); 
@@ -51,30 +28,8 @@
 		if(isEmptyString($type)){
 			$type = $user->getUserGroups()->get(0)->getGroupID();
 		}
-		$leveltwoname = $user->getName();
 		$failureurl =  encode($this->baseUrl('profile/index/id/'.encode($user->getID())));
-	}
-
-	if($tab == 'picture'){
-		$posturl = $this->baseUrl("profile/uploadpicture");
-		if(isMobile()){
-			$posturl = $this->baseUrl("profile/processpicture");
-		}
-		$button_title = "Upload Picture";
-		$successurl = encode($this->baseUrl('profile/index/id/'.encode($user->getID()).'/tab/picture/crop/1'));
-		$failureurl =  encode($this->baseUrl('profile/index/id/'.encode($user->getID()).'/tab/picture'));
-		
-		if($request->crop == 1){
-			$posturl = $this->baseUrl("profile/croppicture");
-			$button_title = "Crop Photo";
-			$successurl = encode($this->baseUrl('profile/view/id/'.encode($user->getID())));
-			$failureurl =  encode($this->baseUrl('profile/index/id/'.encode($user->getID()).'/tab/picture/crop/1'));
-		}
-	}
-	
-	if(!isEmptyString($request->successurl)){
-		$successurl = $request->successurl;
-		$gotosuccess = true; 
+		$breadcrumbtitle = $user->getName();  
 	}
 	
 	$isme = false; 
@@ -82,12 +37,8 @@
 		$isme = true; 
 	}
 	
-	$dob = ""; $dateofbirth = '';  $fdateofbirth = ''; $birthday = ''; $birthmonth = ''; $birthyear = '';
-	if(!isEmptyString($user->getDateOfBirth())){
-		$dob = $user->getDateOfBirth();
-		$dateofbirth = date('M d, Y', strtotime($dob)); 
-		$birthday = abs(date('d', strtotime($dob)));  $birthmonth = abs(date('m', strtotime($dob))); $birthyear = date('Y', strtotime($dob));
-	}
+	$states = getStates();
+	$counties = getAllCounties();
 	
 	#in case of errors in session, populate the fields from session
 	if(!isEmptyString($session->getVar(ERROR_MESSAGE))){ 
@@ -98,19 +49,23 @@
 	$indexurl = $this->baseUrl('profile/index/id/'.encode($user->getID()));
 	$listurl = $this->baseUrl('profile/list');
 	$listitems = $this->translate("profile_list_items");
-	$this->headTitle($title); 
+	$description = '';
+	$this->headTitle($title.$browserappend);
 ?>
-<script type="text/javascript" src="<?php echo $this->serverUrl($this->baseUrl('plugins/custom/jquery.imgareaselect.min.js')); ?>"></script>
-<script type="text/javascript" src="<?php echo $this->serverUrl($this->baseUrl('plugins/bootstrap-switch/bootstrap-switch.min.js')); ?>"></script>
-<script type="text/javascript" src="<?php echo $this->serverUrl($this->baseUrl('plugins/bootstrap-multiselect/bootstrap-multiselect.min.js')); ?>"></script>
-<link href="<?php echo $this->serverUrl($this->baseUrl('assets/css/plugins/bootstrap-switch.css')); ?>" rel="stylesheet" type="text/css" />
-<link href="<?php echo $this->serverUrl($this->baseUrl('assets/css/plugins/select2.css')); ?>" rel="stylesheet" type="text/css" />
 <script>
 $(document).ready(function() {
-	// breadcrumb config
-	$("#levelone_icon").addClass('icon-user-md');
-	$("#levelone_link").attr('href', '<?php echo $listurl; ?>').html('User');
-	$("#leveltwo_link").html('<?php echo $title; ?>');
+	$('.titlebreadcrumb').html('<?php echo $homedir.'Users / '.$breadcrumbtitle; ?>');
+	$('.titlelabel').html('<?php echo $title; ?>');
+	$('.desclabel').html('<?php echo $description; ?>');
+	$('.pageicon').html('<span class="glyphicon glyphicon-list-alt"></span>');
+	
+	// custom date picker options
+	var dateofbirthOpts = datepickerOpts;
+	var startfrom = '<?php echo date('Y'); ?>';
+	dateofbirthOpts.yearRange = "-<?php echo date('Y')-1900; ?>:-0"; 
+	dateofbirthOpts.minDate = "-<?php echo date('Y'); ?>Y";
+	datepickerOpts.maxDate = new Date("Dec 31, "+startfrom);	
+	$("#dateofbirth").datepicker(dateofbirthOpts);
 	
 	$("#indexform").validate({		
 		// define the validation rules one field at a time
@@ -125,20 +80,13 @@ $(document).ready(function() {
 				required: true
 			},
 			username: {
-				required: false<?php //echo isEmptyString($user->getID()) ? 'false' : 'false' ; ?>, 
+				required: <?php echo isEmptyString($user->getID()) ? 'false' : 'true' ; ?>, 
 				minlength: <?php echo $config->profile->usernameminlength; ?>,
 				maxlength: <?php echo $config->profile->usernamemaxlength; ?>
 			},
 			email: {
 				required: true, 
 				email: true
-			},
-			phone: {
-				required: false, 					
-				validnumber: true,
-				minlength: <?php echo $config->country->phoneminlength; ?>,
-				maxlength: <?php echo $config->country->phonemaxlength; ?>,
-				validate_ug: true
 			},
 			oldpassword: {
 				required: function(element) {
@@ -166,10 +114,7 @@ $(document).ready(function() {
 				<?php } ?>	
 				equalTo: "#newpassword"
 			},
-			type: "required",
-			districtid: "required",
-			organisationid: "required",
-			profileimage: "required"
+			type: "required"
 		}, 
 		// the messages for each of the fields being validated
 		messages: {		
@@ -183,7 +128,7 @@ $(document).ready(function() {
 				"required": "<?php echo $this->translate("profile_lastname_error"); ?>"
 			},
 			username: {
-				required: "<?php echo $this->translate("useraccount_username_error"); ?>",
+				required: "<?php echo $this->translate("profile_username_error"); ?>",
 				minlength: "<?php echo sprintf($this->translate("profile_username_error_minlength"), $config->profile->usernameminlength); ?>",
 				maxlength: "<?php echo sprintf($this->translate("profile_username_error_maxlength"), $config->profile->usernamemaxlength); ?>"
 			},
@@ -191,28 +136,19 @@ $(document).ready(function() {
 				"required": "<?php echo $this->translate("profile_email_error"); ?>", 
 				"email": "<?php echo $this->translate("profile_email_invalid_error"); ?>"
 			},
-			phone: {
-				required: "<?php echo $this->translate("profile_phonenumber_error"); ?>", 					
-				maxlength: "<?php echo sprintf($this->translate("profile_phone_maxlength_error"), $config->country->phonemaxlength); ?>",
-				minlength: "<?php echo sprintf($this->translate("profile_phone_maxlength_error"), $config->country->phoneminlength); ?>",
-				validate_ug: "<?php echo $this->translate("globale_phonenumber_format"); ?>"
-			},
 			oldpassword: {
 				required: "<?php echo $this->translate("profile_oldpassword_error"); ?>"
 			},
 			newpassword: {
-				required: "<?php echo $this->translate("useraccount_password_error"); ?>",
-				maxlength: "<?php echo sprintf($this->translate("useraccount_password_error_maxlength"), $config->profile->passwordmaxlength); ?>",
-				minlength: "<?php echo sprintf($this->translate("useraccount_password_error_minlength"), $config->profile->passwordminlength); ?>"
+				required: "<?php echo $this->translate("profile_password_error"); ?>",
+				maxlength: "<?php echo sprintf($this->translate("profile_password_error_maxlength"), $config->profile->passwordmaxlength); ?>",
+				minlength: "<?php echo sprintf($this->translate("profile_password_error_minlength"), $config->profile->passwordminlength); ?>"
 			},
 			confirmpassword: {
 				required: "<?php echo $this->translate("profile_confirmpassword_error"); ?>",
 				equalTo: "<?php echo $this->translate("profile_confirmpassword_error_equalto"); ?>"
 			},
-			type: "<?php echo $this->translate("profile_role_error"); ?>",
-			districtid: "<?php echo $this->translate("global_district_error"); ?>",
-			organisationid: "<?php echo $this->translate("profile_organisation_error"); ?>",
-			profileimage: "Please browse for image on computer"
+			type: "<?php echo $this->translate("profile_role_error"); ?>"
 		},
 		// custom error positions
 		errorPlacement: function(error, element) {
@@ -225,33 +161,8 @@ $(document).ready(function() {
 					}
 					break;
 			}			
-		},
-		ignore: ":hidden:not(select)"
+		}
 	});
-	
-	$.validator.addMethod("validbirth", function(value, element, params) { 
-		var day = $("#birthday").val();
-		var month = $("#birthmonth").val();
-		var year = value;
-		if ((!isEmptyString(day) && (isEmptyString(month) || isEmptyString(year))) || 
-			(!isEmptyString(month) && (isEmptyString(day) || isEmptyString(year)))  || 
-			(!isEmptyString(year) && (isEmptyString(day) || isEmptyString(month))) ){
-			return false; 
-		}
-		return true;        
-	}, "Please select full Date of Birth");
-	
-	$.validator.addMethod("validbirth", function(value, element, params) { 
-		var day = $("#birthday").val();
-		var month = $("#birthmonth").val();
-		var year = value;
-		if ((!isEmptyString(day) && (isEmptyString(month) || isEmptyString(year))) || 
-			(!isEmptyString(month) && (isEmptyString(day) || isEmptyString(year)))  || 
-			(!isEmptyString(year) && (isEmptyString(day) || isEmptyString(month))) ){
-			return false; 
-		}
-		return true;        
-	}, "Please select full Date of Birth");
 	
 	// prevent copy and paste in password fields
 	$('input.password').bind('copy paste', function (e) {
@@ -259,57 +170,9 @@ $(document).ready(function() {
 	});
 		
 	<?php if(!isEmptyString($user->getID())) { ?>
-		$('.password').attr('placeholder', 'Leave empty for no password change'); 
+		$('.password').attr('placeholder', 'Leave empty if no password change'); 
 		$('.disableonedit').attr('readonly', true).attr('disabled', true);
 	<?php } ?>
-	disableField("country"); 
-	$('#districtid').change(function() {
-		autoPopulateSelectChain('districtid', 'countyid', '<?php echo $this->baseUrl('index/selectchaincustom/select_chain_type/district_counties/districtid/'); ?>', '<?php echo $user->getCountyID(); ?>');
-	});
-	$('#districtid').trigger('change');
-	
-	$('#countyid').change(function() {
-		autoPopulateSelectChain('countyid', 'subcountyid', '<?php echo $this->baseUrl('index/selectchaincustom/select_chain_type/county_subcounties/countyid/'); ?>', '<?php echo $user->getSubCountyID(); ?>');
-	});
-	$('#countyid').trigger('change');
-	
-	$('#subcountyid').change(function() {
-		autoPopulateSelectChain('subcountyid', 'parishid', '<?php echo $this->baseUrl('index/selectchaincustom/select_chain_type/subcounty_parishes/subcountyid/'); ?>', '<?php echo $user->getParishID(); ?>');
-	});
-	$('#subcountyid').trigger('change');
-	
-	$('#parishid').change(function() {
-		autoPopulateSelectChain('parishid', 'villageid', '<?php echo $this->baseUrl('index/selectchaincustom/select_chain_type/parish_villages/parishid/'); ?>', '<?php echo $user->getVillageID(); ?>');
-	});
-	$('#parishid').trigger('change');
-	
-	multipleDisableContainerByClass('parish_text');
-	multipleEnableContainerByClass('parish_select');
-	$("#parishtrigger").click(function(){
-		if($(this).is(':checked')){
-			disableContainerByClass('parish_select');
-			enableContainerByClass('parish_text');
-			$(".parish_select select").val('');
-		} else {
-			disableContainerByClass('parish_text');
-			enableContainerByClass('parish_select');
-			$(".parish_text input").val('');
-		}
-	});
-	
-	multipleDisableContainerByClass('village_text');
-	multipleEnableContainerByClass('village_select');
-	$("#villagetrigger").click(function(){
-		if($(this).is(':checked')){
-			disableContainerByClass('village_select');
-			enableContainerByClass('village_text');
-			$(".village_select select").val('');
-		} else {
-			disableContainerByClass('village_text');
-			enableContainerByClass('village_select');
-			$(".village_text input").val('');
-		}
-	});
 	
 	//when button is clicked  
 	$('#check_username_availability').click(function(){ 
@@ -338,10 +201,10 @@ $(document).ready(function() {
 					// alert(result); // return false;
 					if(result == 1){  
 						//show that the username is available
-						$('#username_availability_result').html(username + ' is NOT available!').addClass('alert').addClass('alert-danger fade in').removeClass('alert-success fade in'); 
+						$('#username_availability_result').html(username + ' is NOT available!').addClass('alert').addClass('alert-danger').removeClass('alert-success'); 
 					} else {  
 						//show that the username is NOT available  
-						$('#username_availability_result').html(username + ' is available').addClass('alert').addClass('alert-success fade in').removeClass('alert-danger fade in');
+						$('#username_availability_result').html(username + ' is available').addClass('alert').addClass('alert-success').removeClass('alert-danger');
 					}  
 			});   
 		}
@@ -370,1101 +233,315 @@ $(document).ready(function() {
 					// alert(result); // return false;
 					if(result == 1){  
 						//show that the email is available
-						$('#email_availability_result').html(email + ' is NOT available!').addClass('alert').addClass('alert-danger fade in').removeClass('alert-success fade in'); 
+						$('#email_availability_result').html(email + ' is NOT available!').addClass('alert').addClass('alert-danger').removeClass('alert-success fade in'); 
 					} else {  
 						//show that the email is NOT available  
-						$('#email_availability_result').html(email + ' is available').addClass('alert').addClass('alert-success fade in').removeClass('alert-danger fade in');
+						$('#email_availability_result').html(email + ' is available').addClass('alert').addClass('alert-success').removeClass('alert-danger fade in');
 					}  
 			});  
 		}
 	}
 	
-	//when button is clicked  
-	$('#check_phone_availability').click(function(){ 
-		check_phone_availability();  
-	});
-	$('#phone').change(function(){ 
-		check_phone_availability();  
-	});
-	
-	//function to check phone availability  
-	function check_phone_availability(){  
-		//get the username
-		var checking_html = 'Checking availability...';   
-		var phone = $('#phone').val();  
-		if(!isEmptyString(phone) && isUgNumber(phone)){
-			$('#phone_availability_result').html(checking_html);  
-			var userid = '<?php echo $user->getID(); ?>';
-			//use ajax to run the check  
-			$.post("<?php echo $this->baseUrl('signup/checkphone'); ?>", { phone: phone, userid: userid },  
-				function(result){  
-					//if the result is 1  
-					// alert(result); return false;
-					if(result == 1){  
-						//show that the phone is available
-						$('#phone_availability_result').html(phone + ' is NOT available!').addClass('alert').addClass('alert-danger fade in').removeClass('alert-success fade in'); 
-					} else {  
-						//show that the phone is NOT available  
-						$('#phone_availability_result').html(phone + ' is available').addClass('alert').addClass('alert-success fade in').removeClass('alert-danger fade in');
-					}  
-			});  
-		}
-	}
-	
-	$("ul.nav.nav-tabs li a").click(function(){
-		var url = $(this).attr('goto');
-		var id = $(this).attr('theid');
-		if(!isEmptyString(url) && url != 'undefined'){
-			$(".tab-content #"+id).html("<a id='loading' class='xhidden' style='text-align:center; display:block; margin-top:75px;'><span style='display:block; margin-bottom:15px; font-weight:bold;'>Loading...</span><img style='margin-left:-10px;' src='<?php echo $this->baseUrl('images/ui-anim_basic_16x16.gif'); ?>' /></a>").css({'display':'block'});
-			window.location.href = url;
-		}
-	}); 
-	
-	$('#type').change(function(){
-		var type = $(this).val(); // alert(type);
-		disableContainerByID('market_row');
-		disableContainerByID('organisation_row');
-		if(type == 3){
-			enableContainerByID('market_row');
-		}
-		if(type == 5 || type == 6){
-			enableContainerByID('organisation_row');
-		}
-	});
-	$('#type').change();
-	
-	<?php if(isAMIA()){ ?>
-		$("#marketid").attr("disabled", "disabled").trigger("chosen:updated");
-	<?php } ?>
-	
-	var html = $("#topactions").html();
-	$("#bottomactions").html(html);
 }); 
 </script>
-<!--=== Page Header ===-->
-<div class="page-header">
-    <div class="page-title">
-        <h3><?php echo $title; ?></h3>
-        <span>Profile details</span>
-    </div>
-</div>
-<form class="form-horizontal" action="<?php echo $posturl; ?>" id="indexform" method="post" enctype="multipart/form-data">
-<!--=== Page Content ===-->
-<div class="form-actions fluid" id="topactions">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="xcol-md-offset-2 xcol-md-10 floatleft centeralign">
-                <a class="btn button-previous" href="<?php echo $this->referer; ?>"><i class="icon-remove"></i> <?php echo $this->translate('global_button_cancel'); ?></a> &nbsp;
-                <button type="submit" class="btn btn-primary button-submit" name="save"><i class="icon-ok icon-white"></i> <?php echo $button_title; ?></button>
+<div class="row-fluid margin0 index">
+    <form id="indexform" class="form-horizontal" role="form" action="<?php echo $posturl; ?>" method="post">
+        <div class="col-md-12 padding0">
+            <div class="headerbox">
+                <table class="table border0 nohover margin0">                       
+                    <tr>		                    
+                        <td class="padding2">
+                            <button type="submit" class="btn btn-primary savethenview save"><i class="glyphicon glyphicon-ok icon-white"></i> <?php echo $button_title; ?></button>
+                            <a href="<?php echo $this->baseUrl('profile/view/id/'.encode($user->getID())); ?>" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> <?php echo $this->translate('global_button_cancel'); ?></a>
+                            <input type="hidden" name="entityname" value="UserAccount" />
+                            <input type="hidden" id="id" name="id" value="<?php echo encode($user->getID()); ?>" />
+                            <input type="hidden" class="successurl" id="<?php echo URL_SUCCESS; ?>" name="<?php echo URL_SUCCESS; ?>" title="general" />
+                            <input type="hidden" class="failureurl" id="<?php echo URL_FAILURE; ?>" name="<?php echo URL_FAILURE; ?>" title="general" />
+                            <input type="hidden" id="<?php echo SUCCESS_MESSAGE; ?>" name="<?php echo SUCCESS_MESSAGE; ?>" value="<?php echo $successmessage; ?>" /> 
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
-    </div>
-</div>
-<?php if ($sessionhaserror) { ?>
-    <div class="alert alert-danger fade in fade in"><i class="icon-remove close" data-dismiss="alert"></i><?php echo $session->getVar(ERROR_MESSAGE); ?></div>
-<?php } ?>
-<?php if (!isEmptyString($session->getVar(SUCCESS_MESSAGE))) { ?>
-    <div class="alert alert-success fade in fade in"><i class="icon-remove close" data-dismiss="alert"></i><?php echo $session->getVar(SUCCESS_MESSAGE); ?></div>
-<?php } ?>
-<div class="row margin0">
-    <div class="col-md-12">
-        <!-- Tabs-->
-        <div class="tabbable tabbable-custom tabbable-full-width">
-            <ul class="nav nav-tabs">
-                <?php if ($acl->checkPermission('User Account', ACTION_VIEW)) { ?>
-                	<li><a href="#overview" theid="overview" data-toggle="tab" goto="<?php echo $this->baseUrl('profile/view/id/'.encode($user->getID())); ?>" >Overview</a></li>
-                <?php } ?>
-                <?php if ($acl->checkPermission('User Account', ACTION_EDIT)) { ?>
-                	<li class="<?php echo $tab == 'profile' ? 'active gonowhere' : ''; ?>"><a href="#updateaccount" goto="<?php echo $this->baseUrl('profile/index/id/'.encode($user->getID())); ?>" theid="updateaccount" data-toggle="tab"><?php echo isEmptyString($user->getID()) ? 'New Profile' : 'Update Profile'; ?></a></li>
-                    <?php if(!isEmptyString($user->getID())) { 
-						$title = "Upload Profile Photo";
-						if(!isEmptyString($request->crop)){
-							$title = "Crop Profile Photo"; 
-						}
-					?>
-                    	<li class="<?php echo $tab == 'picture' ? 'active gonowhere' : ''; ?>"><a href="#uploadpicture" goto="<?php echo $this->baseUrl('profile/index/id/'.encode($user->getID()).'/tab/picture'); ?>" theid="uploadpicture" data-toggle="tab"><?php echo $title; ?></a></li>
-                    <?php } ?>
-                <?php } ?>
-                
-                
-            </ul>
-            <div class="tab-content row">
-            	<?php if ($acl->checkPermission('User Account', ACTION_VIEW)) { ?>
-                    <div class="tab-pane" id="overview">
-                    
-                    </div>
-                <?php } ?>
-                <?php if ($acl->checkPermission('User Account', ACTION_EDIT)) { ?>
-                    <div class="tab-pane <?php echo $tab == 'profile' ? 'active' : ''; ?>" id="updateaccount">
-                        <?php if($tab == 'profile') { ?>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="widget">
-                                        <div class="widget-header">
-                                            <h4>General Information</h4>
+        <?php if ($sessionhaserror) { ?>
+            <div class="alert alert-danger"><?php echo $session->getVar(ERROR_MESSAGE); ?></div>
+        <?php } ?>
+        <?php if (!isEmptyString($session->getVar(SUCCESS_MESSAGE))) { ?>
+            <div class="alert alert-success alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> <?php echo $session->getVar(SUCCESS_MESSAGE); ?></div>
+        <?php } ?>
+        <div id="tabs" class="clearfix">
+        	<div class="row-fluid margin0">
+            	<div class="col-md-12" style="margin-top:10px;">
+                    <fieldset class="fieldsetcontainer">
+                        <legend>About</legend>
+                        <div class="panel-body well-sm">
+                            <div class="col-md-9">
+                            	<div class="row-fluid margin">
+                                	<div class="col-md-6 paddingleft0">
+                                    	<div class="form-group">
+                                            <label class="col-sm-5 control-label"><?php echo $this->translate("profile_firstname_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                            <div class="col-sm-7">
+                                                <input type="text" class="form-control input-sm" id="firstname" name="firstname" value="<?php echo $user->getFirstName(); ?>" /><div id="firstname_error"></div>
+                                            </div>
                                         </div>
-                                        <div class="widget-content">
-                                            <div class="row">
-                                                <div class="col-md-6 leftalignlabel">
-                                                    <div class="form-group">
-                                                        <label class="col-md-3 control-label"><?php echo $this->translate("global_type_label"); ?>: <?php echo $this->translate("required_field_marker"); ?></label>
-                                                        <div class="col-md-9">
-                                                        	<?php if($showtypeselect){ ?>
-																<?php
-                                                                    $allvalues = getUserType();
-                                                                    $dropdown = new Zend_Form_Element_Select('type',
-                                                                                        array(
-                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $allvalues),
-                                                                                            'view' => new Zend_View(),
-                                                                                            'decorators' => array('ViewHelper'),
-                                                                                            'class' => array('form-control','xchosen-select','width170')
-                                                                                        )
-                                                                    );  
-                                                                    $dropdown->setValue($user->getType()); 
-                                                                    echo $dropdown->render();
-                                                                ?>
-                                                            <?php } else {  ?>
-                                                            	<?php echo $allroles[$type]; ?>
-                                                            	<input type="hidden" id="type" name="type" value="<?php echo $type; ?>" />
-                                                            <?php } ?>
-                                                            
-                                                            <div id="type_error"></div>
-                                                            <input type="hidden" name="entityname" value="UserAccount" />
-                                                            <input type="hidden" id="id" name="id" value="<?php echo encode($user->getID()); ?>" />
-                                                            <input type="hidden" id="isactive" name="isactive" value="<?php echo $user->getIsActive(); ?>" />
-                                                            <input type="hidden" class="successurl" id="<?php echo URL_SUCCESS; ?>" name="<?php echo URL_SUCCESS; ?>" value="<?php echo $successurl; ?>" />
-                                            				<input type="hidden" class="failureurl" id="<?php echo URL_FAILURE; ?>" name="<?php echo URL_FAILURE; ?>" value="<?php echo $failureurl; ?>" />
-                                                            <input type="hidden" id="<?php echo SUCCESS_MESSAGE; ?>" name="<?php echo SUCCESS_MESSAGE; ?>" value="<?php echo $successmessage; ?>" />
-                                                            <?php if($gotosuccess){ ?>
-                                                            	<input type="hidden" id="nosuccessid" name="nosuccessid" value="1" />
-                                                            <?php } ?>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group" id="organisation_row">
-                                                        <label class="col-md-3 control-label" style="min-width:140px;"><?php echo $this->translate("profile_organisation_label"); ?>: <?php echo $this->translate("required_field_marker"); ?></label>
-                                                        <div class="col-md-8">
-                                                        	<?php if($showorgselect){ ?>
-																 <?php
-																	$dataarray = getOrganisations();
-																	$dropdown = new Zend_Form_Element_Select('organisationid',
-																						array(
-																							'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $dataarray),								
-																							'view' => new Zend_View(),
-																							'decorators' => array('ViewHelper'),
-																							'class' => array('form-control','chosen-select','width180')
-																						)
-																					);
-																	$dropdown->setValue($user->getOrganisationID()); 
-																	echo $dropdown->render(); 
-																?>
-                                                            <?php } else {  ?>
-                                                            	<?php echo $user->getOrganisation()->getName(); ?>
-                                                            	<input type="hidden" id="organisationid" name="organisationid" value="<?php echo $user->getOrganisationID(); ?>" />
-                                                            <?php } ?>
-                                                            <div id="organisationid_error"></div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group" id="market_row">
-                                                        <label class="col-md-3 control-label"><?php echo $this->translate("profile_market_label"); ?>: <?php //echo $this->translate("required_field_marker"); ?></label>
-                                                        <div class="col-md-9">
-                                                            <?php
-                                                                $dataarray = getMarkets();
-                                                                $dropdown = new Zend_Form_Element_Select('marketid',
-                                                                                    array(
-                                                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $dataarray),								'view' => new Zend_View(),
-                                                                                        'decorators' => array('ViewHelper'),
-                                                                                        'class' => array('form-control','chosen-select','width180')
-                                                                                    )
-                                                                                );
-                                                                $dropdown->setValue($user->getMarketID()); 
-                                                                echo $dropdown->render(); 
-                                                            ?><div id="marketid_error"></div>
-                                                            <?php if(isAMIA()){ ?>
-                                                            	<input type="hidden" id="marketid" name="marketid" value="<?php echo $user->getMarketID(); ?>" />
-                                                            <?php } ?>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-md-3 control-label"><?php echo $this->translate("profile_firstname_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                                        <div class="col-md-9"><input type="text" name="firstname" id="firstname" class="form-control input-width-large" value="<?php echo $user->getFirstName(); ?>" />
-                                                        <div id="firstname_error"></div></div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-md-3 control-label"><?php echo $this->translate("profile_lastname_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                                        <div class="col-md-9"><input type="text" name="lastname" id="lastname" class="form-control input-width-large" value="<?php echo $user->getLastName(); ?>" />
-                                                        <div id="lastname_error"></div></div>
-                                                    </div>
-                                                    <?php if(!isEmptyString($user->getID())){ ?>
-                                                    <div class="form-group">
-                                                        <label class="col-md-3 control-label"><?php echo $this->translate("profile_othernames_label"); ?>:</label>
-                                                        <div class="col-md-9"><input type="text" name="othername" id="othername" class="form-control input-width-large" value="<?php echo $user->getOtherName(); ?>" />
-                                                        <div id="othername_error"></div></div>
-                                                    </div>
-                                                    <?php } ?>
-                                                    <div class="form-group">
-                                                        <label class="col-md-3 control-label"><?php echo $this->translate("profile_gender_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                                        <div class="col-md-9">
-                                                            <input type="radio" name="gender" id="gender_male" class="<?php echo $user->isMale() ? 1 : 0; ?>" value="1" /> Male &nbsp;
-                                                            <input type="radio" name="gender" id="gender_female" class="<?php echo $user->isFemale() ? 1 : 0; ?>" value="2" /> Female
-                                                            <div id="gender_error"></div>
-                                                        </div>                                                
-                                                    </div>
-                                                    <?php if(!isEmptyString($user->getID())){ ?>
-                                                        <div class="form-group">
-                                                            <label class="col-md-3 control-label"><?php echo $this->translate("profile_dateofbirth_label"); ?>:</label>
-                                                            <div class="col-md-9">
-                                                                <?php
-                                                                    $daydp = new Zend_Form_Element_Select('birthday',
-                                                                                        array(
-                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => 'Day'), getMonthDays()),	
-                                                                                            'view' => new Zend_View(),
-                                                                                            'decorators' => array('ViewHelper'),
-                                                                                            'class' => array('form-control birth width80 inline'),
-                                                                                            'title' => 'Select Day'		
-                                                                                        )
-                                                                                    );
-                                                                    $daydp->setValue($birthday); 
-                                                                    echo $daydp->render(); 
-                                                                ?>&nbsp;
-                                                                <?php
-                                                                    $monthdp = new Zend_Form_Element_Select('birthmonth',
-                                                                                        array(
-                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => 'Month'), getAllMonthsAsShortNames()),	
-                                                                                            'view' => new Zend_View(),
-                                                                                            'decorators' => array('ViewHelper'),
-                                                                                            'class' => array('form-control birth width80 inline'),
-                                                                                            'title' => 'Select Month'		
-                                                                                        )
-                                                                                    );
-                                                                    $monthdp->setValue($birthmonth); 
-                                                                    echo $monthdp->render(); 
-                                                                ?>&nbsp;
-                                                                <?php
-                                                                    $years = getSubscribeBirthYears();
-                                                                    $yeardp = new Zend_Form_Element_Select('birthyear',
-                                                                                        array(
-                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => 'Year'), $years),	
-                                                                                            'view' => new Zend_View(),
-                                                                                            'decorators' => array('ViewHelper'),
-                                                                                            'class' => array('form-control width80 inline'),
-                                                                                            'title' => 'Select Year'		
-                                                                                        )
-                                                                                    );
-                                                                    $yeardp->setValue($birthyear); 
-                                                                    echo $yeardp->render(); 
-                                                                ?>
-                                                                <input name="dateofbirth" id="dateofbirth" type="hidden" class="span2 datefield xhastooltip" value="<?php echo $dateofbirth; ?>" title="<?php //echo $this->translate("person_dateofbirth_tooltip"); ?>" />
-                                                                <div class="divider5"></div>
-                                                                <?php if($isme){ ?>
-                                                                    <input type="checkbox" name="showbirth" id="showbirth" value="0" class="<?php echo $user->getshowbirth() == 0 ? 1 : 0; ?>" /> &nbsp; <label class="lineblocked notbolded">Hide date on my public profile:</label>
-                                                                    <input type="hidden" name="showbirth_old" id="showbirth_old" value="<?php echo $user->getshowbirth(); ?>" />
-                                                                <?php } ?>
-                                                                <div id="birthday_error"></div><div id="birthmonth_error"></div>
-                                                                <div id="birthyear_error"></div><div id="dateofbirth_error"></div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label class="col-md-3 control-label"><?php echo $this->translate("profile_sector_label"); ?>: <?php //echo $this->translate("global_required_field_marker"); ?></label>
-                                                            <div class="col-md-9">
-                                                                <?php
-                                                                    $allvalues = getSectorAreas();
-                                                                    $dropdown = new Zend_Form_Element_Select('sector',
-                                                                                        array(
-                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $allvalues),
-                                                                                            'view' => new Zend_View(),
-                                                                                            'decorators' => array('ViewHelper'),
-                                                                                            'class' => array('form-control','chosen-select', 'width170')
-                                                                                        )
-                                                                                    );
-                                                                    $dropdown->setValue($user->getSector()); 
-                                                                    echo $dropdown->render(); 
-                                                                ?>
-                                                                <div id="sector_error"></div>
-                                                            </div>                                                
-                                                        </div>
-                                                    <?php } else { ?>
-                                                    	<div class="form-group">
-                                                            <label class="col-md-3 control-label"><?php echo $this->translate("global_district_label"); ?>: <?php echo $this->translate("required_field_marker"); ?></label>
-                                                            <div class="col-md-9">
-                                                                <?php
-                                                                    $list = new LookupType(); 
-                                                                    $list->setName("ALL_DISTRICTS");
-                                                                    $dropdown = new Zend_Form_Element_Select('districtid',
-                                                                                        array(
-                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $list->getOptionValuesFromQuery()),								'view' => new Zend_View(),
-                                                                                            'decorators' => array('ViewHelper'),
-                                                                                            'class' => array('form-control','chosen-select','width180')
-                                                                                        )
-                                                                                    );
-                                                                    $dropdown->setValue($user->getDistrictID()); 
-                                                                    echo $dropdown->render(); 
-                                                                ?><div id="districtid_error"></div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label class="control-label col-md-3">Email: <?php echo $this->translate("required_field_marker"); ?></label>
-                                                            <div class="col-md-9">
-                                                                <input type="text" name="email" id="email" class="form-control input-width-xlarge validate_255_string xdisableonedit inline" value="<?php echo $user->getEmail(); ?>" placeholder="e.g jdoe@domain.com" style="display:inline;" />
-                                                                <input type="hidden" name="oldemail" id="oldemail" value="<?php echo $user->getEmail(); ?>" />
-                                                                <label class="lineblocked"><a class="btn btn-sm btn-info gonowhere" id='check_email_availability' title="Check Availability">Check</a></label>
-                                                                <div id="email_availability_result"></div><div id="email_error"></div>
-																<?php if($user->isUserInActive()){ ?>
-                                                                    <input type="checkbox" name="isinvited" id="isinvited" value="1" /> &nbsp; <label class="lineblocked leftalign">Invite via Email:</label>
-                                                                <?php } ?>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label class="control-label col-md-3"><?php echo $this->translate("profile_username_label"); ?>: <?php echo isEmptyString($user->getID()) ? '' : $this->translate("required_field_marker"); ?></label>
-                                                            <div class="col-md-9">
-                                                                <div class="input-group">
-                                                                    <span class="input-group-btn">
-                                                                        <button type="button" class="btn btn-default">@</button>
-                                                                    </span>
-                                                                    <input type="text" name="username" id="username" class="form-control input-width-medium strictalpha xdisableonedit" maxlength="15" value="<?php echo $user->getUsername(); ?>" placeholder="e.g jdoe" style="display:inline;" /> 
-                                                                    <label class="lineblocked"><a class="btn btn-sm btn-info gonowhere" id='check_username_availability' title="Check Availability">Check</a></label>
-                                                                </div>
-                                                               <div id="username_availability_result"></div><div id="username_error"></div>
-                                                        	</div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label class="control-label col-md-3"><?php echo $this->translate("profile_phone_label"); ?>:</label>
-                                                           	<div class="col-md-9">
-                                                                <div class="input-group">
-                                                                    <span class="input-group-btn">
-                                                                        <button type="button" class="btn btn-default"><?php echo '+'.getCountryCode(); ?></button>
-                                                                    </span>
-                                                                    <input type="text" class="form-control input-width-medium xdisableonedit inline" name="phone" id="phone" placeholder="e.g 0782123456" maxlength="10" value="<?php echo $user->getFormattedPhone(); ?>" style="display:inline;" /> 
-                                                                    <input type="hidden" name="oldphone" id="oldphone" value="<?php echo $user->getPhone(); ?>" />
-                                                                    <label class="lineblocked"><a class="btn btn-sm btn-info gonowhere" id='check_phone_availability' title="Check Availability">Check</a></label>
-                                                                </div>
-                                                                <div id="phone_availability_result"></div><div id="phone_error"></div>
-                                                                <?php if($user->isUserInActive()){ ?>
-                                                                    <!--<input type="checkbox" name="isphoneinvited" id="isphoneinvited" value="1" /> &nbsp; <label class="lineblocked leftalign">Invite via Phone:</label>-->
-                                                                <?php } ?>
-                                                        	</div>
-                                                        </div>
-                                                    <?php } ?>
-                                                </div>
-                                                <?php if(!isEmptyString($user->getID())){ ?>
-                                                    <div class="col-md-6" style="margin-top:-10px;">
-                                                        <div class="widget">
-                                                            <div class="widget-header">
-                                                                <h4><i class="icon-reorder"></i> Biography</h4>
-                                                            </div>
-                                                            <div class="widget-content padding5">
-                                                            	<?php if($isme){ ?>
-                                                                    <input type="checkbox" name="showbio" id="showbio" value="0" class="<?php echo $user->getshowbio() == 0 ? 1 : 0; ?>" /> &nbsp; <label class="lineblocked notbolded">Hide Biography on my public profile:</label>
-                                                                    <input type="hidden" name="showbio_old" id="showbio_old" value="<?php echo $user->getshowbio(); ?>" />
-                                                                <?php } ?>
-                                                                <textarea name="bio" id="bio" class="expanding minheight200" style="min-height:200px; width:95%;"><?php echo $user->getBio(); ?></textarea><div id="bio_error"></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                <?php } ?>
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label"><?php echo $this->translate("profile_lastname_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                            <div class="col-sm-7">
+                                                <input type="text" class="form-control input-sm" id="lastname" name="lastname" value="<?php echo $user->getLastName(); ?>" /><div id="lastname_error"></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label"><?php echo $this->translate("profile_initial_label"); ?>: </label>
+                                            <div class="col-sm-7">
+                                                <input type="text" class="form-control input-sm width75" id="initial" name="initial" value="<?php echo $user->getInitial(); ?>" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label"><?php echo $this->translate("profile_gender_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                            <div class="col-sm-7">
+                                                <label class="radio-inline"><input type="radio" name="gender" id="male" value="1" class="xform-control <?php echo $user->getGender() == '1'? 1 : 0; ?>"> Male</label>
+                                            	<label class="radio-inline"><input type="radio" name="gender" id="female" value="2" class="xform-control <?php echo $user->getGender() == '2'? 1 : 0; ?>"> Female</label>
+                                            	<div id="gender_error"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                    	<div class="form-group">
+                                            <label class="col-sm-4 control-label"><?php echo $this->translate("profile_dob_label"); ?>:</label>
+                                            <div class="col-sm-8">
+                                                <input type="text" class="form-control input-sm datefield readonly width100" name="dateofbirth" id="dateofbirth" value="<?php echo changeMySQLDateToPageFormat($user->getDateofBirth()); ?>" />    
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-4 control-label"><?php echo $this->translate("profile_ssn_label"); ?>:</label>
+                                            <div class="col-sm-8">
+                                                <input type="text" class="form-control input-sm" id="ssn" name="ssn" value="<?php echo $user->getSSN(); ?>" />
+                                            	<div id="ssn_error"></div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <?php if(!isEmptyString($user->getID())){ ?>
-                                <div class="row">
-                                    <div class="col-md-6 form-vertical no-margin">
-                                        <div class="widget">
-                                            <div class="widget-header" style="margin-bottom:5px;">
-                                                <h4><i class="icon-reorder"></i> Location</h4>
-                                            </div>
-                                            <div class="widget-content leftalignlabels" style="margin-left:-15px;">
-                                                <div class="form-group padding0 margin0">
-                                                    <label class="col-md-3 control-label">&nbsp;</label>
-                                                    <div class="col-md-9">
-                                                    	<?php if($isme){ ?>
-                                                            <input type="checkbox" name="showlocation" id="showlocation" value="0" class="<?php echo $user->getshowlocation() == 0 ? 1 : 0; ?>" /> &nbsp; <label class="lineblocked notbolded">Hide location on my public profile:</label>
-                                                            <input type="hidden" name="showlocation_old" id="showlocation_old" value="<?php echo $user->getshowlocation(); ?>" />
-                                                        <?php } ?>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="col-md-3 control-label"><?php echo $this->translate("global_country_label"); ?>:</label>
-                                                    <div class="col-md-9">
-                                                        <?php
-                                                            $countries = getCountries();
-                                                            $countrydropdown = new Zend_Form_Element_Select('country',
-                                                                                array(
-                                                                                    'multiOptions' => array_merge_maintain_keys(array('' => "<Select One>", "UG"=>"Uganda"), $countries),
-                                                                                    'view' => new Zend_View(), 
-                                                                                    'decorators' => array('ViewHelper'),
-                                                                                    'class' => array('form-control','chosen-select','disabledfield','width180')                                            	)
-                                                                            );
-                                                            $countrydropdown->setValue($user->getCountry()); 
-                                                            echo $countrydropdown->render(); 
-                                                        ?>
-                                                        <input type="hidden" id="country2" name="country2" value="UG" />
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="col-md-3 control-label"><?php echo $this->translate("global_district_label"); ?>: <?php echo $this->translate("required_field_marker"); ?></label>
-                                                    <div class="col-md-9">
-                                                        <?php
-                                                            $list = new LookupType(); 
-                                                            $list->setName("ALL_DISTRICTS");
-                                                            $dropdown = new Zend_Form_Element_Select('districtid',
-                                                                                array(
-                                                                                    'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $list->getOptionValuesFromQuery()),								'view' => new Zend_View(),
-                                                                                    'decorators' => array('ViewHelper'),
-                                                                                    'class' => array('form-control','chosen-select','width180')
-                                                                                )
-                                                                            );
-                                                            $dropdown->setValue($user->getDistrictID()); 
-                                                            echo $dropdown->render(); 
-                                                        ?><div id="districtid_error"></div>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="col-md-3 control-label"><?php echo $this->translate("global_county_label"); ?>:</label>
-                                                    <div class="col-md-9">
-                                                        <?php
-                                                            $values = array();
-                                                            $dropdown = new Zend_Form_Element_Select('countyid',
-                                                                                array(
-                                                                                    'multiOptions' => array_merge_maintain_keys(array('' => '<Select District First>'), $values),								'view' => new Zend_View(),
-                                                                                    'decorators' => array('ViewHelper'),
-                                                                                    'class' => array('form-control','chosen-select','width180')
-                                                                                )
-                                                                            );
-                                                            $dropdown->setValue($user->getCountyID()); 
-                                                            echo $dropdown->render(); 
-                                                        ?><div id="countyid_error"></div>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="col-md-3 control-label"><?php echo $this->translate("global_subcounty_label"); ?>:</label>
-                                                    <div class="col-md-9">
-                                                        <?php
-                                                            $values = array();
-                                                            $dropdown = new Zend_Form_Element_Select('subcountyid',
-                                                                                array(
-                                                                                    'multiOptions' => array_merge_maintain_keys(array('' => '<Select County First>'), $values),								'view' => new Zend_View(),
-                                                                                    'decorators' => array('ViewHelper'),
-                                                                                    'class' => array('form-control','chosen-select','width180')
-                                                                                )
-                                                                            );
-                                                            $dropdown->setValue($user->getSubCountyID()); 
-                                                            echo $dropdown->render(); 
-                                                        ?><div id="subcountyid_error"></div>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="col-md-3 control-label"><?php echo $this->translate("global_parish_label"); ?>:</label>
-                                                    <div class="col-md-9">
-                                                        <div class="parish_text inline">
-                                                            <input type="text" name="parishname" id="parishname" class="form-control" value="<?php echo $user->getParish()->getName(); ?>"  />
-                                                        </div>
-                                                        <div class="parish_select inline">
-                                                            <?php
-                                                                $values = array();
-                                                                $dropdown = new Zend_Form_Element_Select('parishid',
-                                                                                    array(
-                                                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select Sub-county First>'), $values),								'view' => new Zend_View(),
-                                                                                        'decorators' => array('ViewHelper'),
-                                                                                        'class' => array('form-control','chosen-select','width180')
-                                                                                    )
-                                                                                );
-                                                                $dropdown->setValue($user->getParishID()); 
-                                                                echo $dropdown->render(); 
-                                                            ?>
-                                                        </div>
-                                                        &nbsp;<input type="checkbox" name="parishtrigger" id="parishtrigger" class="lineblocked" value="1" title="Switch entry mode" placeholder="enter free text" /> Free text
-                                                        <div id="parishname_error"></div><div id="parishid_error"></div>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="col-md-3 control-label"><?php echo $this->translate("global_village_label"); ?>:</label>
-                                                    <div class="col-md-9">
-                                                        <div class="village_text inline">
-                                                            <input type="text" name="villagename" id="villagename" class="form-control" value="<?php echo $user->getVillage()->getName(); ?>"  />
-                                                        </div>
-                                                        <div class="village_select inline">
-                                                            <?php
-                                                                $values = array();
-                                                                $dropdown = new Zend_Form_Element_Select('villageid',
-                                                                                    array(
-                                                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select Parish First>'), $values),								'view' => new Zend_View(),
-                                                                                        'decorators' => array('ViewHelper'),
-                                                                                        'class' => array('form-control','chosen-select','inline','width180')
-                                                                                    )
-                                                                                );
-                                                                $dropdown->setValue($user->getVillageID()); 
-                                                                echo $dropdown->render(); 
-                                                            ?>
-                                                        </div>
-                                                        &nbsp;<input type="checkbox" name="villagetrigger" id="villagetrigger" class="lineblocked" value="1" title="Switch entry mode" placeholder="enter free text" /> Free text
-                                                        <div id="villagename_error"></div><div id="villageid_error"></div>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="col-md-3 control-label">GPS Lat:</label>
-                                                    <div class="col-md-9">
-                                                        <input type="text" name="gpslat" id="gpslat" class="form-control input-width-medium" value="<?php echo $user->getgpslat(); ?>"  />
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="col-md-3 control-label">GPS Lng:</label>
-                                                    <div class="col-md-9">
-                                                        <input type="text" name="gpslng" id="gpslng" class="form-control input-width-medium" value="<?php echo $user->getgpslng(); ?>"  />
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="col-md-3 control-label"><?php echo $this->translate("global_address_label"); ?>:</label>
-                                                    <div class="col-md-9">
-                                                        <textarea name="address" id="address" class="notesfield form-control expanding"><?php echo $user->getAddress(); ?></textarea>
-                                                    </div>
-                                                </div>    
-                                            </div>
-                                        </div>
-                                    </div>                                                            
-                                    <div class="col-md-6 form-vertical no-margin">
-                                        <div class="widget">
-                                            <div class="widget-header">
-                                                <h4><i class="icon-reorder"></i> Settings</h4>
-                                            </div>
-                                            <div class="widget-content">
-                                                <div class="row">
-                                                    <div class="col-md-12 leftalignlabel">
-                                                        <div class="row">
-                                                            <div class="col-md-3">
-                                                                <strong class="subtitle padding-top-10px">Contacts / Identifiers</strong>
-                                                                <!--<p class="text-muted"></p>-->
-                                                            </div>
-                                                           <div class="col-md-9">
-                                                                <div class="form-group">
-                                                                    <label class="control-label"><?php echo $this->translate("profile_email_label"); ?>: <?php echo $this->translate("required_field_marker"); ?></label>
-                                                                    <input type="text" name="email" id="email" class="form-control input-width-xlarge validate_255_string xdisableonedit inline" value="<?php echo $user->getEmail(); ?>" placeholder="e.g jdoe@domain.com" style="display:inline;" />
-                                                                    <input type="hidden" name="oldemail" id="oldemail" value="<?php echo $user->getEmail(); ?>" />
-                                                                    <label class="lineblocked"><a class="btn btn-sm btn-info gonowhere" id='check_email_availability' title="Check Availability">Check</a></label>
-                                                                    <div id="email_availability_result"></div><div id="email_error"></div>
-                                                                    <?php if($user->isUserInActive()){ ?>
-                                                                        <input type="checkbox" name="isinvited" id="isinvited" value="1" /> &nbsp; <label class="lineblocked leftalign">Invite via Email:</label>
-                                                                    <?php } ?>
-                                                                    <?php if($isme){ ?>
-                                                                        <input type="checkbox" name="showemail" id="showemail" value="0" class="<?php echo $user->getshowemail() == 0 ? 1 : 0; ?>" /> &nbsp; <label class="lineblocked notbolded">Hide Email on my public profile:</label>
-                                                                        <input type="hidden" name="showemail_old" id="showemail_old" value="<?php echo $user->getshowemail(); ?>" />
-                                                                    <?php } ?>
-                                                                </div>
-                                                            </div> 
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col-md-3"></div>
-                                                            <div class="col-md-9">
-                                                                <div class="form-group">
-                                                                    <label class="control-label"><?php echo $this->translate("profile_username_label"); ?>: <?php echo $this->translate("required_field_marker"); ?></label>
-                                                                    <div class="input-group">
-                                                                        <span class="input-group-btn">
-                                                                            <button type="button" class="btn btn-default">@</button>
-                                                                        </span>
-                                                                        <input type="text" name="username" id="username" class="form-control input-width-medium strictalpha xdisableonedit" maxlength="15" value="<?php echo $user->getUsername(); ?>" placeholder="e.g jdoe" style="display:inline;" /> 
-                                                                        <label class="lineblocked"><a class="btn btn-sm btn-info gonowhere" id='check_username_availability' title="Check Availability">Check</a></label>
-                                                                    </div>
-                                                                   <div id="username_availability_result"></div><div id="username_error"></div>
-                                                                   
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col-md-3"></div>
-                                                            <div class="col-md-9">
-                                                                <div class="form-group">
-                                                                    <label class="control-label"><?php echo $this->translate("profile_phone_label"); ?>:</label>
-                                                                    <div class="input-group">
-                                                                        <span class="input-group-btn">
-                                                                            <button type="button" class="btn btn-default"><?php echo '+'.getCountryCode(); ?></button>
-                                                                        </span>
-                                                                        <input type="text" class="form-control input-width-medium xdisableonedit inline" name="phone" id="phone" placeholder="e.g 0782123456" maxlength="10" value="<?php echo $user->getFormattedPhone(); ?>" style="display:inline;" /> 
-                                                                        <input type="hidden" name="oldphone" id="oldphone" value="<?php echo $user->getPhone(); ?>" />
-                                                                        <label class="lineblocked"><a class="btn btn-sm btn-info gonowhere" id='check_phone_availability' title="Check Availability">Check</a></label>
-                                                                    </div>
-                                                                    <div id="phone_availability_result"></div><div id="phone_error"></div>
-                                                                    <?php if($user->isUserInActive()){ ?>
-                                                                        <input type="checkbox" name="isphoneinvited" id="isphoneinvited" value="1" /> &nbsp; <label class="lineblocked leftalign">Invite via Phone:</label>
-                                                                    <?php } ?>
-                                                                    <?php if($isme){ ?>
-                                                                        <input type="checkbox" name="showphone" id="showphone" value="0" class="<?php echo $user->getshowphone() == 0 ? 1 : 0; ?>" /> &nbsp; <label class="lineblocked notbolded">Hide Phone on my public profile:</label>
-                                                                        <input type="hidden" name="showphone_old" id="showphone_old" value="<?php echo $user->getshowphone(); ?>" />
-                                                                    <?php } ?>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <?php if(!isEmptyString($user->getID()) && $isme){ ?>
-                                                        <div class="row">
-                                                            <div class="col-md-3">
-                                                                <strong class="subtitle"><?php echo isEmptyString($user->getID()) ? 'Password' : 'Change Password'; ?></strong>
-                                                                <!--<p class="text-muted"></p>-->
-                                                            </div>
-                                                            <div class="col-md-9">
-                                                                <?php if(!isEmptyString($user->getPassword())){ ?>
-                                                                    <div class="form-group">
-                                                                        <label class="control-label blocked"><?php echo $this->translate('useraccount_password_current_label'); ?>: <?php echo $this->translate("required_field_marker"); ?></label>
-                                                                        <input type="password" name="oldpassword" id="oldpassword" class="form-control password input-width-large" autocomplete="off" />
-                                                                        <div id="oldpassword_error"></div>
-                                                                    </div>
-                                                                <?php } ?>
-                                                                <div class="form-group">
-                                                                    <label class="control-label blocked"><?php echo !isEmptyString($user->getPassword()) ? $this->translate("useraccount_password_new_label") : $this->translate("useraccount_password_label"); ?>: <?php echo $this->translate("required_field_marker"); ?></label>
-                                                                    <input type="password" name="newpassword" id="newpassword" class="form-control password input-width-large" autocomplete="off" onkeyup="passwordStrength(this.value)" />
-                                                                    <input type="hidden" name="trx" id="trx"  value="<?php echo $user->getPassword(); ?>" />
-                                                                    <p style="display:inline-block; float:right;">
-                                                                        <label for="passwordStrength" class="hidden">Password strength</label>
-                                                                        <div id="passwordDescription" style="width:100px;">strength</div>
-                                                                        <div id="passwordStrength" class="strength0"></div>
-                                                                    </p>
-                                                                    <div id="newpassword_error"></div>
-                                                                </div>
-                        
-                                                                <div class="form-group">
-                                                                    <label class="control-label blocked">Confirm <?php echo !isEmptyString($user->getPassword()) ? $this->translate("useraccount_password_new_label") : $this->translate("useraccount_password_label"); ?>: <?php echo $this->translate("required_field_marker"); ?></label>
-                                                                    <input type="password" name="confirmpassword" id="confirmpassword" class="form-control password input-width-large" /><div id="confirmpassword_error"></div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <?php } ?>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                            <div class="col-md-3">
+                            	<div id="profileinfo"> 
+                                    <img id="profileimage" class="img-thumbnail img-responsive" style="max-width:140px;" src="<?php echo $user->getMediumPicturePath(); ?>" />
+                                </div>                                                        
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+            <div class="row-fluid margin0">
+            	<div class="col-md-6" style="margin-top:10px;">
+                    <fieldset class="fieldsetcontainer clearfix" id="location" style="min-height:280px;">
+                        <legend>Address</legend>
+                        <div class="panel-body well-sm">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label"><?php echo $this->translate("profile_state_label"); ?>:</label>
+                                    <div class="col-sm-8">
+                                        <?php
+											$dropdown = new Zend_Form_Element_Select('state',
+																array(
+																	'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $states),
+																	'view' => new Zend_View(),
+																	'decorators' => array('ViewHelper'),
+																	'class' => array('form-control','input-sm','disabledfield','width200')
+																)
+											);  
+											$dropdown->setValue($user->getState()); 
+											echo $dropdown->render();
+										?>
                                     </div>
                                 </div>
-                                <div class="row clearfix">
-                                    <div class="col-md-12 clearfix">
-                                        <div class="widget clearfix">
-                                            <div class="widget-header">
-                                                <h4><i class="icon-reorder"></i> Preferrences</h4>
-                                            </div>
-                                            <div class="widget-content clearfix">
-                                                <div class="row">
-                                                    <div class="col-md-6 leftalignlabel">
-                                                        <div class="form-group">
-                                                            <label class="col-md-12 control-label"><?php echo $isme == true ? $this->translate('profile_my_preffered_crops') : $this->translate('profile_preffered_crops'); ?>
-                                                            <div class="divider15"></div>
-                                                            <div class="col-md-12 padding0">
-                                                                <?php
-                                                                    $list = new LookupType(); 
-                                                                    $list->setName("ALL_MARKET_COMMODITIES");
-                                                                    $listdropdown = new Zend_Form_Element_Multiselect('commodityids',
-                                                                        array(
-                                                                              'multiOptions' => $list->getOptionValuesFromQuery(),
-                                                                              'view' => new Zend_View(),
-                                                                              'decorators' => array(array('ViewHelper')),
-                                                                              'class' => array('form-control', 'chosen-select','multipleselect','col-md-12')
-                                                                        )
-                                                                    );
-                                                                    
-                                                                    $listdropdown->setValue($user->getCommodityIDs());
-                                                                    $listdropdown->setAttrib("data-placeholder", 'Select all Commodities of interest');
-                                                                    echo $listdropdown->render();
-                                                                  ?>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label class="col-md-12 control-label"><?php echo $isme == true ? $this->translate('profile_my_preffered_markets') : $this->translate('profile_preffered_markets'); ?>
-                                                            <div class="divider15"></div>
-                                                            <div class="col-md-12 padding0">
-                                                                <?php
-                                                                    $list = new LookupType(); 
-                                                                    $list->setName("ALL_AGMIS_MARKETS");
-                                                                    $listdropdown = new Zend_Form_Element_Multiselect('marketids',
-                                                                        array(
-                                                                              'multiOptions' => $list->getOptionValuesFromQuery(),
-                                                                              'view' => new Zend_View(),
-                                                                              'decorators' => array(array('ViewHelper')),
-                                                                              'class' => array('form-control', 'chosen-select','multipleselect','col-md-12')
-                                                                        )
-                                                                    );
-                                                                    
-                                                                    $listdropdown->setValue($user->getMarketIDs());
-                                                                    $listdropdown->setAttrib("data-placeholder", 'Select all Markets of interest');
-                                                                    echo $listdropdown->render();
-                                                                  ?>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label class="col-md-12 control-label"><?php echo $isme == true ? $this->translate('profile_my_preffered_fuelstations') : $this->translate('profile_preffered_fuelstations'); ?>
-                                                            <div class="divider15"></div>
-                                                            <div class="col-md-12 padding0">
-                                                                <?php
-                                                                    $list = new LookupType(); 
-                                                                    $list->setName("ALL_FUEL_SOURCES");
-                                                                    $listdropdown = new Zend_Form_Element_Multiselect('fuelstationids',
-                                                                        array(
-                                                                              'multiOptions' => $list->getOptionValuesFromQuery(),
-                                                                              'view' => new Zend_View(),
-                                                                              'decorators' => array(array('ViewHelper')),
-                                                                              'class' => array('form-control', 'chosen-select','multipleselect','col-md-12')
-                                                                        )
-                                                                    );
-                                                                    
-                                                                    $listdropdown->setValue($user->getFuelStationIDs());
-                                                                    $listdropdown->setAttrib("data-placeholder", 'Select all Fuel Stations of interest');
-                                                                    echo $listdropdown->render();
-                                                                  ?>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label class="col-md-12 control-label"><?php echo $isme == true ? $this->translate('profile_my_preffered_districts') : $this->translate('profile_preffered_districts'); ?>
-                                                            <div class="divider15"></div>
-                                                            <div class="col-md-12 padding0">
-                                                                <?php
-                                                                    $list = new LookupType(); 
-                                                                    $list->setName("ALL_DISTRICTS");
-                                                                    $listdropdown = new Zend_Form_Element_Multiselect('districtids',
-                                                                        array(
-                                                                              'multiOptions' => $list->getOptionValuesFromQuery(),
-                                                                              'view' => new Zend_View(),
-                                                                              'decorators' => array(array('ViewHelper')),
-                                                                              'class' => array('form-control', 'chosen-select','multipleselect','col-md-12')
-                                                                        )
-                                                                    );
-                                                                    
-                                                                    $listdropdown->setValue($user->getDistrictIDs());
-                                                                    $listdropdown->setAttrib("data-placeholder", 'Select all Districts of interest');
-                                                                    echo $listdropdown->render();
-                                                                  ?>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label class="col-md-12 control-label"><?php echo $isme == true ? $this->translate('profile_my_preffered_categories') : $this->translate('profile_preffered_categories'); ?>
-                                                            <div class="divider15"></div>
-                                                            <div class="col-md-12 padding0 forumcheckboxes">
-                                                                <?php
-                                                                    $cb = new Zend_Form_Element_MultiCheckbox('forumcategoryids',
-                                                                        array(
-                                                                            'multiOptions' => getForumCategories(), 
-                                                                            'view' => new Zend_View(),
-                                                                            'decorators' => array('ViewHelper'),
-                                                                            'class' => array('form-control', 'checkbox')
-                                                                        )
-                                                                    );
-                                                                    $cb->setValue($user->getForumCategoryIDs()); 
-                                                                    $cb->setSeparator(' ');  
-                                                                    echo $cb->render();	
-                                                                  ?>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6 leftalignlabel" id="profilecheckboxes">
-                                                        <div class="form-group">
-                                                            <div class="col-md-12">
-                                                                <div class="make-switch" data-on="success" data-off="danger">
-                                                                    <input type="checkbox" class="toggle <?php echo $user->getemailmeonpost(); ?>" id="emailmeonpost" name="emailmeonpost" value="1" />
-                                                                    <input type="hidden" id="emailmeonpost_old" name="emailmeonpost_old" value="<?php echo $user->getemailmeonpost(); ?>" />
-                                                                </div>
-                                                                <label class="control-label inline"> &nbsp;<?php echo $this->translate('profile_emailmeonpost_label'); ?></label>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <div class="col-md-12">
-                                                                <div class="make-switch" data-on="success" data-off="danger">
-                                                                    <input type="checkbox" class="toggle <?php echo $user->getemailmeoncomment(); ?>" id="emailmeoncomment" name="emailmeoncomment" value="1" />
-                                                                    <input type="hidden" id="emailmeoncomment_old" name="emailmeoncomment_old" value="<?php echo $user->getemailmeoncomment(); ?>" />
-                                                                </div>
-                                                                <label class="control-label inline"> &nbsp;<?php echo $this->translate('profile_emailmeoncomment_label'); ?></label>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <div class="col-md-12">
-                                                                <div class="make-switch" data-on="success" data-off="danger">
-                                                                    <input type="checkbox" class="toggle <?php echo $user->getemailmeonmessage(); ?>" id="emailmeonmessage" name="emailmeonmessage" value="1" />
-                                                                    <input type="hidden" id="emailmeonmessage_old" name="emailmeonmessage_old" value="<?php echo $user->getemailmeonmessage(); ?>" />
-                                                                </div>
-                                                                <label class="control-label inline"> &nbsp;<?php echo $this->translate('profile_emailmeonmessage_label'); ?></label>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <div class="col-md-12">
-                                                                <div class="make-switch" data-on="success" data-off="danger">
-                                                                    <input type="checkbox" class="toggle <?php echo $user->getemailmeonallcrops(); ?>" id="emailmeonallcrops" name="emailmeonallcrops" value="1" />
-                                                                    <input type="hidden" id="emailmeonallcrops_old" name="emailmeonallcrops_old" value="<?php echo $user->getemailmeonallcrops(); ?>" />
-                                                                </div>
-                                                                <label class="control-label inline"> &nbsp;<?php echo $this->translate('profile_emailmeonallcrops_label'); ?></label>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <div class="col-md-12">
-                                                                <div class="make-switch" data-on="success" data-off="danger">
-                                                                    <input type="checkbox" class="toggle <?php echo $user->getemailmeonallmarkets(); ?>" id="emailmeonallmarkets" name="emailmeonallmarkets" value="1" />
-                                                                    <input type="hidden" id="emailmeonallmarkets_old" name="emailmeonallmarkets_old" value="<?php echo $user->getemailmeonallmarkets(); ?>" />
-                                                                </div>
-                                                                <label class="control-label inline"> &nbsp;<?php echo $this->translate('profile_emailmeonallmarkets_label'); ?></label>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <div class="col-md-12">
-                                                                <div class="make-switch" data-on="success" data-off="danger">
-                                                                    <input type="checkbox" class="toggle <?php echo $user->getemailmeonalldistricts(); ?>" id="emailmeonalldistricts" name="emailmeonalldistricts" value="1" />
-                                                                    <input type="hidden" id="emailmeonalldistricts_old" name="emailmeonalldistricts_old" value="<?php echo $user->getemailmeonalldistricts(); ?>" />
-                                                                </div>
-                                                                <label class="control-label inline"> &nbsp;<?php echo $this->translate('profile_emailmeonalldistricts_label'); ?></label>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <div class="col-md-12">
-                                                                <div class="make-switch" data-on="success" data-off="danger">
-                                                                    <input type="checkbox" class="toggle <?php echo $user->getemailmeforreport(); ?>" id="emailmeforreport" name="emailmeforreport" value="1" />
-                                                                    <input type="hidden" id="emailmeforreport_old" name="emailmeforreport_old" value="<?php echo $user->getemailmeforreport(); ?>" />
-                                                                </div>
-                                                                <label class="control-label inline"> &nbsp;<?php echo $this->translate('profile_emailmeforreport_label'); ?></label>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <div class="col-md-12">
-                                                                <div class="make-switch" data-on="success" data-off="danger">
-                                                                    <input type="checkbox" class="toggle <?php echo $user->getemailmeonnews(); ?>" id="emailmeonnews" name="emailmeonnews" value="1" />
-                                                                    <input type="hidden" id="emailmeonnews_old" name="emailmeonnews_old" value="<?php echo $user->getemailmeonnews(); ?>" />
-                                                                </div>
-                                                                <label class="control-label inline"> &nbsp;<?php echo $this->translate('profile_emailmeonnews_label'); ?></label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label"><?php echo $this->translate("profile_county_label"); ?>:</label>
+                                    <div class="col-sm-8">
+                                        <?php
+											$dropdown = new Zend_Form_Element_Select('county',
+																array(
+																	'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $counties),
+																	'view' => new Zend_View(),
+																	'decorators' => array('ViewHelper'),
+																	'class' => array('form-control','input-sm','width200')
+																)
+											);  
+											$dropdown->setValue($user->getCounty()); 
+											echo $dropdown->render();
+										?>
                                     </div>
                                 </div>
-                            <?php } ?>
-                        <?php } ?>
-                    </div>
-                    <div class="tab-pane <?php echo $tab == 'picture' ? 'active' : ''; ?>" id="uploadpicture">
-                    	<?php if(!isEmptyString($user->getID()) && $tab == 'picture') { ?>
-                    		<div class="row leftalignlabel">
-                                <div class="col-md-3" style="width:200px;">
-                                    <div class="widget-header" style="margin-left:15px;">
-                                        <h4><i class="icon-reorder"></i> Current Photo</h4>
-                                        <div id="profileinfo" style="margin-top:15px;">
-                                            <img class="profileimage imagecontainer" src="<?php echo $user->getMediumPicturePath(); ?>" />
-                                        </div>
-                                        <?php if(!isEmptyString($request->crop)){ ?>
-                                        	<div class="divider10"></div>
-                                        	<a href="<?php echo $this->baseUrl('profile/index/tab/picture/id/'.encode($user->getID())); ?>" class="btn btn-info btn-xs">Upload New</a>
-                                       	<?php } ?>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label"><?php echo $this->translate("profile_city_label"); ?>:</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control input-sm width200" id="city" name="city" value="<?php echo $user->getCity(); ?>" />
                                     </div>
                                 </div>
-                                <div class="col-md-9">
-                                    <?php if(isEmptyString($request->crop)){ ?>
-                                    	<script type="text/javascript" src="<?php echo $this->serverUrl($this->baseUrl('plugins/custom/jquery.form.min.js')); ?>"></script>
-                                    	<script>
-                                        $(document).ready(function(){
-											$("#indexform").validate({		
-												// define the validation rules one field at a time
-												rules: {
-													FileInput: "required"
-												}, 
-												// the messages for each of the fields being validated
-												messages: {		
-													FileInput: "No file specified"
-												},
-												// custom error positions
-												errorPlacement: function(error, element) {
-													switch(element.attr("name")){					
-														default:
-															if(element.hasClass("useid_error")){
-																error.appendTo("#"+element.attr("id")+"_error");
-															} else {
-																error.appendTo("#"+element.attr("name")+"_error");
-															}
-															break;
-													}			
-												},
-												ignore: ":hidden:not(select)"
-											});
-											
-											var options = { 
-												target:   '#output',   // target element(s) to be updated with server response 
-												beforeSubmit:  beforeSubmit,  // pre-submit callback 
-												success:       afterSuccess,  // post-submit callback 
-												uploadProgress: OnProgress, //upload progress callback 
-												resetForm: true        // reset the form after successful submit 
-											}; 
-												
-											 $("#FileInput").change(function(){
-												var filename = $(this).val(); // alert('file is '+filename);								
-												$("#filenamedisplay").html(filename);
-												// upload the file to the server
-												// $("#indexform").ajaxSubmit(options);  			
-											});  
-											
-											$('#filenamedisplay').click(function(){
-												$("#FileInput").trigger('click');
-											});
-											
-											$('#submit-btn').click(function(){
-												$("#indexform").ajaxSubmit(options);
-											});
-											
-											$('#re-upload').click(function(){
-												$("#aftersave").hide().addClass('hidden');
-												$("#beforesave").show().removeClass('hidden');
-												$("#filename, #FileInput, #attachment, #attachment_display").val('');
-												$("#uploadresult").html('');
-											});
-											
-											//function after succesful file upload (when server response)
-											function afterSuccess() {
-												$('#submit-btn').show(); //hide submit button
-												$('#loading-img').hide(); //hide submit button
-												$('#progressbox').delay(400).fadeOut(); //hide progress bar
-												$("#filenamedisplay").html('');
-												
-												var data = $.parseJSON($("#output").html());
-												if(data.result == 1){
-													$("#output, #FileInput_error, #filename_error ").hide();	
-													// $('#uploadresult').html('<div class="divider5"></div><span class="alert alert-success">Uploaded. Save changes to continue</span>').removeClass('hidden');
-													$('#uploadresult').html('<div class="divider5"></div><span class="alert alert-success">Uploaded. Please wait while we optimise...</span>').removeClass('hidden');
-													$("#filename").val(data.newfilename);
-													$("#attachment").val(data.oldfilename);
-													$("#attachment_display, #aftersave").show().removeClass('hidden');
-													$("#attachment_display").html(data.oldfilename);
-													$("#beforesave").hide().addClass('hidden');
-													// $("#savecontinue").show().removeClass('hidden');
-													// redirect to the crop page
-													var url = '<?php echo $this->baseUrl('profile/index/id/'.encode($user->getID()).'/tab/picture/crop/1'); ?>';
-													window.location.href = url;
-												}
-											}
-											
-											//function to check file size before uploading.
-											function beforeSubmit(){
-												//check whether browser fully supports all File API
-											   if (window.File && window.FileReader && window.FileList && window.Blob){
-													if(!$('#FileInput').val()) {
-														$("#output").html("<span class='alert alert-danger'>Error: Please select a File to Upload.</span>");
-														return false
-													}
-													$('#submit-btn').hide(); //hide submit button
-													$('#loading-img').show(); //hide submit button
-													$("#output").html("");  
-													
-												} else {
-													//Output error to older unsupported browsers that doesn't support HTML5 File API
-													$("#output").html("Please upgrade your browser. File upload not supported at this time.");
-													return false;
-												}
-											}
-											
-											//progress bar function
-											function OnProgress(event, position, total, percentComplete){
-												//Progress bar
-												$('#progressbox').show();
-												$('#progressbar').width(percentComplete + '%') //update progressbar percent complete
-												$('#statustxt').html(percentComplete + '%'); //update status text
-												if(percentComplete > 50) {
-													$('#statustxt').css('color','#000'); //change status text to white after 50%
-												}
-											}
-											
-											$(".topactions, .bottomactions, #topactions, #bottomactions").hide();
-										});
-                                        </script>
-                                        <div class="divider20"></div>
-                                        <div class="form-group" style="margin-left:0; padding-left:0;">
-                                            <div class="form-group" style="margin-left:0; padding-left:0;">
-                                                <label class="col-md-12 control-label">Upload an Image (Max size <?php echo formatBytes($config->uploads->photomaximumfilesize); ?>) <?php echo $this->translate("required_field_marker"); ?></label>
-                                                <div class="divider20"></div>
-                                                <div class="col-md-8">
-                                                    <div id="beforesave">
-                                                        <div class="fileinput-holder input-group col-md-8" style="padding-left:0;">
-                                                            <div id="filenamedisplay" style="cursor: text; text-overflow: ellipsis; " class="fileinput-preview uneditable-input form-control">No file selected...</div>
-                                                            <div class="input-group-btn">
-                                                                <span style="overflow: hidden; position: relative; cursor: pointer; margin:0;" class="fileinput-btn btn">Browse...
-                                                                    <input type="file" name="<?php echo isMobile() ? 'profileimage' : 'FileInput'; ?>"  id="<?php echo isMobile() ? 'profileimage' : 'FileInput'; ?>" class="form-control inline file" data-style="fileinput" style="position: absolute; top: 0px; right: 0px; margin: 0px; cursor: pointer; font-size: 99px; opacity: 0;" />
-                                                                    <input type="hidden" id="id" name="id" value="<?php echo encode($user->getID()); ?>" />
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-2 padding0">
-                                                        	<?php if(!isMobile()){ ?>
-	                                                            <button type="button" id="submit-btn" class="btn btn-info">Upload</button> &nbsp; 
-                                                            <?php } ?>
-                                                            <img src="<?php echo $this->baseUrl('images/loader.gif'); ?>" id="loading-img" style="display:none;" />
-                                                        </div>                                                    	
-                                                    </div>
-                                                    <div id="aftersave" class="hidden">
-                                                    	<div class="col-md-7" style="padding-left:0;"><span id="attachment_display"><?php // echo $user->getProfilePhoto(); ?></span> &nbsp;<button type="button" id="re-upload" class="btn btn-xs"><i class="icon-remove-circle"></i> Re-upload</button> </div>
-                                                    </div>
-                                                    <div class="divider5"></div>
-                                                    <div id="progressbox"><div id="progressbar"></div><div id="statustxt">0%</div></div>
-                                            		<div id="output"></div><div id="uploadresult" class="hidden"></div>
-                                                    <div id="filename_error"></div><div id="FileInput_error"></div><div id="profileimage_error"></div>
-                                                   <!-- <input type="text" name="profileimage" id="profileimage" class="hidden" value="<?php //echo $user->getProfilePhoto(); ?>" />-->
-                                                    <input type="hidden" id="userid" name="userid" value="<?php echo $user->getID(); ?>" />
-                                                </div>
-                                                
-                                            </div> 
-                                            <div class="divider30"></div>
-                                            <div class="form-group" style="margin-left:0; padding-left:15px;">
-                                                <?php if(!isMobile()){ ?>
-    												<button type="submit" class="btn btn-success btn-lg button-submit hidden" name="savecontinue" id="savecontinue"><i class="icon-ok icon-white"></i> Save Changes</button>
-                                            	<?php } else { ?>
-                                                	<button type="submit" class="btn btn-success btn-lg button-submit" name="savecontinue" id="savecontinue"><i class="icon-ok icon-white"></i> Upload Image</button>
-                                                <?php } ?>
-                                            </div>
-                                        </div>
-                                    <?php } else { ?>
-                                    	<script>
-                                        $(document).ready(function(){
-											$(".topactions, .bottomactions, #topactions, #bottomactions").hide();
-											
-											$('#photo').imgAreaSelect({ 
-												aspectRatio: '4:5', 
-												handles: true,
-												fadeSpeed: 200, 
-												minWidth: 100,
-												maxWidth: 390,
-												x1: 0, y1: 0, x2: 140, y2: 175,
-												/*onSelectChange: preview,*/
-												onSelectEnd: function (img, selection) {
-													$('input[name="x1"]').val(selection.x1);
-													$('input[name="y1"]').val(selection.y1);
-													$('input[name="x2"]').val(selection.x2);
-													$('input[name="y2"]').val(selection.y2);
-													$('input[name="h"]').val(selection.height);
-													$('input[name="w"]').val(selection.width);            
-												}
-											});
-										});
-										</script> 
-                                        <div class="form-group" style="margin-left:15px;">
-                                            <div class="widget-header">
-                                                <h4><i class="icon-reorder"></i> Resize/Crop Photo</h4>
-                                            </div>
-                                            <div class="divider20"></div>
-                                            <label class="blocked">Drag the handles on the image canvas below to resize and click <b>'Crop Photo'</b> to save changes.</label>
-                                            <div class="divider10"></div>
-                                            
-                                            <button type="submit" class="btn btn-success btn-lg button-submit" name="save"><i class="icon-ok icon-white"></i> <?php echo $button_title; ?></button>
-                                            <div class="clearfix divider15"></div>
-                                            <img src="<?php echo $user->getLargePicturePath(); ?>" id="photo" />
-                                            
-                                            <input type="hidden" name="x1" value="0" />
-                                            <input type="hidden" name="y1" value="0" />
-                                            <input type="hidden" name="x2" value="200" />
-                                            <input type="hidden" name="y2" value="200" />
-                                            <input type='hidden' name='w' value='200' />
-                                            <input type='hidden' name='h' value='200' />
-                                            <input type="hidden" id="id" name="id" value="<?php echo encode($user->getID()); ?>" />
-                                            <div class="clearfix divider15"></div>
-                                            <button type="submit" class="btn btn-success btn-lg button-submit" name="save"><i class="icon-ok icon-white"></i> <?php echo $button_title; ?></button>
-                                            
-                                        </div>
-                                    <?php } ?>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label"><?php echo $this->translate("profile_zipcode_label"); ?>:</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control input-sm width100" id="zipcode" name="zipcode" value="<?php echo $user->getZipCode(); ?>" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label"><?php echo $this->translate("profile_addressline1_label"); ?>:</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control input-sm" id="addressline1" name="addressline1" value="<?php echo $user->getAddressline1(); ?>" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label"><?php echo $this->translate("profile_addressline2_label"); ?>:</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control input-sm" id="addressline2" name="addressline2" value="<?php echo $user->getAddressline2(); ?>" />
+                                    </div>
                                 </div>
                             </div>
-                       	<?php } ?>
-                    </div>
-                <?php } ?>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="col-md-6" style="margin-top:10px;">
+                    <fieldset class="fieldsetcontainer clearfix" id="contact" style="min-height:280px;">
+                        <legend>Contact</legend>
+                        <div class="panel-body well-sm">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label"><?php echo $this->translate("profile_homephone_label"); ?>:</label>
+                                    <div class="col-sm-8">
+                                       <input type="text" class="form-control input-sm width150" id="home" name="home" value="<?php echo $user->getHome(); ?>" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label"><?php echo $this->translate("profile_cellphone_label"); ?>:</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control input-sm width150" id="cell" name="cell" value="<?php echo $user->getCell(); ?>" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label"><?php echo $this->translate("profile_workphone_label"); ?>:</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control input-sm width150" id="work" name="work" value="<?php echo $user->getWork(); ?>" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label"><?php echo $this->translate("profile_workext_label"); ?>:</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control input-sm width75" id="ext" name="ext" value="<?php echo $user->getExt(); ?>" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-5 control-label">&nbsp;</label>
+                                    <div class="col-sm-7">&nbsp;</div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
             </div>
-        </div>
-	</div>
+            <div class="row-fluid margin0">
+            	<div class="col-md-12" style="margin-top:10px;">
+                    <fieldset class="fieldsetcontainer">
+                        <legend>Settings and Prefferences</legend>
+                        <div class="panel-body well-sm">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label"><?php echo $this->translate("profile_type_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                    <div class="col-sm-8">
+                                        <?php
+                                            $allvalues = getUserType();
+                                            $dropdown = new Zend_Form_Element_Select('type',
+                                                                array(
+                                                                    'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $allvalues),
+                                                                    'view' => new Zend_View(),
+                                                                    'decorators' => array('ViewHelper'),
+                                                                    'class' => array('form-control','input-sm','width200')
+                                                                )
+                                            );  
+                                            $dropdown->setValue($user->getType()); 
+                                            echo $dropdown->render();
+                                        ?><div id="type_error"></div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label"><?php echo $this->translate("profile_username_label"); ?>: <?php echo isEmptyString($user->getID()) ? '' : $this->translate("global_required_field_marker"); ?></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control input-sm width200 inline" id="username" name="username" value="<?php echo $user->getUserName(); ?>" /> <a class="btn btn-sm btn-default gonowhere" id='check_username_availability' title="Check Availability">Check</a>
+                                        
+                                       	<div id="username_availability_result" style="margin-top:4px"></div>
+                                        <div id="username_error"></div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label"><?php echo $this->translate("profile_email_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                    <div class="col-sm-8">
+                                    	<input type="hidden" name="oldemail" id="oldemail" value="<?php echo $user->getEmail(); ?>" />
+                                        <input type="text" class="form-control input-sm width225 inline" id="email" name="email" value="<?php echo $user->getEmail(); ?>" />
+                                        <a class="btn btn-sm btn-default gonowhere" id='check_email_availability' title="Check Availability">Check</a>
+                                        <div id="email_availability_result" style="margin-top:4px"></div>
+                                        <?php if($user->isUserInActive()){ ?>
+                                            <label class="checkbox-inline"><input type="checkbox" name="isinvited" id="isinvited" value="1" /> Invite via Email:</label>
+                                        <?php } ?>
+                                        <div id="email_error"></div>
+                                    </div>
+                                </div>
+                                <?php if(!isEmptyString($user->getPassword())){ ?>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label"><?php echo $this->translate("profile_password_current_label"); ?>: <?php echo $this->translate("required_field_marker"); ?></label>
+                                        <div class="col-sm-6 paddingright0">
+                                            <input type="password" name="oldpassword" id="oldpassword" class="form-control password input-sm xwidth200" autocomplete="off" />
+                                            <div id="oldpassword_error"></div>
+                                        </div>
+                                    </div>
+                                <?php } ?>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label"><?php echo !isEmptyString($user->getPassword()) ? $this->translate("profile_password_new_label") : $this->translate("profile_password_label"); ?>: <?php echo $this->translate("required_field_marker"); ?></label>
+                                    <div class="col-sm-6 paddingright0">
+                                    	 <input type="password" name="newpassword" id="newpassword" class="form-control password input-sm xwidth200" autocomplete="off" onkeyup="passwordStrength(this.value)" />
+                                        <input type="hidden" name="trx" id="trx"  value="<?php echo $user->getPassword(); ?>" />
+                                        <p style="display:inline-block; float:right;">
+                                            <label for="passwordStrength" class="hidden">Password strength</label>
+                                            <div id="passwordDescription" style="width:100px;">strength</div>
+                                            <div id="passwordStrength" class="strength0"></div>
+                                        </p>
+                                        <div id="newpassword_error"></div>
+                                    </div>
+                                   
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label blocked"><?php echo $this->translate("profile_password_confirm_label"); ?>: <?php echo $this->translate("required_field_marker"); ?></label>
+                                    <div class="col-sm-6 paddingright0">
+                                    	<input type="password" name="confirmpassword" id="confirmpassword" class="form-control password input-sm xwidth200" /><div id="confirmpassword_error"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label"></label>
+                                    <div class="col-sm-8">
+                                        
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label"></label>
+                                    <div class="col-sm-8">
+                                        
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label"></label>
+                                    <div class="col-sm-8">
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+            <div class="divider15"></div>
+   		</div>
+ 	</form>
 </div>
-<div class="form-actions fluid" id="bottomactions"></div>
-</form>
 <?php
 	require_once APPLICATION_PATH.'/includes/footer.php';
 ?>

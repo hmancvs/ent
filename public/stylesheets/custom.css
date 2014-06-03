@@ -286,6 +286,7 @@ select.auto, .auto, td.auto, table.auto {
 .blockcontainer {
 	display:block; 
 	width:100%;
+	text-align:center;
 }
 .bolded {
 	font-weight:bold;
@@ -574,15 +575,27 @@ li.display_box.selected {
 	-webkit-shadow: 0 0 0 1px #F5F5F5, 0 0 0 2px #EBEBEB, 0 0 0 3px #E0E0E0, 0 0 0 4px #D6D6D6;
 }
 .absoluteupload {
-	position:absolute; 
+	/*position:absolute; 
 	width:105px; 
 	padding:1px; 
 	top:5px; 
 	right:-20px; 
 	text-align:center;
+	display:none;*/
+	position:relative; 
+	width:65%; 
+	padding:1px; 
+	text-align:center;
 	display:none;
 }
-
+.uploadlink, #uploadlink {
+	padding:2px 5px;
+	text-align:center;
+	margin:2px auto;
+	text-decoration:none;
+	display:block;
+	font-size:10px;
+}
 .peoplelist {
     margin: 25px 0;
 	-webkit-border-radius: 2px;
@@ -736,6 +749,9 @@ li.display_box.selected {
 	width:100%;
 	float:left;
 }
+#tabs.ui-tabs {
+	min-height:450px;
+}
 #center .ui-widget-content {
 	width:100%;
 	float:left;
@@ -803,7 +819,8 @@ li.display_box.selected {
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
 	border-radius: 4px;
-	margin:0; 
+	margin:0;
+	margin-bottom:10px;
 	padding:0; 
 	display:inline-block; 
 	background:none; 

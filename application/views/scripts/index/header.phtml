@@ -2,8 +2,7 @@
 	include APPLICATION_PATH.'/includes/header.php';
 
 	$userid = $session->getVar("userid"); // debugMessage($userid);
-
-	// $user->populate($userid);
+	$user->populate($userid);
 
 ?>
 <!-- Header -->
@@ -25,7 +24,6 @@
 		  	<span class="col-md-7 paddingleft0" style="font-size:2.5em;"><div class="divider20"></div><?php echo getAppName(); ?></span>
           </a> 
 		</div>
-
 		<!-- Collect the nav links, forms, and other content for toggling -->
 		<div class="collapse navbar-collapse navonlogin" style="height:100px;">
 		  <ul class="nav navbar-nav" id="headermenu">
@@ -35,19 +33,25 @@
             <?php if ($acl->checkPermission('Client', ACTION_LIST)) { ?>
 				<li class="<?php echo $controller == 'client' ? 'active' : ''; ?>"><a href="<?php echo $this->baseUrl('client/list'); ?>"><span class="glyphicon glyphicon-list-alt"></span><span class="menutext">Manage Clients</span></a></li>
             <?php } ?>
-            <li><a class="xgonowhere"><span class="glyphicon glyphicon-user"></span><span class="menutext">Manage Users</span></a></li>
-            <li><a class="xgonowhere"><span class="glyphicon glyphicon-signal"></span><span class="menutext"> Reports</span></a></li>
-            <!--<li><a class="xgonowhere"><span class="glyphicon glyphicon-cog"></span><span class="menutext">Maintenance</span></a></li>-->
+            <?php if ($acl->checkPermission('User Account', ACTION_LIST)) { ?>
+            	<li class="<?php echo $controller == 'profile' ? 'active' : ''; ?>"><a href="<?php echo $this->baseUrl('profile/list'); ?>"><span class="glyphicon glyphicon-user"></span><span class="menutext">Manage Users</span></a></li>
+            <?php } ?>
+            <?php if ($acl->checkPermission('Report Dashboard', ACTION_VIEW)) { ?>
+            	<li><a class="xgonowhere"><span class="glyphicon glyphicon-signal"></span><span class="menutext"> Reports</span></a></li>
+            <?php } ?>
+            <?php if ($acl->checkPermission('Application Settings', ACTION_LIST)) { ?>
+            	<!--<li><a class="xgonowhere"><span class="glyphicon glyphicon-cog"></span><span class="menutext">Maintenance</span></a></li>-->
+            <?php } ?>
 		  </ul>
 
 		  <ul class="nav navbar-nav navbar-right" id="headerright">
             <li style="xwidth:300px;" class="userloggedinfo">
                 <div class="row">
-                    <a class="padding0 col-md-3" href="<?php //echo $this->baseUrl("profile/view/id/".encode($user->getID())); ?>"><img src="<?php echo $user->getMediumPicturePath(); ?>" style="width:95px; padding:5px;" /></a>
+                    <a class="padding0 col-md-3" href="<?php echo $this->baseUrl("profile/view/id/".encode($user->getID())); ?>"><img src="<?php echo $user->getMediumPicturePath(); ?>" style="width:95px; padding:5px;" /></a>
                     <ul class="padding0 col-md-9" style="width:250px; margin-left:2px;">
-                        <li class="btn-default"><a>My Profile</a></li>
-                        <li class="btn-default"><a>Change Password</a></li>
-                        <li class="btn-default"><a>Account Settings</a></li>
+                        <li class="btn-default"><a href="<?php echo $this->baseUrl("profile/view/id/".encode($user->getID())); ?>">My Profile</a></li>
+                        <li class="btn-default"><a href="<?php echo $this->baseUrl("profile/index/id/".encode($user->getID())); ?>">Update Profile</a></li>
+                        <li class="btn-default"><a href="<?php echo $this->baseUrl("profile/index/id/".encode($user->getID())); ?>">Account Settings</a></li>
                         <li class="btn-default"><a href="<?php echo $this->baseUrl("user/logout"); ?>">Sign Out</a></li>
                     </ul>
                 </div>

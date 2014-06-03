@@ -56,7 +56,7 @@ define("CURRENT_RESULTS_QUERY", "crq");
 # the page title for current list
 define("PAGE_TITLE", "ttl");
 
-define('DEFAULT_USER_GROUP', '8');
+define('DEFAULT_USER_GROUP', '2');
 define('DEFAULT_ID', '1');
 define('VALIDATE_PHONE_ACTIVATED', false);
 define('DEFAULT_DATETIME', date("Y-m-d H:i:s"));

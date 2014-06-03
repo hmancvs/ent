@@ -327,6 +327,7 @@ ul, ol {
 	padding:10px;
 	min-height:400px;
 	margin:10px;
+	margin-top:0;
 }
 #centercolumn .listform .headerbox {
 	position:absolute;
@@ -433,4 +434,53 @@ ul, ol {
 	background-position: 8px 9px;
     background-repeat: no-repeat;
 	background-image: url("../images/tick.png");
+}
+.form-control.error {
+	border:1px solid #D17B7E;
+} 
+
+#publiccontainer {
+	width:450px;
+	margin:0 auto;
+	padding:0 20px;
+	border:solid 2px #cacaca;
+	background-color:#fff;
+	height:auto;
+	-webkit-box-shadow: 0 6px 8px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+ 	-moz-box-shadow: 0 6px 8px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+ 	box-shadow: 0 6px 8px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+#publicleft {
+	list-style:none;
+	margin:10px 0 0 0;
+	padding:0;
+}
+#publicleft li {
+	display:block;
+	margin:0;
+	padding:0 5px 5px 50px;
+	height:auto;
+	position:relative;
+	border-bottom:solid 1px #ebebeb;
+}
+#publicleft li:last-child {
+	border-bottom:none;
+}
+#publicleft li img {
+	position:absolute;
+	left:0;
+	top:10px;
+}
+#publicleft li span {
+	display:block;
+	padding-left:20px;
+}
+#publicleft li span h2 {
+	font-size:16px;
+}
+#publicleft li span label {
+	display:block;
+	font-size:16px;
+	color:#848282;
+	width:100%;
 }

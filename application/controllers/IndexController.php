@@ -66,7 +66,8 @@ class IndexController extends Zend_Controller_Action  {
     }
     
    public function createAction() {
-    	// debugMessage($this->_getAllParams()); // exit();
+    	// debugMessage($this->_getAllParams()); // exit(); 
+   		$this->_setParam('id', NULL); // exit();
    		$session = SessionWrapper::getInstance(); 
     	// the name of the class to be instantiated
     	$classname = $this->_getParam("entityname");

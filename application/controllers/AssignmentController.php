@@ -11,13 +11,9 @@ class AssignmentController extends IndexController  {
 		$this->_helper->layout->disableLayout();
     	$this->_helper->viewRenderer->setNoRender(TRUE);
     	$session = SessionWrapper::getInstance();
-    	$formvalues = $this->_getAllParams();
-    	debugMessage($formvalues); 
-    	debugMessage(decode($this->_getParam('failureurl'))); 
-    	debugMessage(decode($this->_getParam('successurl'))); 
-    	// exit();
-    	$assignment = new Assignment();
+    	$formvalues = $this->_getAllParams(); // debugMessage($formvalues); // exit();
     	
+    	$assignment = new Assignment();
     	$id = getAssignmentIDForUser($formvalues['userid'], $formvalues['clientid']);
     	if(!isEmptyString($id)){
     		$formvalues['deassignedbyid'] = $session->getVar('userid');
@@ -26,6 +22,7 @@ class AssignmentController extends IndexController  {
     		$assignment->processPost($formvalues);
     		/* debugMessage($assignment->toArray());
     		debugMessage('error is '.$assignment->getErrorStackAsString()); */
+    		
     		if($assignment->hasError()){
     			$this->_helper->redirector->gotoUrl();
     		} else {
@@ -36,6 +33,5 @@ class AssignmentController extends IndexController  {
     			}
     		}
     	}
-    	// exit;
 	}
 }

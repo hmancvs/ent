@@ -4,35 +4,43 @@
 	$user = new UserAccount();
 	$user->populate(decode($request->id));
 	
-	/*$resending = false;
-	if($request->resend == '1'){
-		$sendresult = $user->sendActivationCodeToMobile();
-		$resending = true;
-	}*/
-	
-	$title = "Signup Confirmation"; 
+	$title = "Activation Confirmation"; 
 	$this->headTitle($title.$browserappend); 
 	
 ?>
-<div id="signup_confirm">
-	<h1><?php echo $title; ?></h1>
-	<form id="activateform">
-		<table class="table">
-			<?php if(!$sessionhaserror) { ?>
-            	<tr>
-					<td><div class="alert alert-success"><a class="close" data-dismiss="alert">×</a>Registration completed successfully</div></td>
-                </tr>    
-			<?php } ?>                       
-			<tr>
-				<td>
-					<label class="centerblock">Thank you for registering with <b><?php echo getAppName(); ?></b></label>
-					<label class="centerblock">However, before you can get started, you have got to activate your account <br /> by clicking on the activation link sent to the email address you provided during registration.</label><br /> 
-					<label class="centerblock"><br /><br />For any assistance please feel free to <a href="<?php echo $this->serverUrl($this->baseUrl('contactus')); ?>" title="Contact us">Contact us</a></label>
-				</td>
-			</tr>
-		</table>
-	</form>
-</div>
+<script>
+$(document).ready(function() {			
+	$(".navonlogin, #sidebar, .breadcrumbs li").remove();
+	
+});	
+</script>
+<style>
+.breadcrumbs li, .pageheader, #headercontainer #headermenu, #headercontainer #headerright {
+	display:none;
+}
+#contentcontainer {
+	margin-left:0;
+}
+.breadcrumbs {
+	padding:30px 0 4px 10px;	
+}
+.headerwrapper {
+	margin:0 auto;
+	margin-left:550px;
+}
+</style>
+<div id="publiccontainer" class="index">
+	<h3 class="centeralign"><?php echo $title; ?></h3>
+    <div class="divider15"></div>
+    <form class="form-horizontal" role="form">
+    	<?php if($sessionhaserror) { ?>
+            <div class="alert alert-error clear"><?php echo $session->getVar(ERROR_MESSAGE); ?></div>
+        <?php } ?>
+        <?php if(!isEmptyString($session->getVar(SUCCESS_MESSAGE)) ){ ?>
+            <div class="alert alert-success clear"><?php echo $session->getVar(SUCCESS_MESSAGE); ?></div>
+        <?php } ?>
+    </form>
+</div>    
 <?php
 	require_once APPLICATION_PATH.'/includes/footer.php';
 ?>

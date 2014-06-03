@@ -1,7 +1,7 @@
 <?php
 	require_once APPLICATION_PATH.'/includes/header.php';
 	
-	$title = sprintf($this->translate("useraccount_pagetitle_login"), getAppName());
+	$title = sprintf($this->translate("profile_pagetitle_login"), getAppName());
 	$this->headTitle($title.$browserappend);
 	
 	$useraccount = new UserAccount();
@@ -23,9 +23,9 @@ $(document).ready(function() {
 		}, 
 		messages: {
 			email: {
-				"required": "<?php echo $this->translate("useraccount_credential_error"); ?>"
+				"required": "<?php echo $this->translate("profile_credential_error"); ?>"
 			},
-			password: "<?php echo $this->translate("useraccount_password_error"); ?>"
+			password: "<?php echo $this->translate("profile_password_error"); ?>"
 		}
 	});
 	
