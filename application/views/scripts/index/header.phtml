@@ -49,7 +49,7 @@
                 <div class="row">
                     <a class="padding0 col-md-3" href="<?php echo $this->baseUrl("profile/view/id/".encode($user->getID())); ?>"><img src="<?php echo $user->getMediumPicturePath(); ?>" style="width:95px; padding:5px;" /></a>
                     <ul class="padding0 col-md-9" style="width:250px; margin-left:2px;">
-                        <li class="btn-default"><a href="<?php echo $this->baseUrl("profile/view/id/".encode($user->getID())); ?>">My Profile</a></li>
+                        <li class="btn-default"><a href="<?php echo $this->baseUrl("profile/view/id/".encode($user->getID())); ?>"><?php echo $user->getName(); ?></a></li>
                         <li class="btn-default"><a href="<?php echo $this->baseUrl("profile/index/id/".encode($user->getID())); ?>">Update Profile</a></li>
                         <li class="btn-default"><a href="<?php echo $this->baseUrl("profile/index/id/".encode($user->getID())); ?>">Account Settings</a></li>
                         <li class="btn-default"><a href="<?php echo $this->baseUrl("user/logout"); ?>">Sign Out</a></li>

@@ -6,7 +6,7 @@ defined('APPLICATION_PATH')
 
 // Define application environment
 defined('APPLICATION_ENV')
-    || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'development'));
+    || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'staging'));
 
 // Ensure library/ is on include_path
 set_include_path(implode(PATH_SEPARATOR, array(
@@ -24,7 +24,7 @@ if(APPLICATION_ENV == 'production'){
 	define('PUBLICFOLDER', '/');	
 } 
 if(APPLICATION_ENV == 'staging'){
-	define('PUBLICFOLDER', '/');
+	define('PUBLICFOLDER', 'public');
 }
 if(APPLICATION_ENV == 'development'){
 	define('PUBLICFOLDER', 'public');
@@ -89,5 +89,3 @@ Zend_Db_Table_Abstract::setDefaultMetadataCache($cache);
 
 # run the default page 
 $application->bootstrap()->run();
-
-// header("Location: user/login");

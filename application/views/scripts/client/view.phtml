@@ -343,7 +343,7 @@
                                     	<div class="row-fluid margin0">
                                             <div class="col-md-12 padding0 pull-right rightalign">
                                                 <p class="margin0 lineblocked">
-                                                    <button type="button" class="btn btn-default btn-xs gonowhere update_trigger" section="bio"><i class="glyphicon glyphicon-pencil"></i> Update</button>
+                                                    <button type="button" class="btn btn-xs gonowhere <?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'btn-primary update_trigger'; ?>" message="This Account is closed and updates are disabled." section="bio"><i class="glyphicon glyphicon-pencil"></i> Update</button>
                                                 </p>
                                                 <p class="margin0 lineblocked">
                                                     <button type="submit" class="btn btn-success btn-xs button-submit save_trigger" section="bio" name="save"><i class="glyphicon glyphicon-ok"></i> Save Changes</button>
@@ -642,7 +642,7 @@
                                     	<div class="row-fluid margin0">
                                             <div class="col-md-12 padding0 pull-right rightalign">
                                                 <p class="margin0 lineblocked">
-                                                    <button type="button" class="btn btn-default btn-xs gonowhere update_trigger" section="referral"><i class="glyphicon glyphicon-pencil"></i> Update</button>
+                                                    <button type="button" class="btn btn-xs gonowhere <?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'btn-primary update_trigger'; ?>" message="This Account is closed and updates are disabled." section="referral"><i class="glyphicon glyphicon-pencil"></i> Update</button>
                                                 </p>
                                                 <p class="margin0 lineblocked">
                                                     <button type="submit" class="btn btn-success btn-xs button-submit save_trigger" section="referral" name="save"><i class="glyphicon glyphicon-ok"></i> Save Changes</button>
@@ -876,7 +876,7 @@
                                                                     $dropdown->setValue($client->getPrimaryDiagnosis()); 
                                                                     echo $dropdown->render();
                                                                 ?>
-                                                                <input type="hidden" name="primarydiagnosis_old" id="primarydiagnosis_old" value="<?php echo $client->getPrimaryDiagnosis(); ?>" />                                   
+                                                                <input type="hidden" name="primarydiagnosis_old" class="form-control" id="primarydiagnosis_old" value="<?php echo $client->getPrimaryDiagnosis(); ?>" />                                   
                                                                 <div id="primarydiagnosis_error"></div>
                                                                 <div class="divider5"></div>
                                                                 <?php
@@ -891,7 +891,7 @@
                                                                     $dropdown->setValue($client->getPrimaryCause()); 
                                                                     echo $dropdown->render();
                                                                 ?>
-                                                                <input type="hidden" name="primarycause_old" id="primarycause_old" value="<?php echo $client->getPrimaryCause(); ?>" />
+                                                                <input type="hidden" name="primarycause_old" id="primarycause_old" class="form-control" value="<?php echo $client->getPrimaryCause(); ?>" />
                                                                 <div id="primarycause_error"></div>
                                                             </div>
                                                         </div>
@@ -963,7 +963,7 @@
                                                                     $dropdown->setValue($client->getSecondaryDiagnosis()); 
                                                                     echo $dropdown->render();
                                                                 ?>
-                                                                <input type="hidden" name="secondarydiagnosis_old" id="secondarydiagnosis_old" value="<?php echo $client->getSecondaryDiagnosis(); ?>" />
+                                                                <input type="hidden" name="secondarydiagnosis_old" id="secondarydiagnosis_old" class="form-control" value="<?php echo $client->getSecondaryDiagnosis(); ?>" />
                                                                 <div class="divider5"></div>
                                                                 <?php
                                                                     $dropdown = new Zend_Form_Element_Select('secondarycause',
@@ -977,7 +977,7 @@
                                                                     $dropdown->setValue($client->getSecondaryCause()); 
                                                                     echo $dropdown->render();
                                                                 ?>
-                                                                <input type="hidden" name="secondarycause_old" id="secondarycause_old" value="<?php echo $client->getSecondaryCause(); ?>" />
+                                                                <input type="hidden" name="secondarycause_old" class="form-control" id="secondarycause_old" value="<?php echo $client->getSecondaryCause(); ?>" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1043,7 +1043,7 @@
                                     	<div class="row-fluid margin0">
                                             <div class="col-md-12 padding0 pull-right rightalign">
                                                 <p class="margin0 lineblocked">
-                                                    <button type="button" class="btn btn-default btn-xs gonowhere update_trigger" section="emergency"><i class="glyphicon glyphicon-pencil"></i> Update</button>
+                                                    <button type="button" class="btn btn-xs gonowhere <?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'btn-primary update_trigger'; ?>" message="This Account is closed and updates are disabled." section="emergency"><i class="glyphicon glyphicon-pencil"></i> Update</button>
                                                 </p>
                                                 <p class="margin0 lineblocked">
                                                     <button type="submit" class="btn btn-success btn-xs button-submit save_trigger" section="emergency" name="save"><i class="glyphicon glyphicon-ok"></i> Save Changes</button>
@@ -1114,8 +1114,8 @@
                                                         Actions <span class="caret"></span>
                                                     </button>
                                                     <ul class="dropdown-menu">
-                                                        <li><a class="addpopup" href="<?php echo $this->baseUrl("client/assign/clientid/".$client->getID()."/pgc/true/type/start"); ?>" title="Assign to User" rel="Assign Client to User" formtitle="indexform" successurl="<?php echo $this->viewurl; ?>" action="<?php echo $this->baseUrl("assignment/create"); ?>">Assign User</a></li>
-                                                        <li><a class="addpopup" href="<?php echo $this->baseUrl("client/assign/clientid/".$client->getID()."/pgc/true/type/end"); ?>" title="De-assign to User" rel="De-assign User" formtitle="indexform" successurl="<?php echo $this->viewurl; ?>" action="<?php echo $this->baseUrl("assignment/deassign"); ?>">Deassign User</a></li>
+                                                        <li><a class="<?php echo !$client->isActive() ? 'alert-dialog' : 'addpopup'; ?>" href="<?php echo $this->baseUrl("client/assign/clientid/".$client->getID()."/pgc/true/type/start"); ?>" message="This Account is closed and updates are disabled." title="Assign to User" rel="Assign Client to User" formtitle="indexform" successurl="<?php echo $this->viewurl; ?>" action="<?php echo $this->baseUrl("assignment/create"); ?>">Assign User</a></li>
+                                                        <li><a class="<?php echo !$client->isActive() ? 'alert-dialog' : 'addpopup'; ?>" href="<?php echo $this->baseUrl("client/assign/clientid/".$client->getID()."/pgc/true/type/end"); ?>" message="This Account is closed and updates are disabled." title="De-assign to User" rel="De-assign User" formtitle="indexform" successurl="<?php echo $this->viewurl; ?>" action="<?php echo $this->baseUrl("assignment/deassign"); ?>">Deassign User</a></li>
                                                     </ul>
                                                 </div>
                                             </div>
