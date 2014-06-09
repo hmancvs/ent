@@ -30,7 +30,7 @@ class IndexController extends Zend_Controller_Action  {
 	public function init()    {
         // Initialize logger and translate actions
 		$this->_logger = Zend_Registry::get("logger"); 
-		$this->_translate = Zend_Registry::get("translate"); 
+		$this->_translate = Zend_Registry::get("translate");
 		// set the redirector to ignore the baseurl for redirections
 		$this->_helper->redirector->setPrependBase(false); 
 		

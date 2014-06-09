@@ -484,3 +484,20 @@ ul, ol {
 	color:#848282;
 	width:100%;
 }
+.listcontainer {
+	display:block;
+	width:auto; ]
+	max-width:100%; 
+	overflow-x:scroll; 
+	padding:2px; 
+	border:1px solid #4b93c2; 
+	border-bottom-width:3px; 
+	border-right:none;
+}
+.table.list {
+	width:2000px;
+	margin-bottom:4px;
+}
+.table.list thead tr th {
+	/*white-space:nowrap;*/
+}

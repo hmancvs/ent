@@ -331,6 +331,10 @@ label.error {
 	display:inline-block; 
 	padding:6px 10px;
 }
+.noimgbuttonsmall {
+	display:inline-block; 
+	padding:2px 6px 4px 6px;
+}
 a.link, .link {
 	color:#4D7496;
 }

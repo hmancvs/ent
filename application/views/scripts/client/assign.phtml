@@ -99,7 +99,7 @@
                     <label class="col-md-3 control-label" for="userid"><?php echo $this->translate("client_userid_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                     <div class="col-md-4 padding0">
                         <?php
-                            $allvalues = getUsers(2, '', 1, $alreadyassigned);
+                            $allvalues = getUsers(2, '', 1);
                             $dropdown = new Zend_Form_Element_Select('userid',
                                                 array(
                                                     'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $allvalues),
@@ -120,7 +120,7 @@
                         <?php
                             $dropdown = new Zend_Form_Element_Select('role',
                                                 array(
-                                                    'multiOptions' => array('1'=>'Supervisor'),
+                                                    'multiOptions' => array('2'=>'Job Coach'),
                                                     'view' => new Zend_View(),
                                                     'decorators' => array('ViewHelper'),
                                                     'class' => array('form-control','input-sm')

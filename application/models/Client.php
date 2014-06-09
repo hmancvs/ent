@@ -10,7 +10,7 @@ class Client extends BaseEntity {
 		$this->hasColumn('firstname', 'string', 255, array('notblank' => true));
 		$this->hasColumn('lastname', 'string', 255, array('notblank' => true));
 		$this->hasColumn('initial', 'string', 6);
-		$this->hasColumn('email', 'string', 50/*, array('notnull' => true, 'notblank' => true)*/);
+		$this->hasColumn('email', 'string', 50);
 		$this->hasColumn('home', 'string', 15);
 		$this->hasColumn('work', 'string', 15);
 		$this->hasColumn('cell', 'string', 15);
@@ -190,9 +190,6 @@ class Client extends BaseEntity {
 		if(isArrayKeyAnEmptyString('startdate', $formvalues)){
 			unset($formvalues['startdate']);
 		}
-		if(!isArrayKeyAnEmptyString('datereceived', $formvalues)){
-			$formvalues['startdate'] = $formvalues['datereceived'];
-		}
 		if(isArrayKeyAnEmptyString('iscriminal', $formvalues)){
 			unset($formvalues['iscriminal']);
 		}
@@ -256,7 +253,7 @@ class Client extends BaseEntity {
 				$formvalues['initialvoucher']['dateapproved'] = changeDateFromPageToMySQLFormat($formvalues['dateapproved']);
 			}
 			if(!isArrayKeyAnEmptyString('datereceived', $formvalues)){
-				$formvalues['initialvoucher']['datereceived'] = changeDateFromPageToMySQLFormat($formvalues['datereceived']);
+				$formvalues['initialvoucher']['startdate'] = changeDateFromPageToMySQLFormat($formvalues['startdate']);
 			}
 			if(!isArrayKeyAnEmptyString('status', $formvalues)){
 				$formvalues['initialvoucher']['status'] = $formvalues['status'];
@@ -619,6 +616,22 @@ class Client extends BaseEntity {
 		$result = $query->execute();
 		return $result;
 	}
+	# has been assigned
+	function hasBeenAssignedCouch() {
+		$query = Doctrine_Query::create()->from('Assignment a')
+		->where("a.clientid = '".$this->getID()."' AND a.status = 1 ");
+		//debugMessage($query->getSQLQuery());
+		$result = $query->execute();
+		if($result){
+			if($result->count() == 1){
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
 	# get array of users already assigned to a client
 	function getAssignedUsersArray(){
 		$users = array();
@@ -663,6 +676,26 @@ class Client extends BaseEntity {
 		//debugMessage($query->getSQLQuery());
 		$result = $query->execute();
 		return $result;
+	}
+	# get the employment jobs for the client
+	function getClientJobs() {
+		$query = Doctrine_Query::create()->from('Job j')
+		->where("j.clientid = '".$this->getID()."'")->orderby('j.startdate');
+		$result = $query->execute();
+		if($result){
+			return $result;
+		}
+		return new Job();
+	}
+	# get the vouchers for client ordered by 
+	function getClientVouchers() {
+		$query = Doctrine_Query::create()->from('Voucher v')
+		->where("v.clientid = '".$this->getID()."'")->orderby('v.startdate');
+		$result = $query->execute();
+		if($result){
+			return $result;
+		}
+		return new Voucher();
 	}
 }
 ?>

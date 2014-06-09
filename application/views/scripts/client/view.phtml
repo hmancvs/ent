@@ -19,22 +19,21 @@
 
 	$section = $request->section;
 	$step = $request->step;
+	if(isEmptyString($request->step)){
+		$request->setParam('step', 'view');
+		$step = 'view';
+	}
+	
 	if($tab == 'profile'){
 		if(isEmptyString($request->section)){
 			$request->setParam('section', 'bio');
 			$section = 'bio';
-		}
-		if(isEmptyString($request->step)){
-			$request->setParam('step', 'view');
-			$step = 'view';
 		}
 		
 		// dropdown data
 		$maritalstatuses = getAllMaritalStatuses();
 		$educationlevels = getEducationLevels();
 		$races = getAllRaces();
-		$states = getStates();
-		$counties = getAllCounties();
 		$programs = getPrograms();
 		$funders = getFunders();
 		$services = getServiceTypes();
@@ -43,7 +42,20 @@
 		$communicationtypes = getCommunicationLevels();
 		$housingtypes = getHousingTypes();
 		$skills = getAllClientSkills();
-		// debugMessage($client->getSkillsList());
+		$states = getStates();
+		$counties = getAllCounties();
+	}
+	
+	if($tab == 'employment'){
+		$states = getStates();
+		$counties = getAllCounties();
+	}
+	
+	if($tab == 'voucher'){
+		$services = getServiceTypes();
+		$programs = getPrograms();
+		$funders = getFunders();
+		$voucherstatuses = getVoucherStatuses();
 	}
 	
 	$title = $client->getName();
@@ -58,13 +70,25 @@
 		$('.desclabel').html('<?php echo $description; ?>');
 		$('.pageicon').html('<span class="glyphicon glyphicon-list-alt"></span>');
 		
+		// custom date picker options
+		var dateofbirthOpts = datepickerOpts;
+		var startfrom = '<?php echo date('Y'); ?>';
+		dateofbirthOpts.yearRange = "-<?php echo date('Y')-1900; ?>:-0"; 
+		dateofbirthOpts.minDate = "-<?php echo date('Y'); ?>Y";
+		datepickerOpts.maxDate = new Date("Dec 31, "+startfrom);	
+		$("#dateofbirth").datepicker(dateofbirthOpts);
+		
+		dateofbirthOpts.yearRange = "-<?php echo date('Y')-2010; ?>:-0"; 
+		datepickerOpts.maxDate = new Date();
+		$("#dateapproved, #startdate, #enddate, #invoicedate, #medicalstartdate").datepicker(dateofbirthOpts);
+		
 		var tab = '<?php echo $tab; ?>';
 		$("#tabtitle").html($("#tab_"+tab+" a."+tab).html());
 		
 		// hide edit controls by default
 		$('.edit, .requiredmark, .save_trigger, .cancel_trigger').addClass('hidden');
 		
-		<?php if($step == 'edit'){ ?>
+		<?php if($tab == 'profile' && $step == 'edit'){ ?>
 			var section = '<?php echo $section; ?>';
 			$('#collapse_'+section+' .edit, #collapse_'+section+' .requiredmark, #collapse_'+section+' .save_trigger, #collapse_'+section+' .cancel_trigger').removeClass('hidden');
 			$('#collapse_'+section+' .view, #collapse_'+section+' .update_trigger').addClass('hidden');
@@ -77,225 +101,432 @@
 				$("#state").attr('readonly', true).attr('disabled', true);
 			}
 			if(section == 'referral'){
-				$("#dateapproved, #datereceived").attr('readonly', true);
+				$("#dateapproved, #startdate").attr('readonly', true);
 			}
-		<?php } ?>
 		
-		// on trigger update, show update fields for a particular section. also cancel any other open fields for update in other sections
-		$(".update_trigger").click(function(){
-			var section = $(this).attr('section');
-			$('#collapse_'+section+' .edit, #collapse_'+section+' .requiredmark, #collapse_'+section+' .save_trigger, #collapse_'+section+' .cancel_trigger').removeClass('hidden');
-			$('#collapse_'+section+' .view, #collapse_'+section+' .update_trigger').addClass('hidden');
-			$('#collapse_'+section+' .edit .form-control').attr('readonly', false).attr('disabled', false);
-			$('.panel-collapse .cancel_trigger:not(#collapse_'+section+' .cancel_trigger)').click();
-			// maintain settings disable and readonly settings for dateofbirth, state, dateapproved
-			if(section == 'bio'){
-				$("#dateofbirth").attr('readonly', true);
-				$("#state").attr('readonly', true).attr('disabled', true);
-			}
-			if(section == 'referral'){
-				$("#dateapproved, #datereceived").attr('readonly', true);
-			}
-		});
-		
-		// on trigger cancel, hide edit fields and show view for each section. 
-		$(".cancel_trigger").click(function(){
-			var section = $(this).attr('section');
-			$('#collapse_'+section+' .edit, #collapse_'+section+' .requiredmark, #collapse_'+section+' .save_trigger, #collapse_'+section+' .cancel_trigger').addClass('hidden');
-			$('#collapse_'+section+' .view, #collapse_'+section+' .update_trigger').removeClass('hidden');
-			$('#collapse_'+section+' .edit .form-control').attr('readonly', true).attr('disabled', true);
-		});
-		
-		// save changes
-		$(".save_trigger").click(function(e){
-			e.preventDefault();
-			var section = $(this).attr('section');
-			$("#successurl").val(base64_encode('<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/'.$tab.'/section/'); ?>'+section));
-			$("#failureurl").val(base64_encode('<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/'.$tab.'/step/edit/section/'); ?>'+section));
-			if ($("#form-profile").valid()) {
-				$.blockUI({ message: '<?php echo $blockcontent; ?>' }); 
-				$("#form-profile").submit();
-			}
-		});
-		
-		// validation 
-		$("#form-profile").validate({		
-			// define the validation rules one field at a time
-			rules: {
-				firstname: {
-					required: true
-				},
-				lastname: {
-					required: true
-				},
-				gender: {
-					required: true
-				},
-				ssn: {
-					required: true
-				},
-				programid: {
-					required: true
-				},
-				funderid: {
-					required: true
-				},
-				servicetypeid: {
-					required: true
-				},
-				hours: {
-					required: true
-				},
-				rate: {
-					required: true
-				},
-				voucherno: {
-					required: true
-				},
-				resumefilename: {
-					required: true
-				},		
-				dateapproved: {
-					required: true
-				},
-				datereceived: {
-					required: true
-				},
-				primarydiagnosis: {
-					required: true
-				},
-				primarycause: {
-					required: true
-				},
-				employmentgoal: {
-					required: true
+			// on trigger update, show update fields for a particular section. also cancel any other open fields for update in other sections
+			$(".update_trigger").click(function(){
+				var section = $(this).attr('section');
+				$('#collapse_'+section+' .edit, #collapse_'+section+' .requiredmark, #collapse_'+section+' .save_trigger, #collapse_'+section+' .cancel_trigger').removeClass('hidden');
+				$('#collapse_'+section+' .view, #collapse_'+section+' .update_trigger').addClass('hidden');
+				$('#collapse_'+section+' .edit .form-control').attr('readonly', false).attr('disabled', false);
+				$('.panel-collapse .cancel_trigger:not(#collapse_'+section+' .cancel_trigger)').click();
+				// maintain settings disable and readonly settings for dateofbirth, state, dateapproved
+				if(section == 'bio'){
+					$("#dateofbirth").attr('readonly', true);
+					$("#state").attr('readonly', true).attr('disabled', true);
 				}
-			}, 
-			// the messages for each of the fields being validated
-			messages: {		
-				firstname: {
-					required: "<?php echo $this->translate("client_firstname_error"); ?>"
-				},
-				lastname: {
-					required: "<?php echo $this->translate("client_lastname_error"); ?>"
-				},
-				gender: {
-					required: "<?php echo $this->translate("client_gender_error"); ?>"
-				},
-				ssn: {
-					required: "<?php echo $this->translate("client_ssn_error"); ?>"
-				},
-				programid: {
-					required: "<?php echo $this->translate("client_programid_error"); ?>"
-				},
-				funderid: {
-					required: "<?php echo $this->translate("client_funderid_error"); ?>"
-				},
-				servicetypeid: {
-					required: "<?php echo $this->translate("client_servicetypeid_error"); ?>"
-				},
-				hours: {
-					required: "<?php echo $this->translate("client_hours_error"); ?>"
-				},
-				rate: {
-					required: "<?php echo $this->translate("client_rate_error"); ?>"
-				},
-				voucherno: {
-					required: "<?php echo $this->translate("client_voucherno_error"); ?>"
-				},
-				resumefilename: {
-					required: "<?php echo $this->translate("client_resumefilename_error"); ?>"
-				},				
-				dateapproved: {
-					required: "<?php echo $this->translate("client_dateapproved_error"); ?>"
-				},
-				datereceived: {
-					required: "<?php echo $this->translate("client_datereceived_error"); ?>"
-				},
-				primarydiagnosis: {
-					required: "<?php echo $this->translate("client_primarydiagnosis_error"); ?>"
-				},
-				primarycause: {
-					required: "<?php echo $this->translate("client_primarycause_error"); ?>"
-				},
-				employmentgoal: {
-					required: "<?php echo $this->translate("client_employmentgoal_error"); ?>"
-				}
-			},
-			// custom error positions
-			errorPlacement: function(error, element) {
-				switch(element.attr("name")){					
-					default:
-						if(element.hasClass("useid_error")){
-							error.appendTo("#"+element.attr("id")+"_error");
-						} else {
-							error.appendTo("#"+element.attr("name")+"_error");
-						}
-						break;
-				}			
-			}
-		});
-		
-		// custom date picker options
-		var dateofbirthOpts = datepickerOpts;
-		var startfrom = '<?php echo date('Y'); ?>';
-		dateofbirthOpts.yearRange = "-<?php echo date('Y')-1900; ?>:-0"; 
-		dateofbirthOpts.minDate = "-<?php echo date('Y'); ?>Y";
-		datepickerOpts.maxDate = new Date("Dec 31, "+startfrom);	
-		$("#dateofbirth").datepicker(dateofbirthOpts);
-		
-		dateofbirthOpts.yearRange = "-<?php echo date('Y')-2010; ?>:-0"; 
-		datepickerOpts.maxDate = new Date();
-		$("#dateapproved, #datereceived").datepicker(dateofbirthOpts);
-		
-		// show or hide containers for resume and cover documents 
-		<?php if($client->hasResume()){ ?>
-			$("#aftersave_resume").addClass('show').removeClass('hidden');
-			$("#beforesave_resume").addClass('hidden').removeClass('show');
-		<?php } ?>
-		<?php if($client->hasCoverletter()){ ?>
-			$("#aftersave_cover").addClass('show').removeClass('hidden');
-			$("#beforesave_cover").addClass('hidden').removeClass('show');
-		<?php } ?>
-		
-		// add filename of selected file in background of input to indicate that a file has been selected.
-		$("#resumefilename").change(function(){
-			if(!isEmptyString($(this).val())){
-				$("#beforesave_resume .fileinput-preview").html($(this).val());
-			}
-		});
-		$("#coverletterfilename").change(function(){
-			if(!isEmptyString($(this).val())){
-				$("#beforesave_cover .fileinput-preview").html($(this).val());
-			}
-		});
-		
-		$(".reupload").click(function(e){
-			e.preventDefault();
-			var type = $(this).attr('rel');
-			var message = '<label class="small centeralign blocked">Note that Re-Uploading this file while delete and replace the existing one. <br /><br /> Click <b>OK</b> to continue or <b>Cancel</b> to ignore</label>';
-			bootbox.confirm(message, function(confirmed) {
-				if(confirmed){
-					// remove the file via ajax
-					$(this).hide();
-					$("#loading_"+type).removeClass('hidden');
-					
-					$.get("<?php echo $this->baseUrl('client/removeupload/id/'.$client->getID().'/'); ?>type/"+type, 
-					   {                        
-						cachebuster: new Date().getTime()},                            
-						function(data){                        
-							// alert(data);      
-							$("#beforesave_"+type+"").addClass('show').removeClass('hidden');                  
-							$("#aftersave_"+type+", #reupload_"+type+", #loading_"+type).addClass('hidden').removeClass('show');
-						}
-					);
-				} else {
-					bootbox.hideAll();
-					return false;
+				if(section == 'referral'){
+					$("#dateapproved, #startdate").attr('readonly', true);
 				}
 			});
 			
-		});
+			// on trigger cancel, hide edit fields and show view for each section. 
+			$(".cancel_trigger").click(function(){
+				var section = $(this).attr('section');
+				$('#collapse_'+section+' .edit, #collapse_'+section+' .requiredmark, #collapse_'+section+' .save_trigger, #collapse_'+section+' .cancel_trigger').addClass('hidden');
+				$('#collapse_'+section+' .view, #collapse_'+section+' .update_trigger').removeClass('hidden');
+				$('#collapse_'+section+' .edit .form-control').attr('readonly', true).attr('disabled', true);
+			});
+			
+			// save changes
+			$(".save_trigger").click(function(e){
+				e.preventDefault();
+				var section = $(this).attr('section');
+				$("#successurl").val(base64_encode('<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/'.$tab.'/section/'); ?>'+section));
+				$("#failureurl").val(base64_encode('<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/'.$tab.'/step/edit/section/'); ?>'+section));
+				if ($("#form-profile").valid()) {
+					$.blockUI({ message: '<?php echo $blockcontent; ?>' }); 
+					$("#form-profile").submit();
+				}
+			});
+			
+			// validation 
+			$("#form-profile").validate({		
+				// define the validation rules one field at a time
+				rules: {
+					firstname: {
+						required: true
+					},
+					lastname: {
+						required: true
+					},
+					gender: {
+						required: true
+					},
+					ssn: {
+						required: true
+					},
+					programid: {
+						required: true
+					},
+					funderid: {
+						required: true
+					},
+					servicetypeid: {
+						required: true
+					},
+					hours: {
+						required: true
+					},
+					rate: {
+						required: true
+					},
+					voucherno: {
+						required: true
+					},
+					resumefilename: {
+						required: true
+					},		
+					dateapproved: {
+						required: true
+					},
+					startdate: {
+						required: true
+					},
+					primarydiagnosis: {
+						required: true
+					},
+					primarycause: {
+						required: true
+					},
+					employmentgoal: {
+						required: true
+					},
+					email: {
+						email: true
+					}
+					contactemail: {
+						email: true
+					}
+				}, 
+				// the messages for each of the fields being validated
+				messages: {		
+					firstname: {
+						required: "<?php echo $this->translate("client_firstname_error"); ?>"
+					},
+					lastname: {
+						required: "<?php echo $this->translate("client_lastname_error"); ?>"
+					},
+					gender: {
+						required: "<?php echo $this->translate("client_gender_error"); ?>"
+					},
+					ssn: {
+						required: "<?php echo $this->translate("client_ssn_error"); ?>"
+					},
+					programid: {
+						required: "<?php echo $this->translate("client_programid_error"); ?>"
+					},
+					funderid: {
+						required: "<?php echo $this->translate("client_funderid_error"); ?>"
+					},
+					servicetypeid: {
+						required: "<?php echo $this->translate("client_servicetypeid_error"); ?>"
+					},
+					hours: {
+						required: "<?php echo $this->translate("client_hours_error"); ?>"
+					},
+					rate: {
+						required: "<?php echo $this->translate("client_rate_error"); ?>"
+					},
+					voucherno: {
+						required: "<?php echo $this->translate("client_voucherno_error"); ?>"
+					},
+					resumefilename: {
+						required: "<?php echo $this->translate("client_resumefilename_error"); ?>"
+					},				
+					dateapproved: {
+						required: "<?php echo $this->translate("client_dateapproved_error"); ?>"
+					},
+					startdate: {
+						required: "<?php echo $this->translate("client_datereceived_error"); ?>"
+					},
+					primarydiagnosis: {
+						required: "<?php echo $this->translate("client_primarydiagnosis_error"); ?>"
+					},
+					primarycause: {
+						required: "<?php echo $this->translate("client_primarycause_error"); ?>"
+					},
+					employmentgoal: {
+						required: "<?php echo $this->translate("client_employmentgoal_error"); ?>"
+					},
+					email: {
+						email: "<?php echo $this->translate("profile_email_invalid_error"); ?>"
+					},
+					contactemail: {
+						email: "<?php echo $this->translate("profile_email_invalid_error"); ?>"
+					}
+				},
+				// custom error positions
+				errorPlacement: function(error, element) {
+					switch(element.attr("name")){					
+						default:
+							if(element.hasClass("useid_error")){
+								error.appendTo("#"+element.attr("id")+"_error");
+							} else {
+								error.appendTo("#"+element.attr("name")+"_error");
+							}
+							break;
+					}			
+				}
+			});
+			
+			// show or hide containers for resume and cover documents 
+			<?php if($client->hasResume()){ ?>
+				$("#aftersave_resume").addClass('show').removeClass('hidden');
+				$("#beforesave_resume").addClass('hidden').removeClass('show');
+			<?php } ?>
+			<?php if($client->hasCoverletter()){ ?>
+				$("#aftersave_cover").addClass('show').removeClass('hidden');
+				$("#beforesave_cover").addClass('hidden').removeClass('show');
+			<?php } ?>
+			
+			// add filename of selected file in background of input to indicate that a file has been selected.
+			$("#resumefilename").change(function(){
+				if(!isEmptyString($(this).val())){
+					$("#beforesave_resume .fileinput-preview").html($(this).val());
+				}
+			});
+			$("#coverletterfilename").change(function(){
+				if(!isEmptyString($(this).val())){
+					$("#beforesave_cover .fileinput-preview").html($(this).val());
+				}
+			});
+			
+			$(".reupload").click(function(e){
+				e.preventDefault();
+				var type = $(this).attr('rel');
+				var message = '<label class="small centeralign blocked">Note that Re-Uploading this file while delete and replace the existing one. <br /><br /> Click <b>OK</b> to continue or <b>Cancel</b> to ignore</label>';
+				bootbox.confirm(message, function(confirmed) {
+					if(confirmed){
+						// remove the file via ajax
+						$(this).hide();
+						$("#loading_"+type).removeClass('hidden');
+						
+						$.get("<?php echo $this->baseUrl('client/removeupload/id/'.$client->getID().'/'); ?>type/"+type, 
+						   {                        
+							cachebuster: new Date().getTime()},                            
+							function(data){                        
+								// alert(data);      
+								$("#beforesave_"+type+"").addClass('show').removeClass('hidden');                  
+								$("#aftersave_"+type+", #reupload_"+type+", #loading_"+type).addClass('hidden').removeClass('show');
+							}
+						);
+					} else {
+						bootbox.hideAll();
+						return false;
+					}
+				});
+			});
+		<?php } ?>
+		
+		<?php if($tab == 'employment' && ($step == 'edit' || $step == 'new')){ ?>
+			// validation 
+			$("#form-employment").validate({		
+				// define the validation rules one field at a time
+				rules: {
+					jobtitle: "required",
+					hoursperweek: {
+						required: true
+					},
+					startdate: {
+						required: true,
+					},
+					enddate: {
+						required: false,
+						ontermination:true,
+						enddateafterstartdate: true
+					},
+					rate: {
+						required: true
+					},
+					ratetype: "required",
+					startdate: "required",
+					status: "required",
+					companyname: "required",
+					contactperson: "required",
+					phone: "required",
+					county: "required", 
+					city: "required", 
+					zipcode: "required",  
+					addressline1: "required",
+					terminationtype: "required",
+					terminationreason: "required"
+				}, 
+				// the messages for each of the fields being validated
+				messages: {		
+					jobtitle: "<?php echo $this->translate("job_jobtitle_error"); ?>",
+					hoursperweek: {
+						required: "<?php echo $this->translate("job_hoursperweek_error"); ?>"
+					}, 
+					startdate: {
+						required: "<?php echo $this->translate("job_startdate_error"); ?>"
+					},
+					rate: {
+						required: "<?php echo $this->translate("job_rate_error"); ?>"
+					},
+					ratetype: "<?php echo $this->translate("job_ratetype_error"); ?>",
+					startdate: "<?php echo $this->translate("job_startdate_error"); ?>",
+					status: "<?php echo $this->translate("job_status_error"); ?>",
+					companyname: "<?php echo $this->translate("company_name_error"); ?>",
+					contactperson: "<?php echo $this->translate("company_contactperson_error"); ?>",
+					phone: "<?php echo $this->translate("company_phone_error"); ?>",
+					county: "<?php echo $this->translate("company_county_error"); ?>", 
+					city: "<?php echo $this->translate("company_city_error"); ?>", 
+					zipcode: "<?php echo $this->translate("company_zipcode_error"); ?>",  
+					addressline1: "<?php echo $this->translate("company_addressline1_error"); ?>",
+					terminationtype: "<?php echo $this->translate("job_terminationtype_error"); ?>",
+					terminationreason: "<?php echo $this->translate("job_terminationreason_error"); ?>"
+				},
+				// custom error positions
+				errorPlacement: function(error, element) {
+					switch(element.attr("name")){					
+						default:
+							if(element.hasClass("useid_error")){
+								error.appendTo("#"+element.attr("id")+"_error");
+							} else {
+								error.appendTo("#"+element.attr("name")+"_error");
+							}
+							break;
+					}			
+				}
+			});
+			
+			$.validator.addMethod("ontermination", function(value, element) {				
+				if($("#status").val() == '0' && isEmptyString(value)){
+					return false;
+				}
+				return true;
+			}, "<?php echo $this->translate("job_enddate_error"); ?>");
+			
+			$('.edit, .requiredmark, .save_trigger, .cancel_trigger').removeClass('hidden');
+			$('.form-control-static.view, .update_trigger').addClass('hidden');
+			
+			// on status change, if terminating job, open up fields for reason and termination type
+			$("#status").change(function(){
+				var status = $(this).val();
+				if(status == 0){
+					$(".complete").removeClass('hidden');
+				}
+				if(status == 1){
+					$("#enddate, #terminationreason, #terminationreason").val('');
+					$(".complete").addClass('hidden');										
+				}
+			});
+			$("#status").trigger('change');
+			
+			$(".save_trigger, .save").click(function(e){
+				e.preventDefault();
+				var status = $("#status").val();
+				if ($("#form-employment").valid()) {
+					if(status == 1){
+						$.blockUI({ message: '<?php echo $blockcontent; ?>' }); 
+						$("#form-employment").submit();
+					}
+					if(status == 0){
+						// if attempting to terminate the job
+						var message = '<label class="small centeralign blocked">Are you sure you want to mark this Job as completed. <br /><br /> Click <b>OK</b> to continue or <b>Cancel</b> to ignore</label>';
+						bootbox.confirm(message, function(confirmed) {
+							if(confirmed){
+								$.blockUI({ message: '<?php echo $blockcontent; ?>' }); 
+								$("#form-employment").submit();
+							} else {
+								bootbox.hideAll();
+								return false;
+							}
+						});
+					}
+				}
+			});
+		<?php } ?>
+		
+		<?php if($tab == 'employment' && $step == 'view'){ ?>
+			$(".complete").addClass('hidden');
+		<?php } ?>
+		
+		<?php if($tab == 'voucher' && ($step == 'edit' || $step == 'new')){ ?>
+			// validation 
+			$("#form-voucher").validate({		
+				// define the validation rules one field at a time
+				rules: {
+					funderid: {
+						required: true
+					},
+					servicetypeid: {
+						required: true
+					},
+					hours: {
+						required: true
+					},
+					rate: {
+						required: true
+					},
+					voucherno: {
+						required: true
+					},
+					days: {
+						required: true
+					},		
+					dateapproved: {
+						required: true
+					},
+					startdate: {
+						required: true
+					}
+				}, 
+				// the messages for each of the fields being validated
+				messages: {		
+					funderid: {
+						required: "<?php echo $this->translate("voucher_funderid_error"); ?>"
+					},
+					servicetypeid: {
+						required: "<?php echo $this->translate("voucher_servicetypeid_error"); ?>"
+					},
+					hours: {
+						required: "<?php echo $this->translate("voucher_hours_error"); ?>"
+					},
+					rate: {
+						required: "<?php echo $this->translate("voucher_voucherrate_error"); ?>"
+					},
+					voucherno: {
+						required: "<?php echo $this->translate("voucher_voucherno_error"); ?>"
+					},
+					days: {
+						required: "<?php echo $this->translate("voucher_days_error"); ?>"
+					},				
+					dateapproved: {
+						required: "<?php echo $this->translate("voucher_dateapproved_error"); ?>"
+					},
+					startdate: {
+						required: "<?php echo $this->translate("voucher_startdate_error"); ?>"
+					}
+				},
+				// custom error positions
+				errorPlacement: function(error, element) {
+					switch(element.attr("name")){					
+						default:
+							if(element.hasClass("useid_error")){
+								error.appendTo("#"+element.attr("id")+"_error");
+							} else {
+								error.appendTo("#"+element.attr("name")+"_error");
+							}
+							break;
+					}			
+				}
+			});
+			
+			$('.edit, .requiredmark, .save_trigger, .cancel_trigger').removeClass('hidden');
+			$('.form-control-static.view, .update_trigger').addClass('hidden');
+			
+			$(".save_trigger, .save").click(function(e){
+				e.preventDefault();
+				var status = $("#status").val();
+				if ($("#form-voucher").valid()) {
+					$.blockUI({ message: '<?php echo $blockcontent; ?>' }); 
+					$("#form-voucher").submit();
+				}
+			});
+		<?php } ?>
 	});
 </script>
 <div class="row-fluid margin0 view">
@@ -323,945 +554,21 @@
         <div class="col-md-9 tab-content makerelative padding0 xtestborder clearfix" id="center">
         	<h4 id="tabtitle"></h4>
         	<div id="profile">
-                <form id="form-profile" class="form-horizontal profile" role="form" action="<?php echo $posturl; ?>" method="post" enctype="multipart/form-data">
-					<div class="panel-group" id="accordion">
-  					<input type="hidden" id="entityname" name="entityname" value="Client" />
-                    <input type="hidden" id="id" name="id" value="<?php echo encode($client->getID()); ?>" />
-                    <input type="hidden" class="successurl" id="<?php echo URL_SUCCESS; ?>" name="<?php echo URL_SUCCESS; ?>" value="" />
-                    <input type="hidden" class="failureurl" id="<?php echo URL_FAILURE; ?>" name="<?php echo URL_FAILURE; ?>" value="" />
-                    <input type="hidden" id="<?php echo SUCCESS_MESSAGE; ?>" name="<?php echo SUCCESS_MESSAGE; ?>" value="<?php echo $successmessage; ?>" />
-                    <input type="hidden" id="nosuccessid" name="nosuccessid" value="1" />
-                    <input type="hidden" id="status" name="status" value="<?php echo $client->getStatus(); ?>" />
-					<?php if($tab == 'profile'){ ?>
-                		<div class="panel-group" id="accordion">
-                        	<div class="panel panel-primary" id="bio">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title"><a class="accordion-toggle <?php echo $section == 'bio' ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_bio">Bio Data</a> </h4>
-                                </div>
-                                <div id="collapse_bio" class="panel-collapse collapse <?php echo $section == 'bio' ? 'in' : '' ; ?>">
-                                	<div class="panel-body">
-                                    	<div class="row-fluid margin0">
-                                            <div class="col-md-12 padding0 pull-right rightalign">
-                                                <p class="margin0 lineblocked">
-                                                    <button type="button" class="btn btn-xs gonowhere <?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'btn-primary update_trigger'; ?>" message="This Account is closed and updates are disabled." section="bio"><i class="glyphicon glyphicon-pencil"></i> Update</button>
-                                                </p>
-                                                <p class="margin0 lineblocked">
-                                                    <button type="submit" class="btn btn-success btn-xs button-submit save_trigger" section="bio" name="save"><i class="glyphicon glyphicon-ok"></i> Save Changes</button>
-                                                </p>
-                                                <p class="margin0 lineblocked">
-                                                    <button type="button" class="btn btn-default btn-xs gonowhere cancel_trigger" section="bio"><i class="glyphicon glyphicon-remove"></i> <?php echo $this->translate('global_button_cancel'); ?></button>
-                                                </p>
-                                            </div>
-                                        </div>
-                                    	<fieldset class="fieldsetcontainer">
-                                            <legend>About</legend>
-                                            <div class="panel-body well-sm">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label" for="firstname"><?php echo $this->translate("client_firstname_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                                        <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getFirstName(); ?></p>
-                                                            <div class="edit">
-                                                            	<input type="text" class="form-control input-sm" id="firstname" name="firstname" value="<?php echo $client->getFirstName(); ?>" />
-                                                            	<div id="firstname_error"></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_lastname_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                                        <div class="col-sm-8">
-                                                          	<p class="form-control-static nullifempty view"><?php echo $client->getLastName(); ?></p>
-                                                            <div class="edit">
-	                                                            <input type="text" class="form-control input-sm" id="lastname" name="lastname" value="<?php echo $client->getLastName(); ?>" />
-                                                                <div id="lastname_error"></div>
-                                                          	</div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_initial_label"); ?>: </label>
-                                                        <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getInitial(); ?></p>
-                                                            <div class="edit"><input type="text" class="form-control input-sm width75" id="initial" name="initial" value="<?php echo $client->getInitial(); ?>" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_gender_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                                        <div class="col-sm-8">
-                                                       		<p class="form-control-static nullifempty view"><?php echo $client->getGenderText(); ?></p>
-                                                            <div class="edit">
-                                                              <label class="radio-inline"><input type="radio" name="gender" id="male" value="1" class="xform-control <?php echo $client->getGender() == '1'? 1 : 0; ?>"> Male</label>
-                                                              <label class="radio-inline"><input type="radio" name="gender" id="female" value="2" class="xform-control <?php echo $client->getGender() == '2'? 1 : 0; ?>"> Female</label>
-                                                              <div id="gender_error"></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_dob_label"); ?>:</label>
-                                                        <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($client->getDateofBirth()); ?></p>
-                                                            <div class="edit"><div class="divider5"></div>
-                                                            	<input type="text" class="form-control input-sm datefield readonly width100" name="dateofbirth" id="dateofbirth" value="<?php echo changeMySQLDateToPageFormat($client->getDateofBirth()); ?>" />
-                                                            </div>                                                            
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_ssn_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                                        <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getSSN(); ?></p>
-                                                            <div class="edit">
-                                                            	<input type="text" class="form-control input-sm" id="ssn" name="ssn" value="<?php echo $client->getSSN(); ?>" />
-                                                            	<div id="ssn_error"></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>                                                    
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_maritalstatus_label"); ?>:</label>
-                                                        <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getMaritalStatus(), $maritalstatuses) ? '': $maritalstatuses[$client->getMaritalStatus()]; ?></p>
-                                                            <div class="edit">
-                                                            	<?php
-																	$dropdown = new Zend_Form_Element_Select('maritalstatus',
-																						array(
-																							'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $maritalstatuses),
-																							'view' => new Zend_View(),
-																							'decorators' => array('ViewHelper'),
-																							'class' => array('form-control','input-sm')
-																						)
-																	);  
-																	$dropdown->setValue($client->getMaritalStatus()); 
-																	echo $dropdown->render();
-																?>
-                                                                <input type="hidden" class="form-control" name="maritalstatus_old" id="maritalstatus_old" value="<?php echo $client->getMaritalStatus(); ?>" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_race_label"); ?>:</label>
-                                                        <div class="col-sm-8">
-                                                          	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getRace(), $races) ? '': $races[$client->getRace()]; ?></p>
-                                                            <div class="edit">
-                                                            	<?php
-																	$dropdown = new Zend_Form_Element_Select('race',
-																						array(
-																							'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $races),
-																							'view' => new Zend_View(),
-																							'decorators' => array('ViewHelper'),
-																							'class' => array('form-control','input-sm')
-																						)
-																	);  
-																	$dropdown->setValue($client->getRace()); 
-																	echo $dropdown->render();
-																?>
-                                                                <input type="hidden" class="form-control" name="race_old" id="race_old" value="<?php echo $client->getRace(); ?>" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_education_label"); ?>:</label>
-                                                        <div class="col-sm-8">
-                                                          	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getEducationLevel(), $educationlevels) ? '': $educationlevels[$client->getEducationLevel()]; ?></p>
-                                                            <div class="edit">
-                                                            	<?php
-																	$dropdown = new Zend_Form_Element_Select('educationlevel',
-																						array(
-																							'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $educationlevels),
-																							'view' => new Zend_View(),
-																							'decorators' => array('ViewHelper'),
-																							'class' => array('form-control','input-sm')
-																						)
-																	);  
-																	$dropdown->setValue($client->getEducationLevel()); 
-																	echo $dropdown->render();
-																?>
-                                                                <input type="hidden" class="form-control" name="educationlevel_old" id="educationlevel_old" value="<?php echo $client->getEducationLevel(); ?>" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </fieldset>
-                                        <div class="divider10"></div>
-                                        <div class="row-fluid margin0">
-                                            <div class="col-md-6 paddingleft0">
-                                                <fieldset class="fieldsetcontainer clearfix" id="location" style="min-height:300px;">
-                                                    <legend>Address</legend>
-                                                    <div class="panel-body well-sm">
-                                                        <div class="col-md-12">
-                                                            <div class="form-group">
-                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_state_label"); ?>:</label>
-                                                                <div class="col-sm-8">
-                                                                	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getState(), $states) ? '': $states[$client->getState()]; ?></p>  
-                                                                    <div class="edit">
-                                                                    	<?php
-																			$dropdown = new Zend_Form_Element_Select('state',
-																								array(
-																									'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $states),
-																									'view' => new Zend_View(),
-																									'decorators' => array('ViewHelper'),
-																									'class' => array('form-control','input-sm','disabledfield')
-																								)
-																			);  
-																			$dropdown->setValue($client->getState()); 
-																			echo $dropdown->render();
-																		?>
-                                                                        <input type="hidden" class="form-control" name="state" id="state" value="<?php echo $client->getState(); ?>" />
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_county_label"); ?>:</label>
-                                                                <div class="col-sm-8">
-                                                                 	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getCounty(), $counties) ? '': $counties[$client->getCounty()]; ?></p>  
-                                                                    <div class="edit">
-                                                                    	<?php
-																			$dropdown = new Zend_Form_Element_Select('county',
-																								array(
-																									'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $counties),
-																									'view' => new Zend_View(),
-																									'decorators' => array('ViewHelper'),
-																									'class' => array('form-control','input-sm',)
-																								)
-																			);  
-																			$dropdown->setValue($client->getCounty()); 
-																			echo $dropdown->render();
-																		?><input type="hidden" class="form-control" name="county_old" id="county_old" value="<?php echo $client->getCounty(); ?>" />
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_city_label"); ?>:</label>
-                                                                <div class="col-sm-8">
-                                                                	<p class="form-control-static nullifempty view"><?php echo $client->getCity(); ?></p>
-                                                                    <div class="edit">
-                                                                    	<input type="text" class="form-control input-sm" id="city" name="city" value="<?php echo $client->getCity(); ?>" />
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_zipcode_label"); ?>:</label>
-                                                                <div class="col-sm-8">
-                                                                	<p class="form-control-static nullifempty view"><?php echo $client->getZipCode(); ?></p>
-                                                                    <div class="edit">
-                                                                    	<input type="text" class="form-control input-sm width100" id="zipcode" name="zipcode" value="<?php echo $client->getZipCode(); ?>" />
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_addressline1_label"); ?>:</label>
-                                                                <div class="col-sm-8">
-                                                                	<p class="form-control-static nullifempty view"><?php echo $client->getAddressline1(); ?></p>
-                                                                    <div class="edit">
-                                                                    	<input type="text" class="form-control input-sm" id="addressline1" name="addressline1" value="<?php echo $client->getAddressline1(); ?>" />
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_addressline2_label"); ?>:</label>
-                                                                <div class="col-sm-8">
-                                                               		<p class="form-control-static nullifempty view"><?php echo $client->getAddressline2(); ?></p>
-                                                                    <div class="edit">
-                                                                    	<input type="text" class="form-control input-sm" id="addressline2" name="addressline2" value="<?php echo $client->getAddressline2(); ?>" />
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </fieldset>
-                                            </div>
-                                            <div class="col-md-6 padding0">
-                                                <fieldset class="fieldsetcontainer clearfix" id="contact" style="min-height:300px;">
-                                                    <legend>Contact</legend>
-                                                    <div class="panel-body well-sm">
-                                                        <div class="col-md-12">
-                                                            <div class="form-group">
-                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_homephone_label"); ?>:</label>
-                                                                <div class="col-sm-8">
-                                                                	<p class="form-control-static nullifempty view"><?php echo $client->getHome(); ?></p>
-                                                                    <div class="edit">
-                                                                    	<input type="text" class="form-control input-sm" id="home" name="home" value="<?php echo $client->getHome(); ?>" />
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_cellphone_label"); ?>:</label>
-                                                                <div class="col-sm-8">
-                                                                	<p class="form-control-static nullifempty view"><?php echo $client->getCell(); ?></p>
-                                                                    <div class="edit">
-                                                                    	<input type="text" class="form-control input-sm" id="cell" name="cell" value="<?php echo $client->getCell(); ?>" />
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_workphone_label"); ?>:</label>
-                                                                <div class="col-sm-8">
-                                                                	<p class="form-control-static nullifempty view"><?php echo $client->getWork(); ?></p>
-                                                                    <div class="edit">
-                                                                    	<input type="text" class="form-control input-sm" id="work" name="work" value="<?php echo $client->getWork(); ?>" />
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_workext_label"); ?>:</label>
-                                                                <div class="col-sm-8">
-                                                                	<p class="form-control-static nullifempty view"><?php echo $client->getExt(); ?></p>  
-                                                                    <div class="edit">
-                                                                    	<input type="text" class="form-control input-sm" id="ext" name="ext" value="<?php echo $client->getExt(); ?>" />
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label class="col-sm-4 control-label"><?php echo $this->translate("client_email_label"); ?>:</label>
-                                                                <div class="col-sm-8">
-                                                                	<p class="form-control-static nullifempty view"><?php echo $client->getEmail(); ?></p> 
-                                                                    <div class="edit">
-                                                                    	<input type="text" class="form-control input-sm" id="email" name="email" value="<?php echo $client->getEmail(); ?>" />
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label class="col-sm-5 control-label">&nbsp;</label>
-                                                                <div class="col-sm-7">&nbsp;</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </fieldset>
-                                            </div>
-                                        </div>
-                                    </div>
-                            	</div>
-                            </div>
-                            <div class="panel panel-primary" id="referral">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title"> <a class="accordion-toggle <?php echo $section == 'referral' ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_referral"> Referral Information</a> </h4>
-                                </div>
-                            	<div id="collapse_referral" class="panel-collapse collapse <?php echo $section == 'referral' ? 'in' : '' ; ?>">
-                                	<div class="panel-body">
-                                    	<div class="row-fluid margin0">
-                                            <div class="col-md-12 padding0 pull-right rightalign">
-                                                <p class="margin0 lineblocked">
-                                                    <button type="button" class="btn btn-xs gonowhere <?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'btn-primary update_trigger'; ?>" message="This Account is closed and updates are disabled." section="referral"><i class="glyphicon glyphicon-pencil"></i> Update</button>
-                                                </p>
-                                                <p class="margin0 lineblocked">
-                                                    <button type="submit" class="btn btn-success btn-xs button-submit save_trigger" section="referral" name="save"><i class="glyphicon glyphicon-ok"></i> Save Changes</button>
-                                                </p>
-                                                <p class="margin0 lineblocked">
-                                                    <button type="button" class="btn btn-default btn-xs gonowhere cancel_trigger" section="referral"><i class="glyphicon glyphicon-remove"></i> <?php echo $this->translate('global_button_cancel'); ?></button>
-                                                </p>
-                                            </div>
-                                        </div>
-                                    	<fieldset class="fieldsetcontainer">
-                                            <legend>Initial Service Package</legend>
-                                            <div class="panel-body well-sm">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_program_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                                        <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getProgramID(), $programs) ? '': $programs[$client->getProgramID()]; ?></p>
-                                                            <div class="edit">
-																<?php
-                                                                    $dropdown = new Zend_Form_Element_Select('programid',
-                                                                                        array(
-                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $programs),
-                                                                                            'view' => new Zend_View(),
-                                                                                            'decorators' => array('ViewHelper'),
-                                                                                            'class' => array('form-control','input-sm',)
-                                                                                        )
-                                                                    );  
-                                                                    $dropdown->setValue($client->getProgramID()); 
-                                                                    echo $dropdown->render();
-                                                                ?>
-                                                                <input type="hidden" class="form-control" name="initialvoucherid" id="initialvoucherid" value="<?php echo $client->getInitialVoucherID(); ?>" />
-                                                                
-                                                                <div id="programid_error"></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_funder_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                                        <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getFunderID(), $funders) ? '': $funders[$client->getFunderID()]; ?></p>
-                                                            <div class="edit">
-																<?php
-                                                                    $dropdown = new Zend_Form_Element_Select('funderid',
-                                                                                        array(
-                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $funders),
-                                                                                            'view' => new Zend_View(),
-                                                                                            'decorators' => array('ViewHelper'),
-                                                                                            'class' => array('form-control','input-sm',)
-                                                                                        )
-                                                                    );  
-                                                                    $dropdown->setValue($client->getFunderID()); 
-                                                                    echo $dropdown->render();
-                                                                ?>
-                                                                <div id="funderid_error"></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_servicetype_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                                        <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getServiceTypeID(), $services) ? '': $services[$client->getServiceTypeID()]; ?></p>
-                                                            <div class="edit">
-																<?php
-                                                                    $dropdown = new Zend_Form_Element_Select('servicetypeid',
-                                                                                        array(
-                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $services),
-                                                                                            'view' => new Zend_View(),
-                                                                                            'decorators' => array('ViewHelper'),
-                                                                                            'class' => array('form-control','input-sm',)
-                                                                                        )
-                                                                    );  
-                                                                    $dropdown->setValue($client->getServiceTypeID()); 
-                                                                    echo $dropdown->render();
-                                                                ?>
-                                                                <div id="servicetypeid_error"></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_units_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                                        <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getInitialVoucher()->getHours(); ?></p> 
-                                                            <div class="edit">
-                                                                <input type="text" class="form-control input-sm width100 isdecimal" id="hours" name="hours" value="<?php echo $client->getInitialVoucher()->getHours(); ?>" />
-                                                                <input type="hidden" class="form-control" name="hours_old" id="hours_old" value="<?php echo $client->getInitialVoucher()->getHours(); ?>" />
-                                                                <div id="hours_error"></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_voucherrate_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                                        <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty view"><?php echo isEmptyString($client->getInitialVoucher()->getRate()) ? '' : $config->country->currencysymbol.$client->getInitialVoucher()->getRate().'/Hr'; ?></p> 
-                                                            <div class="edit">
-                                                                <input type="text" class="form-control input-sm width100 isdecimal" id="rate" name="rate" value="<?php echo $client->getInitialVoucher()->getRate(); ?>" />
-                                                                <input type="hidden" class="form-control" name="rate_old" id="rate_old" value="<?php echo $client->getInitialVoucher()->getRate(); ?>" />
-                                                                <div id="rate_error"></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_voucherid_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                                        <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getInitialVoucher()->getVoucherNo(); ?></p>
-                                                            <div class="edit">
-                                                                <input type="text" class="form-control input-sm" id="voucherno" name="voucherno" value="<?php echo $client->getInitialVoucher()->getVoucherNo(); ?>" />
-                                                                <div id="voucherno_error"></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_dvrsref_label"); ?>:</label>
-                                                        <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getDvrsRef(); ?></p> 
-                                                            <div class="edit">
-                                                                <input type="text" class="form-control input-sm" id="dvrsref" name="dvrsref" value="<?php echo $client->getDvrsRef(); ?>" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_authorizedby_label"); ?> <small class="blocked">(DVRS Counsellor):</small></label>
-                                                        <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getDvrsCounselor(); ?></p> 
-                                                            <div class="edit">
-                                                                <input type="text" class="form-control input-sm" id="dvrscounselor" name="dvrscounselor" value="<?php echo $client->getDvrsCounselor(); ?>" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_dateapproved_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                                        <div class="col-sm-8">
-                                                          	<p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($client->getInitialVoucher()->getDateApproved()); ?></p>
-                                                            <div class="edit"><div class="divider5"></div>
-                                                            	<input type="text" class="form-control input-sm datefield readonly width100" name="dateapproved" id="dateapproved" value="<?php echo changeMySQLDateToPageFormat($client->getInitialVoucher()->getDateApproved()); ?>" />
-                                                                <div id="dateapproved_error"></div>
-                                                            </div>      
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_datereceived_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                                        <div class="col-sm-8">
-                                                          	<p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($client->getInitialVoucher()->getDateReceived()); ?></p>
-                                                            <div class="edit"><div class="divider5"></div>
-                                                            	<input type="text" class="form-control input-sm datefield readonly width100" name="datereceived" id="datereceived" value="<?php echo changeMySQLDateToPageFormat($client->getInitialVoucher()->getDateReceived()); ?>" />
-                                                                <div id="datereceived_error"></div>
-                                                            </div>      
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_resume_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                                        <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getResumeLink(); ?></p>    
-                                                            <div class="edit" id="resume">
-                                                                <div id="beforesave_resume">
-                                                                	<label class="blocked small">Upload a file (Max size <?php echo formatBytes($config->uploads->docmaximumfilesize); ?>)</label>
-                                                                    <div class="fileinput-holder input-group col-md-12 padding0">
-                                                                        <div id="filenamedisplay" class="fileinput-preview uneditable-input form-control">No file selected..</div>
-                                                                        <div class="input-group-btn">
-                                                                            <span class="fileinput-btn btn btn-default">Browse
-                                                                                <input type="file" name="resumefilename" id="resumefilename" class="form-control file input-sm inline" data-style="fileinput" />
-                                                                            </span>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div id="aftersave_resume">
-                                                                	<input type="text" name="resumefilename_old" id="resumefilename_old" class="hidden" value="<?php echo $client->getResumeFilename(); ?>" />
-                                                                    <p class="form-control-static nullifempty"><?php echo $client->getResumeFilename(); ?></p> 
-                                                                </div>
-                                                                <?php if($client->hasResume()){ ?>
-                                                                	<div class="divider5"></div>
-                                                                	<a class="gonowhere btn btn-default btn-xs reupload" id="reupload_resume" rel="resume"><span class="glyphicon glyphicon-refresh"></span> Re-upload</a> <img src="<?php echo $this->baseUrl('images/loader.gif'); ?>" class="hidden" id="loading_resume" />
-                                                                <?php } ?>
-                                                                <div id="resumefilename_error"></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_cover_label"); ?>:</label>
-                                                        <div class="col-sm-8">
-                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getCoverletterLink(); ?></p>  
-                                                            <div class="edit" id="cover">
-                                                                <div id="beforesave_cover">
-                                                                	<label class="blocked small">Upload a file (Max size <?php echo formatBytes($config->uploads->docmaximumfilesize); ?>)</label>
-                                                                    <div class="fileinput-holder input-group col-md-12 padding0">
-                                                                        <div id="filenamedisplay" class="fileinput-preview uneditable-input form-control">No file selected..</div>
-                                                                        <div class="input-group-btn">
-                                                                            <span class="fileinput-btn btn btn-default">Browse
-                                                                                <input type="file" name="coverletterfilename" id="coverletterfilename" class="form-control file input-sm inline" data-style="fileinput" />
-                                                                            </span>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div id="aftersave_cover">
-                                                                	<input type="text" name="coverletterfilename_old" id="coverletterfilename_old" class="hidden" value="<?php echo $client->getCoverLetterFilename(); ?>" />
-                                                                    <p class="form-control-static nullifempty"><?php echo $client->getCoverLetterFilename(); ?></p> 
-                                                                </div>
-                                                                <?php if($client->getCoverletterLink()){ ?>
-                                                                	<div class="divider5"></div>
-                                                                	<a class="gonowhere btn btn-default btn-xs reupload" id="reupload_cover" rel="cover"><span class="glyphicon glyphicon-refresh"></span> Re-upload</a> <img src="<?php echo $this->baseUrl('images/loader.gif'); ?>" class="hidden" id="loading_cover" />
-                                                                <?php } ?>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                               	     
-                                                </div>
-                                            </div>
-                                        </fieldset>
-                                        <div class="divider15"></div>
-                                        <fieldset class="fieldsetcontainer">
-                                            <legend>Client Assessment</legend>
-                                            <div class="panel-body well-sm">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_pdiagnosis_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                                        <div class="col-sm-12">
-                                                            <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getPrimaryDiagnosis(), $disabilitycodes) ? '': '<small class="bolded">Impairment</small>: '.$disabilitycodes[$client->getPrimaryDiagnosis()]; ?></p>
-                                                            <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getPrimaryCause(), $causecodes) ? '': '<small class="bolded">Cause</small>: '.$causecodes[$client->getPrimaryCause()]; ?></p>
-                                                            <div class="edit">
-                                                                <div class="divider5"></div>
-                                                                <?php
-                                                                    $dropdown = new Zend_Form_Element_Select('primarydiagnosis',
-                                                                                        array(
-                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select an Impairment >'), $disabilitycodes),
-                                                                                            'view' => new Zend_View(),
-                                                                                            'decorators' => array('ViewHelper'),
-                                                                                            'class' => array('form-control','input-sm',)
-                                                                                        )
-                                                                    );  
-                                                                    $dropdown->setValue($client->getPrimaryDiagnosis()); 
-                                                                    echo $dropdown->render();
-                                                                ?>
-                                                                <input type="hidden" name="primarydiagnosis_old" class="form-control" id="primarydiagnosis_old" value="<?php echo $client->getPrimaryDiagnosis(); ?>" />                                   
-                                                                <div id="primarydiagnosis_error"></div>
-                                                                <div class="divider5"></div>
-                                                                <?php
-                                                                    $dropdown = new Zend_Form_Element_Select('primarycause',
-                                                                                        array(
-                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select a Cause>'), $causecodes),
-                                                                                            'view' => new Zend_View(),
-                                                                                            'decorators' => array('ViewHelper'),
-                                                                                            'class' => array('form-control','input-sm',)
-                                                                                        )
-                                                                    );  
-                                                                    $dropdown->setValue($client->getPrimaryCause()); 
-                                                                    echo $dropdown->render();
-                                                                ?>
-                                                                <input type="hidden" name="primarycause_old" id="primarycause_old" class="form-control" value="<?php echo $client->getPrimaryCause(); ?>" />
-                                                                <div id="primarycause_error"></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_objective_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                                        <div class="col-sm-12">
-                                                            <p class="form-control-static nullifempty view"><?php echo $client->getEmploymentGoal(); ?></p> 
-                                                            <div class="edit"><textarea class="form-control expanding" id="employmentgoal" name="employmentgoal"><?php echo $client->getEmploymentGoal(); ?></textarea></div>
-                                                            <div id="employmentgoal_error"></div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_skills_label"); ?>:</label>
-                                                        <div class="col-sm-12">
-                                                            <p class="form-control-static nullifempty view"><?php echo $client->getSkillsList(); ?></p>
-                                                            <div class="edit">
-                                                                <?php
-                                                                    $listdropdown = new Zend_Form_Element_Multiselect('skillids',
-                                                                        array(
-                                                                              'multiOptions' => $skills,
-                                                                              'view' => new Zend_View(),
-                                                                              'decorators' => array(array('ViewHelper')),
-                                                                              'class' => array('form-control', 'chosen-select','multipleselect')
-                                                                        )
-                                                                    );
-                                                                    
-                                                                    $listdropdown->setValue($client->getSkillIDs());
-                                                                    $listdropdown->setAttrib("data-placeholder", 'Select all in category');
-                                                                    echo $listdropdown->render();
-                                                                  ?><input type="hidden" name="skillids_old" id="skillids_old" value="<?php echo count($client->getSkillIDs()); ?>" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                					<div class="form-group">
-                                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_allergy_label"); ?>:</label>
-                                                        <div class="col-sm-12">
-                                                            <p class="form-control-static nullifempty view"><?php echo $client->getAllergies(); ?></p>
-                                                            <div class="edit"><textarea class="form-control expanding" id="allergies" name="allergies"><?php echo $client->getAllergies(); ?></textarea></div>
-                                                        </div>
-                                                    </div>
-                                                
-                                                    <div class="form-group">
-                                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_criminal_label"); ?>:</label>
-                                                        <div class="col-sm-12">
-                                                            <p class="form-control-static nullifempty view"><?php echo $client->getCriminalHistory(); ?></p>
-                                                            <div class="edit"><textarea class="form-control expanding" id="criminalhistory" name="criminalhistory"><?php echo $client->getCriminalHistory(); ?></textarea></div>
-                                                        </div>
-                                                    </div>
-
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_sdiagnosis_label"); ?>:</label>
-                                                        <div class="col-sm-12">
-                                                            <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getSecondaryDiagnosis(), $disabilitycodes) ? '': '<small class="bolded">Impairment</small>: '.$disabilitycodes[$client->getSecondaryDiagnosis()]; ?></p>
-                                                            <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getSecondaryCause(), $causecodes) ? '': '<small class="bolded">Cause</small>: '.$causecodes[$client->getSecondaryCause()]; ?></p>
-                                                            <div class="edit">
-                                                                <div class="divider5"></div>
-                                                                <?php
-                                                                    $dropdown = new Zend_Form_Element_Select('secondarydiagnosis',
-                                                                                        array(
-                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select an Impairment >'), $disabilitycodes),
-                                                                                            'view' => new Zend_View(),
-                                                                                            'decorators' => array('ViewHelper'),
-                                                                                            'class' => array('form-control','input-sm',)
-                                                                                        )
-                                                                    );  
-                                                                    $dropdown->setValue($client->getSecondaryDiagnosis()); 
-                                                                    echo $dropdown->render();
-                                                                ?>
-                                                                <input type="hidden" name="secondarydiagnosis_old" id="secondarydiagnosis_old" class="form-control" value="<?php echo $client->getSecondaryDiagnosis(); ?>" />
-                                                                <div class="divider5"></div>
-                                                                <?php
-                                                                    $dropdown = new Zend_Form_Element_Select('secondarycause',
-                                                                                        array(
-                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select a Cause>'), $causecodes),
-                                                                                            'view' => new Zend_View(),
-                                                                                            'decorators' => array('ViewHelper'),
-                                                                                            'class' => array('form-control','input-sm',)
-                                                                                        )
-                                                                    );  
-                                                                    $dropdown->setValue($client->getSecondaryCause()); 
-                                                                    echo $dropdown->render();
-                                                                ?>
-                                                                <input type="hidden" name="secondarycause_old" class="form-control" id="secondarycause_old" value="<?php echo $client->getSecondaryCause(); ?>" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_needs_label"); ?><small class="notbolded"><em>( Medical, Behaviour or Special Needs)</em></small>:</label>
-                                                        <div class="col-sm-12">
-                                                            <p class="form-control-static nullifempty view"><?php echo $client->getNeedsAssessment(); ?></p>
-                                                            <div class="edit"><textarea class="form-control expanding" id="needsassessment" name="needsassessment"><?php echo $client->getNeedsAssessment(); ?></textarea></div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_communication_label"); ?>:</label>
-                                                        <div class="col-sm-8">
-                                                            <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getCommunication(), $communicationtypes) ? '': $communicationtypes[$client->getCommunication()]; ?></p>
-                                                            <div class="edit">
-                                                                <?php
-                                                                    $dropdown = new Zend_Form_Element_Select('communication',
-                                                                                        array(
-                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $communicationtypes),
-                                                                                            'view' => new Zend_View(),
-                                                                                            'decorators' => array('ViewHelper'),
-                                                                                            'class' => array('form-control','input-sm',)
-                                                                                        )
-                                                                    );  
-                                                                    $dropdown->setValue($client->getCommunication()); 
-                                                                    echo $dropdown->render();
-                                                                ?><input type="hidden" name="communication_old" id="communication_old" value="<?php echo $client->getCommunication(); ?>" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-12 control-label"><?php echo $this->translate("client_housing_label"); ?>:</label>
-                                                        <div class="col-sm-8">
-                                                            <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getHousing(), $housingtypes) ? '': $housingtypes[$client->getHousing()]; ?></p>
-                                                            <div class="edit">
-                                                                <?php
-                                                                    $dropdown = new Zend_Form_Element_Select('housing',
-                                                                                        array(
-                                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $housingtypes),
-                                                                                            'view' => new Zend_View(),
-                                                                                            'decorators' => array('ViewHelper'),
-                                                                                            'class' => array('form-control','input-sm',)
-                                                                                        )
-                                                                    );  
-                                                                    $dropdown->setValue($client->getHousing()); 
-                                                                    echo $dropdown->render();
-                                                                ?><input type="hidden" name="housing_old" id="housing_old" value="<?php echo $client->getHousing(); ?>" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </fieldset>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="panel panel-primary" id="emergency">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title"><a class="accordion-toggle <?php echo $section == 'emergency' ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_emergency">Emergency Information </a> </h4>
-                                </div>
-                                <div id="collapse_emergency" class="panel-collapse collapse <?php echo $section == 'emergency' ? 'in' : '' ; ?>">
-                                    <div class="panel-body">
-                                    	<div class="row-fluid margin0">
-                                            <div class="col-md-12 padding0 pull-right rightalign">
-                                                <p class="margin0 lineblocked">
-                                                    <button type="button" class="btn btn-xs gonowhere <?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'btn-primary update_trigger'; ?>" message="This Account is closed and updates are disabled." section="emergency"><i class="glyphicon glyphicon-pencil"></i> Update</button>
-                                                </p>
-                                                <p class="margin0 lineblocked">
-                                                    <button type="submit" class="btn btn-success btn-xs button-submit save_trigger" section="emergency" name="save"><i class="glyphicon glyphicon-ok"></i> Save Changes</button>
-                                                </p>
-                                                <p class="margin0 lineblocked">
-                                                    <button type="button" class="btn btn-default btn-xs gonowhere cancel_trigger" section="emergency"><i class="glyphicon glyphicon-remove"></i> <?php echo $this->translate('global_button_cancel'); ?></button>
-                                                </p>
-                                            </div>
-                                        </div>
-                                    	<fieldset class="fieldsetcontainer">
-                                            <legend>Emergency Contact</legend>
-                                            <div class="panel-body well-sm">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label"><?php echo $this->translate("client_contactperson_label"); ?>:</label>
-                                                        <div class="col-sm-7">
-                                                          	<p class="form-control-static nullifempty view"><?php echo $client->getContactPerson(); ?></p>
-                                                            <div class="edit">
-                                                                <input type="text" class="form-control input-sm" id="contactperson" name="contactperson" value="<?php echo $client->getContactPerson(); ?>" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label"><?php echo $this->translate("client_relationship_label"); ?>:</label>
-                                                        <div class="col-sm-7">
-                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getRelationship(); ?></p>
-                                                            <div class="edit">
-                                                                <input type="text" class="form-control input-sm" id="relationship" name="relationship" value="<?php echo $client->getRelationship(); ?>" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label"><?php echo $this->translate("client_phone_label"); ?>:</label>
-                                                        <div class="col-sm-7">
-                                                        	<p class="form-control-static nullifempty view"><?php echo $client->getContactPhone(); ?></p>
-                                                            <div class="edit">
-                                                                <input type="text" class="form-control input-sm" id="contactphone" name="contactphone" value="<?php echo $client->getContactPhone(); ?>" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-5 control-label"><?php echo $this->translate("client_email_label"); ?>:</label>
-                                                        <div class="col-sm-7">
-                                                         	<p class="form-control-static nullifempty view"><?php echo $client->getContactEmail(); ?></p> 
-                                                            <div class="edit">
-                                                                <input type="text" class="form-control input-sm" id="contactemail" name="contactemail" value="<?php echo $client->getContactEmail(); ?>" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                </div>
-                                            </div>
-                                        </fieldset>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="panel panel-primary" id="assign">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title"><a class="accordion-toggle <?php echo $section == 'assign' ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_assign">Assignment History</a> </h4>
-                                </div>
-                                <div id="collapse_assign" class="panel-collapse collapse <?php echo $section == 'assign' ? 'in' : '' ; ?>">
-                                    <div class="panel-body">
-                                        <div class="row-fluid margin0">
-                                            <div class="col-md-12 padding0">
-                                                <div class="btn-group pull-right">
-                                                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-                                                        Actions <span class="caret"></span>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a class="<?php echo !$client->isActive() ? 'alert-dialog' : 'addpopup'; ?>" href="<?php echo $this->baseUrl("client/assign/clientid/".$client->getID()."/pgc/true/type/start"); ?>" message="This Account is closed and updates are disabled." title="Assign to User" rel="Assign Client to User" formtitle="indexform" successurl="<?php echo $this->viewurl; ?>" action="<?php echo $this->baseUrl("assignment/create"); ?>">Assign User</a></li>
-                                                        <li><a class="<?php echo !$client->isActive() ? 'alert-dialog' : 'addpopup'; ?>" href="<?php echo $this->baseUrl("client/assign/clientid/".$client->getID()."/pgc/true/type/end"); ?>" message="This Account is closed and updates are disabled." title="De-assign to User" rel="De-assign User" formtitle="indexform" successurl="<?php echo $this->viewurl; ?>" action="<?php echo $this->baseUrl("assignment/deassign"); ?>">Deassign User</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="divider5"></div>
-                                    	<table class="table table-condensed table-striped table-responsive viewtable">
-                                            <thead>
-                                                <tr>
-                                                    <th class="centeralign" style="width:15px;">#</th>
-                                                    <th>Name of User</th>
-                                                    <th style="width:12%;">Role</th>
-                                                    <th style="width:22%;">Duration</th>
-                                                    <th style="width:10%;">Status</th>
-                                                    <th style="width:20%;">Assigned By</th>
-                                                    <th style="width:15%;">Date Assigned</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                            	<?php 
-													$assigments = $client->getClientAssignments(); // debugMessage($assigments->toArray());													
-													$countusers = $assigments->count();
-												?>
-                                                <?php if($countusers == 0){ ?>
-                                                	<tr>
-                                                        <td colspan="7"><div class="alert alert-warning">No Users currently allocated</div></td>
-                                                    </tr>
-                                                <?php } else { ?>
-                                                	<?php 
-														$counter = 1;
-														foreach($assigments as $user){
-													?>
-                                                    <tr>
-                                                        <td class="centeralign"><?php echo $counter; ?></td>
-                                                        <td><?php echo $user->getUser()->getName(); ?></td>
-                                                        <td>Supervisor</td>
-                                                        <td><?php echo isEmptyString($user->getEndDate()) ? formatDateAndTime($user->getStartDate(), false).' - To date' : formatDateAndTime($user->getStartDate(), false).' - '.formatDateAndTime($user->getEndDate(), false); ?></td>
-                                                        <td><?php echo isEmptyString($user->getEndDate()) ? 'Active' : 'Closed'; ?></td>
-                                                        <td><?php echo $user->getCreator()->getName(); ?></td>
-                                                        <td><?php echo formatDateAndTime($user->getDateCreated(), false); ?></td>
-                                                    </tr>
-                                                    <?php $counter++; } ?>
-                                              	<?php } ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="panel panel-primary" id="status">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title"><a class="accordion-toggle <?php echo $section == 'status' ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_status">Account Information</a> </h4>
-                                </div>
-                                <div id="collapse_status" class="panel-collapse collapse <?php echo $section == 'status' ? 'in' : '' ; ?>">
-                                    <div class="panel-body">
-                                    	<fieldset class="fieldsetcontainer">
-                                            <legend>Status History</legend>	
-                                            <div class="row-fluid margin0">
-                                                <div class="col-md-12">
-                                                    <p class="floatright margin0">
-                                                    	<?php if($client->isActive()){ ?>
-                                                        	<button type="button" class="btn btn-warning btn-xs confirm-dialog" message="Are you sure you want to Close this Account?" action="<?php echo $this->baseUrl('client/changestatus/id/'.$client->getID().'/status/0/successurl/'.encode($this->viewurl)); ?>"><i class="glyphicon glyphicon-remove-sign"></i> Close Account</button>
-                                                        <?php } else { ?>
-                                                        	<button type="button" class="btn btn-success btn-xs confirm-dialog" message="Are you sure you want to Re-Open this Account?" action="<?php echo $this->baseUrl('client/changestatus/id/'.$client->getID().'/status/1/successurl/'.encode($this->viewurl)); ?>"><i class="glyphicon glyphicon-remove-sign"></i> Re-open Account</button>
-                                                     	<?php } ?>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div class="divider5"></div>
-                                            <div class="col-md-12">
-                                                <table class="table table-condensed table-striped table-responsive viewtable">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="centeralign" style="width:15px;">#</th>
-                                                            <th>Start Date</th>
-                                                            <th>End Date</th>
-                                                            <th style="width:12%;">Status</th>
-                                                            <th style="width:20%;">Opened / Closed By</th>
-                                                            <th style="width:25%;">Comments</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                       <?php 
-															$history = $client->getClientHistory(); // debugMessage($assigments->toArray());													
-															$counthistory = $history->count();
-														?>
-														<?php if($counthistory == 0){ ?>
-															<tr>
-																<td colspan="7"><div class="alert alert-warning">No entries found</div></td>
-															</tr>
-														<?php } else { ?>
-															<?php 
-																$counter = 1;
-																foreach($history as $record){
-															?>
-															<tr>
-																<td class="centeralign"><?php echo $counter; ?></td>
-																<td><?php echo formatDateAndTime($record->getStartDate(), false); ?></td>
-                                                                <td><?php echo formatDateAndTime($record->getEndDate(), false); ?></td>
-																<td><?php echo $record->isActive() ? 'Open' : 'Closed'; ?></td>
-																<td><?php echo $record->getCreator()->getName(); ?></td>
-																<td><?php echo $record->isActive() ? '--' : $user->getReason(); ?></td>
-															</tr>
-															<?php $counter++; } ?>
-														<?php } ?>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                    	</fieldset>
-                                        <div class="divider10"></div>
-                                        <fieldset class="fieldsetcontainer">
-                                            <legend>Maintenance</legend>	
-                                            <div class="row-fluid margin0">
-                                                <div class="col-md-12">
-                                                	<div class="divider15"></div>
-                                                    <p class="floatleft">
-                                                    	<?php if($acl->checkPermission('Client', ACTION_EDIT)){ ?>
-                                                        	<a class="btn btn-default btn-xs" href="<?php echo $this->baseUrl('client/picture/id/'.encode($client->getID())); ?>"><i class="glyphicon glyphicon-upload"></i> Upload Photo</a>
-                                                        <?php } ?>
-														<?php if($acl->checkPermission('Client', ACTION_DELETE)){ ?>
-                                                        	<button type="button" class="btn btn-danger btn-xs confirm-dialog" message="Are you sure you want to Delete this Account? Please note that erasing this entry will also wipe out all data related to it!" action="<?php echo $this->baseUrl('client/delete/id/'.encode($client->getID())."/entityname/Client/successurl/".encode($listurl)); ?>"><i class="glyphicon glyphicon-remove-sign"></i> Delete Account</button>
-                                                        <?php } ?>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div class="divider5"></div>
-                                      	</fieldset>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>                  
-                	<?php } ?>
-                </form>
+            	<?php if($tab == 'profile'){ ?>
+                    <?php require APPLICATION_PATH."/views/scripts/client/profile.phtml"; ?>
+				<?php } ?>
 			</div> 
             <div id="employment">
-                <form id="form-employment" class="form-horizontal employment">
-				<?php if($request->tab == 'employment'){ ?>
-                
+            	<?php if($tab == 'employment'){ ?>
+                	<?php require APPLICATION_PATH."/views/scripts/client/employment.phtml"; ?>
                 <?php } ?>
-                </form>
 			</div>
             <div id="voucher">
-                <form id="form-voucher" class="form-horizontal voucher">
 				<?php if($request->tab == 'voucher'){ ?>
-                
+                	<?php if($tab == 'voucher'){ ?>
+						<?php require APPLICATION_PATH."/views/scripts/client/voucher.phtml"; ?>
+                    <?php } ?>
                 <?php } ?>
-                </form>
 			</div>
             <div id="activity">
                 <form id="form-activity" class="form-horizontal activity">

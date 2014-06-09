@@ -10,7 +10,7 @@ class Assignment extends BaseRecord  {
 		$this->hasColumn('userid', 'integer', null, array('notblank' => true));
 		$this->hasColumn('startdate', 'date', null, array('notblank' => true));
 		$this->hasColumn('enddate', 'date', null);
-		$this->hasColumn('role', 'integer', null);
+		$this->hasColumn('role', 'integer', null, array('default' => 2));
 		$this->hasColumn('notes', 'string', 255);
 		$this->hasColumn('datecreated', 'timestamp');
 		$this->hasColumn('createdby', 'integer', 11);

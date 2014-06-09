@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50524
 File Encoding         : 65001
 
-Date: 2014-06-03 19:29:37
+Date: 2014-06-09 23:10:58
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -35,7 +35,7 @@ CREATE TABLE `aclgroup` (
 -- Records of aclgroup
 -- ----------------------------
 INSERT INTO `aclgroup` VALUES ('1', 'Administrator', 'Overall system administrator', '2014-06-01 16:59:05', '1', null, null);
-INSERT INTO `aclgroup` VALUES ('2', 'Supervisor', 'Logs activities on a client case', '2014-06-01 16:59:05', '1', null, null);
+INSERT INTO `aclgroup` VALUES ('2', 'Job Coach', 'Logs activities against a client voucher', '2014-06-01 16:59:05', '1', null, null);
 INSERT INTO `aclgroup` VALUES ('3', 'Data Clerk', 'Data entry assistant', '2014-06-01 16:59:05', '1', null, null);
 INSERT INTO `aclgroup` VALUES ('4', 'Manager', 'Company management and reporting', '2014-06-01 16:59:05', '1', null, null);
 
@@ -63,47 +63,55 @@ CREATE TABLE `aclpermission` (
   KEY `fk_aclpermission_resourceid` (`resourceid`),
   CONSTRAINT `fk_aclpermission_groupid` FOREIGN KEY (`groupid`) REFERENCES `aclgroup` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_aclpermission_resourceid` FOREIGN KEY (`resourceid`) REFERENCES `aclresource` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=201 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=209 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of aclpermission
 -- ----------------------------
-INSERT INTO `aclpermission` VALUES ('6', '1', '7', '1', '1', '1', '1', '0', '0', '0', '2012-03-01 12:00:00', '1', '2013-12-18 08:39:43', '1');
-INSERT INTO `aclpermission` VALUES ('18', '2', '6', '0', '0', '1', '0', '0', '0', '0', '2012-03-01 12:00:00', '1', '2014-02-13 17:36:18', '38');
-INSERT INTO `aclpermission` VALUES ('19', '3', '6', '0', '0', '1', '0', '0', '0', '0', '2012-03-01 12:00:00', '1', '2014-05-22 16:45:29', '1');
-INSERT INTO `aclpermission` VALUES ('21', '4', '6', '0', '0', '0', '0', '0', '0', '0', '2012-03-01 12:00:00', '1', '2014-02-13 17:29:08', '38');
-INSERT INTO `aclpermission` VALUES ('25', '2', '3', '0', '1', '1', '1', '0', '0', '0', '0000-00-00 00:00:00', '0', '2014-02-13 17:36:18', '38');
-INSERT INTO `aclpermission` VALUES ('28', '4', '3', '0', '0', '0', '0', '0', '0', '0', '0000-00-00 00:00:00', '0', '2014-02-13 17:29:08', '38');
-INSERT INTO `aclpermission` VALUES ('38', '2', '9', '1', '1', '1', '1', '0', '1', '0', '0000-00-00 00:00:00', '0', '2014-02-13 17:36:18', '38');
-INSERT INTO `aclpermission` VALUES ('39', '3', '9', '1', '1', '1', '1', '0', '1', '0', '0000-00-00 00:00:00', '1', '2014-05-22 16:45:29', '1');
-INSERT INTO `aclpermission` VALUES ('41', '4', '9', '1', '1', '1', '1', '0', '1', '0', '0000-00-00 00:00:00', '0', '2014-02-13 17:29:08', '38');
-INSERT INTO `aclpermission` VALUES ('73', '3', '7', '0', '0', '0', '0', '0', '0', '0', '2012-03-01 12:00:00', '1', '2014-05-22 16:45:29', '1');
-INSERT INTO `aclpermission` VALUES ('75', '3', '10', '0', '0', '1', '1', '0', '0', '0', '0000-00-00 00:00:00', '1', '2014-05-22 16:45:29', '1');
-INSERT INTO `aclpermission` VALUES ('108', '1', '5', '1', '1', '1', '1', '1', '0', '0', '2013-12-16 12:51:35', '1', '2013-12-18 08:39:43', '1');
-INSERT INTO `aclpermission` VALUES ('116', '1', '8', '0', '0', '1', '0', '0', '0', '0', '2013-12-16 01:09:38', '1', '2013-12-18 08:39:43', '1');
-INSERT INTO `aclpermission` VALUES ('117', '1', '3', '1', '1', '1', '1', '1', '1', '0', '2013-12-16 01:09:38', '1', '2013-12-18 08:39:43', '1');
-INSERT INTO `aclpermission` VALUES ('118', '1', '9', '1', '1', '1', '1', '1', '1', '0', '2013-12-16 01:14:53', '1', '2013-12-18 08:39:43', '1');
-INSERT INTO `aclpermission` VALUES ('120', '1', '6', '0', '0', '1', '0', '0', '0', '0', '2013-12-16 12:51:35', '1', '2013-12-18 08:39:43', '1');
-INSERT INTO `aclpermission` VALUES ('121', '1', '10', '1', '1', '1', '1', '1', '0', '0', '2013-12-16 01:16:20', '1', '2013-12-18 08:39:43', '1');
-INSERT INTO `aclpermission` VALUES ('123', '1', '1', '0', '0', '1', '1', '0', '0', '0', '2013-12-16 01:16:20', '1', '2013-12-18 08:39:43', '1');
-INSERT INTO `aclpermission` VALUES ('124', '1', '2', '1', '1', '1', '1', '1', '0', '0', '2013-12-16 01:16:20', '1', '2013-12-18 08:39:43', '1');
-INSERT INTO `aclpermission` VALUES ('156', '2', '7', '0', '0', '0', '0', '0', '0', '0', '2014-01-07 07:48:48', '1', '2014-02-13 17:36:18', '38');
-INSERT INTO `aclpermission` VALUES ('157', '2', '10', '0', '0', '1', '1', '0', '0', '0', '2014-01-07 07:48:48', '1', '2014-02-13 17:36:18', '38');
-INSERT INTO `aclpermission` VALUES ('159', '2', '1', '0', '0', '0', '0', '0', '0', '0', '2014-01-07 07:48:48', '1', '2014-02-13 17:36:18', '38');
-INSERT INTO `aclpermission` VALUES ('160', '2', '2', '0', '0', '0', '0', '0', '0', '0', '2014-01-07 07:48:48', '1', '2014-02-13 17:36:18', '38');
-INSERT INTO `aclpermission` VALUES ('168', '2', '8', '0', '0', '1', '0', '0', '0', '0', '2014-01-07 07:48:48', '1', '2014-02-13 17:36:18', '38');
-INSERT INTO `aclpermission` VALUES ('169', '2', '5', '0', '0', '0', '0', '0', '0', '0', '2014-01-07 07:48:48', '1', '2014-02-13 17:36:18', '38');
-INSERT INTO `aclpermission` VALUES ('172', '3', '1', '0', '0', '0', '0', '0', '0', '0', '2014-01-24 05:41:35', '1', '2014-05-22 16:45:29', '1');
-INSERT INTO `aclpermission` VALUES ('173', '3', '2', '0', '0', '0', '0', '0', '0', '0', '2014-01-24 05:41:35', '1', '2014-05-22 16:45:29', '1');
-INSERT INTO `aclpermission` VALUES ('183', '3', '8', '0', '0', '1', '0', '0', '0', '0', '2014-01-24 05:41:35', '1', '2014-05-22 16:45:29', '1');
-INSERT INTO `aclpermission` VALUES ('184', '3', '5', '0', '0', '0', '0', '0', '0', '0', '2014-01-24 05:41:35', '1', '2014-05-22 16:45:29', '1');
-INSERT INTO `aclpermission` VALUES ('185', '3', '3', '0', '1', '1', '1', '0', '0', '0', '2014-01-24 05:41:35', '1', '2014-05-22 16:45:29', '1');
-INSERT INTO `aclpermission` VALUES ('186', '4', '7', '0', '0', '0', '0', '0', '0', '0', '2014-02-13 17:29:08', '38', null, null);
-INSERT INTO `aclpermission` VALUES ('187', '4', '10', '0', '0', '0', '0', '0', '0', '0', '2014-02-13 17:29:08', '38', null, null);
-INSERT INTO `aclpermission` VALUES ('190', '4', '1', '0', '0', '0', '0', '0', '0', '0', '2014-02-13 17:29:08', '38', null, null);
-INSERT INTO `aclpermission` VALUES ('191', '4', '2', '0', '0', '0', '0', '0', '0', '0', '2014-02-13 17:29:08', '38', null, null);
-INSERT INTO `aclpermission` VALUES ('199', '4', '8', '0', '0', '0', '0', '0', '0', '0', '2014-02-13 17:29:08', '38', null, null);
-INSERT INTO `aclpermission` VALUES ('200', '4', '5', '0', '0', '0', '0', '0', '0', '0', '2014-02-13 17:29:08', '38', null, null);
+INSERT INTO `aclpermission` VALUES ('6', '1', '7', '1', '1', '1', '1', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('18', '2', '6', '0', '0', '1', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('19', '3', '6', '0', '0', '1', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('21', '4', '6', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('25', '2', '3', '0', '1', '1', '1', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('28', '4', '3', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('38', '2', '9', '1', '1', '1', '1', '0', '1', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('39', '3', '9', '1', '1', '1', '1', '0', '1', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('41', '4', '9', '1', '1', '1', '1', '0', '1', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('73', '3', '7', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('75', '3', '10', '0', '0', '1', '1', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('108', '1', '5', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('116', '1', '8', '0', '0', '1', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('117', '1', '3', '1', '1', '1', '1', '1', '1', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('118', '1', '9', '1', '1', '1', '1', '1', '1', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('120', '1', '6', '0', '0', '1', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('121', '1', '10', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('123', '1', '1', '0', '0', '1', '1', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('124', '1', '2', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('156', '2', '7', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('157', '2', '10', '0', '0', '1', '1', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('159', '2', '1', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('160', '2', '2', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('168', '2', '8', '0', '0', '1', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('169', '2', '5', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('172', '3', '1', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('173', '3', '2', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('183', '3', '8', '0', '0', '1', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('184', '3', '5', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('185', '3', '3', '0', '1', '1', '1', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('186', '4', '7', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('187', '4', '10', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('190', '4', '1', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('191', '4', '2', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('199', '4', '8', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('200', '4', '5', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('201', '1', '11', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('202', '2', '11', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('203', '3', '11', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('204', '4', '11', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('205', '1', '12', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('206', '2', '12', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('207', '3', '12', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('208', '4', '12', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
 
 -- ----------------------------
 -- Table structure for `aclresource`
@@ -125,20 +133,22 @@ CREATE TABLE `aclresource` (
   `lastupdatedate` datetime DEFAULT NULL,
   `lastupdatedby` int(11) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of aclresource
 -- ----------------------------
-INSERT INTO `aclresource` VALUES ('1', 'Lookup Type', 'Look up types', '0', '0', '1', '1', '0', '0', '0', '2012-03-01 12:00:00', '1', null, null);
-INSERT INTO `aclresource` VALUES ('2', 'Lookup Value', 'Values for the lookup type', '1', '1', '1', '1', '1', '0', '0', '2012-03-01 12:00:00', '1', null, null);
-INSERT INTO `aclresource` VALUES ('3', 'User Account', 'A user within the application', '1', '1', '1', '1', '1', '0', '1', '2012-03-01 12:00:00', '1', null, null);
-INSERT INTO `aclresource` VALUES ('5', 'Role', 'Actions a member can execute on resources', '1', '1', '1', '1', '1', '0', '0', '2012-03-01 12:00:00', '1', null, null);
-INSERT INTO `aclresource` VALUES ('6', 'Dashboard', 'user dashboard', '0', '0', '1', '0', '0', '0', '0', '2012-03-01 12:00:00', '1', null, null);
-INSERT INTO `aclresource` VALUES ('7', 'Application Settings', 'Application Administration', '1', '1', '1', '1', '0', '0', '0', '2012-03-01 12:00:00', '1', null, null);
-INSERT INTO `aclresource` VALUES ('8', 'Report Dashboard', 'The different reports in the Application', '0', '0', '1', '0', '0', '0', '0', '2012-03-01 12:00:00', '1', null, null);
-INSERT INTO `aclresource` VALUES ('9', 'Client', 'The customer who reports a query', '1', '1', '1', '1', '1', '0', '1', '2012-03-01 12:00:00', '1', null, null);
-INSERT INTO `aclresource` VALUES ('10', 'Category', 'Categorisation functionality', '1', '1', '1', '1', '1', '0', '0', '2012-03-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('1', 'Lookup Type', 'Look up types', '0', '0', '1', '1', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('2', 'Lookup Value', 'Values for the lookup type', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('3', 'User Account', 'A user within the application', '1', '1', '1', '1', '1', '0', '1', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('5', 'Role', 'Actions a member can execute on resources', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('6', 'Dashboard', 'user dashboard', '0', '0', '1', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('7', 'Application Settings', 'Application Administration', '1', '1', '1', '1', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('8', 'Report Dashboard', 'The different reports in the Application', '0', '0', '1', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('9', 'Client', 'The customer who reports a query', '1', '1', '1', '1', '1', '0', '1', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('10', 'Category', 'Categorisation functionality', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('11', 'Job', 'Client employment feature', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('12', 'Voucher', 'Client voucher module', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
 
 -- ----------------------------
 -- Table structure for `aclusergroup`
@@ -153,7 +163,7 @@ CREATE TABLE `aclusergroup` (
   KEY `fk_usergroup_userid` (`userid`),
   CONSTRAINT `fk_usergroup_groupid` FOREIGN KEY (`groupid`) REFERENCES `aclgroup` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_usergroup_userid` FOREIGN KEY (`userid`) REFERENCES `useraccount` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of aclusergroup
@@ -295,20 +305,20 @@ CREATE TABLE `assignment` (
   `datedeassigned` datetime DEFAULT NULL,
   `deassignedbyid` int(11) unsigned DEFAULT NULL,
   `reason` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  KEY `fk_assignment_clientid` (`clientid`),
+  KEY `fk_assignment_userid` (`userid`),
+  CONSTRAINT `fk_assignment_clientid` FOREIGN KEY (`clientid`) REFERENCES `client` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_assignment_userid` FOREIGN KEY (`userid`) REFERENCES `useraccount` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of assignment
 -- ----------------------------
-INSERT INTO `assignment` VALUES ('1', '12', '3', '1', '2014-05-28', null, '1', null, '2014-06-01 23:09:46', '1', null, null, null);
-INSERT INTO `assignment` VALUES ('2', '11', '4', '1', '2014-05-28', null, '1', null, '2014-05-28 09:55:25', '1', null, null, null);
-INSERT INTO `assignment` VALUES ('3', '10', '6', '1', '2014-05-28', null, '1', null, '2014-05-28 09:55:25', '1', null, null, null);
-INSERT INTO `assignment` VALUES ('4', '9', '3', '1', '2014-05-28', null, '1', null, '2014-05-28 09:55:25', '1', null, null, null);
-INSERT INTO `assignment` VALUES ('14', '18', '4', '1', '2014-05-26', null, '1', null, '2014-06-02 12:46:03', '1', null, null, null);
-INSERT INTO `assignment` VALUES ('15', '19', '4', '1', '2014-06-02', null, '1', null, '2014-06-02 14:20:00', '1', null, null, null);
-INSERT INTO `assignment` VALUES ('16', '20', '3', '1', '2014-06-01', null, '1', null, '2014-06-03 18:01:21', '1', null, null, null);
-INSERT INTO `assignment` VALUES ('17', '20', '4', '1', '2014-05-28', null, '1', null, '2014-06-03 18:10:40', '1', null, null, null);
+INSERT INTO `assignment` VALUES ('1', '12', '3', '2', '2014-05-28', null, '1', null, '2014-06-01 23:09:46', '1', null, null, null);
+INSERT INTO `assignment` VALUES ('2', '11', '4', '2', '2014-05-28', null, '1', null, '2014-05-28 09:55:25', '1', null, null, null);
+INSERT INTO `assignment` VALUES ('3', '10', '6', '2', '2014-05-28', null, '1', null, '2014-05-28 09:55:25', '1', null, null, null);
+INSERT INTO `assignment` VALUES ('4', '9', '3', '2', '2014-05-28', null, '1', null, '2014-05-28 09:55:25', '1', null, null, null);
 
 -- ----------------------------
 -- Table structure for `audittrail`
@@ -329,23 +339,6 @@ CREATE TABLE `audittrail` (
 
 -- ----------------------------
 -- Records of audittrail
--- ----------------------------
-
--- ----------------------------
--- Table structure for `blank`
--- ----------------------------
-DROP TABLE IF EXISTS `blank`;
-CREATE TABLE `blank` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `datecreated` datetime DEFAULT NULL,
-  `createdby` int(11) unsigned DEFAULT NULL,
-  `lastupdatedate` datetime DEFAULT NULL,
-  `lastupdatedby` int(11) unsigned DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Records of blank
 -- ----------------------------
 
 -- ----------------------------
@@ -433,8 +426,10 @@ CREATE TABLE `client` (
   `relationship` varchar(255) DEFAULT NULL,
   `contactphone` varchar(15) DEFAULT NULL,
   `contactemail` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  KEY `fk_client_voucherid` (`initialvoucherid`),
+  CONSTRAINT `fk_client_voucherid` FOREIGN KEY (`initialvoucherid`) REFERENCES `voucher` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of client
@@ -444,7 +439,7 @@ INSERT INTO `client` VALUES ('6', 'Ronel', 'Meyron', null, '(609) 671-9313', '(6
 INSERT INTO `client` VALUES ('9', 'Andrew', 'Belling', null, '(609) 309-1700', '(609) 309-1700', null, null, null, '1', null, 'US', 'Montgomery', 'NJ', '6', '08408', '7 kerk Street\r\nMiddelburg\r\n5900', '10 Ercher Street ', '2014-05-23 12:48:32', '1', null, null, '135-15-0009', '2', null, null, '6', null, null, null, null, null, null, null, null, null, null, null, null, '2014-03-10', '0', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 INSERT INTO `client` VALUES ('10', 'Venessa', 'Stalenberg', null, '(609) 584-1100', '(609) 584-1100', null, null, null, '2', null, 'US', 'Montgomery Center', 'NJ', '1', '08409', '38 Protea Avenue\r\nMidros \r\nMiddelburg\r\n5900', '77 Ewingville Road Ewing', '2014-05-23 13:53:19', '1', null, null, '135-15-0010', '3', null, null, '3', null, null, null, null, null, null, null, null, null, null, null, null, '2014-03-10', '0', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 INSERT INTO `client` VALUES ('11', 'Unathi', 'Goerge', null, '(732) 239-0778', '(732) 239-0778', null, null, null, '1', null, 'US', 'Montpelier', 'NJ', '8', '08410', '2572 Simphiwe Bleki\r\nKwanonzame\r\nMiddelburg EC\r\n5900', '78 W. Taylor Avenue Trenton', '2014-05-23 15:05:41', '1', null, null, '135-15-0011', '2', null, null, '4', null, null, null, null, null, null, null, null, null, null, null, null, '2014-03-10', '1', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-INSERT INTO `client` VALUES ('12', 'Popi', 'Westel', 'PW', '(732) 422-4565', '(732) 422-6521', '(732) 422-4825', '123', 'collin@domain.com', '1', '1976-11-02', 'US', 'Moretown', 'NJ', '6', '08411', '13 DanielsMidrosMiddelburg5900', '862 Yardville-Allentown Road Hamilton', '2014-05-23 15:15:14', '1', '2014-06-03 17:51:21', '1', '135-15-0001', '6', '1', '3', '3', null, '2', '2', null, 'none', '0', '', '4', null, '1401806632.jpg', null, '1', '2014-03-10', '1', 'LoremIpsum.pdf', 'testcover.pdf', '125692', '', 'Mitchell Paterson', null, null, null, null, 'Pellentesque elementum risus in eros tempus, nec tincidunt tortor consequat. Nam feugiat leo non enim fermentum condimentum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Cras ut hendrerit magna.', 'ipsum dolor sit amet, consectetur adipiscing elit. Proin placerat.', 'Collin Mathew', 'Uncle', '(732) 542-6632', 'collin@domain.com');
+INSERT INTO `client` VALUES ('12', 'Popi', 'Westel', 'PW', '(732) 422-4565', '(732) 422-6521', '(732) 422-4825', '123', 'collin@domain.com', '1', '1976-11-02', 'US', 'Moretown', 'NJ', '6', '08411', '13 DanielsMidrosMiddelburg5900', '862 Yardville-Allentown Road Hamilton', '2014-05-23 15:15:14', '1', '2014-06-03 22:15:45', '1', '135-15-0001', '6', '1', '3', '3', null, '2', '2', null, 'none', '0', '', '4', null, '1401806632.jpg', null, '1', '2014-03-10', '1', 'LoremIpsum.pdf', 'testcover.pdf', '125692', '', 'Mitchell Paterson', '1', '1', null, null, 'Pellentesque elementum risus in eros tempus, nec tincidunt tortor consequat. Nam feugiat leo non enim fermentum condimentum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Cras ut hendrerit magna.', 'ipsum dolor sit amet, consectetur adipiscing elit. Proin placerat.', 'Collin Mathew', 'Uncle', '(732) 542-6632', 'collin@domain.com');
 
 -- ----------------------------
 -- Table structure for `clienthistory`
@@ -465,15 +460,15 @@ CREATE TABLE `clienthistory` (
   `dateclosed` datetime DEFAULT NULL,
   `closedbyid` int(11) unsigned DEFAULT NULL,
   `status` tinyint(4) unsigned DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  KEY `fk_clienthistory_clientid` (`clientid`),
+  CONSTRAINT `fk_clienthistory_clientid` FOREIGN KEY (`clientid`) REFERENCES `client` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of clienthistory
 -- ----------------------------
-INSERT INTO `clienthistory` VALUES ('1', '12', '2014-03-10', null, null, null, null, null, null, '2014-06-02 15:50:12', '1', null, null, '1');
-INSERT INTO `clienthistory` VALUES ('6', '20', '2014-05-28', '2014-06-03', null, null, null, null, null, '2014-06-03 18:10:02', '1', '2014-06-03 18:10:02', null, '0');
-INSERT INTO `clienthistory` VALUES ('7', '20', '2014-06-03', '2014-06-03', null, null, null, null, null, '2014-06-03 18:10:22', '1', '2014-06-03 18:10:22', null, '0');
+INSERT INTO `clienthistory` VALUES ('1', '12', '2014-03-10', null, null, null, null, null, null, '2014-06-03 22:08:46', '1', null, null, '1');
 
 -- ----------------------------
 -- Table structure for `clientskill`
@@ -483,7 +478,9 @@ CREATE TABLE `clientskill` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `clientid` int(11) unsigned DEFAULT NULL,
   `skill` tinyint(4) unsigned DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `fk_clientskill_clientid` (`clientid`),
+  CONSTRAINT `fk_clientskill_clientid` FOREIGN KEY (`clientid`) REFERENCES `client` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -497,16 +494,12 @@ DROP TABLE IF EXISTS `company`;
 CREATE TABLE `company` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `type` tinyint(4) unsigned DEFAULT NULL,
-  `orgname` varchar(255) DEFAULT NULL,
-  `alias` varchar(15) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `alias` varchar(50) DEFAULT NULL,
   `contactperson` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
   `phone` varchar(15) DEFAULT NULL,
   `fax` varchar(15) DEFAULT NULL,
-  `datecreated` datetime DEFAULT NULL,
-  `createdby` int(11) unsigned DEFAULT NULL,
-  `lastupdatedate` datetime DEFAULT NULL,
-  `lastupdatedby` int(11) unsigned DEFAULT NULL,
   `country` varchar(2) DEFAULT NULL,
   `city` varchar(255) DEFAULT NULL,
   `state` varchar(2) DEFAULT NULL,
@@ -515,14 +508,25 @@ CREATE TABLE `company` (
   `addressline1` varchar(255) DEFAULT NULL,
   `addressline2` varchar(255) DEFAULT NULL,
   `defaultrate` decimal(10,2) unsigned DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+  `datecreated` datetime DEFAULT NULL,
+  `createdby` int(11) unsigned DEFAULT NULL,
+  `lastupdatedate` datetime DEFAULT NULL,
+  `lastupdatedby` int(11) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_company_type` (`type`),
+  KEY `index_company_county` (`county`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of company
 -- ----------------------------
-INSERT INTO `company` VALUES ('1', '1', 'Division of Developmental Disabilities', 'DDD', 'Monica Darell', 'ddd@domain.com', '(732) 968-5403', '(732) 968 4331', '2014-05-28 09:13:30', '1', null, null, 'US', 'Greenbook', 'NJ', '9', '08812', 'Greenbook Regional Center', '275 Greenbook Road', '45.00');
-INSERT INTO `company` VALUES ('2', '1', 'Division Of Mental Health Services', 'DMHS', 'Monica Linn', 'dmhs@ent.com', '(732) 012-3456', null, '2014-05-28 09:40:32', '1', null, null, 'US', null, 'NJ', '5', '08813', null, null, '50.00');
+INSERT INTO `company` VALUES ('1', '1', 'Division of Developmental Disabilities', 'DDD', 'Monica Darell', 'ddd@domain.com', '(732) 968-5403', '(732) 968 4331', 'US', 'Greenbook', 'NJ', '9', '08812', 'Greenbook Regional Center', '275 Greenbook Road', '45.00', '2014-05-28 09:13:30', '1', null, null);
+INSERT INTO `company` VALUES ('2', '1', 'Division Of Mental Health Services', 'DMHS', 'Monica Linn', 'dmhs@ent.com', '(732) 012-3456', null, 'US', null, 'NJ', '5', '08813', null, null, '50.00', '2014-05-28 09:40:32', '1', null, null);
+INSERT INTO `company` VALUES ('3', '2', 'Wallmart', null, 'Jim Kommy', 'jim@wallmart.com', '255 025-5545', null, 'US', 'Grogory', 'NJ', '15', '07850', 'South street 278 Block A', 'asdas asdddad adasd', null, null, null, '2014-06-09 22:41:57', null);
+INSERT INTO `company` VALUES ('4', '2', 'clean consults', null, 'asadsd', 'muko@dena.com', '5464161611', null, 'US', 'Junior', 'NJ', '12', '051515', 'sdnsikl sklm lsdsf', null, null, '2014-06-09 12:19:32', '1', '2014-06-09 13:13:51', null);
+INSERT INTO `company` VALUES ('5', '2', 'companyname', null, 'contactperson', 'example@example.com', 'phone', null, 'US', 'city', 'NJ', '1', '90210', 'addressline1', 'addressline2', null, '2014-06-09 13:27:32', '1', null, null);
+INSERT INTO `company` VALUES ('6', '2', 'asdadad', null, 'sdsfssf', 'sdsd@sdfs.dcfd', '232434', null, 'US', 'zxcxzxczcz', 'NJ', '3', '5446456', 'xzcvzxcz', 'xdcvxvxc', null, '2014-06-09 13:38:58', '1', null, null);
+INSERT INTO `company` VALUES ('7', '2', 'Kingundu Systems Inc', null, 'asadasda', 'testsdas@devmail.infomacorp.com', '646162162', null, 'US', 'kampala', 'NJ', '9', '65512', 'asa knakjsdasdad', null, null, '2014-06-09 13:44:10', '1', '2014-06-09 16:05:14', null);
 
 -- ----------------------------
 -- Table structure for `invoice`
@@ -530,11 +534,19 @@ INSERT INTO `company` VALUES ('2', '1', 'Division Of Mental Health Services', 'D
 DROP TABLE IF EXISTS `invoice`;
 CREATE TABLE `invoice` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `voucherid` int(11) unsigned DEFAULT NULL,
+  `invoiceno` varchar(15) DEFAULT NULL,
+  `invoicedate` date DEFAULT NULL,
+  `invoiceamount` decimal(10,2) unsigned DEFAULT NULL,
+  `hourstaken` decimal(10,2) unsigned DEFAULT NULL,
+  `hoursremaining` decimal(10,2) unsigned DEFAULT NULL,
   `datecreated` datetime DEFAULT NULL,
   `createdby` int(11) unsigned DEFAULT NULL,
   `lastupdatedate` datetime DEFAULT NULL,
   `lastupdatedby` int(11) unsigned DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `fk_invoice_voucherid` (`voucherid`),
+  CONSTRAINT `fk_invoice_voucherid` FOREIGN KEY (`voucherid`) REFERENCES `voucher` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -551,6 +563,7 @@ CREATE TABLE `job` (
   `employerid` int(11) unsigned DEFAULT NULL,
   `startdate` date DEFAULT NULL,
   `enddate` date DEFAULT NULL,
+  `status` tinyint(4) unsigned DEFAULT NULL,
   `jobtitle` varchar(255) DEFAULT NULL,
   `hoursperweek` decimal(10,2) unsigned DEFAULT NULL,
   `rate` decimal(10,2) unsigned DEFAULT NULL,
@@ -561,18 +574,26 @@ CREATE TABLE `job` (
   `supervisorname` varchar(255) DEFAULT NULL,
   `supervisorphone` varchar(15) DEFAULT NULL,
   `transportation` tinyint(4) unsigned DEFAULT NULL,
-  `terminationnotes` varchar(255) DEFAULT NULL,
+  `terminationtype` tinyint(4) unsigned DEFAULT NULL,
   `terminationreason` varchar(255) DEFAULT NULL,
+  `islocked` tinyint(4) unsigned DEFAULT NULL,
+  `notes` varchar(255) DEFAULT NULL,
   `datecreated` datetime DEFAULT NULL,
   `createdby` int(11) unsigned DEFAULT NULL,
   `lastupdatedate` datetime DEFAULT NULL,
   `lastupdatedby` int(11) unsigned DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  KEY `fk_job_clientid` (`clientid`),
+  KEY `fk_job_employerid` (`employerid`),
+  KEY `index_job_status` (`status`),
+  CONSTRAINT `fk_job_clientid` FOREIGN KEY (`clientid`) REFERENCES `client` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_job_employerid` FOREIGN KEY (`employerid`) REFERENCES `company` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of job
 -- ----------------------------
+INSERT INTO `job` VALUES ('1', '12', '3', '2014-05-26', null, '1', 'Grocery Assistant', '30.00', '12.00', '1', '1', '2014-05-28', '9am to 3pm. Mon, Wed, Fri', 'Willy Murefa', '1521516655', '2', '1', '', '0', null, '2014-06-04 19:59:37', '1', '2014-06-09 22:41:57', null);
 
 -- ----------------------------
 -- Table structure for `lookupquery`
@@ -609,7 +630,7 @@ CREATE TABLE `lookuptype` (
   `lastupdatedate` datetime DEFAULT NULL,
   `lastupdatedby` int(11) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of lookuptype
@@ -632,6 +653,12 @@ INSERT INTO `lookuptype` VALUES ('15', 'DISABILITY_CAUSE_CODES', 'Causes for Dis
 INSERT INTO `lookuptype` VALUES ('16', 'COMMUNICATION_LEVELS', 'The communication levels', '1', '1', 'The communication levels', '2014-06-01 12:00:00', '1', null, null);
 INSERT INTO `lookuptype` VALUES ('17', 'HOUSING_TYPES', 'The housing type values', '1', '1', 'The housing type values', '2014-06-01 12:00:00', '1', null, null);
 INSERT INTO `lookuptype` VALUES ('18', 'CLIENT_SKILLS', 'Special client skills', '1', '1', 'The proffessional and vocational skills ', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `lookuptype` VALUES ('19', 'TRANSPORTATION_MODES', 'Client modes of transport', '1', '1', 'The client\'s mode of transportation to work', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `lookuptype` VALUES ('20', 'MEDICAL_TYPES', 'Client medical types', '1', '1', 'The client\'s medical types during job placement', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `lookuptype` VALUES ('21', 'WAGE_RATE_TYPES', 'The client rate type for employment', '1', '1', 'The type of rate used for the client job', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `lookuptype` VALUES ('22', 'JOB_STATUSES', 'The job status values', '1', '1', 'The job status values', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `lookuptype` VALUES ('23', 'JOB_TERMINATION_TYPES', 'The job termination types', '1', '1', 'The job termination types', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `lookuptype` VALUES ('24', 'VOUCHER_STATUS', 'The voucher status values', '1', '1', 'The voucher status values', '2014-06-01 12:00:00', '1', null, null);
 
 -- ----------------------------
 -- Table structure for `lookuptypevalue`
@@ -654,7 +681,7 @@ CREATE TABLE `lookuptypevalue` (
   KEY `index_lookuptypevalue_lookuptypevalue` (`lookuptypevalue`),
   KEY `index_lookuptypevalue_lookupvaluedescription` (`lookupvaluedescription`),
   CONSTRAINT `fk_lookuptypevalue_lookuptypeid` FOREIGN KEY (`lookuptypeid`) REFERENCES `lookuptype` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=138 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=158 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of lookuptypevalue
@@ -740,13 +767,33 @@ INSERT INTO `lookuptypevalue` VALUES ('125', '15', '1', 'Cause Unknown', null, '
 INSERT INTO `lookuptypevalue` VALUES ('126', '15', '2', 'Road Accident', null, '1', '2014-06-01 12:00:00', null, null, '01', null);
 INSERT INTO `lookuptypevalue` VALUES ('127', '16', '1', 'Phone', null, '1', '2014-06-01 12:00:00', null, null, null, null);
 INSERT INTO `lookuptypevalue` VALUES ('128', '16', '2', 'Email', null, '1', '2014-06-01 12:00:00', null, null, null, null);
-INSERT INTO `lookuptypevalue` VALUES ('129', '17', '1', 'Type 1', null, '1', '2014-06-01 12:00:00', null, null, null, null);
-INSERT INTO `lookuptypevalue` VALUES ('132', '17', '2', 'Type 2', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('129', '17', '1', 'Housing Type 1', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('132', '17', '2', 'Housing Type 2', null, '1', '2014-06-01 12:00:00', null, null, null, null);
 INSERT INTO `lookuptypevalue` VALUES ('133', '18', '1', 'Data Entry', null, '1', '2014-06-01 12:00:00', null, null, null, null);
 INSERT INTO `lookuptypevalue` VALUES ('134', '18', '2', 'Cleaning / Maintenance', null, '1', '2014-06-01 12:00:00', null, null, null, null);
 INSERT INTO `lookuptypevalue` VALUES ('135', '18', '3', 'Writing', null, '1', '2014-06-01 12:00:00', null, null, null, null);
 INSERT INTO `lookuptypevalue` VALUES ('136', '18', '4', 'Wood Works', null, '1', '2014-06-01 12:00:00', null, null, null, null);
 INSERT INTO `lookuptypevalue` VALUES ('137', '18', '5', 'Drama', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('138', '19', '1', 'Ambulance Service', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('139', '19', '2', 'County Bus Service', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('140', '19', '3', 'County Paratransit', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('141', '19', '4', 'Hudson Bergen Light Rail', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('142', '19', '5', 'Municipal Bus Service ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('143', '19', '6', 'Newark City Subway', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('144', '19', '7', 'NJ Local Transit Bus', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('145', '20', '1', 'Medical Type 1', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('146', '20', '2', 'Medical Type 2', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('147', '21', '1', 'Per Hour', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('148', '21', '2', 'Per Day', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('149', '21', '3', 'Per Week', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('150', '21', '4', 'Per Month', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('151', '22', '1', 'In Progress', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('152', '22', '0', 'Completed', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('153', '23', '1', 'Terminate Type 1', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('154', '23', '2', 'Terminate Type 2', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('155', '24', '1', 'In Progress', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('156', '24', '2', 'Pending Approval', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('157', '24', '3', 'Completed', null, '1', '2014-06-01 12:00:00', null, null, null, null);
 
 -- ----------------------------
 -- Table structure for `payment`
@@ -754,11 +801,18 @@ INSERT INTO `lookuptypevalue` VALUES ('137', '18', '5', 'Drama', null, '1', '201
 DROP TABLE IF EXISTS `payment`;
 CREATE TABLE `payment` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `invoiceid` int(11) unsigned DEFAULT NULL,
+  `paymentdate` date DEFAULT NULL,
+  `paymentamount` decimal(10,2) unsigned DEFAULT NULL,
+  `checkno` varchar(15) DEFAULT NULL,
+  `notes` varchar(500) DEFAULT NULL,
   `datecreated` datetime DEFAULT NULL,
   `createdby` int(11) unsigned DEFAULT NULL,
   `lastupdatedate` datetime DEFAULT NULL,
   `lastupdatedby` int(11) unsigned DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `fk_payment_invoiceid` (`invoiceid`),
+  CONSTRAINT `fk_payment_invoiceid` FOREIGN KEY (`invoiceid`) REFERENCES `invoice` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -813,6 +867,8 @@ CREATE TABLE `session` (
 -- Records of session
 -- ----------------------------
 INSERT INTO `session` VALUES ('08bm4dgd4834fog6q27slkb5a5', '1401812663', '21104000', 'Default|a:12:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:16:\"itemcountperpage\";s:2:\"10\";}');
+INSERT INTO `session` VALUES ('39klfv1p8p1shjaebalqhe6820', '1402343414', '21104000', 'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:4:\"type\";s:1:\"1\";s:16:\"itemcountperpage\";s:2:\"10\";}');
+INSERT INTO `session` VALUES ('7ib1dtkj8cq642ah1bfc8mv821', '1401824433', '21104000', 'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:4:\"type\";s:1:\"1\";s:16:\"itemcountperpage\";s:2:\"10\";}');
 INSERT INTO `session` VALUES ('eeudtg6hpl2kkbaqb26dhirkc1', '1401693181', '21104000', 'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:4:\"type\";s:1:\"1\";s:16:\"itemcountperpage\";s:2:\"10\";}');
 INSERT INTO `session` VALUES ('fc7bgrq5ncuiurnef3d6a7pa16', '1401089166', '21104000', 'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}');
 INSERT INTO `session` VALUES ('gc83vl5d6lp09ool0o668te294', '1401113799', '21104000', 'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:5:\"phone\";s:10:\"0836246789\";s:4:\"type\";s:1:\"1\";}');
@@ -821,7 +877,7 @@ INSERT INTO `session` VALUES ('jel4kp2igcm3sbc4mpknrilrf2', '1401109043', '21104
 INSERT INTO `session` VALUES ('jh468g0lmkp0dq9u3tcacco4u4', '1401099648', '21104000', 'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}');
 INSERT INTO `session` VALUES ('p2mgk7goj8c17c6ategktgrhs7', '1401194808', '21104000', 'Default|a:13:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:4:\"type\";s:1:\"1\";}');
 INSERT INTO `session` VALUES ('p5tjhckc57tdfkgk4tm6hd2772', '1401295890', '21104000', 'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:4:\"type\";s:1:\"1\";s:16:\"itemcountperpage\";s:2:\"10\";}');
-INSERT INTO `session` VALUES ('sn3en863iojj3ipmfovvl00lm2', '1401812948', '21104000', 'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:4:\"type\";s:1:\"1\";s:16:\"itemcountperpage\";s:2:\"25\";}');
+INSERT INTO `session` VALUES ('rrs791nm4s71l4ppidtbjq89l5', '1401952402', '21104000', 'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:4:\"type\";s:1:\"1\";s:16:\"itemcountperpage\";s:2:\"10\";}');
 
 -- ----------------------------
 -- Table structure for `useraccount`
@@ -874,7 +930,7 @@ CREATE TABLE `useraccount` (
   KEY `index_useraccount_isactive` (`isactive`) USING BTREE,
   KEY `index_useraccount_username` (`username`),
   KEY `index_useraccount_email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of useraccount
@@ -897,23 +953,27 @@ CREATE TABLE `voucher` (
   `servicetypeid` int(11) unsigned DEFAULT NULL,
   `voucherno` varchar(50) DEFAULT NULL,
   `dateapproved` date DEFAULT NULL,
-  `datereceived` date DEFAULT NULL,
+  `startdate` date DEFAULT NULL,
+  `invoicedate` date DEFAULT NULL,
   `status` tinyint(4) unsigned DEFAULT NULL,
   `hours` decimal(10,2) unsigned DEFAULT NULL,
   `days` tinyint(4) unsigned DEFAULT NULL,
   `rate` decimal(10,2) unsigned DEFAULT NULL,
   `employmentgoal` varchar(1000) DEFAULT NULL,
   `notes` varchar(1000) DEFAULT NULL,
+  `isrenewable` tinyint(4) unsigned DEFAULT NULL,
   `datecreated` datetime DEFAULT NULL,
   `createdby` int(11) unsigned DEFAULT NULL,
   `lastupdatedate` datetime DEFAULT NULL,
   `lastupdatedby` int(11) unsigned DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  KEY `fk_voucher_clientid` (`clientid`),
+  KEY `fk_voucher_parentid` (`parentid`),
+  CONSTRAINT `fk_voucher_clientid` FOREIGN KEY (`clientid`) REFERENCES `client` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_voucher_parentid` FOREIGN KEY (`parentid`) REFERENCES `voucher` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of voucher
 -- ----------------------------
-INSERT INTO `voucher` VALUES ('1', null, '12', '3', 'TS0005', '2014-03-04', '2014-03-10', '1', '20.00', null, '55.00', null, null, '2014-05-29 17:20:05', '1', '2014-06-03 17:50:54', '1');
-INSERT INTO `voucher` VALUES ('2', null, '3', '4', '456646', '2014-03-13', '2014-05-01', '1', '25.36', null, '65.50', null, null, '2014-05-30 14:21:11', '1', '2014-05-31 18:18:42', '1');
-INSERT INTO `voucher` VALUES ('9', null, '20', '5', '23242', '2014-05-22', '2014-05-28', '1', '23.00', null, '45.00', null, null, '2014-06-03 18:01:21', '1', '2014-06-03 18:01:21', null);
+INSERT INTO `voucher` VALUES ('1', null, '12', '3', 'TS0005', '2014-03-04', '2014-03-10', null, '1', '20.00', '30', '55.00', null, null, null, '2014-05-29 17:20:05', '1', '2014-06-09 22:26:05', '1');

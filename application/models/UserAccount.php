@@ -1074,7 +1074,7 @@ class UserAccount extends BaseEntity {
     	return $this->getType() == 1 ? true : false; 
     }
 	# determine if is a subscriber
-	function isSupervisor(){
+	function isCoach(){
     	return $this->getType() == 2 ? true : false; 
     }
 	function isDataClerk(){
