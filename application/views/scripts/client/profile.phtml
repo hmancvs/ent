@@ -788,10 +788,10 @@
                                     Actions <span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu">
-									<?php if(!$client->hasBeenAssignedCouch()){ ?>
-                                        <li><a class="<?php echo !$client->isActive() ? 'alert-dialog' : 'addpopup'; ?>" href="<?php echo $this->baseUrl("client/assign/clientid/".$client->getID()."/pgc/true/type/start"); ?>" message="This Account is closed and updates are disabled." title="Assign to User" rel="Assign Client to User" formtitle="indexform" successurl="<?php echo $this->viewurl; ?>" action="<?php echo $this->baseUrl("assignment/create"); ?>">Assign User</a></li>
+									<?php if(!$client->hasBeenAssignedCoach()){ ?>
+                                        <li><a class="<?php echo !$client->isActive() ? 'alert-dialog' : 'addpopup'; ?>" href="<?php echo $this->baseUrl("client/assign/clientid/".$client->getID()."/pgc/true/type/start"); ?>" message="This Account is closed and updates are disabled." title="Assign to User" rel="Assign Coach to Client" formtitle="indexform" successurl="<?php echo $this->viewurl; ?>" action="<?php echo $this->baseUrl("assignment/create"); ?>">Assign Coach</a></li>
                                     <?php } else { ?>
-                                        <li><a class="<?php echo !$client->isActive() ? 'alert-dialog' : 'addpopup'; ?>" href="<?php echo $this->baseUrl("client/assign/clientid/".$client->getID()."/pgc/true/type/end"); ?>" message="This Account is closed and updates are disabled." title="De-assign to User" rel="De-assign User" formtitle="indexform" successurl="<?php echo $this->viewurl; ?>" action="<?php echo $this->baseUrl("assignment/deassign"); ?>">Deassign User</a></li>
+                                        <li><a class="<?php echo !$client->isActive() ? 'alert-dialog' : 'addpopup'; ?>" href="<?php echo $this->baseUrl("client/assign/clientid/".$client->getID()."/pgc/true/type/end"); ?>" message="This Account is closed and updates are disabled." title="De-assign to User" rel="De-assign Coach from Client" formtitle="indexform" successurl="<?php echo $this->viewurl; ?>" action="<?php echo $this->baseUrl("assignment/deassign"); ?>">Deassign Coach</a></li>
                                     <?php } ?>
                                 </ul>
                             </div>
@@ -827,7 +827,7 @@
                                 <tr>
                                     <td class="centeralign"><?php echo $counter; ?></td>
                                     <td><?php echo $user->getUser()->getName(); ?></td>
-                                    <td>Supervisor</td>
+                                    <td>Coach</td>
                                     <td><?php echo isEmptyString($user->getEndDate()) ? formatDateAndTime($user->getStartDate(), false).' - To date' : formatDateAndTime($user->getStartDate(), false).' - '.formatDateAndTime($user->getEndDate(), false); ?></td>
                                     <td><?php echo isEmptyString($user->getEndDate()) ? 'Active' : 'Closed'; ?></td>
                                     <td><?php echo $user->getCreator()->getName(); ?></td>

@@ -40,7 +40,7 @@ class Client extends BaseEntity {
 		$this->hasColumn('resumefilename', 'string', 255);
 		$this->hasColumn('coverletterfilename', 'string', 255);
 		
-		$this->hasColumn('coachid', 'integer', null); # main couch
+		$this->hasColumn('coachid', 'integer', null); # main coach
 		$this->hasColumn('programid', 'integer', null);
 		$this->hasColumn('funderid', 'integer', null);
 		$this->hasColumn('servicetypeid', 'integer', null);
@@ -305,7 +305,7 @@ class Client extends BaseEntity {
 		
 		// if adding new client
 		if(isArrayKeyAnEmptyString('id', $formvalues) && !isArrayKeyAnEmptyString('userid', $formvalues)){
-			// check if adding new client so as to set supervisor assignment
+			// check if adding new client so as to set coach assignment
 			$formvalues['coachid'] = $formvalues['userid'];
 			$assignments = array(
 					1 => array(
@@ -617,7 +617,7 @@ class Client extends BaseEntity {
 		return $result;
 	}
 	# has been assigned
-	function hasBeenAssignedCouch() {
+	function hasBeenAssignedCoach() {
 		$query = Doctrine_Query::create()->from('Assignment a')
 		->where("a.clientid = '".$this->getID()."' AND a.status = 1 ");
 		//debugMessage($query->getSQLQuery());
