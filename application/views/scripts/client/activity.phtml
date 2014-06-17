@@ -1,0 +1,635 @@
+ <?php
+ 	$baseview = $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/activity');
+	$activity = new Activity();
+	if($step == 'view'){
+		$activities = $client->getClientActivities($request->voucherid); // debugMessage($activities->toArray()); // exit;
+		$activity_count = $activities->count();
+	}
+	if($step == 'edit' ){
+		$activity_count = '';
+		$activity->populate(decode($request->aid)); // debugMessage($activity->toArray());
+	}
+	if($step == 'new' ){
+		$activity_count = '';
+		$activity->setVoucherID($client->getInitialVoucherID());
+		$activity->setActivityDate(date('Y-m-d'));
+		if(!isEmptyString($request->vid)){
+			$theid = decode($request->vid);
+			if(is_numeric($request->vid)){
+				$theid = $request->vid;
+			}
+			$voucher = new Voucher();
+			$voucher->populate($theid);
+			$activity->setVoucherID($voucher->getID());
+		}
+	}
+	$vouchers = getClientVouchers($client->getID());
+	$hrsremaining = $activity->getVoucher()->getHoursRemaining();
+?>
+<script>
+	$(document).ready(function() {
+		<?php if($step == 'edit' || $step == 'new'){ ?>
+			// validation 
+			$("#form-activity").validate({		
+				// define the validation rules one field at a time
+				rules: {
+					voucherid: "required",
+					activitydate: "required",
+					coachid: "required",
+					starttime: "required",
+					endtime: "required",
+					activitytitle: "required",
+					starthour: "required",
+					startminute: "required",
+					endhour: "required",
+					endminute: "required",
+					expectedperformance: "required",
+					actualperformance: "required",
+					interventionplan: "required",
+					progressofintervention: "required",
+					billablehours: {
+						required: true,
+						min: 0.5,
+						maxhours: true 
+					}
+				}, 
+				// the messages for each of the fields being validated
+				messages: {		
+					voucherid: "<?php echo $this->translate("activity_voucherid_error"); ?>",
+					activitydate: "<?php echo $this->translate("activity_activitydate_error"); ?>",
+					coachid: "<?php echo $this->translate("activity_coach_error"); ?>",
+					starttime: "<?php echo $this->translate("activity_starttime_error"); ?>",
+					endtime: "<?php echo $this->translate("activity_endtime_error"); ?>",
+					activitytitle: "<?php echo $this->translate("activity_activitytitle_error"); ?>",
+					starthour: "<?php echo $this->translate("activity_hour_error"); ?>",
+					startminute: "<?php echo $this->translate("activity_minute_error"); ?>",
+					endhour: "<?php echo $this->translate("activity_hour_error"); ?>",
+					endminute: "<?php echo $this->translate("activity_minute_error"); ?>",
+					expectedperformance: "<?php echo $this->translate("activity_expectedperformance_error"); ?>",
+					actualperformance: "<?php echo $this->translate("activity_actualperformance_error"); ?>",
+					interventionplan: "<?php echo $this->translate("activity_interventionplan_error"); ?>",
+					progressofintervention: "<?php echo $this->translate("activity_progressofintervention_error"); ?>",
+					billablehours: {
+						required: "<?php echo $this->translate("activity_billablehours_error"); ?>",
+						min: "Minimum allowed is 0.5 hours"
+					}
+				},
+				// custom error positions
+				errorPlacement: function(error, element) {
+					switch(element.attr("name")){					
+						default:
+							if(element.hasClass("useid_error")){
+								error.appendTo("#"+element.attr("id")+"_error");
+							} else {
+								error.appendTo("#"+element.attr("name")+"_error");
+							}
+							break;
+					}			
+				}
+			});
+			
+			$('.edit, .requiredmark, .save_trigger, .cancel_trigger').removeClass('hidden');
+			$('.form-control-static.view, .update_trigger').addClass('hidden');
+			
+			$(".save_trigger, .save").click(function(e){
+				e.preventDefault();
+				var status = $("#status").val();
+				if ($("#form-activity").valid()) {
+					$.blockUI({ message: '<?php echo $blockcontent; ?>' }); 
+					$("#form-activity").submit();
+				}
+			});
+			
+			$(".starttime, .endtime, .breaks, #startsetting, #endsetting").change(function(e){
+				var adatev = $("#activitydate").val();
+				var starthr = $("#starthour").val();
+				var startmin = $("#startminute").val();
+				var endhr = $("#endhour").val();
+				var endmin = $("#endminute").val();
+				var hour_diff = 0;
+				// check that starthour and startminute have been specified
+				if(!isEmptyString(adatev) && parseInt(starthr) >= 0 && parseInt(startmin)>= 0){
+					var startstr = adatev+' '+starthr+':'+startmin+' '+$("#startsetting").val();
+					var s = new Date(startstr);
+					var startstamp = s.getTime(); // alert(startstamp);
+					// check that endhour and endminute have been specified
+					if(parseInt(endhr) >= 0 && parseInt(endmin) >= 0){
+						var endstr = adatev+' '+endhr+':'+endmin+' '+$("#endsetting").val(); // alert(endstr);
+						var e = new Date(endstr);
+						var endstamp = e.getTime(); // alert(endstamp);
+						var stampdiff = parseInt(endstamp) - parseInt(startstamp); // alert(stampdiff); // milliseconds between start and end
+						hour_diff = ((stampdiff/(1000*60*60))%24).toFixed(2);
+						// alert(hour_diff);
+						var brkhr = parseFloat($("#billablehour").val());
+						if(isEmptyString(brkhr)){
+							brkhr = 0;
+						}
+						var brkmin = parseFloat($("#billableminute").val());
+						if(isEmptyString(brkmin)){
+							brkmin = 0;
+						}
+						var breakhours = 0; 
+						if(parseInt(brkhr+brkmin) > 0){
+							breakhours = (brkhr + (brkmin/60)).toFixed(2);
+							$("#breakhours").val(breakhours);
+							hour_diff = (hour_diff - breakhours).toFixed(2); // alert(hour_diff);
+						}
+					}
+				}
+				$("#billablehours").val(hour_diff); // write difference to the billable hours field
+				// $("#billablehours").attr('readonly', true);
+			});
+			$(".starttime, .endtime, .breaks, #startsetting, #endsetting").trigger('change');
+			
+			<?php if($step == 'new'){ ?>
+				$("#voucherid").change(function(e){
+					var value = $(this).val();
+					var currentid = '<?php echo $activity->getVoucherID(); ?>'; // alert(value+'-'+currentid);
+					if(!isEmptyString(value) && value != currentid){
+						var url = '<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/activity/step/new/vid/'); ?>'+value;
+						var message = '<label class="blockcontainer notbolded">Are you sure you want to navigate to another Voucher? <br />Note that unsaved changes will be lost<br /><br /> Click <b>OK</b> to confirm, and <b>Cancel</b> to ignore</label>';
+						bootbox.confirm(message, function(confirmed) {
+							if(confirmed){
+								window.location.href = url;					
+							} else {
+								$("#voucherid").val(currentid);
+								bootbox.hideAll();
+								return false;
+							}
+						});
+					}
+				});
+			<?php } ?>
+		<?php } ?>
+	}); 
+</script>
+<form id="form-activity" class="form-horizontal activity" role="form" action="<?php echo $this->baseUrl("activity/create"); ?>" method="post">
+	<div class="btn-group pull-right" style="margin-top:-10px;">
+        <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+            Intervention Actions <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <?php if($step == 'view'){ ?>
+				<?php if($acl->checkPermission('Activity', ACTION_CREATE) && isEmptyString($request->aid)){ ?>	
+                    <li><a href="<?php echo $baseview.'/step/new'; ?>" title="New Intervention"><i class="glyphicon glyphicon-plus"></i> New Intervention</a></li>
+                <?php } ?>
+                <?php if($acl->checkPermission('Activity', ACTION_EDIT) && !isEmptyString($request->aid)){ ?>	
+                	<li><a class="<?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'update_trigger'; ?>" message="This Account is closed and updates are disabled." href="<?php echo $baseview.'/step/edit/aid/'.$request->aid; ?>" title="Update"><i class="glyphicon glyphicon-pencil"></i> Update Intervention</a></li>
+                <?php } ?>
+                <?php if(!isEmptyString($request->aid)){ ?>	
+                    <!--<li><a class="gonowhere" title="Print Intervention"><i class="glyphicon glyphicon-print"></i> Print Intervention</a></li>-->
+                <?php } ?>
+            <?php } ?>
+            <?php if($acl->checkPermission('Activity', ACTION_DELETE) && !isEmptyString($request->aid)){ ?>
+				<?php 
+                    $isdeletable = true;
+                    $message = '';
+                    if(!$client->isActive()){
+                        $isdeletable = false;
+                        $message = 'This Account is closed and updates are disabled!';
+                    }
+                ?>
+                <li><a class="gonowhere <?php echo !$isdeletable ? 'alert-dialog' : 'confirm-dialog'; ?>" title="Delete" message="<?php echo $message; ?> " action="<?php echo $this->baseUrl('activity/delete/id/'.encode($activity->getID())."/entityname/Activity/successurl/".encode($baseview)); ?>"><i class="glyphicon glyphicon-remove"></i> Delete Intervention</a></li>
+            <?php } ?>
+            <li><a href="<?php echo $baseview.'/step/view'; ?>" title="Intervention History"><i class="glyphicon glyphicon-list"></i> Intervention History</a></li>
+        </ul>
+    </div>
+    <?php if($step == 'edit' || $step == 'new'){ ?>
+        <input type="hidden" id="entityname" name="entityname" value="Activity" />
+        <input type="hidden" id="id" name="id" value="<?php echo encode($activity->getID()); ?>" />
+        <input type="hidden" id="clientid" name="clientid" value="<?php echo $client->getID(); ?>" />
+        <input type="hidden" class="successurl" id="<?php echo URL_SUCCESS; ?>" name="<?php echo URL_SUCCESS; ?>" value="<?php echo encode($baseview); ?>" />
+        <input type="hidden" class="failureurl" id="<?php echo URL_FAILURE; ?>" name="<?php echo URL_FAILURE; ?>" value="<?php echo encode($this->viewurl); ?>" />
+        <input type="hidden" id="<?php echo SUCCESS_MESSAGE; ?>" name="<?php echo SUCCESS_MESSAGE; ?>" value="<?php echo $successmessage; ?>" />
+        <input type="hidden" id="nosuccessid" name="nosuccessid" value="1" />
+    <?php } ?>
+    <div class="panel-body padding0">
+    	<div class="divider10"></div>
+		<?php if($step == 'new'){ ?>
+            <h5 class="inline margin0 bolded">Log New Intervention</h5>
+        <?php } ?>
+        <?php if($step == 'edit'){ ?>
+            <h5 class="inline margin0 bolded">Update Intervention</h5>
+        <?php } ?>
+        <div class="row-fluid margin0">
+            <div class="col-md-12 padding0 pull-right rightalign">
+                <?php if($step == 'edit' || $step == 'new'){ ?>
+                    <p class="margin0 lineblocked">
+                        <button type="submit" class="btn btn-success btn-sm button-submit save_trigger save" name="save"><i class="glyphicon glyphicon-ok"></i> <?php echo $step == 'new' ? $this->translate('global_button_save') : $this->translate('global_button_save_changes'); ?></button>
+                    </p>
+                    <p class="margin0 lineblocked">
+                        <a class="btn btn-default btn-sm cancel cancel_trigger"><i class="glyphicon glyphicon-remove"></i> <?php echo $this->translate('global_button_cancel'); ?></a>
+                    </p>
+                <?php } ?>
+            </div>
+        </div>
+       	<?php if($activity_count == 0 && $step == 'view'){ ?>
+        	<div class="divider15"></div>
+            <div style="clear:both;" class="alert alert-warning margin5">There are currently no interventions for <strong><?php echo $client->getName(); ?></strong></div>
+        <?php } ?>
+       
+		<?php if($activity_count > 0 && $step == 'view' && isEmptyString($request->aid)) { ?>
+            <div class="pagedescription">Viewing details for <strong><?php echo $activity_count == 1 ? '1 activity' : $activity_count.' interventions'; ?></strong></div>
+        <?php } ?>
+       
+		<?php if(!isEmptyString($request->aid) || $step == 'new' || $step == 'edit') { 
+            if(!isEmptyString($request->aid)){
+                $activity = new Activity();
+                $activity->populate(decode($request->aid));
+            }
+			$starthour = ''; $startminute = ''; $endhour = ''; $endminute = ''; $startsetting = $endsetting = 'AM';
+			if($step == 'new' || $step == 'edit'){
+				if(!isEmptyString($session->getVar(ERROR_MESSAGE))){ 
+					$formvalues = $session->getVar(FORM_VALUES);
+					$activity->processPost($formvalues);
+					if(!isArrayKeyAnEmptyString('starthour', $formvalues)){
+						$starthour = $formvalues['starthour'];
+					}
+					if(!isArrayKeyAnEmptyString('startminute', $formvalues)){
+						$startminute = $formvalues['startminute'];
+					}
+					if(!isArrayKeyAnEmptyString('endhour', $formvalues)){
+						$endhour = $formvalues['endhour'];
+					}
+					if(!isArrayKeyAnEmptyString('endminute', $formvalues)){
+						$endminute = $formvalues['endminute'];
+					}
+					if(!isArrayKeyAnEmptyString('startsetting', $formvalues)){
+						$startsetting = $formvalues['startsetting'];
+					}
+					if(!isArrayKeyAnEmptyString('endsetting', $formvalues)){
+						$endsetting = $formvalues['endsetting'];
+					}
+				}
+            }
+        ?>
+        	<?php if($step == 'new'){ ?>
+                <div class="divider10"></div>
+                <div style="clear:both;" class="alert alert-info margin5">Note: There are currently <strong><?php echo $hrsremaining; ?></strong> unused Hours on this Voucher</div>
+            <?php } ?>
+            <script>
+				$(document).ready(function() {
+					$.validator.addMethod("maxhours", function(value, element) {				
+						if(parseFloat(value) > parseFloat($("#remaininghours").val())){
+							return false;
+						}
+						return true;
+					}, "<?php echo "You have exceeded the available ".$hrsremaining." hours on this voucher."; ?>");
+				});
+			</script>
+            <fieldset class="fieldsetcontainer">
+                <legend>Summary</legend>
+                <div class="panel-body well-sm makerelative">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("voucher_voucher_label"); ?>:</label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><a href="<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/voucher/vid/'.encode($activity->getVoucherID())); ?>"><?php echo $activity->getVoucher()->isFollowAlong() ? $activity->getVoucher()->getfavoucherno(): $activity->getVoucher()->getvoucherno(); ?></a></p>
+                                <div class="edit">
+                                    <?php
+										$dropdown = new Zend_Form_Element_Select('voucherid',
+															array(
+																'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $vouchers),
+																'view' => new Zend_View(),
+																'decorators' => array('ViewHelper'),
+																'class' => array('form-control','input-sm'),
+															)
+										);  
+										$dropdown->setValue($activity->getVoucherID()); 
+										echo $dropdown->render();
+									?><div id="voucherid_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("activity_coach_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo $activity->getCoach()->getName(); ?></p>
+                                <div class="edit">
+                                    <?php
+										$allvalues = getUsersAssignedToClient($client->getID(), 1);
+										reset($allvalues);
+										$defaultuserid = key($allvalues);
+										if(!isEmptyString($activity->getCoachID())){
+											$defaultuserid = $activity->getCoachID();
+										}
+										$dropdown = new Zend_Form_Element_Select('coachid',
+															array(
+																'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $allvalues),
+																'view' => new Zend_View(),
+																'decorators' => array('ViewHelper'),
+																'class' => array('form-control','input-sm'),
+															)
+										);  
+										$dropdown->setValue($defaultuserid); 
+										echo $dropdown->render();
+									?>
+                                    <div id="coachid_error"></div>
+                                </div>      
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                    	
+                        
+                    </div>
+                </div>
+            </fieldset>          
+            <fieldset class="fieldsetcontainer">
+                <legend>Duration</legend>
+                <div class="panel-body well-sm makerelative">
+                    <div class="col-md-8">
+                    	<div class="form-group">
+                            <label class="col-md-3 control-label"><?php echo $this->translate("activity_activitydate_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-9">
+                                <p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($activity->getActivityDate()); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm datefield readonly width100" name="activitydate" id="activitydate" value="<?php echo changeMySQLDateToPageFormat($activity->getActivityDate()); ?>" />
+                                    <div id="activitydate_error"></div>
+                                </div>      
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label"><?php echo $this->translate("activity_starttime_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-9">
+                                <p class="form-control-static nullifempty view"><?php echo formatTime($activity->getStartTime()); ?></p>
+                                <div class="edit">
+                                	<?php
+										
+										if(!isEmptyString($activity->getStartTime())){ // debugMessage($activity->getStartTime());
+											$starthour = date('H', strtotime($activity->getStartTime()));
+											$startminute = date('i', strtotime($activity->getStartTime()));
+											$startsetting = date('A', strtotime($activity->getStartTime()));
+											if($starthour >= 12){
+												$startsetting = 'PM';
+												if($starthour > 12){
+													$starthour = $starthour-12;
+												}
+											}
+										}
+										if(!isEmptyString($activity->getEndTime())){ // debugMessage($activity->getEndTime());
+											$endhour = date('H', strtotime($activity->getEndTime()));
+											$endminute = date('i', strtotime($activity->getEndTime()));
+											$endsetting = date('A', strtotime($activity->getEndTime()));
+											if($endhour >= 12){
+												$endsetting = 'PM';
+												if($endhour > 12){
+													$endhour = $endhour-12;
+												}
+											}
+										}
+									?>
+                                	<?php
+                                        $dropdown = new Zend_Form_Element_Select('starthour',
+                                                            array(
+                                                                'multiOptions' => array_merge_maintain_keys(array('' => 'Hour'), getHoursForTimePicker()),
+                                                                'view' => new Zend_View(),
+                                                                'decorators' => array('ViewHelper'),
+                                                                'class' => array('form-control','input-sm','inline','starttime'),
+																'style' => 'width:80px;'
+                                                            )
+                                        );  
+                                        $dropdown->setValue($starthour); 
+                                        echo $dropdown->render();
+                                    ?> &nbsp;
+                                    <?php
+                                        $dropdown = new Zend_Form_Element_Select('startminute',
+                                                            array(
+                                                                'multiOptions' => array_merge_maintain_keys(array('' => 'Minute'), getMinutesForTimePicker()),
+                                                                'view' => new Zend_View(),
+                                                                'decorators' => array('ViewHelper'),
+                                                                'class' => array('form-control','input-sm','inline','starttime'),
+																'style' => 'width:85px;'
+                                                            )
+                                        );  
+                                        $dropdown->setValue($startminute); 
+                                        echo $dropdown->render();
+                                    ?> &nbsp;
+                                    <?php
+                                        $dropdown = new Zend_Form_Element_Select('startsetting',
+                                                            array(
+                                                                'multiOptions' => getTimeSetting(),
+                                                                'view' => new Zend_View(),
+                                                                'decorators' => array('ViewHelper'),
+                                                                'class' => array('form-control','input-sm','inline'),
+																'style' => 'width:70px;'
+                                                            )
+                                        );  
+                                        $dropdown->setValue($startsetting); 
+                                        echo $dropdown->render();
+                                    ?>
+                                    <div id="starthour_error"></div><div id="startminute_error"></div>
+                                </div>      
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label"><?php echo $this->translate("activity_endtime_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-9">
+                                <p class="form-control-static nullifempty view"><?php echo formatTime($activity->getEndTime()); ?></p>
+                                <div class="edit">
+                                    <?php
+                                        $dropdown = new Zend_Form_Element_Select('endhour',
+                                                            array(
+                                                                'multiOptions' => array_merge_maintain_keys(array('' => 'Hour'), getHoursForTimePicker()),
+                                                                'view' => new Zend_View(),
+                                                                'decorators' => array('ViewHelper'),
+                                                                'class' => array('form-control','input-sm','inline','endtime'),
+																'style' => 'width:80px;'
+                                                            )
+                                        );  
+                                        $dropdown->setValue($endhour); 
+                                        echo $dropdown->render();
+                                    ?> &nbsp;
+                                    <?php
+                                        $dropdown = new Zend_Form_Element_Select('endminute',
+                                                            array(
+                                                                'multiOptions' => array_merge_maintain_keys(array('' => 'Minute'), getMinutesForTimePicker()),
+                                                                'view' => new Zend_View(),
+                                                                'decorators' => array('ViewHelper'),
+                                                                'class' => array('form-control','input-sm','inline','endtime'),
+																'style' => 'width:85px;'
+                                                            )
+                                        );  
+                                        $dropdown->setValue($endminute); 
+                                        echo $dropdown->render();
+                                    ?> &nbsp;
+                                    <?php
+                                        $dropdown = new Zend_Form_Element_Select('endsetting',
+                                                            array(
+                                                                'multiOptions' => getTimeSetting(),
+                                                                'view' => new Zend_View(),
+                                                                'decorators' => array('ViewHelper'),
+                                                                'class' => array('form-control','input-sm','inline'),
+																'style' => 'width:70px;'
+                                                            )
+                                        );  
+                                        $dropdown->setValue($endsetting); 
+                                        echo $dropdown->render();
+                                    ?>
+                                    <div id="endhour_error"></div><div id="endminute_error"></div>
+                                </div>      
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label"><?php echo $this->translate("activity_break_label"); ?>:</label>
+                            <div class="col-md-9">
+                                <p class="form-control-static nullifempty view"><?php echo formatNumber($activity->getBreakHours()); ?></p>
+                                <div class="edit">
+                                    <?php
+										$billablehour = ''; $billableminute = ''; 
+										$billablehours = 0; $breakhours = 0;
+										if(!isEmptyString($activity->getbillablehours())){
+											$billablehours = $activity->getbillablehours();
+										}
+										if(!isEmptyString($activity->getBreakHours())){
+											$breakhours = $activity->getBreakHours();
+											$bhm = decimalToTime($activity->getBreakHours()); // debugMessage('>>'.$bhm);
+											$break_array = explode(':', $bhm);
+											$billablehour = $break_array[0];
+											$billableminute = $break_array[1];
+										}
+										
+                                        $dropdown = new Zend_Form_Element_Select('billablehour',
+                                                            array(
+                                                                'multiOptions' => array_merge_maintain_keys(array('' => 'Hour'), getHoursForTimePicker()),
+                                                                'view' => new Zend_View(),
+                                                                'decorators' => array('ViewHelper'),
+                                                                'class' => array('form-control','input-sm','inline','breaks'),
+																'style' => 'width:80px;'
+                                                            )
+                                        );  
+                                        $dropdown->setValue($billablehour); 
+                                        echo $dropdown->render();
+                                    ?> &nbsp;
+                                    <?php
+                                        $dropdown = new Zend_Form_Element_Select('billableminute',
+                                                            array(
+                                                                'multiOptions' => array_merge_maintain_keys(array('' => 'Minute'), getMinutesForTimePicker()),
+                                                                'view' => new Zend_View(),
+                                                                'decorators' => array('ViewHelper'),
+                                                                'class' => array('form-control','input-sm','inline','breaks'),
+																'style' => 'width:85px;'
+                                                            )
+                                        );  
+                                        $dropdown->setValue($billableminute); 
+                                        echo $dropdown->render();
+                                    ?> &nbsp;
+                                    <input type="hidden" class="form-control" name="breakhours" id="breakhours" value="<?php echo $breakhours; ?>" />
+                                </div>      
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label"><?php echo $this->translate("activity_billablehours_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-9">
+                                <p class="form-control-static nullifempty view"><?php echo formatNumber($activity->getBillableHours()); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control readonly width80 centeralign inline" name="billablehours" id="billablehours" value="<?php echo $billablehours; ?>" /><div id="billablehours_error"></div>
+                                    <input type="hidden" class="form-control" name="remaininghours" id="remaininghours" value="<?php echo $hrsremaining; ?>" />
+                                </div>      
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                    
+                    </div>
+              	</div>
+        	</fieldset>
+            <fieldset class="fieldsetcontainer">
+                <legend>Intervention Progress Details</legend>
+                <div class="panel-body well-sm makerelative">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-md-12 control-label"><?php echo $this->translate("activity_progressofintervention_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-12">
+                                <p class="form-control-static nullifempty view"><?php echo $activity->getprogressofintervention(); ?></p>
+                                <div class="edit">
+                                    <textarea class="form-control expanding" name="progressofintervention" id="progressofintervention"><?php echo $activity->getprogressofintervention(); ?></textarea><div id="progressofintervention_error"></div>
+                                </div>
+                       		</div>
+                     	</div>
+                        <div class="form-group">
+                            <label class="col-md-12 control-label"><?php echo $this->translate("activity_expectedperformance_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-12">
+                                <p class="form-control-static nullifempty view"><?php echo $activity->getexpectedperformance(); ?></p>
+                                <div class="edit">
+                                    <textarea class="form-control expanding" name="expectedperformance" id="expectedperformance"><?php echo $activity->getexpectedperformance(); ?></textarea><div id="expectedperformance_error"></div>
+                                </div>
+                       		</div>
+                     	</div>
+                        <div class="form-group">
+                            <label class="col-md-12 control-label"><?php echo $this->translate("activity_actualperformance_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-12">
+                                <p class="form-control-static nullifempty view"><?php echo $activity->getactualperformance(); ?></p>
+                                <div class="edit">
+                                    <textarea class="form-control expanding" name="actualperformance" id="actualperformance"><?php echo $activity->getactualperformance(); ?></textarea><div id="actualperformance_error"></div>
+                                </div>
+                       		</div>
+                     	</div>
+                        <div class="form-group">
+                            <label class="col-md-12 control-label"><?php echo $this->translate("activity_interventionplan_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-12">
+                                <p class="form-control-static nullifempty view"><?php echo $activity->getinterventionplan(); ?></p>
+                                <div class="edit">
+                                    <textarea class="form-control expanding" name="interventionplan" id="interventionplan"><?php echo $activity->getinterventionplan(); ?></textarea><div id="interventionplan_error"></div>
+                                </div>
+                       		</div>
+                     	</div>
+                        
+                 	</div>
+           		</div>
+       		</fieldset>
+            <div class="row-fluid margin0">
+                <div class="col-md-12 padding0 pull-right rightalign">
+                    <?php if($step == 'edit' || $step == 'new'){ ?>
+                        <p class="margin0 lineblocked">
+                            <button type="submit" class="btn btn-success btn-sm button-submit save_trigger save" name="save"><i class="glyphicon glyphicon-ok"></i> <?php echo $step == 'new' ? $this->translate('global_button_save') : $this->translate('global_button_save_changes'); ?></button>
+                        </p>
+                        <p class="margin0 lineblocked">
+                            <a class="btn btn-default btn-sm cancel cancel_trigger"><i class="glyphicon glyphicon-remove"></i> <?php echo $this->translate('global_button_cancel'); ?></a>
+                        </p>
+                    <?php } ?>
+                </div>
+            </div>
+        <?php } ?>
+        <?php if(isEmptyString($request->aid) && $step == 'view') { ?>
+            <div class="divider5"></div>
+            <div class="col-md-12 padding0">
+            	<div class="listcontainer">
+                    <table class="table list table-striped table-responsive viewtable">
+                        <thead>
+                            <tr>
+                                <th class="centeralign" style="width:15px;">Details</th>
+                                <th class="nowrapping"><?php echo $this->translate('voucher_voucherno_label'); ?></th>
+                                <th class="nowrapping"><?php echo $this->translate('activity_activitydate_label'); ?></th>
+                                <th class="nowrapping"><?php echo $this->translate('activity_coach_label'); ?><img src="<?php echo $this->baseUrl('images/spacer.gif'); ?>" style="width:75px; height:2px;" /></th>
+                                <th class="nowrapping"><?php echo $this->translate('activity_starttime_label'); ?></th>
+                                <th class="nowrapping"><?php echo $this->translate('activity_endtime_label'); ?></th>
+                                <th class="nowrapping"><?php echo $this->translate('activity_break_label'); ?></th>
+                                <th class="nowrapping"><?php echo $this->translate('activity_billablehours_label'); ?></th>
+                                <th class="nowrapping"><?php echo $this->translate('activity_activitysummary_label'); ?><img src="<?php echo $this->baseUrl('images/spacer.gif'); ?>" style="width:150px; height:2px;" /></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           <?php 
+                                $counter = 1;
+                                foreach($activities as $activity){ 
+                           ?>
+                                <tr>
+                                    <td class="centeralign"><a href="<?php echo $baseview.'/step/view/aid/'.encode($activity->getID()); ?>" class="btn btn-default btn-xs">View</a></td>
+                                    <td><?php echo $activity->getVoucher()->isFollowAlong() ? $activity->getVoucher()->getfavoucherno(): $activity->getVoucher()->getvoucherno(); ?></td>
+                                    <td><?php echo formatDateAndTime($activity->getActivityDate(), false); ?></td>
+                                    <td><?php echo $activity->getCoach()->getName(); ?></td>
+                                    <td><?php echo date('H:i a', strtotime($activity->getStartTime())); ?></td>
+                                    <td><?php echo date('H:i a', strtotime($activity->getEndTime())); ?></td>
+                                    <td><?php echo formatNumber($activity->getBreakHours()); ?></td>
+                                    <td><?php echo formatNumber($activity->getBillableHours()); ?></td>
+                                    <td><?php echo snippet($activity->getprogressofintervention(), 100, '<a href="'.$baseview.'/step/view/aid/'.encode($activity->getID()).'">...more</a>'); ?></td>
+                                </tr>
+                            <?php $counter++; } ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        <?php } ?>
+    </div>
+</form>

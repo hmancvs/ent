@@ -764,6 +764,20 @@
 		}
 		return $array;
 	}
+	# return the follow along types
+	function getFAServiceTypes($value = ''){
+		$query = "SELECT s.id as optionvalue, s.alias as optiontext FROM service s where s.type = 3 order by optiontext ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			if(!isArrayKeyAnEmptyString($value, $array)){
+				return $array[$value];
+			} else {
+				return '';
+			}
+		}
+		return $array;
+	}
 	# check for funders
 	function getFunders($value = ''){
 		$query = "SELECT c.id as optionvalue, c.alias as optiontext FROM company c where c.type = 1 order by optiontext ";
@@ -1004,6 +1018,13 @@
 				return '';
 			}
 		}
+		return $array;
+	}
+	# determine the list of vouchers for the client
+	function getClientVouchers($clientid){
+		$query = "SELECT v.id as optionvalue, if(v.type = 2, concat(v.favoucherno,' [',s.alias,']'), concat(v.voucherno,' [',s.alias,']')) as optiontext FROM voucher AS v LEFT JOIN service AS s ON v.servicetypeid = s.id where v.clientid = '".$clientid."' group by v.id order by s.alias ";
+		// debugMessage($query); // exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
 		return $array;
 	}
 	# determine the hours dropdown for timepicker

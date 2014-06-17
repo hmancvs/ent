@@ -1,6 +1,6 @@
 <?php
 
-class VoucherController extends IndexController  {
+class ActivityController extends IndexController  {
 	
 	/**
 	 * Override unknown actions to enable ACL checking 
@@ -11,7 +11,7 @@ class VoucherController extends IndexController  {
 	 */
 	public function getActionforACL() {
 	 	$action = strtolower($this->getRequest()->getActionName()); 
-	 	if($action == "processvoucher" ){
+	 	if($action == "processactivity" ){
 	 		return ACTION_CREATE;
 	 	}
 		return parent::getActionforACL();
@@ -29,28 +29,28 @@ class VoucherController extends IndexController  {
     		$this->_setParam('createdby', $session->getVar('userid'));
     	}
     	
-    	$formvalues = $this->_getAllParams(); debugMessage($formvalues); // exit(); 
+    	$formvalues = $this->_getAllParams(); // debugMessage($formvalues); // exit(); 
     	// debugMessage($formvalues);
     	
-    	$voucher = new Voucher();
+    	$activity = new Activity();
     	if(!isEmptyString($id)){
     		# if voucher already, fetch existing entry
-    		$voucher->populate(decode($id)); // debugMessage($voucher->toArray());
+    		$activity->populate(decode($id)); // debugMessage($activity->toArray());
     	}
     	
     	# process the voucher
-    	$voucher->processPost($formvalues); // debugMessage($voucher->toArray()); debugMessage('error is '.$voucher->getErrorStackAsString()); exit();
+    	$activity->processPost($formvalues); // debugMessage($activity->toArray()); debugMessage('error is '.$activity->getErrorStackAsString()); exit();
     	
     	# check for processing errors
-    	if($voucher->hasError()){
-    		$session->setVar(ERROR_MESSAGE, $voucher->getErrorStackAsString());
+    	if($activity->hasError()){
+    		$session->setVar(ERROR_MESSAGE, $activity->getErrorStackAsString());
     		$session->setVar(FORM_VALUES, $formvalues);
     		$this->_helper->redirector->gotoUrl(decode($this->_getParam('failureurl')));
     	}
     	
     	try {
     		// save the voucher and return to success page (client view)
-    		$voucher->save(); // debugMessage('ssaved perfect');
+    		$activity->save(); // debugMessage('ssaved perfect');
     		if(isEmptyString($id)){
     			$session->setVar(SUCCESS_MESSAGE, $this->_translate->translate('global_save_success'));
     		} else {

@@ -53,6 +53,7 @@
 	
 	if($tab == 'voucher'){
 		$services = getServiceTypes();
+		$faservices = getFAServiceTypes();
 		$programs = getPrograms();
 		$funders = getFunders();
 		$voucherstatuses = getVoucherStatuses();
@@ -83,7 +84,7 @@
 		$("#dateofbirth").datepicker(dateofbirthOpts);
 		
 		dateofbirthOpts.yearRange = "-<?php echo date('Y')-2010; ?>:-0"; 
-		datepickerOpts.maxDate = new Date();
+		// datepickerOpts.maxDate = new Date();
 		$("#dateapproved, #startdate, #enddate, #invoicedate, #medicalstartdate, #activitydate").datepicker(dateofbirthOpts);
 		
 		var tab = '<?php echo $tab; ?>';
@@ -449,76 +450,6 @@
 		<?php } ?>
 		
 		<?php if($tab == 'voucher' && ($step == 'edit' || $step == 'new')){ ?>
-			// validation 
-			$("#form-voucher").validate({		
-				// define the validation rules one field at a time
-				rules: {
-					funderid: {
-						required: true
-					},
-					servicetypeid: {
-						required: true
-					},
-					hours: {
-						required: true
-					},
-					rate: {
-						required: true
-					},
-					voucherno: {
-						required: true
-					},
-					days: {
-						required: true
-					},		
-					dateapproved: {
-						required: true
-					},
-					startdate: {
-						required: true
-					}
-				}, 
-				// the messages for each of the fields being validated
-				messages: {		
-					funderid: {
-						required: "<?php echo $this->translate("voucher_funderid_error"); ?>"
-					},
-					servicetypeid: {
-						required: "<?php echo $this->translate("voucher_servicetypeid_error"); ?>"
-					},
-					hours: {
-						required: "<?php echo $this->translate("voucher_hours_error"); ?>"
-					},
-					rate: {
-						required: "<?php echo $this->translate("voucher_voucherrate_error"); ?>"
-					},
-					voucherno: {
-						required: "<?php echo $this->translate("voucher_voucherno_error"); ?>"
-					},
-					days: {
-						required: "<?php echo $this->translate("voucher_days_error"); ?>"
-					},				
-					dateapproved: {
-						required: "<?php echo $this->translate("voucher_dateapproved_error"); ?>"
-					},
-					startdate: {
-						required: "<?php echo $this->translate("voucher_startdate_error"); ?>"
-					}
-				},
-				// custom error positions
-				errorPlacement: function(error, element) {
-					switch(element.attr("name")){					
-						default:
-							if(element.hasClass("useid_error")){
-								error.appendTo("#"+element.attr("id")+"_error");
-							} else {
-								error.appendTo("#"+element.attr("name")+"_error");
-							}
-							break;
-					}			
-				}
-			});
-			
 			$('.edit, .requiredmark, .save_trigger, .cancel_trigger').removeClass('hidden');
 			$('.form-control-static.view, .update_trigger').addClass('hidden');
 			
@@ -530,6 +461,19 @@
 					$("#form-voucher").submit();
 				}
 			});
+			
+			$("#servicetypeid").change(function(e){
+				var value = $(this).val();
+				if(value == 3 || value == 5){
+					enableContainerByID('intensive');
+					$("#type").attr('checked', true);
+				} else {
+					disableContainerByID('intensive');
+					$("#type").attr('checked', false);
+				}
+			});
+			$("#servicetypeid").trigger('change');
+			
 		<?php } ?>
 		
 		<?php if($tab == 'activity' && ($step == 'edit' || $step == 'new')){ ?>
@@ -537,6 +481,7 @@
 			$("#form-activity").validate({		
 				// define the validation rules one field at a time
 				rules: {
+					voucherid: "required",
 					activitydate: "required",
 					coachid: "required",
 					starttime: "required",
@@ -558,6 +503,7 @@
 				}, 
 				// the messages for each of the fields being validated
 				messages: {		
+					voucherid: "<?php echo $this->translate("activity_voucherid_error"); ?>",
 					activitydate: "<?php echo $this->translate("activity_activitydate_error"); ?>",
 					coachid: "<?php echo $this->translate("activity_coach_error"); ?>",
 					starttime: "<?php echo $this->translate("activity_starttime_error"); ?>",

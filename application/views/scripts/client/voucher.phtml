@@ -1,31 +1,115 @@
  <?php
+ 	$voucher = new Voucher();
  	$baseview = $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/voucher');
 	if($step == 'view'){
 		$vouchers = $client->getClientVouchers(); // debugMessage($vouchers->toArray());
 		$voucher_count = $vouchers->count();
 	}
-	if($step == 'edit' ){
+	if(!isEmptyString($request->vid)){
 		$voucher_count = '';
-		$voucher = new Voucher();
 		$voucher->populate(decode($request->vid)); // debugMessage($voucher->toArray());
 	}
 	if($step == 'new' ){
 		$voucher_count = '';
-		$voucher = new Voucher(); // debugMessage('>> '.$client->getServiceTypeID());
+		$voucher->setServiceTypeID($client->getServiceTypeID());
+		$voucher->setType(1);
+		$voucher->setClientID($client->getID());
 	}
 	
+	$isfollowalong = false;
+	if(!isEmptyString($request->faid) || $voucher->isFollowAlong()){
+		$isfollowalong = true;
+		$favoucher = new Voucher();
+		$favoucher->populate(decode($request->faid));
+		// debugMessage($favoucher->toArray());
+		if($step == 'new'){
+			$voucher->setStatus('2');
+			$voucher->setFaVoucherNo($favoucher->getfaprefix());
+			$voucher->setType(2);
+			$voucher->setParentID($favoucher->getID());
+			$voucher->setRate($favoucher->getRate());
+		}
+	}
+	
+	if(!isEmptyString($session->getVar(ERROR_MESSAGE))){ 
+		$formvalues = $session->getVar(FORM_VALUES);
+		$voucher->processPost($formvalues);
+	}
 ?>
+<script>
+	$(document).ready(function() {
+		<?php if($step == 'edit' || $step == 'new'){ ?>
+			$('.edit, .requiredmark, .save_trigger, .cancel_trigger').removeClass('hidden');
+			$('.form-control-static.view, .update_trigger').addClass('hidden');
+			
+			$(".save_trigger, .save").click(function(e){
+				e.preventDefault();
+				var status = $("#status").val();
+				if ($("#form-voucher").valid()) {
+					$.blockUI({ message: '<?php echo $blockcontent; ?>' }); 
+					$("#form-voucher").submit();
+				}
+			});
+			
+			$("#servicetypeid").change(function(e){
+				var value = $(this).val();
+				if(value == 3 || value == 5){
+					enableContainerByID('intensive');
+					$("#type").attr('checked', true);
+				} else {
+					disableContainerByID('intensive');
+					$("#type").attr('checked', false);
+				}
+			});
+			$("#servicetypeid").trigger('change');
+			
+		<?php } ?>
+	}); 
+</script>	        
 <form id="form-voucher" class="form-horizontal voucher" role="form" action="<?php echo $this->baseUrl("voucher/create"); ?>" method="post">
-	<?php if($step == 'view'){ ?>
-        <p class="margin0 lineblocked makeabsolute" style="right:30px; top:5px;">
-        	<?php if($acl->checkPermission('Voucher', ACTION_CREATE) && isEmptyString($request->vid)){ ?>	
-            	<a class="btn btn-sm btn-primary" href="<?php echo $baseview.'/step/new'; ?>" title="New Voucher"><i class="glyphicon glyphicon-plus"></i> New Voucher</a>
+	<div class="btn-group pull-right" style="margin-top:-10px;">
+        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+            Voucher Actions <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <?php if($step == 'view'){ ?>
+				<?php if($acl->checkPermission('Voucher', ACTION_CREATE) && isEmptyString($request->vid)){ ?>	
+                    <li><a href="<?php echo $baseview.'/step/new'; ?>" title="New Voucher"><i class="glyphicon glyphicon-plus"></i> New Voucher</a></li>
+                <?php } ?>
+                <?php if($acl->checkPermission('Voucher', ACTION_EDIT) && !isEmptyString($request->vid)){ ?>	
+                	<li><a class="<?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'update_trigger'; ?>" message="This Account is closed and updates are disabled." href="<?php echo $baseview.'/step/edit/vid/'.encode($voucher->getID()); ?>" title="Update"><i class="glyphicon glyphicon-pencil"></i> Update Voucher</a></li>
+                <?php } ?>
+                <?php if(!isEmptyString($request->vid)){ ?>
+                    <?php if($acl->checkPermission('Voucher', ACTION_CREATE)){ ?>	
+                        <li><a href="<?php echo $baseview.'/step/new/faid/'.$request->vid; ?>"><i class="glyphicon glyphicon-arrow-right"></i> Request F/A</a></li>
+                    <?php } ?>    
+                <?php } ?>
+                <?php if($acl->checkPermission('Activity', ACTION_CREATE) && !isEmptyString($request->vid)){ ?>	
+                    <li><a href="<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/activity/step/new/vid/'.encode($voucher->getID())); ?>" title="New Intervention"><i class="glyphicon glyphicon-plus"></i> Log New Intervention</a></li>
+                    <li><a href="<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/activity/step/view/voucherid/'.$voucher->getID()); ?>" title=" Intervention History"><i class="glyphicon glyphicon-list"></i> Intervention History</a></li>
+                    <!--<li><a class="gonowhere" title="Print Voucher"><i class="glyphicon glyphicon-print"></i> Print Voucher</a></li>
+                    <li><a class="gonowhere" title="Print Voucher"><i class="glyphicon glyphicon-signal"></i> Billable Hours Report</a></li>
+                    <li><a class="gonowhere" title="Print Voucher"><i class="glyphicon glyphicon-signal"></i> Activity Log Report</a></li>-->
+                <?php } ?>
             <?php } ?>
-            <?php if(!isEmptyString($request->vid)){ ?>
-                <a class="btn btn-sm btn-primary" href="<?php echo $baseview.'/step/view'; ?>" title="All Vouchers"><i class="glyphicon glyphicon-list"></i> Voucher History</a>
+            <?php if($acl->checkPermission('Voucher', ACTION_DELETE) && !isEmptyString($request->vid)){ ?>
+				<?php 
+                    $isdeletable = true;
+                    $message = '';
+                    if($client->getInitialVoucherID() == $voucher->getID()){
+                        $isdeletable = false;
+                        $message = 'The Initial Service Voucher cannot be deleted. Only updates are allowed!';
+                    }
+                    if($voucher->hasActivities()){
+                        $isdeletable = false;
+                        $message = 'This Voucher has Intervention Activities and delete is disabled!';
+                    }
+                ?>
+                <li><a class="gonowhere <?php echo !$isdeletable ? 'alert-dialog' : 'confirm-dialog'; ?>" title="Delete" message="<?php echo $message; ?> " action="<?php echo $this->baseUrl('voucher/delete/id/'.encode($voucher->getID())."/entityname/Voucher/successurl/".encode($baseview)); ?>"><i class="glyphicon glyphicon-remove"></i> Delete Voucher</a></li>
             <?php } ?>
-        </p>
-    <?php } ?>
+            <li><a href="<?php echo $baseview.'/step/view'; ?>" title="All Vouchers"><i class="glyphicon glyphicon-list"></i> Voucher History</a></li>
+        </ul>
+    </div>
     <?php if($step == 'edit' || $step == 'new'){ ?>
         <input type="hidden" id="entityname" name="entityname" value="Voucher" />
         <input type="hidden" id="id" name="id" value="<?php echo encode($voucher->getID()); ?>" />
@@ -34,11 +118,13 @@
         <input type="hidden" class="failureurl" id="<?php echo URL_FAILURE; ?>" name="<?php echo URL_FAILURE; ?>" value="<?php echo encode($this->viewurl); ?>" />
         <input type="hidden" id="<?php echo SUCCESS_MESSAGE; ?>" name="<?php echo SUCCESS_MESSAGE; ?>" value="<?php echo $successmessage; ?>" />
         <input type="hidden" id="nosuccessid" name="nosuccessid" value="1" />
+        <input type="hidden" name="type" id="type" value="<?php echo $voucher->getType(); ?>" />
+        <input type="hidden" name="parentid" id="parentid" value="<?php echo $voucher->getParentID(); ?>" />
     <?php } ?>
     <div class="panel-body padding0">
     	<div class="divider10"></div>
 		<?php if($step == 'new'){ ?>
-            <h5 class="inline margin0 bolded">Enter new Voucher</h5>
+            <h5 class="inline margin0 bolded"><?php echo !isEmptyString($request->faid) ? 'Request Follow Along Voucher' : 'Enter new Voucher'; ?></h5>
         <?php } ?>
         <?php if($step == 'edit'){ ?>
             <h5 class="inline margin0 bolded">Update Voucher</h5>
@@ -55,7 +141,7 @@
                 <?php } ?>
             </div>
         </div>
-       	<?php if($voucher_count == 0 && $step == 'view'){ ?>
+       	<?php if($voucher_count == 0 && $step == 'view' && isEmptyString($request->vid)){ ?>
         	<div class="divider15"></div>
             <div style="clear:both;" class="alert alert-warning margin5">There are currently no vouchers for <strong><?php echo $client->getName(); ?></strong></div>
         <?php } ?>
@@ -63,53 +149,110 @@
 		<?php if($voucher_count > 0 && $step == 'view' && isEmptyString($request->vid)) { ?>
             <div class="pagedescription">Viewing details for <strong><?php echo $voucher_count == 1 ? '1 Voucher' : $voucher_count.' Vouchers'; ?></strong></div>
         <?php } ?>
-       
-		<?php if(!isEmptyString($request->vid) || $step == 'new' || $step == 'edit') { 
-            if(!isEmptyString($request->vid)){
-                $voucher = new Voucher();
-                $voucher->populate(decode($request->vid));
-            }
-			if($step == 'new'){
-				$voucher->setServiceTypeID($client->getServiceTypeID());
-				if(!isEmptyString($session->getVar(ERROR_MESSAGE))){ 
-					$formvalues = $session->getVar(FORM_VALUES);
-					$voucher->processPost($formvalues);
-				}
-            }
-        ?>
+       	<?php if(!isEmptyString($request->vid) || $step == 'edit' || $step == 'new'){ ?>
+        
+        <script>
+			$(document).ready(function() {
+				// validation 
+				$("#form-voucher").validate({		
+					// define the validation rules one field at a time
+					rules: {
+						funderid: "required",
+						servicetypeid: "required",
+						hours: {
+							required: true
+						},
+						rate: {
+							required: true
+						},
+						<?php if(!$isfollowalong){ ?>
+							voucherno: "required",
+						<?php } ?>
+						favoucherno: "required",
+						faprefix: {
+							required: "#type:checked"
+						},	
+						days: {
+							required: true
+						},
+						<?php if(!$isfollowalong){ ?>			
+							dateapproved: "required",
+						<?php } ?>
+						<?php if($isfollowalong){ ?>			
+							enddate: "required",
+						<?php } ?>
+						startdate: "required",
+						status: "required"
+					}, 
+					// the messages for each of the fields being validated
+					messages: {		
+						funderid: "<?php echo $this->translate("voucher_funderid_error"); ?>",
+						servicetypeid: "<?php echo $this->translate("voucher_servicetypeid_error"); ?>",
+						hours: {
+							required: "<?php echo $this->translate("voucher_hours_error"); ?>"
+						},
+						rate: {
+							required: "<?php echo $this->translate("voucher_voucherrate_error"); ?>"
+						},
+						<?php if(!$isfollowalong){ ?>
+							voucherno: "<?php echo $this->translate("voucher_voucherno_error"); ?>",
+						<?php } ?>
+						favoucherno: "<?php echo $this->translate("voucher_favoucherno_error"); ?>",
+						faprefix: {
+							required: "<?php echo $this->translate("voucher_faprefix_error"); ?>"
+						},
+						days: {
+							required: "<?php echo $this->translate("voucher_days_error"); ?>"
+						},	
+						<?php if(!$isfollowalong){ ?>					
+						dateapproved: "<?php echo $this->translate("voucher_dateapproved_error"); ?>",
+						<?php } ?>
+						startdate: "<?php echo $this->translate("voucher_startdate_error"); ?>",
+						fastartdate: "<?php echo $this->translate("voucher_startdate_error"); ?>",
+						<?php if($isfollowalong){ ?>			
+							enddate: "<?php echo $this->translate("voucher_enddate_error"); ?>",
+						<?php } ?>
+						status: "<?php echo $this->translate("voucher_status_error"); ?>"
+					},
+					// custom error positions
+					errorPlacement: function(error, element) {
+						switch(element.attr("name")){					
+							default:
+								if(element.hasClass("useid_error")){
+									error.appendTo("#"+element.attr("id")+"_error");
+								} else {
+									error.appendTo("#"+element.attr("name")+"_error");
+								}
+								break;
+						}			
+					}
+				});
+			}); 
+			</script>
             <fieldset class="fieldsetcontainer">
                 <legend>Voucher Details</legend>
                 <div class="panel-body well-sm makerelative">
-                    <?php if($step == 'view'){ ?>
-                        <p class="margin0 lineblocked makeabsolute" style="right:5px; top:-5px;">
-                            <?php if($acl->checkPermission('Voucher', ACTION_EDIT)){ ?>	
-                                <a class="btn btn-primary btn-xs <?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'update_trigger'; ?>" message="This Account is closed and updates are disabled." href="<?php echo $baseview.'/step/edit/vid/'.encode($voucher->getID()); ?>" title="Update"><i class="glyphicon glyphicon-pencil"></i> Update</a>
-                            <?php } ?>
-                            <?php if($acl->checkPermission('Voucher', ACTION_DELETE) && $client->getInitialVoucherID() != $voucher->getID()){ ?>
-                                <button type="button" class="btn btn-default btn-xs <?php echo $client->getInitialVoucherID() == $voucher->getID() ? 'alert-dialog' : 'confirm-dialog'; ?> noimgbuttonsmall" title="Delete" message="<?php echo $client->getInitialVoucherID() == $voucher->getID() ? 'Initial Voucher cannot be deleted. Only updates are allowed!' : 'Are you sure you want to delete this entry?'; ?> " action="<?php echo $this->baseUrl('voucher/delete/id/'.encode($voucher->getID())."/entityname/Voucher/successurl/".encode($baseview)); ?>"><i class="glyphicon glyphicon-remove"></i></button>
-                            <?php } ?>
-                        </p>
-                    <?php } ?>
                     <div class="col-md-6">
-                        <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("voucher_voucherno_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-8">
-                                <p class="form-control-static nullifempty view"><?php echo $voucher->getvoucherno(); ?></p>
-                                <div class="edit">
-                                    <input type="text" class="form-control input-sm width125" id="voucherno" name="voucherno" value="<?php echo $voucher->getvoucherno(); ?>" />
-                                    <div id="voucherno_error"></div>
-                                </div>
-                            </div>
-                        </div>
                         <div class="form-group">
                             <label class="col-md-4 control-label"><?php echo $this->translate("voucher_servicetypeid_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                             <div class="col-md-8">
-                                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($voucher->getServiceTypeID(), $services) ? '': $services[$voucher->getServiceTypeID()]; ?></p>
+                            	<?php 
+									$servicetype = isArrayKeyAnEmptyString($voucher->getServiceTypeID(), $services) ? '': $services[$voucher->getServiceTypeID()];
+									if($voucher->getType() == 2 && !isEmptyString($voucher->getParentID())){
+										$isfollowalong = true;
+										$servicetype = isArrayKeyAnEmptyString($voucher->getServiceTypeID(), $faservices) ? '': $faservices[$voucher->getServiceTypeID()];
+									}
+								?>
+                                <p class="form-control-static nullifempty view"><?php echo $servicetype; ?></p>
                                 <div class="edit">
                                     <?php
+										$types = $services;
+										if($isfollowalong){
+											$types = $faservices; 
+										}
                                         $dropdown = new Zend_Form_Element_Select('servicetypeid',
                                                             array(
-                                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $services),
+                                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $types),
                                                                 'view' => new Zend_View(),
                                                                 'decorators' => array('ViewHelper'),
                                                                 'class' => array('form-control','input-sm','width150')
@@ -122,8 +265,66 @@
                                 </div>
                             </div>
                         </div>
+                        <?php if($isfollowalong){ ?>
+                        	<div class="form-group">
+                                <label class="col-md-4 control-label"><?php echo $this->translate("voucher_favoucherno_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                <div class="col-md-8">
+                                    <p class="form-control-static nullifempty view"><?php echo $voucher->getfavoucherno(); ?></p>
+                                    <div class="edit">
+                                        <input type="text" class="form-control input-sm width125" id="favoucherno" name="favoucherno" value="<?php echo $voucher->getfavoucherno(); ?>" />
+                                        <div id="favoucherno_error"></div>
+                                    </div>
+                                </div>
+                            </div>
+                     	<?php } ?>
                         <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("voucher_units_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <label class="col-md-4 control-label"><?php echo $this->translate("voucher_voucherno_label"); ?>: 
+                                <?php if(!$isfollowalong){ ?>    
+                                	<?php echo $this->translate("global_required_field_marker"); ?>
+                                <?php } ?>
+                            <?php if($step == 'new'){ ?>
+                                <span class="pagedescription blocked">After Approval</span>
+                            <?php } ?>
+                            </label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo $voucher->getvoucherno(); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm width125" id="voucherno" name="voucherno" value="<?php echo $voucher->getvoucherno(); ?>" />
+                                    <div id="voucherno_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <?php if(!$isfollowalong){ ?>
+                            <div class="form-group" id="intensive">
+                                <label class="col-md-4 control-label">
+                                	<?php if($step != 'view'){ ?>
+                                    	<div class="divider30"></div>
+									<?php } ?>
+									<?php echo $this->translate("voucher_faprefix_label"); ?>:
+                                    <?php if(!isEmptyString($voucher->getfaprefix())){ ?>
+                                    	<div class="divider5"></div>
+                                        <label class="pagedescription">For Intensive Vouchers only</label>
+                                    <?php } ?>
+                                </label>
+                                <div class="col-md-8">
+                                    <p class="form-control-static nullifempty view"><?php echo $voucher->getfaprefix(); ?></p>
+                                    <div class="edit">
+                                        <label class="checkbox-inline" style="margin-bottom:5px;"><input type="checkbox" name="type" id="type" value="2" /> This Voucher is Intensive</label>
+                                        <input type="text" class="form-control input-sm width125" id="faprefix" name="faprefix" value="<?php echo $voucher->getfaprefix(); ?>" />
+                                        <div id="faprefix_error"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php } ?>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">
+                            	<?php if(!$isfollowalong){ ?>
+									<?php echo $this->translate("voucher_units_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?>
+                                <?php } else { ?>
+                                	<?php echo $this->translate("voucher_faunits_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?>
+                                <?php } ?>
+                            </label>
                             <div class="col-md-8">
                                 <p class="form-control-static nullifempty view"><?php echo $voucher->getHours(); ?></p> 
                                 <div class="edit">
@@ -167,7 +368,11 @@
                     </div>
                     <div class="col-md-6">
                     	<div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("voucher_dateapproved_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <label class="col-md-4 control-label"><?php echo $this->translate("voucher_dateapproved_label"); ?>: 
+								<?php if(!$isfollowalong){ ?>	
+                                    <?php echo $this->translate("global_required_field_marker"); ?>
+                                <?php } ?>
+                            </label>
                             <div class="col-md-8">
                                 <p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($voucher->getDateApproved()); ?></p>
                                 <div class="edit">
@@ -177,7 +382,13 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("voucher_stardate_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <label class="col-md-4 control-label">
+                            	<?php if(!$isfollowalong){ ?>	
+                                    <?php echo $this->translate("voucher_startdate_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?>
+                                <?php } else { ?>
+									<?php echo $this->translate("voucher_fastartdate_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?>
+                                <?php } ?>
+                            </label>
                             <div class="col-md-8">
                                 <p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($voucher->getstartdate()); ?></p>
                                 <div class="edit">
@@ -197,16 +408,30 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("voucher_invoicedate_label"); ?>:</label>
-                            <div class="col-md-8">
-                                <p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($voucher->getinvoicedate()); ?></p>
-                                <div class="edit">
-                                    <input type="text" class="form-control input-sm datefield readonly width100" name="invoicedate" id="invoicedate" value="<?php echo changeMySQLDateToPageFormat($voucher->getinvoicedate()); ?>" />
-                                    <div id="invoicedate_error"></div>
-                                </div>      
+                        <?php if(!$isfollowalong){ ?>		
+                            <div class="form-group">
+                                <label class="col-md-4 control-label"><?php echo $this->translate("voucher_invoicedate_label"); ?>:</label>
+                                <div class="col-md-8">
+                                    <p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($voucher->getinvoicedate()); ?></p>
+                                    <div class="edit">
+                                        <input type="text" class="form-control input-sm datefield readonly width100" name="invoicedate" id="invoicedate" value="<?php echo changeMySQLDateToPageFormat($voucher->getinvoicedate()); ?>" />
+                                        <div id="invoicedate_error"></div>
+                                    </div>      
+                                </div>
                             </div>
-                        </div>
+                       	<?php } ?>
+                        <?php if($isfollowalong){ ?>		
+                            <div class="form-group">
+                                <label class="col-md-4 control-label"><?php echo $this->translate("voucher_enddate_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                <div class="col-md-8">
+                                    <p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($voucher->getenddate()); ?></p>
+                                    <div class="edit">
+                                        <input type="text" class="form-control input-sm datefield readonly width100" name="enddate" id="enddate" value="<?php echo changeMySQLDateToPageFormat($voucher->getenddate()); ?>" />
+                                        <div id="enddate_error"></div>
+                                    </div>      
+                                </div>
+                            </div>
+                       	<?php } ?>
                     </div>
                 </div>
             </fieldset>
@@ -244,10 +469,16 @@
                     </div>
                 </fieldset>
                 <fieldset class="fieldsetcontainer">
-                    <legend>Latest Intervention Progress</legend>
+                    <legend>Latest Intervention Details</legend>
                     <?php $activity = $voucher->getLatestActivity(); ?>
                     <div class="panel-body well-sm makerelative">
                         <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="col-md-12 control-label"><?php echo $this->translate("activity_progressofintervention_label"); ?>:</label>
+                                <div class="col-md-12">
+                                    <p class="form-control-static nullifempty view"><?php echo $activity->getprogressofintervention(); ?></p>
+                                </div>
+                            </div>
                             <div class="form-group">
                                 <label class="col-md-12 control-label"><?php echo $this->translate("activity_expectedperformance_label"); ?>:</label>
                                 <div class="col-md-12">
@@ -264,12 +495,6 @@
                                 <label class="col-md-12 control-label"><?php echo $this->translate("activity_interventionplan_label"); ?>:</label>
                                 <div class="col-md-12">
                                     <p class="form-control-static nullifempty view"><?php echo $activity->getinterventionplan(); ?></p>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-md-12 control-label"><?php echo $this->translate("activity_progressofintervention_label"); ?>:</label>
-                                <div class="col-md-12">
-                                    <p class="form-control-static nullifempty view"><?php echo $activity->getprogressofintervention(); ?></p>
                                 </div>
                             </div>
                         </div>
@@ -300,11 +525,23 @@
                            <?php 
                                 $counter = 1;
                                 foreach($vouchers as $voucher){ 
+									$isfollowalong = false;
+									$servicetype = isArrayKeyAnEmptyString($voucher->getServiceTypeID(), $services) ? '': $services[$voucher->getServiceTypeID()];
+									if($voucher->getType() == 2 && !isEmptyString($voucher->getParentID())){
+										$isfollowalong = true;
+										$servicetype = isArrayKeyAnEmptyString($voucher->getServiceTypeID(), $faservices) ? '': $faservices[$voucher->getServiceTypeID()];
+									}
                             ?>
                                 <tr>
                                     <td class="centeralign"><?php echo $counter; ?></td>
-                                    <td><a href="<?php echo $baseview.'/step/view/vid/'.encode($voucher->getID()); ?>"><?php echo $voucher->getvoucherno(); ?></a></td>
-                                    <td><?php echo isArrayKeyAnEmptyString($voucher->getServiceTypeID(), $services) ? '': $services[$voucher->getServiceTypeID()]; ?></td>
+                                    <td>
+                                    	<?php if($isfollowalong){ ?>
+                                    		<a href="<?php echo $baseview.'/step/view/vid/'.encode($voucher->getID()); ?>"><?php echo $voucher->getfavoucherno(); ?></a>
+                                       	<?php } else { ?>
+                                        	<a href="<?php echo $baseview.'/step/view/vid/'.encode($voucher->getID()); ?>"><?php echo $voucher->getvoucherno(); ?></a>
+                                        <?php } ?>
+                                    </td>
+                                    <td><?php echo $servicetype; ?></td>
                                     <td><?php echo isArrayKeyAnEmptyString($voucher->getClient()->getFunderID(), $funders) ? '': $funders[$voucher->getClient()->getFunderID()]; ?></td>
                                     <td><?php echo isArrayKeyAnEmptyString($voucher->getStatus(), $voucherstatuses) ? '' : $voucherstatuses[$voucher->getStatus()]; ?></td>
                                     <td><?php echo formatDateAndTime($voucher->getDateApproved(), false); ?></td>

@@ -710,9 +710,13 @@ class Client extends BaseEntity {
 		return new Voucher();
 	}
 	# get the activities for client ordered by date
-	function getClientActivities(){
+	function getClientActivities($voucherid =''){
+		$custom_query = "";
+		if(!isEmptyString($voucherid)){
+			$custom_query = " AND a.voucherid = '".$voucherid."' ";
+		}
 		$query = Doctrine_Query::create()->from('Activity a')
-		->where("a.clientid = '".$this->getID()."'")->orderby('a.activitydate desc');
+		->where("a.clientid = '".$this->getID()."' ".$custom_query)->orderby('a.activitydate desc');
 		$result = $query->execute();
 		if($result){
 			return $result;

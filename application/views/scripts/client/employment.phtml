@@ -19,6 +19,132 @@
 	$jobstatuses = getJobStatuses();
 	$terminationtypes = getTerminationTypes();
 ?>
+<script>
+	$(document).ready(function() {
+		<?php if($step == 'edit' || $step == 'new'){ ?>
+			// validation 
+			$("#form-employment").validate({		
+				// define the validation rules one field at a time
+				rules: {
+					jobtitle: "required",
+					hoursperweek: {
+						required: true
+					},
+					startdate: {
+						required: true,
+					},
+					enddate: {
+						required: false,
+						ontermination:true,
+						enddateafterstartdate: true
+					},
+					rate: {
+						required: true
+					},
+					ratetype: "required",
+					startdate: "required",
+					status: "required",
+					companyname: "required",
+					contactperson: "required",
+					phone: "required",
+					county: "required", 
+					city: "required", 
+					zipcode: "required",  
+					addressline1: "required",
+					terminationtype: "required",
+					terminationreason: "required"
+				}, 
+				// the messages for each of the fields being validated
+				messages: {		
+					jobtitle: "<?php echo $this->translate("job_jobtitle_error"); ?>",
+					hoursperweek: {
+						required: "<?php echo $this->translate("job_hoursperweek_error"); ?>"
+					}, 
+					startdate: {
+						required: "<?php echo $this->translate("job_startdate_error"); ?>"
+					},
+					rate: {
+						required: "<?php echo $this->translate("job_rate_error"); ?>"
+					},
+					ratetype: "<?php echo $this->translate("job_ratetype_error"); ?>",
+					startdate: "<?php echo $this->translate("job_startdate_error"); ?>",
+					status: "<?php echo $this->translate("job_status_error"); ?>",
+					companyname: "<?php echo $this->translate("company_name_error"); ?>",
+					contactperson: "<?php echo $this->translate("company_contactperson_error"); ?>",
+					phone: "<?php echo $this->translate("company_phone_error"); ?>",
+					county: "<?php echo $this->translate("company_county_error"); ?>", 
+					city: "<?php echo $this->translate("company_city_error"); ?>", 
+					zipcode: "<?php echo $this->translate("company_zipcode_error"); ?>",  
+					addressline1: "<?php echo $this->translate("company_addressline1_error"); ?>",
+					terminationtype: "<?php echo $this->translate("job_terminationtype_error"); ?>",
+					terminationreason: "<?php echo $this->translate("job_terminationreason_error"); ?>"
+				},
+				// custom error positions
+				errorPlacement: function(error, element) {
+					switch(element.attr("name")){					
+						default:
+							if(element.hasClass("useid_error")){
+								error.appendTo("#"+element.attr("id")+"_error");
+							} else {
+								error.appendTo("#"+element.attr("name")+"_error");
+							}
+							break;
+					}			
+				}
+			});
+			
+			$.validator.addMethod("ontermination", function(value, element) {				
+				if($("#status").val() == '0' && isEmptyString(value)){
+					return false;
+				}
+				return true;
+			}, "<?php echo $this->translate("job_enddate_error"); ?>");
+			
+			$('.edit, .requiredmark, .save_trigger, .cancel_trigger').removeClass('hidden');
+			$('.form-control-static.view, .update_trigger').addClass('hidden');
+			
+			// on status change, if terminating job, open up fields for reason and termination type
+			$("#status").change(function(){
+				var status = $(this).val();
+				if(status == 0){
+					$(".complete").removeClass('hidden');
+				}
+				if(status == 1){
+					$("#enddate, #terminationreason, #terminationreason").val('');
+					$(".complete").addClass('hidden');										
+				}
+			});
+			$("#status").trigger('change');
+			
+			$(".save_trigger, .save").click(function(e){
+				e.preventDefault();
+				var status = $("#status").val();
+				if ($("#form-employment").valid()) {
+					if(status == 1){
+						$.blockUI({ message: '<?php echo $blockcontent; ?>' }); 
+						$("#form-employment").submit();
+					}
+					if(status == 0){
+						// if attempting to terminate the job
+						var message = '<label class="small centeralign blocked">Are you sure you want to mark this Job as completed. <br /><br /> Click <b>OK</b> to continue or <b>Cancel</b> to ignore</label>';
+						bootbox.confirm(message, function(confirmed) {
+							if(confirmed){
+								$.blockUI({ message: '<?php echo $blockcontent; ?>' }); 
+								$("#form-employment").submit();
+							} else {
+								bootbox.hideAll();
+								return false;
+							}
+						});
+					}
+				}
+			});
+		<?php } ?>
+	}); 
+</script>		
+		<?php if($tab == 'employment' && $step == 'view'){ ?>
+			$(".complete").addClass('hidden');
+		<?php } ?>
 <form id="form-employment" class="form-horizontal employment" role="form" action="<?php echo $this->baseUrl("job/create"); ?>" method="post">
 	<?php if($step == 'view'){ ?>
         <p class="margin0 lineblocked makeabsolute" style="right:30px; top:5px;">
