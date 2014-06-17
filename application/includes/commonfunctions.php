@@ -156,8 +156,19 @@ function formatDateAndTime($mysqldate, $ignoretime = true){
 	$sDate = $oDate->format("m/d/Y".$timestr);
 	return $sDate;
 }
+function formatTime($timestring){
+	if(isEmptyString($timestring)){
+		return '--';
+	}
+	$otime = new DateTime($timestring);
+	$stime = $otime->format("H:i a");
+	return $stime;
+}
 function getCurrentMysqlTimestamp(){
 	return date('Y-m-d H:i:s');
+}
+function decimalToTime($decimal){
+	return gmdate('H:i', floor($decimal * 3600));
 }
 /**
  * Check whether or not the string is empty. The string is emptied

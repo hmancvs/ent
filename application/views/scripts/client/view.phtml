@@ -58,11 +58,15 @@
 		$voucherstatuses = getVoucherStatuses();
 	}
 	
+	if($tab == 'activity'){
+		$services = getServiceTypes();
+	}
+	
 	$title = $client->getName();
 	$description = 'Profile Details';	
 	$this->headTitle($title.$browserappend);
 ?>
-<script type="text/javascript" src="<?php echo $this->serverUrl($this->baseUrl('javascript/plugins/jquery.form.min.js')); ?>"></script>
+<!--<script type="text/javascript" src="<?php //echo $this->serverUrl($this->baseUrl('javascript/plugins/jquery.form.min.js')); ?>"></script>-->
 <script>
 	$(document).ready(function() {
 		$('.titlebreadcrumb').html('<?php echo $homedir.'Clients / '.$client->getName(); ?>');
@@ -80,7 +84,7 @@
 		
 		dateofbirthOpts.yearRange = "-<?php echo date('Y')-2010; ?>:-0"; 
 		datepickerOpts.maxDate = new Date();
-		$("#dateapproved, #startdate, #enddate, #invoicedate, #medicalstartdate").datepicker(dateofbirthOpts);
+		$("#dateapproved, #startdate, #enddate, #invoicedate, #medicalstartdate, #activitydate").datepicker(dateofbirthOpts);
 		
 		var tab = '<?php echo $tab; ?>';
 		$("#tabtitle").html($("#tab_"+tab+" a."+tab).html());
@@ -527,6 +531,110 @@
 				}
 			});
 		<?php } ?>
+		
+		<?php if($tab == 'activity' && ($step == 'edit' || $step == 'new')){ ?>
+			// validation 
+			$("#form-activity").validate({		
+				// define the validation rules one field at a time
+				rules: {
+					activitydate: "required",
+					coachid: "required",
+					starttime: "required",
+					endtime: "required",
+					activitytitle: "required",
+					starthour: "required",
+					startminute: "required",
+					endhour: "required",
+					endminute: "required",
+					expectedperformance: "required",
+					actualperformance: "required",
+					interventionplan: "required",
+					progressofintervention: "required",
+					billablehours: {
+						required: true,
+						min: 0.5,
+						maxhours: true 
+					}
+				}, 
+				// the messages for each of the fields being validated
+				messages: {		
+					activitydate: "<?php echo $this->translate("activity_activitydate_error"); ?>",
+					coachid: "<?php echo $this->translate("activity_coach_error"); ?>",
+					starttime: "<?php echo $this->translate("activity_starttime_error"); ?>",
+					endtime: "<?php echo $this->translate("activity_endtime_error"); ?>",
+					activitytitle: "<?php echo $this->translate("activity_activitytitle_error"); ?>",
+					starthour: "<?php echo $this->translate("activity_hour_error"); ?>",
+					startminute: "<?php echo $this->translate("activity_minute_error"); ?>",
+					endhour: "<?php echo $this->translate("activity_hour_error"); ?>",
+					endminute: "<?php echo $this->translate("activity_minute_error"); ?>",
+					expectedperformance: "<?php echo $this->translate("activity_expectedperformance_error"); ?>",
+					actualperformance: "<?php echo $this->translate("activity_actualperformance_error"); ?>",
+					interventionplan: "<?php echo $this->translate("activity_interventionplan_error"); ?>",
+					progressofintervention: "<?php echo $this->translate("activity_progressofintervention_error"); ?>",
+					billablehours: {
+						required: "<?php echo $this->translate("activity_billablehours_error"); ?>",
+						min: "Minimum allowed is 0.5 hours"
+					}
+				},
+				// custom error positions
+				errorPlacement: function(error, element) {
+					switch(element.attr("name")){					
+						default:
+							if(element.hasClass("useid_error")){
+								error.appendTo("#"+element.attr("id")+"_error");
+							} else {
+								error.appendTo("#"+element.attr("name")+"_error");
+							}
+							break;
+					}			
+				}
+			});
+			
+			$('.edit, .requiredmark, .save_trigger, .cancel_trigger').removeClass('hidden');
+			$('.form-control-static.view, .update_trigger').addClass('hidden');
+			
+			$(".starttime, .endtime, .breaks, #startsetting, #endsetting").change(function(e){
+				var adatev = $("#activitydate").val();
+				var starthr = $("#starthour").val();
+				var startmin = $("#startminute").val();
+				var endhr = $("#endhour").val();
+				var endmin = $("#endminute").val();
+				var hour_diff = 0;
+				// check that starthour and startminute have been specified
+				if(!isEmptyString(adatev) && parseInt(starthr) >= 0 && parseInt(startmin)>= 0){
+					var startstr = adatev+' '+starthr+':'+startmin+' '+$("#startsetting").val();
+					var s = new Date(startstr);
+					var startstamp = s.getTime(); // alert(startstamp);
+					// check that endhour and endminute have been specified
+					if(parseInt(endhr) >= 0 && parseInt(endmin) >= 0){
+						var endstr = adatev+' '+endhr+':'+endmin+' '+$("#endsetting").val(); // alert(endstr);
+						var e = new Date(endstr);
+						var endstamp = e.getTime(); // alert(endstamp);
+						var stampdiff = parseInt(endstamp) - parseInt(startstamp); // alert(stampdiff); // milliseconds between start and end
+						hour_diff = ((stampdiff/(1000*60*60))%24).toFixed(2);
+						// alert(hour_diff);
+						var brkhr = parseFloat($("#billablehour").val());
+						if(isEmptyString(brkhr)){
+							brkhr = 0;
+						}
+						var brkmin = parseFloat($("#billableminute").val());
+						if(isEmptyString(brkmin)){
+							brkmin = 0;
+						}
+						var breakhours = 0; 
+						if(parseInt(brkhr+brkmin) > 0){
+							breakhours = (brkhr + (brkmin/60)).toFixed(2);
+							$("#breakhours").val(breakhours);
+							hour_diff = (hour_diff - breakhours).toFixed(2); // alert(hour_diff);
+						}
+					}
+				}
+				$("#billablehours").val(hour_diff); // write difference to the billable hours field
+				// $("#billablehours").attr('readonly', true);
+			});
+			$(".starttime, .endtime, .breaks, #startsetting, #endsetting").trigger('change');
+			
+		<?php } ?>
 	});
 </script>
 <div class="row-fluid margin0 view">
@@ -565,17 +673,13 @@
 			</div>
             <div id="voucher">
 				<?php if($request->tab == 'voucher'){ ?>
-                	<?php if($tab == 'voucher'){ ?>
-						<?php require APPLICATION_PATH."/views/scripts/client/voucher.phtml"; ?>
-                    <?php } ?>
+					<?php require APPLICATION_PATH."/views/scripts/client/voucher.phtml"; ?>
                 <?php } ?>
 			</div>
             <div id="activity">
-                <form id="form-activity" class="form-horizontal activity">
 				<?php if($request->tab == 'activity'){ ?>
-                
+                	<?php require APPLICATION_PATH."/views/scripts/client/activity.phtml"; ?>
                 <?php } ?>
-                </form>
 			</div>
             <div id="finance">
                 <form id="form-finance" class="form-horizontal finance">

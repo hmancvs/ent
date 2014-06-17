@@ -18,11 +18,11 @@
 <form id="form-voucher" class="form-horizontal voucher" role="form" action="<?php echo $this->baseUrl("voucher/create"); ?>" method="post">
 	<?php if($step == 'view'){ ?>
         <p class="margin0 lineblocked makeabsolute" style="right:30px; top:5px;">
-        	<?php if($acl->checkPermission('Voucher', ACTION_CREATE)){ ?>	
+        	<?php if($acl->checkPermission('Voucher', ACTION_CREATE) && isEmptyString($request->vid)){ ?>	
             	<a class="btn btn-sm btn-primary" href="<?php echo $baseview.'/step/new'; ?>" title="New Voucher"><i class="glyphicon glyphicon-plus"></i> New Voucher</a>
             <?php } ?>
             <?php if(!isEmptyString($request->vid)){ ?>
-                <a class="btn btn-sm btn-default" href="<?php echo $baseview.'/step/view'; ?>" title="All Vouchers"><i class="glyphicon glyphicon-list"></i> All Vouchers</a>
+                <a class="btn btn-sm btn-primary" href="<?php echo $baseview.'/step/view'; ?>" title="All Vouchers"><i class="glyphicon glyphicon-list"></i> Voucher History</a>
             <?php } ?>
         </p>
     <?php } ?>
@@ -83,14 +83,24 @@
                     <?php if($step == 'view'){ ?>
                         <p class="margin0 lineblocked makeabsolute" style="right:5px; top:-5px;">
                             <?php if($acl->checkPermission('Voucher', ACTION_EDIT)){ ?>	
-                                <a class="btn btn-default btn-xs <?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'update_trigger'; ?>" message="This Account is closed and updates are disabled." href="<?php echo $baseview.'/step/edit/vid/'.encode($voucher->getID()); ?>" title="Update"><i class="glyphicon glyphicon-pencil"></i> Update</a>
+                                <a class="btn btn-primary btn-xs <?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'update_trigger'; ?>" message="This Account is closed and updates are disabled." href="<?php echo $baseview.'/step/edit/vid/'.encode($voucher->getID()); ?>" title="Update"><i class="glyphicon glyphicon-pencil"></i> Update</a>
                             <?php } ?>
-                            <?php if($acl->checkPermission('Voucher', ACTION_DELETE)){ ?>
+                            <?php if($acl->checkPermission('Voucher', ACTION_DELETE) && $client->getInitialVoucherID() != $voucher->getID()){ ?>
                                 <button type="button" class="btn btn-default btn-xs <?php echo $client->getInitialVoucherID() == $voucher->getID() ? 'alert-dialog' : 'confirm-dialog'; ?> noimgbuttonsmall" title="Delete" message="<?php echo $client->getInitialVoucherID() == $voucher->getID() ? 'Initial Voucher cannot be deleted. Only updates are allowed!' : 'Are you sure you want to delete this entry?'; ?> " action="<?php echo $this->baseUrl('voucher/delete/id/'.encode($voucher->getID())."/entityname/Voucher/successurl/".encode($baseview)); ?>"><i class="glyphicon glyphicon-remove"></i></button>
                             <?php } ?>
                         </p>
                     <?php } ?>
                     <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("voucher_voucherno_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo $voucher->getvoucherno(); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm width125" id="voucherno" name="voucherno" value="<?php echo $voucher->getvoucherno(); ?>" />
+                                    <div id="voucherno_error"></div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label class="col-md-4 control-label"><?php echo $this->translate("voucher_servicetypeid_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                             <div class="col-md-8">
@@ -109,16 +119,6 @@
                                         echo $dropdown->render();
                                     ?>
                                     <div id="servicetypeid_error"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("voucher_voucherno_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-8">
-                                <p class="form-control-static nullifempty view"><?php echo $voucher->getvoucherno(); ?></p>
-                                <div class="edit">
-                                    <input type="text" class="form-control input-sm width125" id="voucherno" name="voucherno" value="<?php echo $voucher->getvoucherno(); ?>" />
-                                    <div id="voucherno_error"></div>
                                 </div>
                             </div>
                         </div>
@@ -209,7 +209,73 @@
                         </div>
                     </div>
                 </div>
-            </fieldset>          
+            </fieldset>
+            <?php if($step == 'view'){ ?>       
+                <fieldset class="fieldsetcontainer">
+                    <legend>Intervention Summary</legend>
+                    <div class="panel-body well-sm makerelative">
+                        <div class="col-md-9">
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Hours Available To-date:</label>
+                                <div class="col-md-8">
+                                    <p class="form-control-static nullifempty view"><?php echo $voucher->getHoursRemaining(); ?></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Hours Utilised To-date:</label>
+                                <div class="col-md-8">
+                                    <p class="form-control-static nullifempty view"><?php echo $voucher->getHoursUsed(); ?></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Executed By:</label>
+                                <div class="col-md-8">
+                                    <p class="form-control-static nullifempty view">
+									<?php 
+										$history = $voucher->getClient()->getCurrentAssignedCoach();
+										if($history){
+											echo '<a href="'.$this->baseUrl('profile/view/id/'.encode($history->getUserID())).'">'.$history->getUser()->getName().'</a>';
+										}
+									?>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="fieldsetcontainer">
+                    <legend>Latest Intervention Progress</legend>
+                    <?php $activity = $voucher->getLatestActivity(); ?>
+                    <div class="panel-body well-sm makerelative">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="col-md-12 control-label"><?php echo $this->translate("activity_expectedperformance_label"); ?>:</label>
+                                <div class="col-md-12">
+                                    <p class="form-control-static nullifempty view"><?php echo $activity->getexpectedperformance(); ?></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-12 control-label"><?php echo $this->translate("activity_actualperformance_label"); ?>:</label>
+                                <div class="col-md-12">
+                                    <p class="form-control-static nullifempty view"><?php echo $activity->getactualperformance(); ?></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-12 control-label"><?php echo $this->translate("activity_interventionplan_label"); ?>:</label>
+                                <div class="col-md-12">
+                                    <p class="form-control-static nullifempty view"><?php echo $activity->getinterventionplan(); ?></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-12 control-label"><?php echo $this->translate("activity_progressofintervention_label"); ?>:</label>
+                                <div class="col-md-12">
+                                    <p class="form-control-static nullifempty view"><?php echo $activity->getprogressofintervention(); ?></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            <?php } ?>  
         <?php } ?>
         <?php if(isEmptyString($request->vid) && $step == 'view') { ?>
             <div class="divider5"></div>

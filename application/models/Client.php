@@ -632,6 +632,18 @@ class Client extends BaseEntity {
 			return false;
 		}
 	}
+	# the current assigned coach
+	function getCurrentAssignedCoach() {
+		$query = Doctrine_Query::create()->from('Assignment a')
+		->where("a.clientid = '".$this->getID()."' AND a.status = 1 ")->orderby("a.startdate desc")->limit('1');
+		//debugMessage($query->getSQLQuery());
+		$result = $query->execute();
+		if($result){
+			return $result->get(0);
+		} else {
+			return new Assignment();
+		}
+	}
 	# get array of users already assigned to a client
 	function getAssignedUsersArray(){
 		$users = array();
@@ -687,7 +699,7 @@ class Client extends BaseEntity {
 		}
 		return new Job();
 	}
-	# get the vouchers for client ordered by 
+	# get the vouchers for client ordered by date
 	function getClientVouchers() {
 		$query = Doctrine_Query::create()->from('Voucher v')
 		->where("v.clientid = '".$this->getID()."'")->orderby('v.startdate');
@@ -696,6 +708,16 @@ class Client extends BaseEntity {
 			return $result;
 		}
 		return new Voucher();
+	}
+	# get the activities for client ordered by date
+	function getClientActivities(){
+		$query = Doctrine_Query::create()->from('Activity a')
+		->where("a.clientid = '".$this->getID()."'")->orderby('a.activitydate desc');
+		$result = $query->execute();
+		if($result){
+			return $result;
+		}
+		return new Activity();
 	}
 }
 ?>

@@ -91,5 +91,34 @@ class Voucher extends BaseEntity {
 		// debugMessage($formvalues); // exit();
 		parent::processPost($formvalues);
 	}
+	# get the total the number of hours used on a voucher
+	function getHoursUsed(){
+		$hrz = 0;
+		$query = Doctrine_Query::create()->from('Activity a')
+		->where("a.voucherid = '".$this->getID()."' ")->orderby('a.activitydate desc');
+		$result = $query->execute();
+		if($result){
+			// debugMessage($result->toArray());
+			foreach ($result as $activity){
+				$hrz += $activity->getBillableHours();
+			}
+			// debugMessage($hrz);
+		}
+		return $hrz;
+	}
+	# get the hours remaining
+	function getHoursRemaining(){
+		return $this->getHours() - $this->getHoursUsed();
+	}
+	# get the latest activity for the client voucher
+	function getLatestActivity(){
+		$query = Doctrine_Query::create()->from('Activity a')
+		->where("a.voucherid = '".$this->getID()."'")->orderby('a.activitydate desc')->limit('1');
+		$result = $query->execute();
+		if($result){
+			return $result->get(0);
+		}
+		return new Activity();
+	}
 }
 ?>

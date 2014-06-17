@@ -1006,4 +1006,49 @@
 		}
 		return $array;
 	}
+	# determine the hours dropdown for timepicker
+	function getHoursForTimePicker(){
+		$hours = array(
+				'00'=>'00',
+				'01'=>'01',
+				'02'=>'02',
+				'03'=>'03',
+				'04'=>'04',
+				'05'=>'05',
+				'06'=>'06',
+				'07'=>'07',
+				'08'=>'08',
+				'09'=>'09',
+				'10'=>'10',
+				'11'=>'11',
+				'12'=>'12'
+		);
+		return $hours;
+	}
+	# determine the minutes dropdown for timepicker
+	function getMinutesForTimePicker(){
+		$minutes = array(
+				'00'=>'00',
+				'05'=>'05',
+				'10'=>'10',
+				'15'=>'15',
+				'20'=>'20',
+				'25'=>'25',
+				'30'=>'30',
+				'35'=>'35',
+				'40'=>'40',
+				'45'=>'45',
+				'50'=>'50',
+				'55'=>'55'
+		);
+		return $minutes;
+	}
+	# determine the minutes dropdown for timepicker
+	function getTimeSetting(){
+		$setting = array(
+				'AM'=>'AM',
+				'PM'=>'PM'
+		);
+		return $setting;
+	}
 ?>

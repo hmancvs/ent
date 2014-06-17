@@ -235,8 +235,8 @@ class IndexController extends Zend_Controller_Action  {
     	$obj = new $classname;
     	$id = is_numeric($formvalues['id']) ? $formvalues['id'] : decode($formvalues['id']);
     	$obj->populate($id);
-    	/*debugMessage($obj->toArray());
-    	exit();*/
+    	/* debugMessage($obj->toArray());
+    	exit(); */
     	if($obj->delete()) {
     		$session->setVar(SUCCESS_MESSAGE, $this->_translate->translate("global_delete_success"));
     		if(!isEmptyString($successmessage)){
