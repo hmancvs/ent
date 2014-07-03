@@ -18,6 +18,8 @@
 	$transportmodes = getTransportationModes();
 	$jobstatuses = getJobStatuses();
 	$terminationtypes = getTerminationTypes();
+	$states = getStates();
+	$counties = getAllCounties();
 ?>
 <script>
 	$(document).ready(function() {
@@ -140,11 +142,13 @@
 				}
 			});
 		<?php } ?>
-	}); 
-</script>		
-		<?php if($tab == 'employment' && $step == 'view'){ ?>
+		
+		<?php if($step == 'view'){ ?>
 			$(".complete").addClass('hidden');
 		<?php } ?>
+	}); 
+</script>		
+		
 <form id="form-employment" class="form-horizontal employment" role="form" action="<?php echo $this->baseUrl("job/create"); ?>" method="post">
 	<?php if($step == 'view'){ ?>
         <p class="margin0 lineblocked makeabsolute" style="right:30px; top:5px;">

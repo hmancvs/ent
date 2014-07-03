@@ -11,13 +11,13 @@ class Voucher extends BaseEntity {
 		$this->hasColumn('parentid', 'integer', null);
 		$this->hasColumn('clientid', 'integer', null);
 		$this->hasColumn('servicetypeid', 'integer', null, array('notblank' => true));
+		$this->hasColumn('description', 'string', 500);
 		$this->hasColumn('voucherno', 'string', 50);
 		$this->hasColumn('favoucherno', 'string', 50);
 		$this->hasColumn('faprefix', 'string', 15);
 		$this->hasColumn('dateapproved','date', null);
 		$this->hasColumn('startdate','date', null);
 		$this->hasColumn('invoicedate','date', null);
-		$this->hasColumn('enddate','date', null);
 		$this->hasColumn('enddate','date', null);
 		$this->hasColumn('status', 'integer', null, array('default' => 0));
 		$this->hasColumn('hours', 'decimal', 11, array('scale' => 2, 'notblank' => true));

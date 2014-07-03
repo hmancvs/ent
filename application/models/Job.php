@@ -11,12 +11,14 @@ class Job extends BaseEntity {
 		$this->hasColumn('employerid', 'integer', null/* , array('notblank' => true) */);
 		$this->hasColumn('startdate', 'date', null, array('notblank' => true));
 		$this->hasColumn('enddate', 'string', 15);
+		$this->hasColumn('type', 'integer', null);
 		$this->hasColumn('status', 'integer', null, array('default'=>1));
 		$this->hasColumn('islocked', 'integer', null, array('default'=>0));
 		$this->hasColumn('jobtitle', 'string', 255, array('notblank' => true));
-		$this->hasColumn('hoursperweek', 'decimal', 11, array('scale' => 2, 'notblank' => true));
+		$this->hasColumn('workdetails', 'string', 255);
+		$this->hasColumn('hoursperweek', 'decimal', 11, array('scale' => 2));
 		$this->hasColumn('rate', 'decimal', 11, array('scale' => 2, 'notblank' => true));
-		$this->hasColumn('ratetype', 'integer', null);
+		$this->hasColumn('ratetype', 'integer', null, array('default'=>'1'));
 		$this->hasColumn('medicaltype', 'integer', null);
 		$this->hasColumn('medicalstartdate', 'date', null);
 		$this->hasColumn('workschedule', 'string', 255);
@@ -40,7 +42,6 @@ class Job extends BaseEntity {
        									// "employerid.notblank" => $this->translate->_("job_employerid_error"),
        									"startdate.notblank" => $this->translate->_("job_startdate_error"),
        									"jobtitle.notblank" => $this->translate->_("job_jobtitle_error"),
-       									"hoursperweek.notblank" => $this->translate->_("job_hoursperweek_error"),
        									"rate.notblank" => $this->translate->_("job_rate_error"),
        									"ratetype.notblank" => $this->translate->_("job_ratetype_error"),
        									"status.notblank" => $this->translate->_("job_status_error")
@@ -173,6 +174,9 @@ class Job extends BaseEntity {
 		}
 		if(isArrayKeyAnEmptyString('islocked', $formvalues)){
 			unset($formvalues['islocked']);
+		}
+		if(isArrayKeyAnEmptyString('type', $formvalues)){
+			unset($formvalues['type']);
 		}
 		// debugMessage($formvalues); exit(); 
 		parent::processPost($formvalues);

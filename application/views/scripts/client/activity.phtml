@@ -4,6 +4,9 @@
 	if($step == 'view'){
 		$activities = $client->getClientActivities($request->voucherid); // debugMessage($activities->toArray()); // exit;
 		$activity_count = $activities->count();
+		if(!isEmptyString($request->aid)){
+			$activity->populate(decode($request->aid)); 
+		}
 	}
 	if($step == 'edit' ){
 		$activity_count = '';
@@ -25,6 +28,7 @@
 	}
 	$vouchers = getClientVouchers($client->getID());
 	$hrsremaining = $activity->getVoucher()->getHoursRemaining();
+	$services = getServiceTypes();
 ?>
 <script>
 	$(document).ready(function() {
@@ -183,7 +187,7 @@
             <?php if($acl->checkPermission('Activity', ACTION_DELETE) && !isEmptyString($request->aid)){ ?>
 				<?php 
                     $isdeletable = true;
-                    $message = '';
+                    $message = 'Are youu sure you want to delete this entry?';
                     if(!$client->isActive()){
                         $isdeletable = false;
                         $message = 'This Account is closed and updates are disabled!';

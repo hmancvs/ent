@@ -577,6 +577,12 @@
 		$conn = Doctrine_Manager::connection();
 		$all_lists = $conn->fetchAll("SELECT l.id as id, l.displayname as name FROM lookuptype AS l WHERE l.listable = 1 order by l.displayname ASC ");
 		return $all_lists;
+	}
+	# all listable variable groupings as lookuptype
+	function getListableLookupTypes($current = ''){
+		$query = "SELECT l.id as optionvalue, l.displayname as optiontext FROM lookuptype AS l WHERE l.listable = 1 order by l.displayname ASC ";
+		$array = getOptionValuesFromDatabaseQuery($query);
+		return $array;
 	}	
 	# user types
 	function getUserType($value = '', $ignorelist =''){
@@ -738,7 +744,7 @@
 	}
 	# return programs
 	function getPrograms($value = ''){
-		$query = "SELECT s.id as optionvalue, s.alias as optiontext FROM service s where s.type = 1 order by optiontext ";
+		$query = "SELECT s.id as optionvalue, concat(s.alias,'-',s.name) as optiontext FROM service s where s.type = 1 order by optiontext ";
 		// debugMessage($query); exit();
 		$array = getOptionValuesFromDatabaseQuery($query);
 		if(!isEmptyString($value)){
@@ -835,8 +841,13 @@
 		return $array;
 	}
 	# disability diagnosis codes
-	function getDisabilityDiagnosisCodes($value = ''){
-		$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.alias,' - ',l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'DISABILITY_DIAGNOSIS_CODES' order by ABS(l.alias) ";
+	function getDisabilityDiagnosisCodes($value = '', $aliased =true){
+		if($aliased){
+			$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.alias,' - ',l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'DISABILITY_DIAGNOSIS_CODES' order by ABS(l.alias) ";
+		} else {
+			$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'DISABILITY_DIAGNOSIS_CODES' order by ABS(l.alias) ";
+		}
+		
 		// debugMessage($query); exit();
 		$array = getOptionValuesFromDatabaseQuery($query);
 		if(!isEmptyString($value)){
@@ -849,8 +860,13 @@
 		return $array;
 	}
 	# disability cause codes
-	function getDisabilityCauseCodes($value = ''){
-		$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.alias,' - ',l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'DISABILITY_CAUSE_CODES' order by ABS(l.alias) ";
+	function getDisabilityCauseCodes($value = '', $aliased = true){
+		if($aliased){
+			$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.alias,' - ',l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'DISABILITY_CAUSE_CODES' order by ABS(l.alias) ";
+		} else {
+			$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'DISABILITY_CAUSE_CODES' order by ABS(l.alias) ";
+		}
+		
 		// debugMessage($query); exit();
 		$array = getOptionValuesFromDatabaseQuery($query);
 		if(!isEmptyString($value)){
@@ -861,6 +877,18 @@
 			}
 		}
 		return $array;
+	}
+	# determine the disability code combination from impairement and cause
+	function getDisabilityCodeForClient($impairmentid, $causeid){
+		$query_diagnosis = "SELECT l.alias as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'DISABILITY_DIAGNOSIS_CODES' AND l.lookuptypevalue = '".$impairmentid."' ";
+		$conn = Doctrine_Manager::connection();
+		$result_diagnosis = $conn->fetchOne($query_diagnosis);
+		
+		$query_cause = "SELECT l.alias as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'DISABILITY_CAUSE_CODES' AND l.lookuptypevalue = '".$causeid."' ";
+		$conn = Doctrine_Manager::connection();
+		$result_cause = $conn->fetchOne($query_cause);
+		
+		return $result_diagnosis.$result_cause;
 	}
 	# determine the education levels
 	function getEducationLevels($value = ''){
@@ -1071,5 +1099,201 @@
 				'PM'=>'PM'
 		);
 		return $setting;
+	}
+	# determine the client skills
+	function getAllIncomeSources($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, trim(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_INCOME_SOURCE' order by optiontext ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			if(!isArrayKeyAnEmptyString($value, $array)){
+				return $array[$value];
+			} else {
+				return '';
+			}
+		}
+		return $array;
+	}
+	# determine the client medication therapy treatment
+	function getAllTherapyTreatments($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, trim(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_THERAPY_TREATMENTS' order by optiontext ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			if(!isArrayKeyAnEmptyString($value, $array)){
+				return $array[$value];
+			} else {
+				return '';
+			}
+		}
+		return $array;
+	}
+	# determine the client quality of life
+	function getAllLifeQualityOptions($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, trim(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_LIFE_QUALITY' ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			if(!isArrayKeyAnEmptyString($value, $array)){
+				return $array[$value];
+			} else {
+				return '';
+			}
+		}
+		return $array;
+	}
+	# determine the client employment goal options
+	function getAllEmploymentGoalOptions($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, trim(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_EMPLOYMENT_PREFERRENCE' order by optiontext ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			if(!isArrayKeyAnEmptyString($value, $array)){
+				return $array[$value];
+			} else {
+				return '';
+			}
+		}
+		return $array;
+	}
+	# determine the client workshift options
+	function getAllWorkshiftOptions($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, trim(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_PREFERRED_WORKSHIFT' ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			if(!isArrayKeyAnEmptyString($value, $array)){
+				return $array[$value];
+			} else {
+				return '';
+			}
+		}
+		return $array;
+	}
+	# determine the client job type options
+	function getAllJobTypes($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, trim(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_JOB_TYPES' ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			if(!isArrayKeyAnEmptyString($value, $array)){
+				return $array[$value];
+			} else {
+				return '';
+			}
+		}
+		return $array;
+	}
+	# determine the client areas of interest
+	function getAllClientInterestsOptions($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, trim(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_EDUC_INTERESTS' ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			if(!isArrayKeyAnEmptyString($value, $array)){
+				return $array[$value];
+			} else {
+				return '';
+			}
+		}
+		return $array;
+	}
+	# determine the client learning styles
+	function getAllClientLearningStyles($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, trim(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_EDUC_LEARNINGSTYLES' ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			if(!isArrayKeyAnEmptyString($value, $array)){
+				return $array[$value];
+			} else {
+				return '';
+			}
+		}
+		return $array;
+	}
+	# determine the employment job difficult reasons
+	function getAllEmploymentDifficultyOptions($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, trim(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_EMPLOYMENT_DIFFICULTY' ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			if(!isArrayKeyAnEmptyString($value, $array)){
+				return $array[$value];
+			} else {
+				return '';
+			}
+		}
+		return $array;
+	}
+	# determine the client events
+	function getAllClientEvents($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, trim(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_PASTEVENTS_TYPES' ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			if(!isArrayKeyAnEmptyString($value, $array)){
+				return $array[$value];
+			} else {
+				return '';
+			}
+		}
+		return $array;
+	}
+	# determine the client support services
+	function getAllClientSupportServices($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, trim(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_SUPPORT_SERVICES' ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			if(!isArrayKeyAnEmptyString($value, $array)){
+				return $array[$value];
+			} else {
+				return '';
+			}
+		}
+		return $array;
+	}
+	# determine the client special job accomodation
+	function getAllSpecialAccomodationOptions($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, trim(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_EMPLOYMENT_JOBACCOMODATIONS' ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			if(!isArrayKeyAnEmptyString($value, $array)){
+				return $array[$value];
+			} else {
+				return '';
+			}
+		}
+		return $array;
+	}
+	# determine the client discharge types
+	function getAllMilitaryDischargeOptions($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, trim(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_MILITARY_DISCHARGE_TYPE' ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			if(!isArrayKeyAnEmptyString($value, $array)){
+				return $array[$value];
+			} else {
+				return '';
+			}
+		}
+		return $array;
+	}
+	# determine the client problems associated with military combat
+	function getAllCombatProblems($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, trim(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_MILITARY _COMBAT_PROBLEMS' ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			if(!isArrayKeyAnEmptyString($value, $array)){
+				return $array[$value];
+			} else {
+				return '';
+			}
+		}
+		return $array;
 	}
 ?>

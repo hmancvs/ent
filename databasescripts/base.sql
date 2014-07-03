@@ -1,1498 +1,1476 @@
--- Adminer 3.3.3 MySQL dump
+/*
+Navicat MySQL Data Transfer
 
-SET NAMES utf8;
-SET foreign_key_checks = 0;
-SET time_zone = 'SYSTEM';
-SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
+Source Server         : localhost
+Source Server Version : 50524
+Source Host           : localhost:3306
+Source Database       : ent
 
+Target Server Type    : MYSQL
+Target Server Version : 50524
+File Encoding         : 65001
+
+Date: 2014-07-03 13:17:29
+*/
+
+SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for `aclgroup`
+-- ----------------------------
 DROP TABLE IF EXISTS `aclgroup`;
 CREATE TABLE `aclgroup` (
-  `id` int(11) unsigned NOT NULL auto_increment,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
   `description` varchar(255) NOT NULL,
   `datecreated` datetime NOT NULL,
   `createdby` int(11) unsigned NOT NULL,
-  `lastupdatedate` datetime default NULL,
-  `lastupdatedby` int(11) unsigned default NULL,
-  PRIMARY KEY  (`id`),
+  `lastupdatedate` datetime DEFAULT NULL,
+  `lastupdatedby` int(11) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
   UNIQUE KEY `unique_name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
-INSERT INTO `aclgroup` (`id`, `name`, `description`, `datecreated`, `createdby`, `lastupdatedate`, `lastupdatedby`) VALUES
-(1,	'Administrator',	'Overall system administrator',	'0000-00-00 00:00:00',	1,	NULL,	NULL),
-(2,	'Customer Care',	'Logs new Ticket and Assigns directorate',	'0000-00-00 00:00:00',	1,	NULL,	NULL),
-(3,	'Department Official',	'Receives Ticket for Assignment',	'0000-00-00 00:00:00',	1,	NULL,	NULL),
-(5,	'Client',	'Reports Ticket to Customer Care',	'0000-00-00 00:00:00',	1,	NULL,	NULL),
-(6,	'Accounting Official',	'Monitors Ticket progress reports',	'0000-00-00 00:00:00',	1,	NULL,	NULL),
-(7,	'Management',	'Company management and reporting',	'0000-00-00 00:00:00',	1,	NULL,	NULL);
+-- ----------------------------
+-- Records of aclgroup
+-- ----------------------------
+INSERT INTO `aclgroup` VALUES ('1', 'Administrator', 'Overall system administrator', '2014-06-01 16:59:05', '1', null, null);
+INSERT INTO `aclgroup` VALUES ('2', 'Job Coach', 'Logs activities against a client voucher', '2014-06-01 16:59:05', '1', null, null);
+INSERT INTO `aclgroup` VALUES ('3', 'Data Clerk', 'Data entry assistant', '2014-06-01 16:59:05', '1', null, null);
+INSERT INTO `aclgroup` VALUES ('4', 'Manager', 'Company management and reporting', '2014-06-01 16:59:05', '1', null, null);
 
+-- ----------------------------
+-- Table structure for `aclpermission`
+-- ----------------------------
 DROP TABLE IF EXISTS `aclpermission`;
 CREATE TABLE `aclpermission` (
-  `id` int(11) unsigned NOT NULL auto_increment,
-  `groupid` int(11) unsigned default NULL,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `groupid` int(11) unsigned DEFAULT NULL,
   `resourceid` int(11) unsigned NOT NULL,
-  `create` tinyint(4) unsigned NOT NULL default '0',
-  `edit` tinyint(4) unsigned NOT NULL default '0',
-  `view` tinyint(4) unsigned NOT NULL default '0',
-  `list` tinyint(4) unsigned NOT NULL default '0',
-  `delete` tinyint(4) unsigned NOT NULL default '0',
-  `export` tinyint(4) unsigned NOT NULL default '0',
-  `approve` tinyint(3) unsigned NOT NULL default '0',
+  `create` tinyint(4) unsigned NOT NULL DEFAULT '0',
+  `edit` tinyint(4) unsigned NOT NULL DEFAULT '0',
+  `view` tinyint(4) unsigned NOT NULL DEFAULT '0',
+  `list` tinyint(4) unsigned NOT NULL DEFAULT '0',
+  `delete` tinyint(4) unsigned NOT NULL DEFAULT '0',
+  `export` tinyint(4) unsigned NOT NULL DEFAULT '0',
+  `approve` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `datecreated` datetime NOT NULL,
   `createdby` int(11) unsigned NOT NULL,
-  `lastupdatedate` datetime default NULL,
-  `lastupdatedby` int(11) unsigned default NULL,
-  PRIMARY KEY  (`id`),
+  `lastupdatedate` datetime DEFAULT NULL,
+  `lastupdatedby` int(11) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
   KEY `fk_aclpermission_groupid` (`groupid`),
   KEY `fk_aclpermission_resourceid` (`resourceid`),
   CONSTRAINT `fk_aclpermission_groupid` FOREIGN KEY (`groupid`) REFERENCES `aclgroup` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_aclpermission_resourceid` FOREIGN KEY (`resourceid`) REFERENCES `aclresource` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=211 DEFAULT CHARSET=utf8;
 
-INSERT INTO `aclpermission` (`id`, `groupid`, `resourceid`, `create`, `edit`, `view`, `list`, `delete`, `export`, `approve`, `datecreated`, `createdby`, `lastupdatedate`, `lastupdatedby`) VALUES
-(6,	1,	7,	1,	1,	1,	1,	0,	0,	0,	'2012-03-01 12:00:00',	1,	'2013-12-18 08:39:43',	1),
-(18,	2,	6,	0,	0,	1,	0,	0,	0,	0,	'2012-03-01 12:00:00',	1,	'2014-02-13 17:36:18',	38),
-(19,	3,	6,	0,	0,	1,	0,	0,	0,	0,	'2012-03-01 12:00:00',	1,	'2014-05-22 16:45:29',	1),
-(21,	5,	6,	0,	0,	0,	0,	0,	0,	0,	'2012-03-01 12:00:00',	1,	'2014-02-13 17:29:08',	38),
-(22,	6,	6,	0,	0,	1,	0,	0,	0,	0,	'2012-03-01 12:00:00',	1,	'2014-02-13 17:30:48',	38),
-(23,	7,	6,	0,	0,	1,	0,	0,	0,	0,	'2012-03-01 12:00:00',	1,	'2014-04-24 16:01:04',	1),
-(25,	2,	3,	0,	1,	1,	1,	0,	0,	0,	'0000-00-00 00:00:00',	0,	'2014-02-13 17:36:18',	38),
-(28,	5,	3,	0,	0,	0,	0,	0,	0,	0,	'0000-00-00 00:00:00',	0,	'2014-02-13 17:29:08',	38),
-(29,	6,	3,	0,	0,	1,	1,	0,	0,	0,	'0000-00-00 00:00:00',	1,	'2014-02-13 17:30:48',	38),
-(30,	7,	3,	0,	1,	1,	1,	0,	0,	0,	'0000-00-00 00:00:00',	1,	'2014-04-24 16:01:04',	1),
-(32,	2,	9,	1,	1,	1,	1,	1,	2,	0,	'0000-00-00 00:00:00',	0,	'2014-02-13 17:36:18',	38),
-(35,	5,	9,	0,	0,	1,	0,	0,	0,	0,	'0000-00-00 00:00:00',	0,	'2014-02-13 17:29:08',	38),
-(36,	6,	9,	0,	0,	1,	1,	2,	2,	0,	'0000-00-00 00:00:00',	1,	'2014-02-13 17:30:48',	38),
-(37,	7,	9,	0,	0,	1,	1,	0,	1,	0,	'0000-00-00 00:00:00',	1,	'2014-04-24 16:01:04',	1),
-(38,	2,	10,	1,	1,	1,	1,	0,	2,	0,	'0000-00-00 00:00:00',	0,	'2014-02-13 17:36:18',	38),
-(39,	3,	10,	0,	0,	1,	1,	0,	0,	0,	'0000-00-00 00:00:00',	1,	'2014-05-22 16:45:29',	1),
-(41,	5,	10,	0,	0,	2,	0,	0,	0,	0,	'0000-00-00 00:00:00',	0,	'2014-02-13 17:29:08',	38),
-(42,	6,	10,	0,	0,	1,	1,	0,	0,	0,	'0000-00-00 00:00:00',	1,	'2014-02-13 17:30:48',	38),
-(43,	7,	10,	0,	0,	1,	1,	0,	1,	0,	'0000-00-00 00:00:00',	1,	'2014-04-24 16:01:04',	1),
-(44,	2,	13,	0,	0,	1,	1,	0,	0,	0,	'0000-00-00 00:00:00',	0,	'2014-02-13 17:36:18',	38),
-(47,	5,	13,	0,	0,	0,	0,	0,	0,	0,	'0000-00-00 00:00:00',	0,	'2014-02-13 17:29:08',	38),
-(48,	6,	13,	0,	0,	1,	1,	0,	0,	0,	'0000-00-00 00:00:00',	1,	'2014-02-13 17:30:48',	38),
-(49,	7,	13,	0,	0,	1,	1,	0,	0,	0,	'0000-00-00 00:00:00',	1,	'2014-04-24 16:01:04',	1),
-(50,	2,	11,	0,	0,	1,	1,	2,	2,	0,	'2012-03-01 12:00:00',	1,	'2014-02-13 17:36:18',	38),
-(52,	6,	11,	0,	0,	1,	1,	0,	0,	0,	'2012-03-01 12:00:00',	1,	'2014-02-13 17:30:48',	38),
-(53,	7,	11,	0,	0,	1,	1,	0,	1,	0,	'2012-03-01 12:00:00',	1,	'2014-04-24 16:01:04',	1),
-(54,	6,	8,	0,	0,	1,	0,	0,	0,	0,	'2012-03-01 12:00:00',	1,	'2014-02-13 17:30:48',	38),
-(55,	6,	8,	2,	2,	1,	2,	2,	2,	2,	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(73,	3,	7,	0,	0,	0,	0,	0,	0,	0,	'2012-03-01 12:00:00',	1,	'2014-05-22 16:45:29',	1),
-(75,	3,	14,	0,	0,	1,	1,	0,	0,	0,	'0000-00-00 00:00:00',	1,	'2014-05-22 16:45:29',	1),
-(108,	1,	5,	1,	1,	1,	1,	1,	0,	0,	'2013-12-16 12:51:35',	1,	'2013-12-18 08:39:43',	1),
-(112,	1,	11,	1,	1,	1,	1,	1,	1,	0,	'2013-12-16 12:42:08',	1,	'2013-12-18 08:39:43',	1),
-(115,	1,	16,	1,	1,	1,	1,	1,	0,	0,	'2013-12-16 01:09:38',	1,	'2013-12-18 08:39:43',	1),
-(116,	1,	8,	0,	0,	1,	0,	0,	0,	0,	'2013-12-16 01:09:38',	1,	'2013-12-18 08:39:43',	1),
-(117,	1,	3,	1,	1,	1,	1,	1,	1,	0,	'2013-12-16 01:09:38',	1,	'2013-12-18 08:39:43',	1),
-(118,	1,	10,	1,	1,	1,	1,	1,	1,	0,	'2013-12-16 01:14:53',	1,	'2013-12-18 08:39:43',	1),
-(120,	1,	6,	0,	0,	1,	0,	0,	0,	0,	'2013-12-16 12:51:35',	1,	'2013-12-18 08:39:43',	1),
-(121,	1,	14,	1,	1,	1,	1,	1,	0,	0,	'2013-12-16 01:16:20',	1,	'2013-12-18 08:39:43',	1),
-(122,	1,	15,	1,	1,	1,	1,	1,	0,	0,	'2013-12-16 01:16:20',	1,	'2013-12-18 08:39:43',	1),
-(123,	1,	1,	0,	0,	1,	1,	0,	0,	0,	'2013-12-16 01:16:20',	1,	'2013-12-18 08:39:43',	1),
-(124,	1,	2,	1,	1,	1,	1,	1,	0,	0,	'2013-12-16 01:16:20',	1,	'2013-12-18 08:39:43',	1),
-(125,	1,	13,	1,	1,	1,	1,	1,	0,	0,	'2013-12-16 01:22:26',	1,	'2013-12-18 08:39:43',	1),
-(126,	1,	9,	1,	1,	1,	1,	1,	1,	0,	'2013-12-16 01:22:26',	1,	'2013-12-18 08:39:43',	1),
-(127,	6,	7,	0,	0,	0,	0,	0,	0,	0,	'2013-12-16 03:21:35',	1,	'2014-02-13 17:30:48',	38),
-(129,	6,	14,	0,	0,	0,	0,	0,	0,	0,	'2013-12-16 03:21:35',	1,	'2014-02-13 17:30:48',	38),
-(131,	6,	15,	0,	0,	0,	0,	0,	0,	0,	'2013-12-16 03:21:35',	1,	'2014-02-13 17:30:48',	38),
-(132,	6,	1,	0,	0,	0,	0,	0,	0,	0,	'2013-12-16 03:21:35',	1,	'2014-02-13 17:30:48',	38),
-(133,	6,	2,	0,	0,	0,	0,	0,	0,	0,	'2013-12-16 03:21:35',	1,	'2014-02-13 17:30:48',	38),
-(134,	6,	16,	0,	0,	1,	1,	0,	0,	0,	'2013-12-16 03:21:35',	1,	'2014-02-13 17:30:48',	38),
-(135,	6,	5,	0,	0,	0,	0,	0,	0,	0,	'2013-12-16 03:21:35',	1,	'2014-02-13 17:30:48',	38),
-(136,	1,	17,	0,	0,	1,	0,	0,	0,	0,	'2013-12-16 05:19:15',	1,	'2013-12-18 08:39:43',	1),
-(137,	1,	19,	0,	0,	1,	0,	0,	0,	0,	'2013-12-18 08:39:43',	1,	NULL,	NULL),
-(138,	1,	20,	0,	0,	1,	0,	0,	0,	0,	'2013-12-18 08:39:43',	1,	NULL,	NULL),
-(139,	1,	18,	0,	0,	1,	0,	0,	0,	0,	'2013-12-18 08:39:43',	1,	NULL,	NULL),
-(140,	1,	21,	0,	0,	1,	0,	0,	0,	0,	'2013-12-18 08:39:43',	1,	NULL,	NULL),
-(141,	1,	22,	0,	0,	1,	0,	0,	0,	0,	'2013-12-18 08:39:43',	1,	NULL,	NULL),
-(142,	7,	7,	0,	0,	1,	1,	0,	0,	0,	'2013-12-26 10:10:47',	1,	'2014-04-24 16:01:04',	1),
-(143,	7,	14,	0,	0,	1,	1,	0,	0,	0,	'2013-12-26 10:10:47',	1,	'2014-04-24 16:01:04',	1),
-(144,	7,	15,	0,	0,	1,	1,	0,	0,	0,	'2013-12-26 10:10:47',	1,	'2014-04-24 16:01:04',	1),
-(145,	7,	1,	0,	0,	1,	1,	0,	0,	0,	'2013-12-26 10:10:47',	1,	'2014-04-24 16:01:04',	1),
-(146,	7,	2,	0,	0,	1,	1,	0,	0,	0,	'2013-12-26 10:10:47',	1,	'2014-04-24 16:01:04',	1),
-(147,	7,	19,	0,	0,	1,	0,	0,	0,	0,	'2013-12-26 10:10:47',	1,	'2014-04-24 16:01:04',	1),
-(148,	7,	20,	0,	0,	1,	0,	0,	0,	0,	'2013-12-26 10:10:47',	1,	'2014-04-24 16:01:04',	1),
-(149,	7,	18,	0,	0,	1,	0,	0,	0,	0,	'2013-12-26 10:10:47',	1,	'2014-04-24 16:01:04',	1),
-(150,	7,	21,	0,	0,	1,	0,	0,	0,	0,	'2013-12-26 10:10:47',	1,	'2014-04-24 16:01:04',	1),
-(151,	7,	17,	0,	0,	1,	0,	0,	0,	0,	'2013-12-26 10:10:47',	1,	'2014-04-24 16:01:04',	1),
-(152,	7,	22,	0,	0,	1,	0,	0,	0,	0,	'2013-12-26 10:10:47',	1,	'2014-04-24 16:01:04',	1),
-(153,	7,	16,	0,	0,	1,	1,	0,	0,	0,	'2013-12-26 10:10:47',	1,	'2014-04-24 16:01:04',	1),
-(154,	7,	8,	0,	0,	1,	0,	0,	0,	0,	'2013-12-26 10:10:47',	1,	'2014-04-24 16:01:04',	1),
-(155,	7,	5,	0,	0,	1,	1,	0,	0,	0,	'2013-12-26 10:10:47',	1,	'2014-04-24 16:01:04',	1),
-(156,	2,	7,	0,	0,	0,	0,	0,	0,	0,	'2014-01-07 07:48:48',	1,	'2014-02-13 17:36:18',	38),
-(157,	2,	14,	0,	0,	1,	1,	0,	0,	0,	'2014-01-07 07:48:48',	1,	'2014-02-13 17:36:18',	38),
-(158,	2,	15,	0,	0,	1,	1,	0,	0,	0,	'2014-01-07 07:48:48',	1,	'2014-02-13 17:36:18',	38),
-(159,	2,	1,	0,	0,	0,	0,	0,	0,	0,	'2014-01-07 07:48:48',	1,	'2014-02-13 17:36:18',	38),
-(160,	2,	2,	0,	0,	0,	0,	0,	0,	0,	'2014-01-07 07:48:48',	1,	'2014-02-13 17:36:18',	38),
-(161,	2,	19,	0,	0,	0,	0,	0,	0,	0,	'2014-01-07 07:48:48',	1,	'2014-02-13 17:36:18',	38),
-(162,	2,	20,	0,	0,	0,	0,	0,	0,	0,	'2014-01-07 07:48:48',	1,	'2014-02-13 17:36:18',	38),
-(163,	2,	18,	0,	0,	0,	0,	0,	0,	0,	'2014-01-07 07:48:48',	1,	'2014-02-13 17:36:18',	38),
-(164,	2,	21,	0,	0,	0,	0,	0,	0,	0,	'2014-01-07 07:48:48',	1,	'2014-02-13 17:36:18',	38),
-(165,	2,	17,	0,	0,	0,	0,	0,	0,	0,	'2014-01-07 07:48:48',	1,	'2014-02-13 17:36:18',	38),
-(166,	2,	22,	0,	0,	0,	0,	0,	0,	0,	'2014-01-07 07:48:48',	1,	'2014-02-13 17:36:18',	38),
-(167,	2,	16,	0,	0,	1,	1,	0,	0,	0,	'2014-01-07 07:48:48',	1,	'2014-02-13 17:36:18',	38),
-(168,	2,	8,	0,	0,	1,	0,	0,	0,	0,	'2014-01-07 07:48:48',	1,	'2014-02-13 17:36:18',	38),
-(169,	2,	5,	0,	0,	0,	0,	0,	0,	0,	'2014-01-07 07:48:48',	1,	'2014-02-13 17:36:18',	38),
-(170,	3,	11,	0,	0,	1,	1,	0,	0,	0,	'2014-01-24 05:41:35',	1,	'2014-05-22 16:45:29',	1),
-(171,	3,	15,	0,	0,	1,	1,	0,	0,	0,	'2014-01-24 05:41:35',	1,	'2014-05-22 16:45:29',	1),
-(172,	3,	1,	0,	0,	0,	0,	0,	0,	0,	'2014-01-24 05:41:35',	1,	'2014-05-22 16:45:29',	1),
-(173,	3,	2,	0,	0,	0,	0,	0,	0,	0,	'2014-01-24 05:41:35',	1,	'2014-05-22 16:45:29',	1),
-(174,	3,	13,	0,	0,	1,	1,	0,	0,	0,	'2014-01-24 05:41:35',	1,	'2014-05-22 16:45:29',	1),
-(175,	3,	19,	0,	0,	1,	0,	0,	0,	0,	'2014-01-24 05:41:35',	1,	'2014-05-22 16:45:29',	1),
-(176,	3,	20,	0,	0,	1,	0,	0,	0,	0,	'2014-01-24 05:41:35',	1,	'2014-05-22 16:45:29',	1),
-(177,	3,	18,	0,	0,	1,	0,	0,	0,	0,	'2014-01-24 05:41:35',	1,	'2014-05-22 16:45:29',	1),
-(178,	3,	21,	0,	0,	1,	0,	0,	0,	0,	'2014-01-24 05:41:35',	1,	'2014-05-22 16:45:29',	1),
-(179,	3,	17,	0,	0,	1,	0,	0,	0,	0,	'2014-01-24 05:41:35',	1,	'2014-05-22 16:45:29',	1),
-(180,	3,	9,	1,	1,	1,	1,	1,	1,	0,	'2014-01-24 05:41:35',	1,	'2014-05-22 16:45:29',	1),
-(181,	3,	22,	0,	0,	1,	0,	0,	0,	0,	'2014-01-24 05:41:35',	1,	'2014-05-22 16:45:29',	1),
-(182,	3,	16,	1,	1,	1,	1,	1,	0,	0,	'2014-01-24 05:41:35',	1,	'2014-05-22 16:45:29',	1),
-(183,	3,	8,	0,	0,	1,	0,	0,	0,	0,	'2014-01-24 05:41:35',	1,	'2014-05-22 16:45:29',	1),
-(184,	3,	5,	0,	0,	0,	0,	0,	0,	0,	'2014-01-24 05:41:35',	1,	'2014-05-22 16:45:29',	1),
-(185,	3,	3,	0,	1,	1,	1,	0,	0,	0,	'2014-01-24 05:41:35',	1,	'2014-05-22 16:45:29',	1),
-(186,	5,	7,	0,	0,	0,	0,	0,	0,	0,	'2014-02-13 17:29:08',	38,	NULL,	NULL),
-(187,	5,	14,	0,	0,	0,	0,	0,	0,	0,	'2014-02-13 17:29:08',	38,	NULL,	NULL),
-(188,	5,	11,	0,	0,	0,	0,	0,	0,	0,	'2014-02-13 17:29:08',	38,	NULL,	NULL),
-(189,	5,	15,	0,	0,	0,	0,	0,	0,	0,	'2014-02-13 17:29:08',	38,	NULL,	NULL),
-(190,	5,	1,	0,	0,	0,	0,	0,	0,	0,	'2014-02-13 17:29:08',	38,	NULL,	NULL),
-(191,	5,	2,	0,	0,	0,	0,	0,	0,	0,	'2014-02-13 17:29:08',	38,	NULL,	NULL),
-(192,	5,	19,	0,	0,	0,	0,	0,	0,	0,	'2014-02-13 17:29:08',	38,	NULL,	NULL),
-(193,	5,	20,	0,	0,	0,	0,	0,	0,	0,	'2014-02-13 17:29:08',	38,	NULL,	NULL),
-(194,	5,	18,	0,	0,	0,	0,	0,	0,	0,	'2014-02-13 17:29:08',	38,	NULL,	NULL),
-(195,	5,	21,	0,	0,	0,	0,	0,	0,	0,	'2014-02-13 17:29:08',	38,	NULL,	NULL),
-(196,	5,	17,	0,	0,	0,	0,	0,	0,	0,	'2014-02-13 17:29:08',	38,	NULL,	NULL),
-(197,	5,	22,	0,	0,	0,	0,	0,	0,	0,	'2014-02-13 17:29:08',	38,	NULL,	NULL),
-(198,	5,	16,	1,	1,	1,	0,	0,	0,	0,	'2014-02-13 17:29:08',	38,	NULL,	NULL),
-(199,	5,	8,	0,	0,	0,	0,	0,	0,	0,	'2014-02-13 17:29:08',	38,	NULL,	NULL),
-(200,	5,	5,	0,	0,	0,	0,	0,	0,	0,	'2014-02-13 17:29:08',	38,	NULL,	NULL),
-(201,	6,	19,	0,	0,	1,	0,	0,	0,	0,	'2014-02-13 17:30:48',	38,	NULL,	NULL),
-(202,	6,	20,	0,	0,	1,	0,	0,	0,	0,	'2014-02-13 17:30:48',	38,	NULL,	NULL),
-(203,	6,	18,	0,	0,	1,	0,	0,	0,	0,	'2014-02-13 17:30:48',	38,	NULL,	NULL),
-(204,	6,	21,	0,	0,	1,	0,	0,	0,	0,	'2014-02-13 17:30:48',	38,	NULL,	NULL),
-(205,	6,	17,	0,	0,	1,	0,	0,	0,	0,	'2014-02-13 17:30:48',	38,	NULL,	NULL),
-(206,	6,	22,	0,	0,	0,	0,	0,	0,	0,	'2014-02-13 17:30:48',	38,	NULL,	NULL),
-(207,	1,	23,	0,	0,	1,	0,	0,	0,	0,	'2014-04-18 22:46:46',	2,	NULL,	NULL),
-(208,	7,	23,	0,	0,	1,	0,	0,	0,	0,	'2014-04-24 16:01:04',	1,	NULL,	NULL),
-(209,	3,	23,	0,	0,	1,	0,	0,	0,	0,	'2014-05-22 16:45:29',	1,	NULL,	NULL);
+-- ----------------------------
+-- Records of aclpermission
+-- ----------------------------
+INSERT INTO `aclpermission` VALUES ('6', '1', '7', '1', '1', '1', '1', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('18', '2', '6', '0', '0', '1', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('19', '3', '6', '0', '0', '1', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('21', '4', '6', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('25', '2', '3', '0', '1', '1', '1', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('28', '4', '3', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('38', '2', '9', '1', '1', '1', '1', '0', '1', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('39', '3', '9', '1', '1', '1', '1', '0', '1', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('41', '4', '9', '1', '1', '1', '1', '0', '1', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('73', '3', '7', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('75', '3', '10', '0', '0', '1', '1', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('108', '1', '5', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('116', '1', '8', '0', '0', '1', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('117', '1', '3', '1', '1', '1', '1', '1', '1', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('118', '1', '9', '1', '1', '1', '1', '1', '1', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('120', '1', '6', '0', '0', '1', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('121', '1', '10', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('123', '1', '1', '0', '0', '1', '1', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('124', '1', '2', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('156', '2', '7', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('157', '2', '10', '0', '0', '1', '1', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('159', '2', '1', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('160', '2', '2', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('168', '2', '8', '0', '0', '1', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('169', '2', '5', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('172', '3', '1', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('173', '3', '2', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('183', '3', '8', '0', '0', '1', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('184', '3', '5', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('185', '3', '3', '0', '1', '1', '1', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('186', '4', '7', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('187', '4', '10', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('190', '4', '1', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('191', '4', '2', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('199', '4', '8', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('200', '4', '5', '0', '0', '0', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('201', '1', '11', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('202', '2', '11', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('203', '3', '11', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('204', '4', '11', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('205', '1', '12', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('206', '2', '12', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('207', '3', '12', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('208', '4', '12', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('209', '1', '13', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclpermission` VALUES ('210', '2', '13', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '0', null, null);
 
+-- ----------------------------
+-- Table structure for `aclresource`
+-- ----------------------------
 DROP TABLE IF EXISTS `aclresource`;
 CREATE TABLE `aclresource` (
-  `id` int(11) unsigned NOT NULL auto_increment,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
   `description` varchar(255) NOT NULL,
-  `create` tinyint(4) NOT NULL default '0',
-  `edit` tinyint(4) NOT NULL default '0',
-  `view` tinyint(4) NOT NULL default '0',
-  `list` tinyint(4) NOT NULL default '0',
-  `delete` tinyint(4) NOT NULL default '0',
-  `approve` tinyint(4) NOT NULL default '0',
-  `export` tinyint(4) NOT NULL default '0',
+  `create` tinyint(4) NOT NULL DEFAULT '0',
+  `edit` tinyint(4) NOT NULL DEFAULT '0',
+  `view` tinyint(4) NOT NULL DEFAULT '0',
+  `list` tinyint(4) NOT NULL DEFAULT '0',
+  `delete` tinyint(4) NOT NULL DEFAULT '0',
+  `approve` tinyint(4) NOT NULL DEFAULT '0',
+  `export` tinyint(4) NOT NULL DEFAULT '0',
   `datecreated` datetime NOT NULL,
   `createdby` int(11) unsigned NOT NULL,
-  `lastupdatedate` datetime default NULL,
-  `lastupdatedby` int(11) unsigned default NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `lastupdatedate` datetime DEFAULT NULL,
+  `lastupdatedby` int(11) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 
-INSERT INTO `aclresource` (`id`, `name`, `description`, `create`, `edit`, `view`, `list`, `delete`, `approve`, `export`, `datecreated`, `createdby`, `lastupdatedate`, `lastupdatedby`) VALUES
-(1,	'Lookup Type',	'Look up types',	0,	0,	1,	1,	0,	0,	0,	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(2,	'Lookup Value',	'Values for the lookup type',	1,	1,	1,	1,	1,	0,	0,	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(3,	'User Account',	'A user within the application',	1,	1,	1,	1,	1,	0,	1,	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(5,	'Role',	'Actions a member can execute on resources',	1,	1,	1,	1,	1,	0,	0,	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(6,	'Dashboard',	'user dashboard',	0,	0,	1,	0,	0,	0,	0,	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(7,	'Application Settings',	'Application Administration',	1,	1,	1,	1,	0,	0,	0,	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(8,	'Report Dashboard',	'The different reports in the Application',	0,	0,	1,	0,	0,	0,	0,	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(9,	'Query',	'The query reported for resolution',	1,	1,	1,	1,	1,	0,	1,	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(10,	'Client',	'The customer who reports a query',	1,	1,	1,	1,	1,	0,	1,	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(11,	'Department',	'The group assigned or responsible for a ticket',	1,	1,	1,	1,	1,	0,	1,	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(13,	'Messaging',	'Messaging functionality',	1,	1,	1,	1,	1,	0,	0,	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(14,	'Category',	'Categorisation functionality',	1,	1,	1,	1,	1,	0,	0,	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(15,	'Documents',	'Uploads functionality',	1,	1,	1,	1,	1,	0,	0,	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(16,	'Query Feedback',	'Query Feedback Functionality',	1,	1,	1,	1,	1,	0,	0,	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(17,	'Queries by Status Report',	'Queries by Status Report',	0,	0,	1,	0,	0,	0,	0,	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(18,	'Queries by Department Report',	'Queries by Department Report',	0,	0,	1,	0,	0,	0,	0,	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(19,	'Queries by Category Report',	'Queries by Category Report',	0,	0,	1,	0,	0,	0,	0,	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(20,	'Queries by Client Report',	'Queries by Client Report',	0,	0,	1,	0,	0,	0,	0,	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(21,	'Queries by Source Report',	'Queries by Source Report',	0,	0,	1,	0,	0,	0,	0,	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(22,	'Query Audit Trail Report',	'Queries Audit Trail Report',	0,	0,	1,	0,	0,	0,	0,	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(23,	'Queries by Town Report',	'Queries by Town Report',	0,	0,	1,	0,	0,	0,	0,	'2012-03-01 12:00:00',	1,	NULL,	NULL);
+-- ----------------------------
+-- Records of aclresource
+-- ----------------------------
+INSERT INTO `aclresource` VALUES ('1', 'Lookup Type', 'Look up types', '0', '0', '1', '1', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('2', 'Lookup Value', 'Values for the lookup type', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('3', 'User Account', 'A user within the application', '1', '1', '1', '1', '1', '0', '1', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('5', 'Role', 'Actions a member can execute on resources', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('6', 'Dashboard', 'user dashboard', '0', '0', '1', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('7', 'Application Settings', 'Application Administration', '1', '1', '1', '1', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('8', 'Report Dashboard', 'The different reports in the Application', '0', '0', '1', '0', '0', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('9', 'Client', 'The customer who reports a query', '1', '1', '1', '1', '1', '0', '1', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('10', 'Category', 'Categorisation functionality', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('11', 'Job', 'Client employment feature', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('12', 'Voucher', 'Client voucher module', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
+INSERT INTO `aclresource` VALUES ('13', 'Activity', 'Client intervention activities', '1', '1', '1', '1', '1', '0', '0', '2014-06-01 12:00:00', '1', null, null);
 
+-- ----------------------------
+-- Table structure for `aclusergroup`
+-- ----------------------------
 DROP TABLE IF EXISTS `aclusergroup`;
 CREATE TABLE `aclusergroup` (
-  `id` int(11) unsigned NOT NULL auto_increment,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `groupid` int(11) unsigned NOT NULL,
-  `userid` int(11) unsigned default NULL,
-  PRIMARY KEY  (`id`),
+  `userid` int(11) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
   UNIQUE KEY `unique_user_group` (`groupid`,`userid`),
   KEY `fk_usergroup_userid` (`userid`),
   CONSTRAINT `fk_usergroup_groupid` FOREIGN KEY (`groupid`) REFERENCES `aclgroup` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_usergroup_userid` FOREIGN KEY (`userid`) REFERENCES `useraccount` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8;
 
-INSERT INTO `aclusergroup` (`id`, `groupid`, `userid`) VALUES
-(1,	1,	1),
-(32,	1,	39),
-(63,	1,	70),
-(34,	2,	41),
-(38,	2,	45),
-(40,	2,	47),
-(41,	2,	48),
-(47,	2,	54),
-(49,	2,	56),
-(55,	2,	62),
-(60,	2,	67),
-(61,	2,	68),
-(65,	2,	72),
-(33,	3,	40),
-(36,	3,	43),
-(37,	3,	44),
-(39,	3,	46),
-(48,	3,	55),
-(50,	3,	57),
-(51,	3,	58),
-(52,	3,	59),
-(54,	3,	61),
-(56,	3,	63),
-(57,	3,	64),
-(58,	3,	65),
-(62,	3,	69),
-(46,	6,	53),
-(59,	6,	66),
-(64,	6,	71),
-(35,	7,	42),
-(42,	7,	49),
-(43,	7,	50),
-(44,	7,	51),
-(45,	7,	52);
+-- ----------------------------
+-- Records of aclusergroup
+-- ----------------------------
+INSERT INTO `aclusergroup` VALUES ('1', '1', '1');
+INSERT INTO `aclusergroup` VALUES ('37', '2', '3');
+INSERT INTO `aclusergroup` VALUES ('38', '2', '4');
+INSERT INTO `aclusergroup` VALUES ('41', '2', '6');
+INSERT INTO `aclusergroup` VALUES ('39', '3', '5');
+INSERT INTO `aclusergroup` VALUES ('32', '4', '2');
 
+-- ----------------------------
+-- Table structure for `activity`
+-- ----------------------------
+DROP TABLE IF EXISTS `activity`;
+CREATE TABLE `activity` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `voucherid` int(11) unsigned DEFAULT NULL,
+  `clientid` int(11) unsigned DEFAULT NULL,
+  `coachid` int(11) unsigned DEFAULT NULL,
+  `activitydate` date DEFAULT NULL,
+  `activitysummary` varchar(255) DEFAULT NULL,
+  `actcode` varchar(15) DEFAULT NULL,
+  `starttime` time DEFAULT NULL,
+  `endtime` time DEFAULT NULL,
+  `breakhours` decimal(10,2) unsigned DEFAULT NULL,
+  `billablehours` decimal(10,2) unsigned DEFAULT NULL,
+  `datecreated` datetime DEFAULT NULL,
+  `createdby` int(11) unsigned DEFAULT NULL,
+  `lastupdatedate` datetime DEFAULT NULL,
+  `lastupdatedby` int(11) unsigned DEFAULT NULL,
+  `expectedperformance` varchar(1000) DEFAULT NULL,
+  `actualperformance` varchar(1000) DEFAULT NULL,
+  `interventionplan` varchar(1000) DEFAULT NULL,
+  `progressofintervention` varchar(1000) DEFAULT NULL,
+  `notes` varchar(1000) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_activity_voucherid` (`voucherid`),
+  KEY `fk_activity_clientid` (`clientid`),
+  KEY `fk_activity_userid` (`coachid`),
+  CONSTRAINT `fk_activity_clientid` FOREIGN KEY (`clientid`) REFERENCES `client` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_activity_userid` FOREIGN KEY (`coachid`) REFERENCES `useraccount` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_activity_voucherid` FOREIGN KEY (`voucherid`) REFERENCES `voucher` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of activity
+-- ----------------------------
+INSERT INTO `activity` VALUES ('4', '1', '12', '3', '2014-06-10', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin placerat', null, '08:30:00', '11:30:00', '1.00', '2.00', '2014-06-16 19:39:06', '1', '2014-06-16 19:39:43', null, 'Proin viverra ipsum quis sapien tempor faucibus. Ut feugiat urna sed enim aliquet, sagittis suscipit nulla sodales. Integer bibendum quis elit non interdum. Quisque lorem felis, laoreet consequat sodales a, porta non ligula.', 'Morbi lobortis feugiat orci eu laoreet. Phasellus elementum velit non metus elementum, at dapibus erat mollis. Donec non eros quis orci vulputate vehicula ut quis augue. Phasellus a vestibulum', 'Pellentesque elementum risus in eros tempus, nec tincidunt tortor consequat. Nam feugiat leo non enim fermentum condimentum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Cras ut hendrerit magna', 'Cras congue nisl et ornare dignissim. Proin ut lacus nunc. Sed quis tortor non felis tempus auctor. Ut aliquet arcu elementum risus sagittis, quis malesuada tortor mattis. Curabitur non convallis ligula. Fusce massa nisl, lacinia bibendum accumsan vel, porttitor ut purus. Vestibulum pharetra libero at sapien pretium semper nec quis nibh. Aliquam massa lorem,', null);
+INSERT INTO `activity` VALUES ('5', '1', '12', '3', '2014-06-13', 'Pellentesque congue lacus massa, nec convallis sem rutrum tempor. ', null, '14:00:00', '16:00:00', '0.00', '2.00', '2014-06-16 19:41:43', '1', null, null, 'Quisque placerat aliquet magna quis elementum. Curabitur in molestie felis, a vulputate ipsum. Vestibulum pharetra pharetra ante, a molestie mi malesuada id.', 'Donec nec felis sit amet magna faucibus vestibulum. Praesent magna justo, consectetur ut urna sit amet, facilisis sodales tortor. Nulla semper ac lacus et accumsan. ', 'Aenean bibendum gravida lectus id facilisis. Proin ut urna nec turpis feugiat lobortis at vitae lectus. Etiam euismod leo nec pulvinar congue. Maecenas quam tellus, luctus at sollicitudin sit amet', 'Curabitur commodo posuere tellus, vel suscipit metus vulputate eu. Duis convallis, ipsum vitae tristique lobortis, velit leo ultricies enim, id hendrerit diam lorem eu purus.', null);
+
+-- ----------------------------
+-- Table structure for `appconfig`
+-- ----------------------------
 DROP TABLE IF EXISTS `appconfig`;
 CREATE TABLE `appconfig` (
-  `id` int(11) unsigned NOT NULL auto_increment,
-  `section` varchar(50) NOT NULL default '',
-  `sectiondisplay` varchar(50) default NULL,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `section` varchar(50) NOT NULL DEFAULT '',
+  `sectiondisplay` varchar(50) DEFAULT NULL,
   `optionname` varchar(50) NOT NULL,
-  `displayname` varchar(50) default NULL,
+  `displayname` varchar(50) DEFAULT NULL,
   `description` varchar(255) NOT NULL,
-  `optionvalue` varchar(255) default '',
-  `optiontype` varchar(15) default '',
-  `active` enum('N','Y') default 'Y',
-  `editable` tinyint(4) unsigned default NULL,
+  `optionvalue` varchar(255) DEFAULT '',
+  `optiontype` varchar(15) DEFAULT '',
+  `active` enum('N','Y') DEFAULT 'Y',
+  `editable` tinyint(4) unsigned DEFAULT NULL,
   `datecreated` datetime NOT NULL,
   `createdby` int(11) unsigned NOT NULL,
-  `lastupdatedate` datetime default NULL,
-  `lastupdatedby` int(11) unsigned default NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `lastupdatedate` datetime DEFAULT NULL,
+  `lastupdatedby` int(11) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=71 DEFAULT CHARSET=utf8;
 
-INSERT INTO `appconfig` (`id`, `section`, `sectiondisplay`, `optionname`, `displayname`, `description`, `optionvalue`, `optiontype`, `active`, `editable`, `datecreated`, `createdby`, `lastupdatedate`, `lastupdatedby`) VALUES
-(1,	'backup',	'Backup Settings',	'retentionperiod',	'Backup Rentention Perid',	'Duration for which backups are kept',	'30',	'integer',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 15:34:21',	NULL),
-(2,	'backup',	'Backup Settings',	'scriptfolder',	'Folder for Backup Scripts',	'The path relative to the APPLICATION_PATH variable, use a starting / since the variable is a folder name',	'/backup/scripts',	'text',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 15:34:21',	NULL),
-(3,	'backup',	'Backup Settings',	'usegzip',	'Gzip Backups',	'Whether to use gzip compression or not, options are yes and no',	'no',	'text',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 15:34:21',	NULL),
-(4,	'backup',	'Backup Settings',	'removesqlfile',	'Sql Backups',	'Remove SQL file after processing, options are yes and no',	'no',	'text',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 15:34:21',	NULL),
-(5,	'backup',	'Backup Settings',	'sendemail',	'Send Backups to Admin Email',	'Send backup via email, options are yes and no',	'no',	'text',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 15:34:21',	NULL),
-(6,	'country',	'Country Settings',	'currencysymbol',	'Currency Symbol',	'',	'R ',	'text',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 18:25:00',	NULL),
-(7,	'country',	'Country Settings',	'currencycode',	'Currency Code',	'',	'ZAR ',	'text',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 18:25:00',	NULL),
-(8,	'country',	'Country Settings',	'currencydecimalplaces',	'Currreny decimal places',	'',	'0',	'integer',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 18:25:00',	NULL),
-(9,	'country',	'Country Settings',	'mincurrencyvalue',	'Minimum currency amount',	'',	'1',	'decimal',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 18:25:00',	NULL),
-(10,	'country',	'Country Settings',	'maxcurrencyvalue',	'Maximum currency amount',	'',	'200',	'decimal',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 18:25:01',	NULL),
-(12,	'dateandtime',	'Date and Time Settings',	'shortformat',	'Short date display format',	'',	'm/d/Y',	'text',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 14:08:46',	NULL),
-(13,	'dateandtime',	'Date and Time Settings',	'mediumformat',	'Long date display format',	'',	'M j, Y',	'text',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 14:08:46',	NULL),
-(14,	'dateandtime',	'Date and Time Settings',	'longformat',	'Long date with week day',	'',	'l, j F Y',	'text',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 14:08:46',	NULL),
-(15,	'dateandtime',	'Date and Time Settings',	'mysqlformat',	'Short date database format',	'',	'%m/%d/%Y',	'text',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 14:08:46',	NULL),
-(16,	'dateandtime',	'Date and Time Settings',	'mysqlmediumformat',	'Long date database format',	'',	'%d %b, %Y',	'text',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 14:08:46',	NULL),
-(17,	'dateandtime',	'Date and Time Settings',	'mysqldateandtimeformat',	'Long date with timestamp',	'',	'%m/%d/%Y - %H:%i:%s',	'text',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 14:08:46',	NULL),
-(19,	'password',	'User Profile Settings',	'passwordminlength',	'Minimum password length',	'The minimum length of a password',	'6',	'integer',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-03-25 10:52:59',	NULL),
-(20,	'dateandtime',	'Date and Time Settings',	'mindate',	'Date picker number of days ahead of current date',	'The minimum date for the date picker',	'2',	'integer',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 14:08:46',	NULL),
-(21,	'dateandtime',	'Date and Time Settings',	'maxdate',	'Date picker number of days before current date',	'The maximum date for the date picker',	'2',	'integer',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 14:08:46',	NULL),
-(22,	'dateandtime',	'Date and Time Settings',	'datepickerformat',	'Javascript long date',	'The format for Javascript dates',	'M dd, yy',	'text',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 14:08:46',	NULL),
-(23,	'dateandtime',	'Date and Time Settings',	'javascriptshortformat',	'Javascript short date',	'Short date for Javascript dates',	'm/dd/yy',	'text',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 14:08:46',	NULL),
-(24,	'uploads',	'File upload Options',	'docallowedformats',	'Allowed formats for document upload',	'Allowed document file formats',	'doc, docx, pdf, txt, jpg, jpeg, png, bmp',	'text',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 14:09:02',	NULL),
-(25,	'uploads',	'File upload Options',	'docmaximumfilesize',	'Maximum allowed size (bytes) for document uploads',	'Maximum size of a document in bytes',	'2000000',	'integer',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 14:09:02',	NULL),
-(26,	'password',	'User Profile Settings',	'passwordmaxlength',	'Maximum password length',	'The maximum length of a password',	'20',	'integer',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-03-25 10:52:59',	NULL),
-(30,	'notification',	'Notification and Email Options',	'emailmessagesender',	'Sender of email notifications',	'The email address the application uses to send out notifications',	'admin@bsaconsulting.co.za',	'text',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-03-24 20:00:00',	NULL),
-(31,	'uploads',	'File upload Settings',	'photoallowedformats',	'Profile photo allowed formats',	'Allowed photo file formats',	'jpg, jpeg, png',	'text',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 14:09:02',	NULL),
-(32,	'uploads',	'File upload Settings',	'photomaximumfilesize',	'Maximum allowed size (bytes) for profile photo',	'Maximum size of a profile photo in bytes',	'2000000',	'integer',	'Y',	1,	'2012-03-01 12:00:00',	1,	'2014-02-12 14:09:02',	NULL),
-(35,	'notification',	'Notification and Email Options',	'supportemailaddress',	'Contact us, feedback and support email address ',	'The address to which support emails are sent',	'admin@bsaconsulting.co.za',	'text',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-03-24 20:00:00',	NULL),
-(36,	'dateandtime',	'Date and Time Settings',	'mindateofbirth',	'Date of birth number of years before today',	'The number of years before today for allowable date for the hire date',	'100',	'integer',	'Y',	1,	'2011-05-18 09:55:32',	1,	'2014-02-12 14:08:46',	NULL),
-(37,	'password',	'User Profile Settings',	'usernamemaxlength',	'Minimum username length',	'',	'15',	'integer',	'Y',	1,	'2011-05-18 09:55:32',	1,	'2014-03-25 10:52:59',	NULL),
-(38,	'password',	'User Profile Settings',	'usernameminlength',	'Maximum username length',	'',	'4',	'integer',	'Y',	1,	'2011-05-18 09:55:32',	1,	'2014-03-25 10:52:59',	NULL),
-(39,	'country',	'Country Settings',	'countryisocode',	'Country standard iso code',	'',	'ZA',	'text',	'Y',	1,	'2011-05-18 09:55:32',	1,	'2014-02-12 18:25:01',	NULL),
-(40,	'country',	'Country Settings',	'phonemaxlength',	'Maximum digits allowed for phone number',	'',	'10',	'integer',	'Y',	1,	'2011-05-18 09:55:32',	1,	'2014-02-12 18:25:01',	NULL),
-(41,	'country',	'Country Settings',	'phoneminlength',	'Minimum digits allowed for phone number',	'',	'10',	'integer',	'Y',	1,	'2011-05-18 09:55:32',	1,	'2014-02-12 18:25:01',	NULL),
-(42,	'country',	'Country Settings',	'nationalidminlength',	'Minimum digits allowed for National ID',	'',	'13',	'integer',	'Y',	1,	'2011-05-18 09:55:32',	1,	'2014-02-12 18:25:01',	NULL),
-(43,	'country',	'Country Settings',	'nationalidmaxlength',	'Maximum digits allowed for National ID',	'',	'13',	'integer',	'Y',	1,	'2011-05-18 09:55:32',	1,	'2014-02-12 18:25:01',	NULL),
-(44,	'password',	'User Profile Settings',	'activationkeylength',	'The length of random account activation key',	'',	'6',	'integer',	'Y',	1,	'2011-05-18 09:55:32',	1,	'2014-03-25 10:52:59',	NULL),
-(45,	'notification',	'Notification and Email Options',	'notificationsendername',	'Name of sender for email notifications',	'',	'Q1 Team',	'text',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-03-24 20:00:00',	NULL),
-(46,	'country',	'Country Settings',	'countrycode',	'Phone number code prefix',	'',	'27',	'integer',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-02-12 18:25:01',	NULL),
-(47,	'sms',	'SMS Settings',	'serverurl',	'The server url',	'',	'http://smsplus3.routesms.com:8080/bulksms/bulksms',	'text',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-04-19 16:19:24',	NULL),
-(48,	'sms',	'SMS Settings',	'serverusername',	'The server username',	'',	'bsaconsulting00',	'text',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-04-19 16:19:24',	NULL),
-(49,	'sms',	'SMS Settings',	'serverpassword',	'The server password',	'',	'hj78dg4r',	'text',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-04-19 16:19:24',	NULL),
-(50,	'sms',	'SMS Settings',	'serverport',	'The sms server port',	'',	'8080',	'text',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-04-19 16:19:24',	NULL),
-(51,	'sms',	'SMS Settings',	'sendername',	'The default sender of sms notifications',	'',	'Q1 Team',	'text',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-04-19 16:19:24',	NULL),
-(52,	'sms',	'SMS Settings',	'testnumber',	'The test number for sms notifications',	'',	'27836246789',	'text',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-04-19 16:19:24',	NULL),
-(53,	'country',	'Country Settings',	'timezone',	'Country timezone',	'',	'UTC+02:00',	'text',	'Y',	1,	'2012-02-28 15:59:27',	1,	NULL,	NULL),
-(54,	'notification',	'Notification and Email Options',	'errorlogemail',	'Email used to report errors and downtime',	'',	'admin@bsaconsulting.co.za',	'text',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-03-24 20:00:00',	NULL),
-(55,	'notification',	'Notification and Email Options',	'smtpuser',	'SMPT User email',	'',	'admin@bsaconsulting.co.za',	'text',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-03-24 20:00:00',	NULL),
-(56,	'notification',	'Notification and Email Options',	'smtphost',	'SMTP host ipaddress/domain',	'',	'admin@bsaconsulting.co.za',	'text',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-03-24 20:00:00',	NULL),
-(57,	'notification',	'Notification and Email Options',	'smtppassword',	'SMTP Password',	'',	'bsa!@#_q1',	'text',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-03-24 20:00:00',	NULL),
-(58,	'notification',	'Notification and Email Options',	'smtpport',	'SMTP Port',	'',	'587',	'integer',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-03-24 20:00:00',	NULL),
-(59,	'notification',	'Notification and Email Options',	'defaultadminemail',	'Default Admin email',	'',	'admin@bsaconsulting.co.za',	'text',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-03-24 20:00:00',	NULL),
-(60,	'notification',	'Notification and Email Options',	'defaultadminname',	'Default Admin name',	'',	'Q1 Support',	'text',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-03-24 20:00:00',	NULL),
-(61,	'system',	'System and UI Settings',	'appname',	'Application name',	'',	'Q1',	'text',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-03-22 14:13:15',	NULL),
-(62,	'system',	'System and UI Settings',	'companyname',	'Company name',	'',	'Q1',	'text',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-03-22 14:13:15',	NULL),
-(63,	'system',	'System and UI Settings',	'companysignoff',	'Company signoff',	'',	'Q1 Team',	'text',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-03-22 14:13:15',	NULL),
-(64,	'system',	'System and UI Settings',	'logotype',	'Logo Type',	'1392299606.jpg',	'1',	'text',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-03-22 14:13:15',	NULL),
-(65,	'system',	'System and UI Settings',	'copyrightinfo',	'Company Copyright',	'',	' Copyright Â© 2014  |  Q.1  |  All Rights Reserved',	'text',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-03-22 14:13:15',	NULL),
-(67,	'sms',	'SMS Settings',	'smsdelivery',	'Turn on/off sms sending feature',	'',	'on',	'Boolean',	'Y',	1,	'2012-02-28 15:59:27',	1,	'2014-03-28 12:40:33',	NULL);
+-- ----------------------------
+-- Records of appconfig
+-- ----------------------------
+INSERT INTO `appconfig` VALUES ('1', 'backup', 'Backup Settings', 'retentionperiod', 'Backup Rentention Perid', 'Duration for which backups are kept', '30', 'integer', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 15:34:21', null);
+INSERT INTO `appconfig` VALUES ('2', 'backup', 'Backup Settings', 'scriptfolder', 'Folder for Backup Scripts', 'The path relative to the APPLICATION_PATH variable, use a starting / since the variable is a folder name', '/backup/scripts', 'text', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 15:34:21', null);
+INSERT INTO `appconfig` VALUES ('3', 'backup', 'Backup Settings', 'usegzip', 'Gzip Backups', 'Whether to use gzip compression or not, options are yes and no', 'no', 'text', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 15:34:21', null);
+INSERT INTO `appconfig` VALUES ('4', 'backup', 'Backup Settings', 'removesqlfile', 'Sql Backups', 'Remove SQL file after processing, options are yes and no', 'no', 'text', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 15:34:21', null);
+INSERT INTO `appconfig` VALUES ('5', 'backup', 'Backup Settings', 'sendemail', 'Send Backups to Admin Email', 'Send backup via email, options are yes and no', 'no', 'text', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 15:34:21', null);
+INSERT INTO `appconfig` VALUES ('6', 'country', 'Country Settings', 'currencysymbol', 'Currency Symbol', '', '$', 'text', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 18:25:00', null);
+INSERT INTO `appconfig` VALUES ('7', 'country', 'Country Settings', 'currencycode', 'Currency Code', '', 'USD', 'text', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 18:25:00', null);
+INSERT INTO `appconfig` VALUES ('8', 'country', 'Country Settings', 'currencydecimalplaces', 'Currreny decimal places', '', '2', 'integer', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 18:25:00', null);
+INSERT INTO `appconfig` VALUES ('9', 'country', 'Country Settings', 'mincurrencyvalue', 'Minimum currency amount', '', '0.01', 'decimal', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 18:25:00', null);
+INSERT INTO `appconfig` VALUES ('10', 'country', 'Country Settings', 'maxcurrencyvalue', 'Maximum currency amount', '', '200', 'decimal', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 18:25:01', null);
+INSERT INTO `appconfig` VALUES ('12', 'dateandtime', 'Date and Time Settings', 'shortformat', 'Short date display format', '', 'm/d/Y', 'text', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 14:08:46', null);
+INSERT INTO `appconfig` VALUES ('13', 'dateandtime', 'Date and Time Settings', 'mediumformat', 'Long date display format', '', 'M j, Y', 'text', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 14:08:46', null);
+INSERT INTO `appconfig` VALUES ('14', 'dateandtime', 'Date and Time Settings', 'longformat', 'Long date with week day', '', 'l, j F Y', 'text', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 14:08:46', null);
+INSERT INTO `appconfig` VALUES ('15', 'dateandtime', 'Date and Time Settings', 'mysqlformat', 'Short date database format', '', '%m/%d/%Y', 'text', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 14:08:46', null);
+INSERT INTO `appconfig` VALUES ('16', 'dateandtime', 'Date and Time Settings', 'mysqlmediumformat', 'Long date database format', '', '%d %b, %Y', 'text', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 14:08:46', null);
+INSERT INTO `appconfig` VALUES ('17', 'dateandtime', 'Date and Time Settings', 'mysqldateandtimeformat', 'Long date with timestamp', '', '%m/%d/%Y - %H:%i:%s', 'text', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 14:08:46', null);
+INSERT INTO `appconfig` VALUES ('19', 'password', 'User Profile Settings', 'passwordminlength', 'Minimum password length', 'The minimum length of a password', '6', 'integer', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-03-25 10:52:59', null);
+INSERT INTO `appconfig` VALUES ('20', 'dateandtime', 'Date and Time Settings', 'mindate', 'Date picker number of days ahead of current date', 'The minimum date for the date picker', '2', 'integer', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 14:08:46', null);
+INSERT INTO `appconfig` VALUES ('21', 'dateandtime', 'Date and Time Settings', 'maxdate', 'Date picker number of days before current date', 'The maximum date for the date picker', '2', 'integer', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 14:08:46', null);
+INSERT INTO `appconfig` VALUES ('22', 'dateandtime', 'Date and Time Settings', 'datepickerformat', 'Javascript long date', 'The format for Javascript dates', 'M dd, yy', 'text', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 14:08:46', null);
+INSERT INTO `appconfig` VALUES ('23', 'dateandtime', 'Date and Time Settings', 'javascriptshortformat', 'Javascript short date', 'Short date for Javascript dates', 'm/dd/yy', 'text', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 14:08:46', null);
+INSERT INTO `appconfig` VALUES ('24', 'uploads', 'File upload Options', 'docallowedformats', 'Allowed formats for document upload', 'Allowed document file formats', 'doc, docx, pdf, txt, rtf, odt', 'text', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 14:09:02', null);
+INSERT INTO `appconfig` VALUES ('25', 'uploads', 'File upload Options', 'docmaximumfilesize', 'Maximum allowed size (bytes) for document uploads', 'Maximum size of a document in bytes', '4000000', 'integer', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 14:09:02', null);
+INSERT INTO `appconfig` VALUES ('26', 'password', 'User Profile Settings', 'passwordmaxlength', 'Maximum password length', 'The maximum length of a password', '20', 'integer', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-03-25 10:52:59', null);
+INSERT INTO `appconfig` VALUES ('30', 'notification', 'Notification and Email Options', 'emailmessagesender', 'Sender of email notifications', 'The email address the application uses to send out notifications', 'notifications@devmail.infomacorp.com', 'text', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-03-24 20:00:00', null);
+INSERT INTO `appconfig` VALUES ('31', 'uploads', 'File upload Settings', 'photoallowedformats', 'Profile photo allowed formats', 'Allowed photo file formats', 'jpg, jpeg, png', 'text', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 14:09:02', null);
+INSERT INTO `appconfig` VALUES ('32', 'uploads', 'File upload Settings', 'photomaximumfilesize', 'Maximum allowed size (bytes) for profile photo', 'Maximum size of a profile photo in bytes', '4000000', 'integer', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-02-12 14:09:02', null);
+INSERT INTO `appconfig` VALUES ('35', 'notification', 'Notification and Email Options', 'supportemailaddress', 'Contact us, feedback and support email address ', 'The address to which support emails are sent', 'support@devmail.infomacorp.com', 'text', 'Y', '1', '2012-02-28 15:59:27', '1', '2014-03-24 20:00:00', null);
+INSERT INTO `appconfig` VALUES ('36', 'dateandtime', 'Date and Time Settings', 'mindateofbirth', 'Date of birth number of years before today', 'The number of years before today for allowable date for the hire date', '100', 'integer', 'Y', '1', '2011-05-18 09:55:32', '1', '2014-02-12 14:08:46', null);
+INSERT INTO `appconfig` VALUES ('37', 'password', 'User Profile Settings', 'usernamemaxlength', 'Minimum username length', '', '15', 'integer', 'Y', '1', '2011-05-18 09:55:32', '1', '2014-03-25 10:52:59', null);
+INSERT INTO `appconfig` VALUES ('38', 'password', 'User Profile Settings', 'usernameminlength', 'Maximum username length', '', '4', 'integer', 'Y', '1', '2011-05-18 09:55:32', '1', '2014-03-25 10:52:59', null);
+INSERT INTO `appconfig` VALUES ('39', 'country', 'Country Settings', 'countryisocode', 'Country standard iso code', '', 'US', 'text', 'Y', '1', '2011-05-18 09:55:32', '1', '2014-02-12 18:25:01', null);
+INSERT INTO `appconfig` VALUES ('40', 'country', 'Country Settings', 'phonemaxlength', 'Maximum digits allowed for phone number', '', '11', 'integer', 'Y', '1', '2011-05-18 09:55:32', '1', '2014-02-12 18:25:01', null);
+INSERT INTO `appconfig` VALUES ('41', 'country', 'Country Settings', 'phoneminlength', 'Minimum digits allowed for phone number', '', '10', 'integer', 'Y', '1', '2011-05-18 09:55:32', '1', '2014-02-12 18:25:01', null);
+INSERT INTO `appconfig` VALUES ('42', 'country', 'Country Settings', 'ssnminlength', 'Minimum digits allowed for SSN', '', '9', 'integer', 'Y', '1', '2011-05-18 09:55:32', '1', '2014-02-12 18:25:01', null);
+INSERT INTO `appconfig` VALUES ('43', 'country', 'Country Settings', 'ssnmaxlength', 'Maximum digits allowed for SSN', '', '93', 'integer', 'Y', '1', '2011-05-18 09:55:32', '1', '2014-02-12 18:25:01', null);
+INSERT INTO `appconfig` VALUES ('44', 'password', 'User Profile Settings', 'activationkeylength', 'The length of random account activation key', '', '6', 'integer', 'Y', '1', '2011-05-18 09:55:32', '1', '2014-03-25 10:52:59', null);
+INSERT INTO `appconfig` VALUES ('45', 'notification', 'Notification and Email Options', 'notificationsendername', 'Name of sender for email notifications', '', 'ENT Support', 'text', 'Y', '1', '2012-02-28 15:59:27', '1', '2014-03-24 20:00:00', null);
+INSERT INTO `appconfig` VALUES ('46', 'country', 'Country Settings', 'countrycode', 'Phone number code prefix', '', '1', 'integer', 'Y', '1', '2012-02-28 15:59:27', '1', '2014-02-12 18:25:01', null);
+INSERT INTO `appconfig` VALUES ('53', 'country', 'Country Settings', 'timezone', 'Country timezone', '', 'UTC-07:00', 'text', 'Y', '1', '2012-02-28 15:59:27', '1', null, null);
+INSERT INTO `appconfig` VALUES ('54', 'notification', 'Notification and Email Options', 'errorlogemail', 'Email used to report errors and downtime', '', 'admin@devmail.infomacorp.com', 'text', 'Y', '1', '2012-02-28 15:59:27', '1', '2014-03-24 20:00:00', null);
+INSERT INTO `appconfig` VALUES ('55', 'notification', 'Notification and Email Options', 'smtpuser', 'SMPT User email', '', 'admin@devmail.infomacorp.com', 'text', 'Y', '1', '2012-02-28 15:59:27', '1', '2014-03-24 20:00:00', null);
+INSERT INTO `appconfig` VALUES ('56', 'notification', 'Notification and Email Options', 'smtphost', 'SMTP host ipaddress/domain', '', '127.0.0.1', 'text', 'Y', '1', '2012-02-28 15:59:27', '1', '2014-03-24 20:00:00', null);
+INSERT INTO `appconfig` VALUES ('57', 'notification', 'Notification and Email Options', 'smtppassword', 'SMTP Password', '', 'password', 'text', 'Y', '1', '2012-02-28 15:59:27', '1', '2014-03-24 20:00:00', null);
+INSERT INTO `appconfig` VALUES ('58', 'notification', 'Notification and Email Options', 'smtpport', 'SMTP Port', '', '25', 'integer', 'Y', '1', '2012-02-28 15:59:27', '1', '2014-03-24 20:00:00', null);
+INSERT INTO `appconfig` VALUES ('59', 'notification', 'Notification and Email Options', 'defaultadminemail', 'Default Admin email', '', 'admin@devmail.infomacorp.com', 'text', 'Y', '1', '2012-02-28 15:59:27', '1', '2014-03-24 20:00:00', null);
+INSERT INTO `appconfig` VALUES ('60', 'notification', 'Notification and Email Options', 'defaultadminname', 'Default Admin name', '', 'ENT Support', 'text', 'Y', '1', '2012-02-28 15:59:27', '1', '2014-03-24 20:00:00', null);
+INSERT INTO `appconfig` VALUES ('61', 'system', 'System and UI Settings', 'appname', 'Application name', '', 'ENT', 'text', 'Y', '1', '2012-02-28 15:59:27', '1', '2014-03-22 14:13:15', null);
+INSERT INTO `appconfig` VALUES ('62', 'system', 'System and UI Settings', 'companyname', 'Company name', '', 'Employment Network Team Of New Jersey', 'text', 'Y', '1', '2012-02-28 15:59:27', '1', '2014-03-22 14:13:15', null);
+INSERT INTO `appconfig` VALUES ('63', 'system', 'System and UI Settings', 'companysignoff', 'Company signoff', '', 'ENT Support', 'text', 'Y', '1', '2012-02-28 15:59:27', '1', '2014-03-22 14:13:15', null);
+INSERT INTO `appconfig` VALUES ('64', 'system', 'System and UI Settings', 'logotype', 'Logo Type', '1392299606.jpg', '0', 'text', 'Y', '1', '2012-02-28 15:59:27', '1', '2014-03-22 14:13:15', null);
+INSERT INTO `appconfig` VALUES ('65', 'system', 'System and UI Settings', 'copyrightinfo', 'Company Copyright', '', ' Copyright © 2014  |  ENT  |  All Rights Reserved', 'text', 'Y', '1', '2012-02-28 15:59:27', '1', '2014-03-22 14:13:15', null);
+INSERT INTO `appconfig` VALUES ('66', 'profile', 'User Profile Settings', 'passwordminlength', 'Minimum password length', 'The minimum length of a password', '6', 'integer', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-03-17 00:05:02', null);
+INSERT INTO `appconfig` VALUES ('67', 'profile', 'User Profile Settings', 'passwordmaxlength', 'Maximum password length', 'The maximum length of a password', '20', 'integer', 'Y', '1', '2012-03-01 12:00:00', '1', '2014-03-17 00:05:02', null);
+INSERT INTO `appconfig` VALUES ('68', 'profile', 'User Profile Settings', 'usernamemaxlength', 'Minimum username length', '', '20', 'integer', 'Y', '1', '2011-05-18 09:55:32', '1', '2014-03-17 00:05:02', null);
+INSERT INTO `appconfig` VALUES ('69', 'profile', 'User Profile Settings', 'usernameminlength', 'Maximum username length', '', '4', 'integer', 'Y', '1', '2011-05-18 09:55:32', '1', '2014-03-17 00:05:02', null);
+INSERT INTO `appconfig` VALUES ('70', 'profile', 'User Profile Settings', 'activationkeylength', 'The length of random account activation key', '', '6', 'integer', 'Y', '1', '2011-05-18 09:55:32', '1', '2014-03-17 00:05:02', null);
 
+-- ----------------------------
+-- Table structure for `assessmentdetails`
+-- ----------------------------
+DROP TABLE IF EXISTS `assessmentdetails`;
+CREATE TABLE `assessmentdetails` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `clientid` int(11) unsigned DEFAULT NULL,
+  `type` tinyint(4) unsigned DEFAULT NULL,
+  `subtype` tinyint(4) unsigned DEFAULT NULL,
+  `parentid` int(11) unsigned DEFAULT NULL,
+  `value1` varchar(500) DEFAULT NULL,
+  `value2` varchar(500) DEFAULT NULL,
+  `value3` varchar(500) DEFAULT NULL,
+  `value4` varchar(500) DEFAULT NULL,
+  `value5` varchar(500) DEFAULT NULL,
+  `value6` varchar(500) DEFAULT NULL,
+  `value7` varchar(500) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_assessmentdetails_clientid` (`clientid`),
+  CONSTRAINT `fk_assessmentdetails_clientid` FOREIGN KEY (`clientid`) REFERENCES `client` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of assessmentdetails
+-- ----------------------------
+INSERT INTO `assessmentdetails` VALUES ('61', '12', '3', '1', null, '8am', '9am', '10am', '9am', '8am', null, null);
+INSERT INTO `assessmentdetails` VALUES ('62', '12', '3', '2', null, '3pm', '4pm', '5pm', '5pm', '5pm', null, null);
+INSERT INTO `assessmentdetails` VALUES ('65', '12', '5', null, null, 'John Doe', 'Brother', 'jdoe@domain.com', '732 4510656', null, null, null);
+INSERT INTO `assessmentdetails` VALUES ('66', '12', '4', null, null, 'Kimbery High School', 'Mercer', null, 'Information Systems', '2008', null, null);
+INSERT INTO `assessmentdetails` VALUES ('68', '12', '1', '1', null, 'Pellentesque congue lacus massa', null, null, null, null, null, null);
+INSERT INTO `assessmentdetails` VALUES ('69', '12', '1', '2', null, 'Nec convallis sem rutrum tempor', null, null, null, null, null, null);
+INSERT INTO `assessmentdetails` VALUES ('70', '12', '1', '3', null, 'Quisque placerat aliquet magna', null, null, null, null, null, null);
+INSERT INTO `assessmentdetails` VALUES ('71', '12', '2', null, null, 'Rihanna', '23', 'spouse', null, null, null, null);
+INSERT INTO `assessmentdetails` VALUES ('72', '12', '2', null, null, 'Jessica', '1', 'daughter', null, null, null, null);
+
+-- ----------------------------
+-- Table structure for `assignment`
+-- ----------------------------
+DROP TABLE IF EXISTS `assignment`;
+CREATE TABLE `assignment` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `clientid` int(11) unsigned DEFAULT NULL,
+  `userid` int(11) unsigned DEFAULT NULL,
+  `role` tinyint(4) unsigned DEFAULT NULL,
+  `startdate` date DEFAULT NULL,
+  `enddate` date DEFAULT NULL,
+  `status` tinyint(4) unsigned DEFAULT NULL,
+  `notes` varchar(1000) DEFAULT NULL,
+  `datecreated` datetime DEFAULT NULL,
+  `createdby` int(11) unsigned DEFAULT NULL,
+  `datedeassigned` datetime DEFAULT NULL,
+  `deassignedbyid` int(11) unsigned DEFAULT NULL,
+  `reason` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_assignment_clientid` (`clientid`),
+  KEY `fk_assignment_userid` (`userid`),
+  CONSTRAINT `fk_assignment_clientid` FOREIGN KEY (`clientid`) REFERENCES `client` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_assignment_userid` FOREIGN KEY (`userid`) REFERENCES `useraccount` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of assignment
+-- ----------------------------
+INSERT INTO `assignment` VALUES ('1', '12', '3', '2', '2014-05-28', null, '1', null, '2014-06-01 23:09:46', '1', null, null, null);
+INSERT INTO `assignment` VALUES ('2', '11', '4', '2', '2014-05-28', null, '1', null, '2014-05-28 09:55:25', '1', null, null, null);
+INSERT INTO `assignment` VALUES ('3', '10', '6', '2', '2014-05-28', null, '1', null, '2014-05-28 09:55:25', '1', null, null, null);
+INSERT INTO `assignment` VALUES ('4', '9', '3', '2', '2014-05-28', null, '1', null, '2014-05-28 09:55:25', '1', null, null, null);
+
+-- ----------------------------
+-- Table structure for `audittrail`
+-- ----------------------------
 DROP TABLE IF EXISTS `audittrail`;
 CREATE TABLE `audittrail` (
-  `id` int(11) unsigned NOT NULL auto_increment,
-  `userid` int(11) unsigned default NULL,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `userid` int(11) unsigned DEFAULT NULL,
   `transactiontype` varchar(50) NOT NULL,
   `transactiondetails` mediumtext,
   `transactiondate` datetime NOT NULL,
-  `executedby` int(11) unsigned default NULL,
-  `success` enum('N','Y') NOT NULL default 'N',
-  `browserdetails` varchar(50) default NULL,
-  PRIMARY KEY  (`id`),
+  `executedby` int(11) unsigned DEFAULT NULL,
+  `success` enum('N','Y') NOT NULL DEFAULT 'N',
+  `browserdetails` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`),
   KEY `fk_audittrail_transactiontype` (`transactiontype`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- ----------------------------
+-- Records of audittrail
+-- ----------------------------
 
+-- ----------------------------
+-- Table structure for `category`
+-- ----------------------------
 DROP TABLE IF EXISTS `category`;
 CREATE TABLE `category` (
-  `id` int(11) unsigned NOT NULL auto_increment,
-  `type` tinyint(4) unsigned default NULL,
-  `name` varchar(50) default NULL,
-  `description` varchar(500) default NULL,
-  `alias` varchar(50) default NULL,
-  `parentid` int(11) unsigned default NULL,
-  `datecreated` datetime default NULL,
-  `createdby` int(11) unsigned default NULL,
-  `lastupdatedate` datetime default NULL,
-  `lastupdatedby` int(11) unsigned default NULL,
-  PRIMARY KEY  (`id`),
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `type` tinyint(4) unsigned DEFAULT NULL,
+  `name` varchar(50) DEFAULT NULL,
+  `alias` varchar(50) DEFAULT NULL,
+  `description` varchar(500) DEFAULT NULL,
+  `parentid` int(11) unsigned DEFAULT NULL,
+  `datecreated` datetime DEFAULT NULL,
+  `createdby` int(11) unsigned DEFAULT NULL,
+  `lastupdatedate` datetime DEFAULT NULL,
+  `lastupdatedby` int(11) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
   KEY `fk_category_parentid` (`parentid`),
   CONSTRAINT `fk_category_parentid` FOREIGN KEY (`parentid`) REFERENCES `category` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `category` (`id`, `type`, `name`, `description`, `alias`, `parentid`, `datecreated`, `createdby`, `lastupdatedate`, `lastupdatedby`) VALUES
-(1,	1,	'Electricity',	'',	NULL,	NULL,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(2,	2,	'New meter installation',	NULL,	NULL,	1,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(3,	2,	'No Meter',	NULL,	NULL,	1,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(4,	2,	'Meter not working',	NULL,	NULL,	1,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(5,	2,	'Blocked meter',	NULL,	NULL,	1,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(6,	2,	'General',	NULL,	NULL,	1,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(7,	1,	'Water',	'',	NULL,	NULL,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(8,	2,	'New meter installation',	NULL,	NULL,	7,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(9,	2,	'No Meter',	NULL,	NULL,	7,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(10,	2,	'Meter not working',	NULL,	NULL,	7,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(11,	2,	'Blocked meter',	NULL,	NULL,	7,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(12,	2,	'General',	NULL,	NULL,	7,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(13,	1,	'Billing',	'',	NULL,	NULL,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(14,	2,	'Meter not read',	NULL,	NULL,	13,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(15,	2,	'Meter inaccessible',	NULL,	NULL,	13,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(16,	2,	'Overstated bill',	NULL,	NULL,	13,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(17,	2,	'Understated bill',	NULL,	NULL,	13,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(18,	2,	'Invalid details',	NULL,	NULL,	13,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(19,	2,	'General',	NULL,	NULL,	13,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(20,	1,	'Finance',	'',	NULL,	NULL,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(21,	2,	'Invalid details',	NULL,	NULL,	20,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(22,	2,	'Payment not acceptated',	NULL,	NULL,	20,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(23,	2,	'Document submission',	NULL,	NULL,	20,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(24,	2,	'Procurement',	NULL,	NULL,	20,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(25,	2,	'Arrangements to pay',	NULL,	NULL,	20,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(26,	2,	'Refund',	NULL,	NULL,	20,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(27,	2,	'General',	NULL,	NULL,	20,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(28,	1,	'Technical',	'',	NULL,	NULL,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(29,	2,	'Brocken Infrastructure',	NULL,	NULL,	28,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(30,	2,	'No infrastructure',	NULL,	NULL,	28,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(31,	2,	'Bulding plans',	NULL,	NULL,	28,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(32,	2,	'New Developments',	NULL,	NULL,	28,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(33,	2,	'Valuations',	NULL,	NULL,	28,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(34,	2,	'Wrong Infrastracture',	NULL,	NULL,	28,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(35,	2,	'Blocked Systems',	NULL,	NULL,	28,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(36,	2,	'Malfunctioning',	NULL,	NULL,	28,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(37,	2,	'General',	NULL,	NULL,	28,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(38,	1,	'Traffic',	'',	NULL,	NULL,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(39,	2,	'Brocken Infrastructure',	NULL,	NULL,	38,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(40,	2,	'Malfunctioning',	NULL,	NULL,	38,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(41,	2,	'Updates',	NULL,	NULL,	38,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(42,	2,	'Roadside assistance',	NULL,	NULL,	38,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(43,	2,	'General',	NULL,	NULL,	38,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(44,	1,	'Health & Environment',	'',	NULL,	NULL,	'2013-10-30 11:29:21',	1,	'2014-03-25 11:09:45',	NULL),
-(45,	2,	'Brocken Infrastructure',	NULL,	NULL,	44,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(46,	2,	'No infrastructure',	NULL,	NULL,	44,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(47,	2,	'Blocked Systems',	NULL,	NULL,	44,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(48,	2,	'Spillages',	NULL,	NULL,	44,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(49,	2,	'Disaster Management',	NULL,	NULL,	44,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(50,	2,	'Encroachment',	NULL,	NULL,	44,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(51,	2,	'Tresspassing',	NULL,	NULL,	44,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(52,	2,	'General',	NULL,	NULL,	44,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(53,	1,	'Community',	'',	NULL,	NULL,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(54,	2,	'Customer care',	NULL,	NULL,	53,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(55,	2,	'Bookings',	NULL,	NULL,	53,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(56,	2,	'Meetings',	NULL,	NULL,	53,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(57,	2,	'Workshops',	NULL,	NULL,	53,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(58,	2,	'Indigent',	NULL,	NULL,	53,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(59,	2,	'Awareness',	NULL,	NULL,	53,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(60,	2,	'Development',	NULL,	NULL,	53,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(61,	2,	'Consumer details',	NULL,	NULL,	53,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(62,	2,	'Business',	NULL,	NULL,	53,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(63,	2,	'Carriers',	NULL,	NULL,	53,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(64,	2,	'Employment',	NULL,	NULL,	53,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(65,	2,	'General',	NULL,	NULL,	53,	'2013-10-30 11:29:21',	1,	NULL,	NULL),
-(66,	1,	'Roads',	NULL,	NULL,	NULL,	'2014-03-25 11:09:23',	1,	NULL,	NULL),
-(76,	3,	'INXUBA YETHEMBA MUNICIPALITY',	NULL,	NULL,	NULL,	'2014-04-18 16:17:13',	1,	'2014-04-19 09:37:12',	NULL),
-(77,	3,	'Municipal Two',	NULL,	NULL,	NULL,	'2014-04-18 16:17:13',	2,	'2014-04-18 16:47:11',	NULL),
-(81,	4,	'Cradock',	NULL,	NULL,	76,	'2014-04-18 16:52:27',	1,	'2014-04-19 09:37:52',	NULL),
-(82,	4,	'Lingelihle',	NULL,	NULL,	76,	'2014-04-18 16:52:58',	1,	'2014-04-19 09:38:09',	NULL),
-(83,	4,	'Michausdal',	NULL,	NULL,	76,	'2014-04-18 16:53:07',	1,	'2014-04-19 09:38:30',	NULL),
-(84,	4,	'Middleburg',	NULL,	NULL,	76,	'2014-04-19 09:38:46',	1,	NULL,	NULL),
-(85,	4,	'Kwanonzame',	NULL,	NULL,	76,	'2014-04-19 09:39:04',	1,	NULL,	NULL),
-(86,	4,	'Lusaka',	NULL,	NULL,	76,	'2014-04-19 09:39:14',	1,	NULL,	NULL),
-(87,	4,	'Midros',	NULL,	NULL,	76,	'2014-04-19 09:40:39',	1,	NULL,	NULL),
-(88,	3,	'Municipal Three',	NULL,	NULL,	NULL,	'2014-04-19 17:05:23',	39,	NULL,	NULL);
+-- ----------------------------
+-- Records of category
+-- ----------------------------
 
+-- ----------------------------
+-- Table structure for `client`
+-- ----------------------------
 DROP TABLE IF EXISTS `client`;
 CREATE TABLE `client` (
-  `id` int(11) unsigned NOT NULL auto_increment,
-  `type` tinyint(4) unsigned default NULL,
-  `refno` varchar(15) default NULL,
-  `nationalid` varchar(15) default NULL,
-  `category` tinyint(4) unsigned default NULL,
-  `companyname` varchar(255) default NULL,
-  `contactperson` varchar(255) default NULL,
-  `firstname` varchar(255) default NULL,
-  `lastname` varchar(255) default NULL,
-  `phone` varchar(15) default NULL,
-  `phone2` varchar(15) default NULL,
-  `email` varchar(255) default NULL,
-  `country` char(2) default NULL,
-  `city` varchar(255) default NULL,
-  `town` varchar(255) default NULL,
-  `postalcode` varchar(15) default NULL,
-  `address` varchar(500) default NULL,
-  `municipalityid` int(11) unsigned default NULL,
-  `townid` int(11) unsigned default NULL,
-  `datecreated` datetime default NULL,
-  `createdby` int(11) unsigned default NULL,
-  `lastupdatedate` datetime default NULL,
-  `lastupdatedby` int(11) unsigned default NULL,
-  `notifyemails` varchar(1000) default NULL,
-  `notifyphones` varchar(1000) default NULL,
-  `otherid` varchar(15) default NULL,
-  PRIMARY KEY  (`id`)
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `firstname` varchar(255) DEFAULT NULL,
+  `lastname` varchar(255) DEFAULT NULL,
+  `middlename` varchar(255) DEFAULT NULL,
+  `initial` varchar(6) DEFAULT NULL,
+  `home` varchar(15) DEFAULT NULL,
+  `cell` varchar(15) DEFAULT NULL,
+  `work` varchar(15) DEFAULT NULL,
+  `ext` varchar(6) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `email2` varchar(255) DEFAULT NULL,
+  `gender` tinyint(4) unsigned DEFAULT NULL,
+  `dateofbirth` date DEFAULT NULL,
+  `country` char(2) DEFAULT NULL,
+  `city` varchar(255) DEFAULT NULL,
+  `state` varchar(2) DEFAULT NULL,
+  `county` tinyint(4) unsigned DEFAULT NULL,
+  `zipcode` varchar(15) DEFAULT NULL,
+  `addressline1` varchar(250) DEFAULT NULL,
+  `addressline2` varchar(250) DEFAULT NULL,
+  `datecreated` datetime DEFAULT NULL,
+  `createdby` int(11) unsigned DEFAULT NULL,
+  `lastupdatedate` datetime DEFAULT NULL,
+  `lastupdatedby` int(11) unsigned DEFAULT NULL,
+  `ssn` varchar(15) DEFAULT NULL,
+  `programid` int(11) unsigned DEFAULT NULL,
+  `funderid` int(11) unsigned DEFAULT NULL,
+  `servicetypeid` int(11) unsigned DEFAULT NULL,
+  `coachid` int(11) unsigned DEFAULT NULL,
+  `communication` tinyint(4) unsigned DEFAULT NULL,
+  `race` tinyint(4) unsigned DEFAULT NULL,
+  `maritalstatus` tinyint(4) DEFAULT NULL,
+  `allergies` varchar(500) DEFAULT NULL,
+  `iscriminal` tinyint(4) unsigned DEFAULT NULL,
+  `criminalhistory` text,
+  `bio` text,
+  `profilephoto` varchar(255) DEFAULT NULL,
+  `userid` int(11) unsigned DEFAULT NULL,
+  `initialvoucherid` int(11) unsigned DEFAULT NULL,
+  `startdate` date DEFAULT NULL,
+  `referraldate` date DEFAULT NULL,
+  `assessmentdate` date DEFAULT NULL,
+  `status` tinyint(4) unsigned DEFAULT NULL,
+  `resumefilename` varchar(255) DEFAULT NULL,
+  `coverletterfilename` varchar(255) DEFAULT NULL,
+  `dvrsref` varchar(15) DEFAULT NULL,
+  `dddref` varchar(15) DEFAULT NULL,
+  `dvrscounselor` varchar(255) DEFAULT NULL,
+  `primarydiagnosis` tinyint(4) unsigned DEFAULT NULL,
+  `primarycause` tinyint(4) unsigned DEFAULT NULL,
+  `secondarydiagnosis` tinyint(4) unsigned DEFAULT NULL,
+  `secondarycause` tinyint(4) unsigned DEFAULT NULL,
+  `needsassessment` varchar(1000) DEFAULT NULL,
+  `employmentgoal` varchar(1000) DEFAULT NULL,
+  `contactperson` varchar(255) DEFAULT NULL,
+  `relationship` varchar(255) DEFAULT NULL,
+  `contactphone` varchar(15) DEFAULT NULL,
+  `contactcell` varchar(15) DEFAULT NULL,
+  `contactemail` varchar(255) DEFAULT NULL,
+  `contactperson2` varchar(255) DEFAULT NULL,
+  `relationship2` varchar(255) DEFAULT NULL,
+  `contactphone2` varchar(15) DEFAULT NULL,
+  `contactcell2` varchar(15) DEFAULT NULL,
+  `contactemail2` varchar(255) DEFAULT NULL,
+  `referralinforeceived` varchar(255) DEFAULT NULL,
+  `nickname` varchar(255) DEFAULT NULL,
+  `incomesources` varchar(255) DEFAULT NULL,
+  `totalmonthlyincome` decimal(10,2) unsigned DEFAULT NULL,
+  `reduceincomebenefit` tinyint(4) unsigned DEFAULT NULL,
+  `providedwithbenefitinfo` tinyint(4) unsigned DEFAULT NULL,
+  `requiresmedicalaccomodation` tinyint(4) unsigned DEFAULT NULL,
+  `therapytreatment` varchar(255) DEFAULT NULL,
+  `housing` tinyint(4) unsigned DEFAULT NULL,
+  `householdcount` varchar(15) DEFAULT NULL,
+  `oncallhousesupport` tinyint(4) unsigned DEFAULT NULL,
+  `qualityoflife` tinyint(4) unsigned DEFAULT NULL,
+  `partnername` varchar(255) DEFAULT NULL,
+  `yearsinrship` varchar(15) DEFAULT NULL,
+  `jobpreferred` varchar(50) DEFAULT NULL,
+  `jobpreferred1` varchar(50) DEFAULT NULL,
+  `workshift` varchar(25) DEFAULT NULL,
+  `jobtype` varchar(25) DEFAULT NULL,
+  `dateavailable` varchar(50) DEFAULT NULL,
+  `hoursavailableperweek` decimal(10,2) unsigned DEFAULT NULL,
+  `traveldistance` varchar(15) DEFAULT NULL,
+  `desiredhourlyrate` varchar(15) DEFAULT NULL,
+  `transportation` varchar(15) DEFAULT NULL,
+  `educationlevel` tinyint(4) unsigned DEFAULT NULL,
+  `contactschooltoverify` tinyint(4) unsigned DEFAULT NULL,
+  `experiencedlearningproblems` tinyint(4) unsigned DEFAULT NULL,
+  `learningproblems` varchar(255) DEFAULT NULL,
+  `academicskillsdetails` text,
+  `formaleducinterests` varchar(255) DEFAULT NULL,
+  `learningstyles` varchar(500) DEFAULT NULL,
+  `typingspeed` varchar(15) DEFAULT NULL,
+  `driverslicenseno` varchar(15) DEFAULT NULL,
+  `specialinfoforjobapplied` text,
+  `cancontactreferences` tinyint(4) unsigned DEFAULT NULL,
+  `whynotcontact` varchar(255) DEFAULT NULL,
+  `onprobation` tinyint(4) unsigned DEFAULT NULL,
+  `convictedoffelony` tinyint(4) unsigned DEFAULT NULL,
+  `convictedofmisdemeanor` tinyint(4) unsigned DEFAULT NULL,
+  `convictiondetails` varchar(255) DEFAULT NULL,
+  `employertheftcase` tinyint(4) unsigned DEFAULT NULL,
+  `theftcasedetails` varchar(255) DEFAULT NULL,
+  `isveteran` tinyint(4) unsigned DEFAULT NULL,
+  `servicebranch` varchar(50) DEFAULT NULL,
+  `technicalspeciality` varchar(50) DEFAULT NULL,
+  `rank` varchar(50) DEFAULT NULL,
+  `dischargetype` tinyint(4) unsigned DEFAULT NULL,
+  `iscombat` tinyint(4) unsigned DEFAULT NULL,
+  `combatproblems` varchar(255) DEFAULT NULL,
+  `combatproblemstreated` tinyint(4) unsigned DEFAULT NULL,
+  `employmentdifficulty` varchar(255) DEFAULT NULL,
+  `difficultydetails` varchar(500) DEFAULT NULL,
+  `currentevents` varchar(255) DEFAULT NULL,
+  `pastevents` varchar(255) DEFAULT NULL,
+  `supportservices` varchar(255) DEFAULT NULL,
+  `jobassistcontact` varchar(255) DEFAULT NULL,
+  `awareofopportunities` varchar(255) DEFAULT NULL,
+  `assistivedevice` varchar(255) DEFAULT NULL,
+  `selfstrengths` text,
+  `selfabilities` text,
+  `potentialbarriers` text,
+  `barriersolutions` text,
+  `medicalconditions` varchar(500) DEFAULT NULL,
+  `physicallimatations` varchar(500) DEFAULT NULL,
+  `psychologicallimitations` varchar(500) DEFAULT NULL,
+  `medicationregimen` varchar(500) DEFAULT NULL,
+  `nutritionalstatus` varchar(500) DEFAULT NULL,
+  `livingconditions` varchar(500) DEFAULT NULL,
+  `lifestyle` varchar(500) DEFAULT NULL,
+  `medicalaccesssafety` varchar(500) DEFAULT NULL,
+  `livingenvironment` varchar(500) DEFAULT NULL,
+  `transportationsafety` varchar(500) DEFAULT NULL,
+  `socialrships` varchar(500) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_client_voucherid` (`initialvoucherid`),
+  KEY `fk_client_servicetypeid` (`servicetypeid`),
+  KEY `fk_client_programid` (`programid`),
+  CONSTRAINT `fk_client_programid` FOREIGN KEY (`programid`) REFERENCES `service` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_client_servicetypeid` FOREIGN KEY (`servicetypeid`) REFERENCES `service` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_client_voucherid` FOREIGN KEY (`initialvoucherid`) REFERENCES `voucher` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of client
+-- ----------------------------
+INSERT INTO `client` VALUES ('1', 'Zinzi', 'France', null, null, '(609) 775-6568', '(609) 775-6568', null, null, null, null, '1', null, 'US', 'Brookfield', 'NJ', '10', '08400', '2 Ralawe Street\r\nLingelihle\r\n5881', '1270 Broadway', '2014-05-14 15:20:37', '1', '2014-05-27 15:53:36', null, '135-15-0001', '2', null, null, '3', null, null, null, null, null, null, null, null, null, null, '2014-03-10', null, null, '0', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `client` VALUES ('6', 'Ronel', 'Meyron', null, null, '(609) 671-9313', '(609) 671-9313', null, null, null, null, '1', null, 'US', 'Middletown Springs', 'NJ', '2', '08405', '9 Botterblom\r\nMiddelburg\r\n5900', '302 W. State Street ', '2014-05-23 11:49:14', '1', null, null, '135-15-0006', '3', null, null, '4', null, null, null, null, null, null, null, null, null, null, '2014-03-10', null, null, '0', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `client` VALUES ('9', 'Andrew', 'Belling', null, null, '(609) 309-1700', '(609) 309-1700', null, null, null, null, '1', null, 'US', 'Montgomery', 'NJ', '6', '08408', '7 kerk Street\r\nMiddelburg\r\n5900', '10 Ercher Street ', '2014-05-23 12:48:32', '1', null, null, '135-15-0009', '2', null, null, '6', null, null, null, null, null, null, null, null, null, null, '2014-03-10', null, null, '0', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `client` VALUES ('10', 'Venessa', 'Stalenberg', null, null, '(609) 584-1100', '(609) 584-1100', null, null, null, null, '2', null, 'US', 'Montgomery Center', 'NJ', '1', '08409', '38 Protea Avenue\r\nMidros \r\nMiddelburg\r\n5900', '77 Ewingville Road Ewing', '2014-05-23 13:53:19', '1', null, null, '135-15-0010', '3', null, null, '3', null, null, null, null, null, null, null, null, null, null, '2014-03-10', null, null, '0', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `client` VALUES ('11', 'Unathi', 'Goerge', null, null, '(732) 239-0778', '(732) 239-0778', null, null, null, null, '1', null, 'US', 'Montpelier', 'NJ', '8', '08410', '2572 Simphiwe Bleki\r\nKwanonzame\r\nMiddelburg EC\r\n5900', '78 W. Taylor Avenue Trenton', '2014-05-23 15:05:41', '1', null, null, '135-15-0011', '2', null, null, '4', null, null, null, null, null, null, null, null, null, null, '2014-03-10', null, null, '1', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `client` VALUES ('12', 'Popi', 'Westel', 'Mike', 'PW', '(732) 422-4565', '(732) 422-6521', '(732) 422-4825', '123', 'collin@domain.com', '', '1', '1976-11-02', 'US', 'Moretown', 'NJ', '6', '08411', '13 DanielsMidrosMiddelburg5900', '862 Yardville-Allentown Road Hamilton', '2014-05-23 15:15:14', '1', '2014-07-03 12:20:29', '1', '135-15-0001', '6', '1', '3', '3', null, '2', '2', 'none', '0', '', null, '1401806632.jpg', null, '1', '2014-03-10', '2014-03-01', '2014-06-03', '1', 'LoremIpsum.pdf', 'LoremIpsum.txt', '125692', '', 'Mitchell Paterson', '15', '7', '19', '25', 'Pellentesque elementum risus in eros tempus, nec tincidunt tortor consequat. Nam feugiat leo non enim fermentum condimentum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Cras ut hendrerit magna.', 'ipsum dolor sit amet, consectetur adipiscing elit. Proin placerat.', 'Collin Mathew', 'Brother', '736 456 5621', null, 'collin@ymail.com', 'Martha', 'Employer', '451 546 2156', null, 'martha@gcos.com', null, 'Wssy', '14', '150.00', '1', '1', '1', '3', '12', '4', '1', '3', 'Rihanna Simpson', '4', '6', '26', '1', '2', '2014-06-02', '40.00', '25', '15', '1', '4', '1', '1', 'Duis in iaculis nisi, in vulputate enim. Nullam auctor est non libero tincidunt sollicitudin. Proin a erat ligula. Aliquam sed neque mattis, ultrices ', 'Praesent sed odio quis lorem pellentesque bibendum quis id nunc. Curabitur ac dui tristique, aliquet enim et, tincidunt neque. Duis et mi feugiat, sagittis nibh eu, porttitor justo.', '1,2,3', '1,3,5', '5.5', '54645615', 'Praesent sed odio quis lorem pellentesque bibendum quis id nunc. Curabitur ac dui tristique, aliquet enim et, tincidunt neque. Duis et mi feugiat, sagittis nibh eu, porttitor justo.', '0', 'Lorem ipsum reason', '0', '0', '0', null, '0', '', '0', '', '', '', '4', '0', null, null, '1', 'Quisque quam odio, gravida fringilla pellentesque consequat, luctus ullamcorper metus.', '3,5', '1,10', '3,4,6', ' Integer condimentum aliquam dui at vestibulum. Curabitur in odio blandit', 'Cras congue nisl et ornare dignissim. Proin ut lacus nunc', '3,4,6', ' Proin viverra ipsum quis sapien tempor faucibus.', 'Quisque lorem felis, laoreet consequat sodales a, porta non ligula.', 'Nam feugiat leo non enim fermentum condimentum. Cum sociis natoque penatibus et magnis dis parturient montes', 'Cras ut hendrerit magna. Mauris sodales et mi non ultrices. Proin ipsum quam, dignissim non ultrices a', '1,0,0,0', '0,1,0,0', '0,1,1,0', '1,0,0,0', '0,0,0,0', '0,1,1,0', '0,1,0,0', '1,0,0,0', '0,1,0,0', '1,0,0,0', '0,1,0,0');
+
+-- ----------------------------
+-- Table structure for `clienthistory`
+-- ----------------------------
+DROP TABLE IF EXISTS `clienthistory`;
+CREATE TABLE `clienthistory` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `clientid` int(11) unsigned DEFAULT NULL,
+  `startdate` date DEFAULT NULL,
+  `enddate` date DEFAULT NULL,
+  `reason` varchar(1000) DEFAULT NULL,
+  `isgoalreached` tinyint(4) unsigned DEFAULT NULL,
+  `goaldetails` varchar(1000) DEFAULT NULL,
+  `comments` varchar(1000) DEFAULT NULL,
+  `assessedbyid` int(11) unsigned DEFAULT NULL,
+  `datecreated` datetime DEFAULT NULL,
+  `createdby` int(11) unsigned DEFAULT NULL,
+  `dateclosed` datetime DEFAULT NULL,
+  `closedbyid` int(11) unsigned DEFAULT NULL,
+  `status` tinyint(4) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_clienthistory_clientid` (`clientid`),
+  CONSTRAINT `fk_clienthistory_clientid` FOREIGN KEY (`clientid`) REFERENCES `client` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of clienthistory
+-- ----------------------------
+INSERT INTO `clienthistory` VALUES ('1', '12', '2014-03-10', null, null, null, null, null, null, '2014-06-03 22:08:46', '1', null, null, '1');
+
+-- ----------------------------
+-- Table structure for `clientmedication`
+-- ----------------------------
+DROP TABLE IF EXISTS `clientmedication`;
+CREATE TABLE `clientmedication` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `clientid` int(11) unsigned DEFAULT NULL,
+  `type` varchar(500) DEFAULT NULL,
+  `strength` varchar(500) DEFAULT NULL,
+  `dosage` varchar(500) DEFAULT NULL,
+  `sidedefects` varchar(500) DEFAULT NULL,
+  `purpose` varchar(500) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of clientmedication
+-- ----------------------------
+INSERT INTO `clientmedication` VALUES ('42', '12', 'Lorem ipsum dolor', '250', '3x1', 'Nam feugiat leo', 'Cras congue nisl et ornare');
+INSERT INTO `clientmedication` VALUES ('43', '12', 'Pellentesque', '300', '2x1', 'Aenean bibendum', 'Nam feugiat leo non enim');
+
+-- ----------------------------
+-- Table structure for `clientskill`
+-- ----------------------------
+DROP TABLE IF EXISTS `clientskill`;
+CREATE TABLE `clientskill` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `clientid` int(11) unsigned DEFAULT NULL,
+  `skill` tinyint(4) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_clientskill_clientid` (`clientid`),
+  CONSTRAINT `fk_clientskill_clientid` FOREIGN KEY (`clientid`) REFERENCES `client` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of clientskill
+-- ----------------------------
+INSERT INTO `clientskill` VALUES ('8', '12', '2');
+INSERT INTO `clientskill` VALUES ('11', '12', '1');
+INSERT INTO `clientskill` VALUES ('12', '12', '3');
+INSERT INTO `clientskill` VALUES ('13', '12', '4');
+
+-- ----------------------------
+-- Table structure for `company`
+-- ----------------------------
+DROP TABLE IF EXISTS `company`;
+CREATE TABLE `company` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `type` tinyint(4) unsigned DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `alias` varchar(50) DEFAULT NULL,
+  `contactperson` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `phone` varchar(15) DEFAULT NULL,
+  `fax` varchar(15) DEFAULT NULL,
+  `country` varchar(2) DEFAULT NULL,
+  `city` varchar(255) DEFAULT NULL,
+  `state` varchar(2) DEFAULT NULL,
+  `county` tinyint(4) unsigned DEFAULT NULL,
+  `zipcode` varchar(15) DEFAULT NULL,
+  `addressline1` varchar(255) DEFAULT NULL,
+  `addressline2` varchar(255) DEFAULT NULL,
+  `defaultrate` decimal(10,2) unsigned DEFAULT NULL,
+  `datecreated` datetime DEFAULT NULL,
+  `createdby` int(11) unsigned DEFAULT NULL,
+  `lastupdatedate` datetime DEFAULT NULL,
+  `lastupdatedby` int(11) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_company_type` (`type`),
+  KEY `index_company_county` (`county`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of company
+-- ----------------------------
+INSERT INTO `company` VALUES ('1', '1', 'Division of Developmental Disabilities', 'DDD', 'Monica Darell', 'ddd@domain.com', '(732) 968-5403', '(732) 968 4331', 'US', 'Greenbook', 'NJ', '9', '08812', 'Greenbook Regional Center', '275 Greenbook Road', '45.00', '2014-05-28 09:13:30', '1', null, null);
+INSERT INTO `company` VALUES ('2', '1', 'Division Of Mental Health Services', 'DMHS', 'Monica Linn', 'dmhs@ent.com', '(732) 012-3456', null, 'US', null, 'NJ', '5', '08813', null, null, '50.00', '2014-05-28 09:40:32', '1', null, null);
+INSERT INTO `company` VALUES ('3', '2', 'Wallmart', null, 'Jim Kommy', 'jim@wallmart.com', '255 025-5545', null, 'US', 'Grogory', 'NJ', '15', '07850', 'South street 278 Block A', 'asdas asdddad adasd', null, null, null, '2014-06-18 10:52:42', null);
+INSERT INTO `company` VALUES ('4', '2', 'clean consults', null, 'asadsd', 'muko@dena.com', '5464161611', null, 'US', 'Junior', 'NJ', '12', '051515', 'sdnsikl sklm lsdsf', null, null, '2014-06-09 12:19:32', '1', '2014-06-09 13:13:51', null);
+INSERT INTO `company` VALUES ('5', '2', 'companyname', null, 'contactperson', 'example@example.com', 'phone', null, 'US', 'city', 'NJ', '1', '90210', 'addressline1', 'addressline2', null, '2014-06-09 13:27:32', '1', null, null);
+INSERT INTO `company` VALUES ('6', '2', 'asdadad', null, 'sdsfssf', 'sdsd@sdfs.dcfd', '232434', null, 'US', 'zxcxzxczcz', 'NJ', '3', '5446456', 'xzcvzxcz', 'xdcvxvxc', null, '2014-06-09 13:38:58', '1', null, null);
+INSERT INTO `company` VALUES ('7', '2', 'Kingundu Systems Inc', null, 'asadasda', 'testsdas@devmail.infomacorp.com', '646162162', null, 'US', 'kampala', 'NJ', '9', '65512', 'asa knakjsdasdad', null, null, '2014-06-09 13:44:10', '1', '2014-06-09 16:05:14', null);
+INSERT INTO `company` VALUES ('8', '2', 'hgvghvh', null, 'opjojop', null, '6848641', null, 'US', 'gvcghvh', 'NJ', null, null, 'ghgvhj', null, null, '2014-06-29 21:00:57', '1', '2014-06-30 11:39:45', null);
+INSERT INTO `company` VALUES ('9', '2', 'fd', null, 'asdsada', null, '324524', null, 'US', 'sdadddd', 'NJ', '17', 'dasda', 'adasdadsa', null, null, '2014-06-29 21:02:29', '1', null, null);
+INSERT INTO `company` VALUES ('11', '2', 'Global Enterprises LLC', null, 'Mike', null, '732 6522 062', null, 'US', 'Millicent', 'NJ', null, null, 'x', null, null, '2014-06-29 21:47:41', '1', '2014-07-03 12:20:29', null);
+INSERT INTO `company` VALUES ('12', '2', 'decada', null, 'dsffsfs', 'weff@EFS.sdsdfs', '3242342', null, 'US', 'sdfdgf', 'NJ', '15', '65465', 'dgfdgd', 'fd', null, '2014-06-29 21:48:59', '1', '2014-06-29 21:50:03', null);
+
+-- ----------------------------
+-- Table structure for `invoice`
+-- ----------------------------
+DROP TABLE IF EXISTS `invoice`;
+CREATE TABLE `invoice` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `clientid` int(11) unsigned DEFAULT NULL,
+  `voucherid` int(11) unsigned DEFAULT NULL,
+  `invoiceno` varchar(15) DEFAULT NULL,
+  `invoicedate` date DEFAULT NULL,
+  `invoiceamount` decimal(10,2) unsigned DEFAULT NULL,
+  `hourstaken` decimal(10,2) unsigned DEFAULT NULL,
+  `hoursremaining` decimal(10,2) unsigned DEFAULT NULL,
+  `datecreated` datetime DEFAULT NULL,
+  `createdby` int(11) unsigned DEFAULT NULL,
+  `lastupdatedate` datetime DEFAULT NULL,
+  `lastupdatedby` int(11) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_invoice_voucherid` (`voucherid`),
+  KEY `fk_invoice_clientid` (`clientid`),
+  CONSTRAINT `fk_invoice_clientid` FOREIGN KEY (`clientid`) REFERENCES `client` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_invoice_voucherid` FOREIGN KEY (`voucherid`) REFERENCES `voucher` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `client` (`id`, `type`, `refno`, `nationalid`, `category`, `companyname`, `contactperson`, `firstname`, `lastname`, `phone`, `phone2`, `email`, `country`, `city`, `town`, `postalcode`, `address`, `municipalityid`, `townid`, `datecreated`, `createdby`, `lastupdatedate`, `lastupdatedby`, `notifyemails`, `notifyphones`, `otherid`) VALUES
-(63,	2,	NULL,	'8201310365081',	1,	NULL,	NULL,	'Zinzi',	'France',	'27825153191',	NULL,	'zinziswanobutho@gmail.com',	'ZA',	'Cradock',	NULL,	'5880',	'2 Ralawe Street\r\nLingelihle\r\n5881',	76,	81,	'2014-05-14 15:20:37',	47,	NULL,	NULL,	NULL,	NULL,	NULL),
-(64,	2,	NULL,	'7606200570080',	1,	NULL,	NULL,	'Thandisizwe',	'Moyi',	'27788110596',	NULL,	NULL,	'ZA',	'Middelburg',	NULL,	'5900',	'80 Gemsbok Avenue\r\nMidros\r\nMiddelburg\r\n5900',	76,	84,	'2014-05-22 12:40:26',	48,	NULL,	NULL,	NULL,	NULL,	NULL),
-(65,	2,	NULL,	'8811135262089',	1,	NULL,	NULL,	'Thando',	'Bontiya',	'27840642450',	NULL,	NULL,	'ZA',	'Middelburg',	NULL,	'5900',	'19 Nqwemesha \r\nKwanonzame\r\nMiddelburg EC\r\n5900',	76,	84,	'2014-05-22 15:09:39',	48,	NULL,	NULL,	NULL,	NULL,	NULL),
-(66,	2,	NULL,	'8906230441081',	1,	NULL,	NULL,	'Neliswa',	'Mbodli',	'27848773521',	NULL,	NULL,	'ZA',	'Middelburg',	NULL,	'5900',	'1810 Allan Boesak\r\nKwanonzame\r\nMiddelburg EC\r\n5900',	76,	84,	'2014-05-22 15:48:46',	48,	NULL,	NULL,	NULL,	'0837495132',	NULL),
-(67,	2,	NULL,	NULL,	1,	NULL,	NULL,	'Vicey',	'Zonke',	'27745036809',	NULL,	NULL,	'ZA',	'Middelburg',	NULL,	'5900',	'7 Zintwana\r\nKwanonzame\r\nMiddelburg EC\r\n5900',	76,	84,	'2014-05-23 09:42:47',	48,	NULL,	NULL,	NULL,	NULL,	NULL),
-(68,	2,	NULL,	NULL,	1,	NULL,	NULL,	'Ronel',	'Meyron',	'27845283493',	NULL,	NULL,	'ZA',	'Middelburg',	NULL,	'5900',	'9 Botterblom\r\nMiddelburg\r\n5900',	76,	84,	'2014-05-23 11:49:14',	48,	NULL,	NULL,	NULL,	NULL,	NULL),
-(69,	2,	NULL,	NULL,	1,	NULL,	NULL,	'Nombulelo',	'Maki',	'27835427077',	NULL,	NULL,	'ZA',	'Middelburg',	NULL,	'5900',	'2112 Nzimeni Maseti\r\nKwanonzame\r\nMiddelburg\r\n5900',	76,	84,	'2014-05-23 11:58:46',	48,	NULL,	NULL,	NULL,	NULL,	NULL),
-(70,	2,	NULL,	'7804165855089',	1,	NULL,	NULL,	'Mzukisi',	'Makeleni',	'27730829810',	NULL,	NULL,	'ZA',	'Lusaka',	NULL,	'5900',	'3326 Athenkosi\r\nLusaka\r\nMiddelburg EC\r\n5900',	76,	84,	'2014-05-23 12:24:10',	48,	NULL,	NULL,	NULL,	NULL,	NULL),
-(71,	2,	NULL,	NULL,	1,	NULL,	NULL,	'Andrew',	'Belling',	'27733058581',	NULL,	NULL,	'ZA',	'Town',	NULL,	'5900',	'7 kerk Street\r\nMiddelburg\r\n5900',	76,	84,	'2014-05-23 12:48:32',	48,	NULL,	NULL,	NULL,	NULL,	NULL),
-(72,	2,	NULL,	NULL,	1,	NULL,	NULL,	'Venessa',	'Stalenberg',	'27737695335',	NULL,	NULL,	'ZA',	'Midros',	NULL,	'5900',	'38 Protea Avenue\r\nMidros \r\nMiddelburg\r\n5900',	76,	84,	'2014-05-23 13:53:19',	48,	NULL,	NULL,	NULL,	NULL,	NULL),
-(73,	2,	NULL,	NULL,	1,	NULL,	NULL,	'Unathi',	'Goerge',	'27736010630',	NULL,	NULL,	'ZA',	'Kwanonzame',	NULL,	'5900',	'2572 Simphiwe Bleki\r\nKwanonzame\r\nMiddelburg EC\r\n5900',	76,	84,	'2014-05-23 15:05:41',	48,	NULL,	NULL,	NULL,	NULL,	NULL),
-(74,	2,	NULL,	'',	1,	NULL,	NULL,	'Popi',	'Westel',	'27849996502',	NULL,	'',	'ZA',	'Middleburg',	NULL,	'5900',	'13 Daniels\r\nMidros\r\nMiddelburg\r\n5900',	76,	87,	'2014-05-23 15:15:14',	48,	'2014-05-23 15:46:55',	1,	'',	'',	''),
-(75,	1,	NULL,	NULL,	4,	'Inxuba Yethemba Municipality',	'Dean',	NULL,	NULL,	'27833557320',	NULL,	'cpw.iym@mtnloaded.co.za',	'ZA',	'Middelburg',	NULL,	'5900',	'Market Street\r\nMiddelburg\r\n5900',	76,	84,	'2014-05-23 15:32:29',	48,	'2014-05-23 15:46:03',	1,	'',	'',	NULL),
-(76,	2,	NULL,	NULL,	1,	NULL,	NULL,	'Dean',	'Gedonas',	'27737540992',	NULL,	NULL,	'ZA',	'Middelburg',	NULL,	'5900',	'109 Smid \r\nMiddelburg\r\n5900',	76,	84,	'2014-05-23 15:47:07',	48,	NULL,	NULL,	NULL,	NULL,	NULL),
-(77,	1,	NULL,	NULL,	4,	'Department of Health',	'Ronel',	NULL,	NULL,	'27824260685',	NULL,	NULL,	'ZA',	'Kwanonzame',	NULL,	'5900',	'2 Mjekula\r\nKwanonzame\r\nMiddelburg EC\r\n5900',	76,	84,	'2014-05-23 15:58:25',	48,	NULL,	NULL,	NULL,	NULL,	NULL),
-(78,	2,	NULL,	'',	1,	NULL,	NULL,	'Lizzette',	'De Klerk',	'27248323855',	NULL,	'',	'ZA',	'Midros',	NULL,	'5900',	'4 Horbert Avenue\r\nMidros\r\nMiddelburg EC\r\n5900',	76,	87,	'2014-05-23 16:14:59',	48,	'2014-05-24 13:15:17',	39,	'',	'',	'');
+-- ----------------------------
+-- Records of invoice
+-- ----------------------------
 
-DROP TABLE IF EXISTS `comment`;
-CREATE TABLE `comment` (
-  `id` int(11) unsigned NOT NULL auto_increment,
-  `parentid` int(11) unsigned default NULL,
-  `userid` int(11) unsigned default NULL,
-  `ticketid` int(11) unsigned default NULL,
-  `ledgerid` int(11) unsigned default NULL,
-  `type` tinyint(4) unsigned default NULL,
-  `content` blob NOT NULL,
-  `datecreated` datetime NOT NULL,
-  `createdby` int(11) unsigned NOT NULL,
-  `lastupdatedate` datetime default NULL,
-  `lastupdatedby` int(11) unsigned default NULL,
-  PRIMARY KEY  (`id`),
-  KEY `fk_comment_ticketid` (`ticketid`),
-  KEY `fk_comment_ledgerid` (`ledgerid`),
-  KEY `fk_comment_userid` (`userid`),
-  KEY `fk_comment_parentid` (`parentid`),
-  KEY `index_comment_type` (`type`),
-  CONSTRAINT `fk_comment_ledgerid` FOREIGN KEY (`ledgerid`) REFERENCES `ticket_ledger` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_comment_parentid` FOREIGN KEY (`parentid`) REFERENCES `comment` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_comment_ticketid` FOREIGN KEY (`ticketid`) REFERENCES `ticket` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_comment_userid` FOREIGN KEY (`userid`) REFERENCES `useraccount` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+-- ----------------------------
+-- Table structure for `job`
+-- ----------------------------
+DROP TABLE IF EXISTS `job`;
+CREATE TABLE `job` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `type` tinyint(4) unsigned DEFAULT '1',
+  `clientid` int(11) unsigned DEFAULT NULL,
+  `employerid` int(11) unsigned DEFAULT NULL,
+  `startdate` date DEFAULT NULL,
+  `enddate` date DEFAULT NULL,
+  `status` tinyint(4) unsigned DEFAULT NULL,
+  `jobtitle` varchar(255) DEFAULT NULL,
+  `workdetails` varchar(255) DEFAULT NULL,
+  `hoursperweek` decimal(10,2) unsigned DEFAULT NULL,
+  `rate` decimal(10,2) unsigned DEFAULT NULL,
+  `ratetype` tinyint(4) unsigned DEFAULT NULL,
+  `rateoriginal` decimal(10,2) unsigned DEFAULT NULL,
+  `medicaltype` tinyint(4) unsigned DEFAULT NULL,
+  `medicalstartdate` date DEFAULT NULL,
+  `workschedule` varchar(255) DEFAULT NULL,
+  `supervisorname` varchar(255) DEFAULT NULL,
+  `supervisorphone` varchar(15) DEFAULT NULL,
+  `transportation` tinyint(4) unsigned DEFAULT NULL,
+  `terminationtype` tinyint(4) unsigned DEFAULT NULL,
+  `terminationreason` varchar(255) DEFAULT NULL,
+  `islocked` tinyint(4) unsigned DEFAULT NULL,
+  `notes` varchar(255) DEFAULT NULL,
+  `datecreated` datetime DEFAULT NULL,
+  `createdby` int(11) unsigned DEFAULT NULL,
+  `lastupdatedate` datetime DEFAULT NULL,
+  `lastupdatedby` int(11) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_job_clientid` (`clientid`),
+  KEY `fk_job_employerid` (`employerid`),
+  KEY `index_job_status` (`status`),
+  CONSTRAINT `fk_job_clientid` FOREIGN KEY (`clientid`) REFERENCES `client` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_job_employerid` FOREIGN KEY (`employerid`) REFERENCES `company` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
+-- ----------------------------
+-- Records of job
+-- ----------------------------
+INSERT INTO `job` VALUES ('1', '1', '12', '3', '2014-05-26', '0000-00-00', '1', 'Grocery Assistant', '', '30.00', '12.00', '1', null, '1', '2014-05-28', '9am to 3pm. Mon, Wed, Fri', 'Willy Murefa', '1521516655', '2', '1', '', '0', '', '2014-06-04 19:59:37', '1', '2014-07-03 12:20:29', '1');
+INSERT INTO `job` VALUES ('4', '2', '12', '11', '2011-12-01', '2012-06-05', '1', 'Data Entry Officer', 'System data entry', null, '8.00', '1', null, null, null, null, 'Mike', null, null, null, 'Contract ended', '0', null, '2014-06-29 21:47:41', '1', '2014-07-03 12:20:29', '1');
+INSERT INTO `job` VALUES ('5', '1', '12', '12', '2014-06-02', null, '1', 'aabbcc', null, '24.00', '12.00', '1', null, '1', '2014-06-17', 'dsfss', 'dfgdgdg', 'df', '4', null, '', '0', null, '2014-06-29 21:48:59', '1', '2014-07-03 12:20:29', '1');
 
-DROP TABLE IF EXISTS `department`;
-CREATE TABLE `department` (
-  `id` int(11) unsigned NOT NULL auto_increment,
-  `type` tinyint(4) unsigned default NULL,
-  `category` tinyint(4) unsigned default NULL,
-  `parentid` int(11) unsigned default NULL,
-  `level` tinyint(4) unsigned default NULL,
-  `name` varchar(255) default NULL,
-  `headperson` varchar(255) default NULL,
-  `headid` int(11) unsigned default NULL,
-  `refno` varchar(15) default NULL,
-  `description` varchar(500) default NULL,
-  `email` varchar(255) default NULL,
-  `phone` varchar(15) default NULL,
-  `contactperson` varchar(255) default NULL,
-  `contactid` int(11) unsigned default NULL,
-  `datecreated` datetime default NULL,
-  `createdby` int(11) unsigned default NULL,
-  `lastupdatedate` datetime default NULL,
-  `lastupdatedby` int(11) unsigned default NULL,
-  `notifyuserids` varchar(255) default NULL,
-  `notifyemails` varchar(1000) default NULL,
-  `notifyphones` varchar(1000) default NULL,
-  PRIMARY KEY  (`id`),
-  KEY `fk_department_parentid` (`parentid`),
-  CONSTRAINT `fk_department_parentid` FOREIGN KEY (`parentid`) REFERENCES `department` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-INSERT INTO `department` (`id`, `type`, `category`, `parentid`, `level`, `name`, `headperson`, `headid`, `refno`, `description`, `email`, `phone`, `contactperson`, `contactid`, `datecreated`, `createdby`, `lastupdatedate`, `lastupdatedby`, `notifyuserids`, `notifyemails`, `notifyphones`) VALUES
-(1,	3,	2,	1,	2,	'Finance',	'Lennox Sobahle Tukwayo',	NULL,	'',	NULL,	'lennox@iym.gov.za',	'0488015000',	'Lennox Sobahle Tukwayo',	NULL,	'2013-10-01 00:00:00',	1,	'2014-04-10 11:29:12',	1,	NULL,	'lennox@iym.gov.za',	'0837579802'),
-(2,	3,	1,	2,	1,	'Municipal Manager',	'Mzwandile Tantsi',	NULL,	'',	NULL,	'mzwandile@iym.gov.za',	'0488015000',	'Mzwandile Tantsi',	NULL,	'2013-10-01 00:00:00',	1,	'2014-04-10 17:25:05',	1,	NULL,	'mzwandile@iym.gov.za',	''),
-(5,	3,	3,	9,	3,	'Human Resource',	'',	NULL,	'',	NULL,	'',	'',	'',	NULL,	'2013-10-01 00:00:00',	1,	'2014-03-31 19:10:31',	1,	NULL,	'',	''),
-(6,	3,	3,	1,	3,	'Accountant: Revenue',	'Lennox Sobahle Tukwayo',	NULL,	'',	NULL,	'frieda@iym.gov.za',	'0488015117',	'Frieda De Jager',	NULL,	'2013-10-01 00:00:00',	1,	'2014-04-11 16:19:23',	1,	'61',	'lennox@iym.gov.za',	'0847101133'),
-(8,	3,	3,	29,	3,	'Health & Environment',	'',	NULL,	'',	NULL,	'',	'',	'',	NULL,	'2013-10-01 00:00:00',	1,	'2014-03-31 19:12:39',	1,	NULL,	'',	''),
-(9,	3,	2,	9,	2,	'Corporate Services',	'Bafo Thanduxolo Sigenu',	NULL,	'',	NULL,	'thanduxolo@iym.gov.za',	'0488015000',	'Bafo Thanduxolo Sigenu',	NULL,	'2013-10-01 00:00:00',	1,	'2014-04-10 17:16:12',	1,	NULL,	'thanduxolo@iym.gov.za',	''),
-(10,	3,	3,	11,	3,	'SMME Development',	'Lulamile Jojiyasi',	NULL,	'',	NULL,	'zola@iym.gov.za',	'0488015089',	'Nokuzola James',	NULL,	'2013-10-01 00:00:00',	1,	'2014-04-11 10:50:49',	1,	'59',	'lulamile@iym.gov.za',	''),
-(11,	3,	2,	11,	2,	'Local Economic Development',	'Lulamile Jojiyasi',	NULL,	'',	NULL,	'lulamile@iym.gov.za',	'0488015000',	'Lulamile Jojiyasi',	NULL,	'2013-10-01 00:00:00',	1,	'2014-04-10 17:20:29',	1,	NULL,	'lulamile@iym.gov.za',	''),
-(14,	3,	3,	1,	3,	'Budget Office',	'Lennox Sobahle Tukwayo',	NULL,	'',	NULL,	'ludwe@iym.gov.za',	'0488015015',	'Ludwe Hanana',	NULL,	'2013-10-01 00:00:00',	1,	'2014-04-11 16:38:16',	1,	NULL,	'lennox@iym.gov.za',	'0835468723'),
-(15,	3,	3,	11,	3,	'Agricultural Development',	'Lulamile Jojiyasi',	NULL,	'',	NULL,	'siyabulela@iym.gov.za',	'0488015094',	'Siyabulela Salman',	NULL,	'2013-10-01 00:00:00',	1,	'2014-04-11 10:30:41',	1,	'57',	'lulamile@iym.gov.za',	''),
-(22,	3,	3,	26,	3,	'Electrical Services Cradock',	'Amos Saleni',	NULL,	'',	NULL,	'mteza@iym.gov.za',	'0488015000',	'',	43,	'2013-10-31 00:00:00',	1,	'2014-05-22 13:32:04',	1,	'43',	'amos@iym.gov.za',	''),
-(23,	3,	3,	26,	3,	'Water Services',	'Amos Saleni',	NULL,	'',	NULL,	'mashiyald@gmail.com',	'0488015000',	'',	44,	'2013-10-31 00:00:00',	1,	'2014-04-07 18:04:09',	1,	'44',	'amos@iym.gov.za',	''),
-(24,	3,	3,	1,	3,	'Accountant: Internal Services',	'Lennox Sobahle Tukwayo',	NULL,	'',	NULL,	'rentia@iym.gov.za',	'0488015029',	'Rentia Crouse',	NULL,	'2013-10-31 00:00:00',	1,	'2014-04-11 16:11:42',	1,	'60',	'lennox@iym.gov.za',	''),
-(26,	3,	2,	26,	2,	'Technical',	'Amos Saleni',	NULL,	'',	NULL,	'amos@iym.gov.za',	'0488015000',	'Amos Saleni',	NULL,	'2013-10-31 00:00:00',	1,	'2014-04-07 17:57:27',	1,	NULL,	'amos@iym.gov.za',	''),
-(27,	3,	3,	11,	3,	'Tourism Development',	'Lulamile Jojiyasi',	NULL,	'',	NULL,	'lineobebeza@gmail.com',	'0488811113',	'Lineo Bebeza',	NULL,	'2013-10-31 00:00:00',	1,	'2014-04-11 16:49:18',	1,	NULL,	'lulamile@iym.gov.za',	''),
-(29,	3,	2,	29,	2,	'Community Services',	'Noluthando Majiba',	NULL,	'',	NULL,	'majiba@iym.gov.za',	'0488015000',	'Noluthando Majiba',	NULL,	'2013-10-31 00:00:00',	1,	'2014-04-10 17:22:00',	1,	NULL,	'noluthando@iym.gov.za',	''),
-(31,	3,	3,	26,	3,	'Public Works',	'',	NULL,	'',	NULL,	'',	'',	'',	NULL,	'2014-03-31 18:59:17',	1,	'2014-04-04 16:47:24',	1,	NULL,	'',	''),
-(33,	3,	3,	26,	3,	'Planning, Building and Land Use',	'Amos Saleni',	NULL,	'',	NULL,	'avelamashaba@yahoo.com',	'0488015000',	'Avela Mashaba',	NULL,	'2014-04-07 17:45:30',	1,	'2014-04-07 17:49:28',	1,	'46',	'',	''),
-(34,	3,	3,	1,	3,	'Supply Chain Management',	'Lennox Sobahle Tukwayo',	NULL,	'',	NULL,	'alda@iym.gov.za',	'0488015031',	'Alda-Lea Hukfie',	NULL,	'2014-04-11 16:44:22',	1,	'2014-04-11 16:47:33',	1,	'65',	'lennox@iym.gov.za',	'0737372654'),
-(35,	3,	1,	NULL,	1,	'Mayor\'s Office',	'Nyameka Goniwe',	NULL,	'',	NULL,	'nyameka@iym.gov.za',	'0488015000',	'Nyameka Goniwe',	NULL,	'2014-04-11 16:52:32',	1,	NULL,	NULL,	NULL,	'nyameka@iym.gov.za',	''),
-(38,	3,	3,	26,	3,	'Electrical Services Middleburg',	'Amos Saleni',	NULL,	'',	NULL,	'francois.iym@mymtnmail.co.za',	'0498021380',	'',	55,	'2014-05-22 13:03:35',	1,	NULL,	NULL,	'55',	'',	'');
-
-DROP TABLE IF EXISTS `department_category`;
-CREATE TABLE `department_category` (
-  `id` int(11) unsigned NOT NULL auto_increment,
-  `departmentid` int(11) unsigned default NULL,
-  `categoryid` int(11) unsigned default NULL,
-  PRIMARY KEY  (`id`),
-  KEY `fk_departmentcategory_departmentid` (`departmentid`),
-  KEY `fk_departmentcategory_categoryid` (`categoryid`),
-  CONSTRAINT `fk_departmentcategory_categoryid` FOREIGN KEY (`categoryid`) REFERENCES `category` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_departmentcategory_departmentid` FOREIGN KEY (`departmentid`) REFERENCES `department` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
-DROP TABLE IF EXISTS `document`;
-CREATE TABLE `document` (
-  `id` int(11) unsigned NOT NULL auto_increment,
-  `type` tinyint(4) NOT NULL,
-  `filename` varchar(255) NOT NULL,
-  `title` varchar(255) default NULL,
-  `description` varchar(500) default NULL,
-  `filepath` varchar(255) default NULL,
-  `filesize` bigint(20) unsigned default NULL,
-  `extension` varchar(6) default NULL,
-  `mimetype` varchar(50) default '',
-  `dateuploaded` datetime default NULL,
-  `notes` blob,
-  `uploadedbyid` int(11) unsigned default NULL,
-  `ticketid` int(11) unsigned default NULL,
-  `commentid` int(11) unsigned default NULL,
-  `ledgerid` int(11) unsigned default NULL,
-  PRIMARY KEY  (`id`),
-  KEY `fk_document_ticketid` (`ticketid`),
-  KEY `fk_document_commentid` (`commentid`),
-  KEY `fk_document_ledgerid` (`ledgerid`),
-  KEY `fk_document_uploadedbyid` (`uploadedbyid`),
-  KEY `fk_document_type` (`type`),
-  CONSTRAINT `fk_document_commentid` FOREIGN KEY (`commentid`) REFERENCES `comment` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_document_ledgerid` FOREIGN KEY (`ledgerid`) REFERENCES `ticket_ledger` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_document_ticketid` FOREIGN KEY (`ticketid`) REFERENCES `ticket` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_document_uploadedbyid` FOREIGN KEY (`uploadedbyid`) REFERENCES `useraccount` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
+-- ----------------------------
+-- Table structure for `lookupquery`
+-- ----------------------------
 DROP TABLE IF EXISTS `lookupquery`;
 CREATE TABLE `lookupquery` (
-  `id` int(10) unsigned NOT NULL auto_increment,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
-  `description` varchar(255) default NULL,
+  `description` varchar(255) DEFAULT NULL,
   `querystring` varchar(500) NOT NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
-INSERT INTO `lookupquery` (`id`, `name`, `description`, `querystring`) VALUES
-(1,	'ALL_USERS',	'Returns the list of all Users in the system',	'SELECT u.id as optionvalue, concat(u.firstname,\' \',u.lastname) as optiontext FROM useraccount u ORDER BY optiontext'),
-(2,	'ALL_ACL_GROUPS',	'All defined ACL groups',	'SELECT id as optionvalue, name as optiontext FROM aclgroup'),
-(3,	'ALL_RESOURCES',	'The resources that are secured within the application',	'SELECT r.name AS optiontext, r.id AS optionvalue FROM aclresource AS r ORDER BY optiontext');
+-- ----------------------------
+-- Records of lookupquery
+-- ----------------------------
+INSERT INTO `lookupquery` VALUES ('1', 'ALL_USERS', 'Returns the list of all Users in the system', 'SELECT u.id as optionvalue, concat(u.firstname,\' \',u.lastname) as optiontext FROM useraccount u ORDER BY optiontext');
+INSERT INTO `lookupquery` VALUES ('2', 'ALL_ACL_GROUPS', 'All defined ACL groups', 'SELECT id as optionvalue, name as optiontext FROM aclgroup');
+INSERT INTO `lookupquery` VALUES ('3', 'ALL_RESOURCES', 'The resources that are secured within the application', 'SELECT r.name AS optiontext, r.id AS optionvalue FROM aclresource AS r ORDER BY optiontext');
 
+-- ----------------------------
+-- Table structure for `lookuptype`
+-- ----------------------------
 DROP TABLE IF EXISTS `lookuptype`;
 CREATE TABLE `lookuptype` (
-  `id` int(11) unsigned NOT NULL auto_increment,
-  `name` varchar(50) NOT NULL,
-  `displayname` varchar(50) NOT NULL,
-  `listable` tinyint(4) unsigned default '1',
-  `updatable` tinyint(4) unsigned default NULL,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `displayname` varchar(255) NOT NULL,
+  `listable` tinyint(4) unsigned DEFAULT '1',
+  `updatable` tinyint(4) unsigned DEFAULT NULL,
   `description` varchar(255) NOT NULL,
   `datecreated` datetime NOT NULL,
   `createdby` int(11) unsigned NOT NULL,
-  `lastupdatedate` datetime default NULL,
-  `lastupdatedby` int(11) unsigned default NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `lastupdatedate` datetime DEFAULT NULL,
+  `lastupdatedby` int(11) unsigned DEFAULT NULL,
+  `addbutnodelete` tinyint(4) unsigned DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8;
 
-INSERT INTO `lookuptype` (`id`, `name`, `displayname`, `listable`, `updatable`, `description`, `datecreated`, `createdby`, `lastupdatedate`, `lastupdatedby`) VALUES
-(1,	'YES_NO',	'Yes No Boolean ',	1,	0,	'Yes, No value options.',	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(2,	'TRANSACTION_TYPES',	'Transaction Types',	1,	0,	'System Audit Trail transaction types.',	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(3,	'LIST_ITEM_COUNT_OPTIONS',	'Listing Items Per Page Values',	1,	0,	'Available number of items per page on lists',	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(4,	'ACTIVE_STATUS',	'Active Status Boolean',	1,	0,	'Whether a user is active or not',	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(5,	'GENDER',	'Gender Values',	1,	0,	'The different gender values',	'2012-03-19 18:50:51',	1,	NULL,	NULL),
-(6,	'ACTION_STATUS',	'Activity Statuses',	1,	1,	'The progress status values',	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(7,	'CONTACTUS_CATEGORIES',	'Contact Us Form Categories',	1,	1,	'The contactus form categories',	'2012-03-01 12:00:00',	1,	NULL,	NULL),
-(8,	'SALUTATION',	'Salutations',	1,	1,	'The different salutations Mr, Mrs, Dr, etc',	'2009-05-12 19:18:15',	2012,	'0000-00-00 00:00:00',	NULL),
-(9,	'TICKET_SOURCES',	'Query Sources',	1,	1,	'The methods used to report customer queries',	'0000-00-00 00:00:00',	0,	NULL,	NULL),
-(10,	'TICKET_STATUS',	'Query Status Values',	1,	0,	'The statuses through which a ticket runs through',	'0000-00-00 00:00:00',	0,	NULL,	NULL),
-(11,	'TICKET_PRIORITIES',	'Query Priority',	1,	1,	'The priority assigned to a Query',	'2013-12-06 19:18:15',	1,	NULL,	NULL),
-(12,	'TICKET_FEEDBACK_VALUES',	'Query Feeback Parameters',	1,	1,	'The rating values for Query feedback',	'2013-12-06 19:18:15',	1,	NULL,	NULL),
-(13,	'DEPARTMENT_TYPES',	'Department types',	1,	1,	'The types of departments',	'2013-12-06 19:18:15',	1,	NULL,	NULL),
-(14,	'DEPARTMENT_CATEGORIES',	'Department Categories',	1,	1,	'The categories assigned to departments',	'2013-12-06 19:18:15',	1,	NULL,	NULL),
-(15,	'CLIENT_CATEGORIES',	'Client Categories',	1,	1,	'The categories of clients available',	'2013-12-06 19:18:15',	1,	NULL,	NULL),
-(16,	'CLIENT_TYPES',	'Client Types',	1,	0,	'The type of customer.',	'2013-12-06 19:18:15',	1,	NULL,	NULL),
-(17,	'USER_STATUS',	'User Status Values',	1,	0,	'The user status flags.',	'2013-12-06 19:18:15',	1,	NULL,	NULL),
-(18,	'TOGGLE_ENABLED',	'Toggle Enable/Disable',	1,	0,	'Enabled or disabled',	'2013-12-06 22:23:55',	1,	NULL,	NULL),
-(19,	'QUERY_CATEGORIES',	'Query Categories',	1,	1,	'The query categories',	'2013-12-06 22:23:55',	1,	NULL,	NULL),
-(20,	'SYSTEM_MUNICIPALITIES',	'Municipalities and Towns',	1,	1,	'The municipalities and towns for querying clients',	'2013-12-06 22:23:55',	1,	NULL,	NULL);
+-- ----------------------------
+-- Records of lookuptype
+-- ----------------------------
+INSERT INTO `lookuptype` VALUES ('1', 'YES_NO', 'Yes No Boolean ', '0', '0', 'Yes, No value options.', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('2', 'TRANSACTION_TYPES', 'Transaction Types', '0', '0', 'System Audit Trail transaction types.', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('3', 'LIST_ITEM_COUNT_OPTIONS', 'System List Items Per Page', '1', '0', 'Available number of items per page on lists', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('4', 'ACTIVE_STATUS', 'System Active Statuses', '0', '0', 'Whether a user is active or not', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('5', 'GENDER', 'Gender Values', '0', '0', 'The different gender values', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('8', 'SALUTATION', 'Client Salutations', '1', '1', 'The different salutations Mr, Mrs, Dr, etc', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('9', 'USER_STATUS', 'System User Status Values', '1', '0', 'The user status flags.', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('10', 'NEW_JERSEY_COUNTIES', 'System Counties', '1', '1', 'All the counties in New Jersey', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('11', 'MARITAL_STATUS_VALUES', 'Client Marital Status Values', '1', '1', 'The marital status values', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('12', 'EDUCATION_LEVELS', 'Client Education Levels', '1', '1', 'The education level for clients', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('13', 'RACES', 'Client Races', '1', '1', 'The race of client', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('14', 'DISABILITY_DIAGNOSIS_CODES', 'Client Codes for Disability Impairement', '1', '1', 'Disability Diagnosis Codes', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('15', 'DISABILITY_CAUSE_CODES', 'Client Codes for Disability Cause/Source', '1', '1', 'Causes for Disability Impairment', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('16', 'COMMUNICATION_LEVELS', 'Client Communication Levels', '1', '1', 'The communication levels', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('17', 'HOUSING_TYPES', 'Client Current Living/Housing Arrangements', '1', '1', 'The housing type values', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('18', 'CLIENT_SKILLS', 'Client Special Skills', '1', '1', 'The proffessional and vocational skills ', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('19', 'TRANSPORTATION_MODES', 'Client Transportation Modes', '1', '1', 'The client\'s mode of transportation to work', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('20', 'MEDICAL_TYPES', 'Client Medical Types', '1', '1', 'The client\'s medical types during job placement', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('21', 'WAGE_RATE_TYPES', 'Client Employment Wage Types', '1', '1', 'The type of rate used for the client job', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('22', 'JOB_STATUSES', 'Client Employment Job Statuses', '1', '0', 'The job status values', '2014-06-01 12:00:00', '1', null, null, '1');
+INSERT INTO `lookuptype` VALUES ('23', 'JOB_TERMINATION_TYPES', 'Client Employment Termination Types', '1', '0', 'The job termination types', '2014-06-01 12:00:00', '1', null, null, '1');
+INSERT INTO `lookuptype` VALUES ('24', 'VOUCHER_STATUS', 'Voucher Statuses', '0', '1', 'The voucher status values', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('25', 'CLIENT_EMERGENCY_RELATIONSHIP', 'Client Emergency Relationships', '1', '1', 'The relationship between client and emergency contact', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('26', 'CLIENT_INCOME_SOURCE', 'Client Employment Income Sources', '1', '1', 'The current income source for client', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('27', 'CLIENT_EMPLOYMENT_PREFERRENCE', 'Client Employment Goal Sectors', '1', '1', 'The preferred sectors for client employment', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('28', 'CLIENT_PREFERRED_WORKSHIFT', 'Client Employment Workshifts', '1', '1', 'The preferred mode of employment', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('29', 'CLIENT_JOB_TYPES', 'Client Employment Job Types', '1', '1', 'The Job types preferred by client', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('30', 'CLIENT_EDUC_INTERESTS', 'Client Education Subjects of Interest', '1', '1', 'The subject areas where the client had most interest', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('31', 'CLIENT_EDUC_LEARNINGSTYLES', 'Client Education Preferred Learning Styles', '1', '1', 'If client were learning a new task, the best ways for them to understand', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('32', 'CLIENT_THERAPY_TREATMENTS', 'Client Medication Therapy/Treatment', '1', '1', 'The client medication assessment therapy treatment', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('33', 'CLIENT_LIFE_QUALITY', 'Client Current Quality of Life', '1', '1', 'How the client describes their quality of life currently', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('34', 'CLIENT_EMPLOYMENT_DIFFICULTY', 'Client Employment Reasons for job difficulties', '1', '1', 'Have you ever experienced any difficulties in obtaining employment or in job settings because of:', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('35', 'CLIENT_PASTEVENTS_TYPES', 'Client Participatory Events', '1', '1', 'The social events that client was/is participating in.', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('36', 'CLIENT_SUPPORT_SERVICES', 'Client List of Support Services ', '1', '1', 'The Support services under social / cultural information', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('37', 'CLIENT_EMPLOYMENT_JOBACCOMODATIONS', 'Client Employment Job Accomodations ', '1', '1', 'The list of special areas/conditions that need to be taken into consideration during placement', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('38', 'CLIENT_SAFETY_ASSESSMENT_AREAS', 'Client Personal Health and Safety Assessment Options', '1', '1', 'How the health or safety risks impact life and employment', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('39', 'CLIENT_MILITARY_DISCHARGE_TYPE', 'Client Military Discharge Type', '1', '1', 'The discharge types for military service', '2014-06-01 12:00:00', '1', null, null, '0');
+INSERT INTO `lookuptype` VALUES ('40', 'CLIENT_MILITARY _COMBAT_PROBLEMS', 'Client Military Combat Problems', '1', '1', 'The combat problems associated with combat', '2014-06-01 12:00:00', '1', null, null, '0');
 
+-- ----------------------------
+-- Table structure for `lookuptypevalue`
+-- ----------------------------
 DROP TABLE IF EXISTS `lookuptypevalue`;
 CREATE TABLE `lookuptypevalue` (
-  `id` int(11) unsigned NOT NULL auto_increment,
-  `lookuptypeid` int(11) unsigned NOT NULL,
-  `lookuptypevalue` varchar(50) NOT NULL,
-  `lookupvaluedescription` varchar(255) default NULL,
-  `info` varchar(1000) default NULL,
-  `createdby` int(11) unsigned NOT NULL,
-  `datecreated` datetime NOT NULL,
-  `lastupdatedate` datetime default NULL,
-  `lastupdatedby` int(11) unsigned default NULL,
-  PRIMARY KEY  (`id`),
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `lookuptypeid` int(11) unsigned DEFAULT NULL,
+  `lookuptypevalue` varchar(50) DEFAULT NULL,
+  `lookupvaluedescription` varchar(255) DEFAULT NULL,
+  `info` blob,
+  `createdby` int(11) unsigned DEFAULT NULL,
+  `datecreated` datetime DEFAULT NULL,
+  `lastupdatedate` datetime DEFAULT NULL,
+  `lastupdatedby` int(11) unsigned DEFAULT NULL,
+  `alias` varchar(255) DEFAULT NULL,
+  `code` int(11) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
   KEY `fk_lookuptypevalue_lookuptypeid` (`lookuptypeid`),
   KEY `index_lookuptypevalue_lookuptypevalue` (`lookuptypevalue`),
   KEY `index_lookuptypevalue_lookupvaluedescription` (`lookupvaluedescription`),
   CONSTRAINT `fk_lookuptypevalue_lookuptypeid` FOREIGN KEY (`lookuptypeid`) REFERENCES `lookuptype` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=427 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of lookuptypevalue
+-- ----------------------------
+INSERT INTO `lookuptypevalue` VALUES ('1', '1', '1', 'Yes', null, '1', '2012-03-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('2', '1', '0', 'No', null, '1', '2012-03-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('3', '2', 'Login', 'User login transaction', null, '1', '2012-03-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('4', '2', 'Logout', 'User logout transaction', null, '1', '2012-03-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('5', '2', 'Recover Password', 'User password recovery transaction', null, '1', '2012-03-01 12:00:00', '2013-12-23 14:14:55', null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('6', '3', '10', '10', null, '1', '2012-03-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('7', '3', '25', '25', null, '1', '2012-03-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('8', '3', '50', '50', null, '1', '2012-03-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('9', '3', '100', '100', null, '1', '2012-03-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('10', '4', 'Active', 'Active', null, '1', '2012-03-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('11', '4', 'In Active', 'In Active', null, '1', '2012-03-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('12', '3', '250', '250', null, '1', '2012-03-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('13', '3', '500', '500', null, '1', '2012-03-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('14', '3', 'All', 'All', null, '1', '2012-03-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('19', '5', '1', 'Male', null, '1', '2012-03-22 12:06:17', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('20', '5', '2', 'Female', null, '1', '2012-03-22 12:06:28', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('33', '8', '1', 'Dr', null, '1', '2011-10-01 12:00:00', '0000-00-00 00:00:00', null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('34', '8', '2', 'Ms', null, '1', '2011-10-01 12:00:00', '0000-00-00 00:00:00', null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('35', '8', '3', 'Mr', null, '1', '2011-10-01 12:00:00', '0000-00-00 00:00:00', null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('36', '8', '4', 'Mrs', null, '1', '2011-10-01 12:00:00', '0000-00-00 00:00:00', null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('37', '8', '5', 'Eng', null, '1', '2011-10-01 12:00:00', '0000-00-00 00:00:00', null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('38', '8', '6', 'Prof', null, '1', '2011-10-01 12:00:00', '0000-00-00 00:00:00', null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('78', '9', '0', 'Pending Activation', null, '1', '2013-12-06 22:16:10', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('79', '9', '1', 'Active', null, '1', '2013-12-06 22:16:24', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('80', '9', '2', 'Deactivated', null, '1', '2013-12-06 22:16:40', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('81', '10', '1', 'Bergen', null, '1', '2014-05-27 16:01:53', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('85', '10', '2', 'Burlington', null, '1', '2014-05-27 16:01:53', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('86', '10', '3', 'Camden', null, '1', '2014-05-27 16:01:53', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('87', '10', '4', 'Cape May', null, '1', '2014-05-27 16:01:53', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('88', '10', '5', 'Cumberland', null, '1', '2014-05-27 16:01:53', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('89', '10', '6', 'Essex', null, '1', '2014-05-27 16:01:53', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('90', '10', '7', 'Gloucester', null, '1', '2014-05-27 16:01:53', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('91', '10', '8', 'Hudson', null, '1', '2014-05-27 16:01:53', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('92', '10', '9', 'Hunterdon', null, '1', '2014-05-27 16:01:53', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('93', '10', '10', 'Mercer', null, '1', '2014-05-27 16:01:53', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('94', '10', '11', 'Middlesex', null, '1', '2014-05-27 16:01:53', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('95', '10', '12', 'Monmouth', null, '1', '2014-05-27 16:01:53', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('96', '10', '13', 'Morris ', null, '1', '2014-05-27 16:01:53', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('97', '10', '14', 'Ocean', null, '1', '2014-05-27 16:01:53', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('98', '10', '15', 'Passaic', null, '1', '2014-05-27 16:01:53', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('99', '10', '16', 'Salem ', null, '1', '2014-05-27 16:01:53', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('100', '10', '17', 'Somerset', null, '1', '2014-05-27 16:01:53', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('101', '10', '18', 'Sussex ', null, '1', '2014-05-27 16:01:53', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('102', '10', '19', 'Union', null, '1', '2014-05-27 16:01:53', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('103', '10', '20', 'Warren', null, '1', '2014-05-27 16:01:53', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('104', '11', '1', 'Married', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('105', '11', '2', 'Single', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('106', '11', '3', 'Divorced', null, '1', '2014-06-01 12:00:00', '2014-06-19 20:00:26', null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('107', '11', '4', 'Widowed', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('109', '12', '2', 'Elementary School', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('111', '12', '4', 'High School', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('112', '12', '5', 'College Undergraduate', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('113', '12', '6', 'College Graduate', null, '1', '2014-06-01 12:00:00', '2014-06-19 15:09:57', null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('114', '12', '7', 'Vocation School', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('116', '13', '1', 'White', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('117', '13', '2', 'Black', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('118', '13', '3', 'Native', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('119', '13', '4', 'Asian', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('120', '13', '5', 'Native Hawaiian', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('121', '13', '6', 'Multiracial', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('122', '13', '7', 'Hispanic', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('123', '14', '1', 'No Impairement', null, '1', '2014-06-01 12:00:00', '2014-06-19 16:33:20', null, '00', null);
+INSERT INTO `lookuptypevalue` VALUES ('124', '14', '2', 'Blindness', null, '1', '2014-06-01 12:00:00', '2014-06-19 16:33:53', null, '01', null);
+INSERT INTO `lookuptypevalue` VALUES ('125', '15', '1', 'Cause Unknown', null, '1', '2014-06-01 12:00:00', '2014-06-19 16:14:30', null, '00', null);
+INSERT INTO `lookuptypevalue` VALUES ('126', '15', '2', 'Accident/Injury', null, '1', '2014-06-01 12:00:00', '2014-06-19 19:18:24', null, '01', null);
+INSERT INTO `lookuptypevalue` VALUES ('127', '16', '1', 'Phone', null, '1', '2014-06-01 12:00:00', '2014-06-19 15:45:58', null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('128', '16', '2', 'Email', null, '1', '2014-06-01 12:00:00', '2014-06-19 15:45:53', null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('129', '17', '1', 'Living with family of origin', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('132', '17', '2', 'Living with friends', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('133', '18', '1', 'Bookkeeping ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('134', '18', '2', 'Microsoft - Excel ', null, '1', '2014-06-01 12:00:00', '2014-06-19 20:15:38', null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('135', '18', '3', 'Cash Office ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('136', '18', '4', 'Fork-Lift ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('137', '18', '5', 'Operator EKG', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('138', '19', '1', 'Public (Bus/Train)', null, '1', '2014-06-01 12:00:00', '2014-06-19 20:21:40', null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('139', '19', '2', 'Own Vehicle', null, '1', '2014-06-01 12:00:00', '2014-06-19 20:22:04', null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('140', '19', '3', 'Family Member', null, '1', '2014-06-01 12:00:00', '2014-06-19 20:22:55', null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('141', '19', '4', 'Friend', null, '1', '2014-06-01 12:00:00', '2014-06-19 20:23:02', null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('142', '19', '5', 'Provided by County', null, '1', '2014-06-01 12:00:00', '2014-06-20 12:45:49', null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('145', '20', '1', 'Medical Type 1', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('146', '20', '2', 'Medical Type 2', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('147', '21', '1', 'Per Hour', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('148', '21', '2', 'Per Day', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('149', '21', '3', 'Per Week', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('150', '21', '4', 'Per Month', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('151', '22', '1', 'In Progress', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('152', '22', '0', 'Completed', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('153', '23', '1', 'Terminate Type 1', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('154', '23', '2', 'Terminate Type 2', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('155', '24', '1', 'In Progress', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('156', '24', '2', 'Pending Approval', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('157', '24', '3', 'Completed', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('158', '11', '5', 'Partnered', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('161', '11', '6', 'Separated', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('162', '13', '8', 'Pacific Islander', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('163', '13', '9', 'American Indian', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('164', '13', '10', 'Alaskan', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('165', '13', '11', 'Other', null, '1', '2014-06-01 12:00:00', '2014-06-19 20:04:42', null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('166', '26', '1', 'None ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('167', '26', '2', 'Pension ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('168', '26', '3', 'TANF ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('169', '26', '4', 'Social Security Disability Insurance', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('170', '26', '5', 'General Assistance ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('171', '26', '6', 'Savings ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('172', '26', '7', 'Investments ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('173', '26', '8', 'Social Security Income', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('174', '26', '9', 'Alimony - Child Support ', null, '1', '2014-06-01 12:00:00', '2014-06-19 20:00:08', null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('175', '26', '10', 'Other Workers Comp ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('176', '26', '11', 'Veterans Benefits', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('177', '26', '12', 'Unemployment Benefits ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('178', '26', '13', 'Employed ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('179', '26', '14', 'Cash Income (Employment)', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('184', '25', '1', 'Father', null, '1', '2014-06-19 15:20:21', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('185', '25', '2', 'Mother', null, '1', '2014-06-19 15:20:52', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('186', '25', '3', 'Sibling', null, '1', '2014-06-19 15:21:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('187', '25', '4', 'Child', null, '1', '2014-06-19 15:31:40', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('188', '25', '5', 'Grand Child', null, '1', '2014-06-19 15:31:54', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('189', '25', '6', 'Grand Parent', null, '1', '2014-06-19 15:32:01', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('190', '25', '7', 'In-law', null, '1', '2014-06-19 15:32:14', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('191', '25', '8', 'Aunt', null, '1', '2014-06-19 15:32:26', '2014-06-19 15:40:19', null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('192', '25', '9', 'Uncle', null, '1', '2014-06-19 15:42:45', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('194', '25', '0', 'Other', null, '1', '2014-06-19 15:43:13', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('195', '25', '11', 'Partner', null, '1', '2014-06-19 15:43:24', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('196', '25', '12', 'Guardian', null, '1', '2014-06-19 15:44:29', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('197', '25', '13', 'Friend', null, '1', '2014-06-19 15:44:36', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('198', '14', '3', 'Other Visual Impairement', null, '1', '2014-06-19 16:45:37', null, null, '02', null);
+INSERT INTO `lookuptypevalue` VALUES ('199', '14', '4', 'Deafness, Primary Communication Visual', null, '1', '2014-06-19 17:00:23', null, null, '03', null);
+INSERT INTO `lookuptypevalue` VALUES ('200', '14', '5', 'Deafness, Primary Communication Auditory', null, '1', '2014-06-19 17:01:57', null, null, '04', null);
+INSERT INTO `lookuptypevalue` VALUES ('201', '14', '6', 'Hearing Loss, Primary Communication Visual', null, '1', '2014-06-19 17:02:20', '2014-06-19 17:03:01', null, '05', null);
+INSERT INTO `lookuptypevalue` VALUES ('202', '14', '7', 'Hearing Loss, Primary Communication Auditory', null, '1', '2014-06-19 17:03:18', null, null, '06', null);
+INSERT INTO `lookuptypevalue` VALUES ('203', '14', '8', 'Other Hearing Impairements', null, '1', '2014-06-19 17:03:40', null, null, '07', null);
+INSERT INTO `lookuptypevalue` VALUES ('204', '14', '9', 'Deaf Blindness', null, '1', '2014-06-19 17:03:56', null, null, '08', null);
+INSERT INTO `lookuptypevalue` VALUES ('205', '14', '10', 'Communicative Impairments (expressive/receptive)', null, '1', '2014-06-19 17:06:35', '2014-06-19 17:12:25', null, '09', null);
+INSERT INTO `lookuptypevalue` VALUES ('206', '14', '11', 'Mobility Orthopedic/Neurological Impairments', null, '1', '2014-06-19 17:13:31', null, null, '10', null);
+INSERT INTO `lookuptypevalue` VALUES ('207', '14', '12', 'Manipulation/Dexterity Orthopedic/Neurological Impairments', null, '1', '2014-06-19 17:15:04', null, null, '11', null);
+INSERT INTO `lookuptypevalue` VALUES ('208', '14', '13', 'Both Mobility Orthopedic/Neurological Impairments and Manipulation/Dexterity Orthopedic/Neurological Impairments', null, '1', '2014-06-19 17:16:05', null, null, '12', null);
+INSERT INTO `lookuptypevalue` VALUES ('209', '14', '14', 'Other Orthopedic Impairments', null, '1', '2014-06-19 17:16:52', null, null, '13', null);
+INSERT INTO `lookuptypevalue` VALUES ('210', '14', '15', 'Respiratory Impairments', null, '1', '2014-06-19 17:17:07', null, null, '14', null);
+INSERT INTO `lookuptypevalue` VALUES ('211', '14', '16', 'General Physical Debilitation (fatigue, weakness, pain, etc)', null, '1', '2014-06-19 17:18:15', null, null, '15', null);
+INSERT INTO `lookuptypevalue` VALUES ('212', '14', '17', 'Other Physical Impairments', null, '1', '2014-06-19 17:19:04', null, null, '16', null);
+INSERT INTO `lookuptypevalue` VALUES ('213', '14', '18', 'Cognitive Impairments', null, '1', '2014-06-19 17:20:06', null, null, '17', null);
+INSERT INTO `lookuptypevalue` VALUES ('214', '14', '19', 'Psychosocial Impairments', null, '1', '2014-06-19 17:21:10', null, null, '18', null);
+INSERT INTO `lookuptypevalue` VALUES ('215', '14', '20', 'Other Mental Impairments', null, '1', '2014-06-19 17:21:55', null, null, '19', null);
+INSERT INTO `lookuptypevalue` VALUES ('216', '15', '3', 'Alcohol Abuse or Dependence', null, '1', '2014-06-19 17:23:40', null, null, '02', null);
+INSERT INTO `lookuptypevalue` VALUES ('217', '15', '4', 'Amputations', null, '1', '2014-06-19 17:23:55', null, null, '03', null);
+INSERT INTO `lookuptypevalue` VALUES ('218', '15', '5', 'Anxiery Disorders', null, '1', '2014-06-19 17:24:07', null, null, '04', null);
+INSERT INTO `lookuptypevalue` VALUES ('219', '15', '6', 'Athritis and Rheumatism', null, '1', '2014-06-19 17:25:01', null, null, '05', null);
+INSERT INTO `lookuptypevalue` VALUES ('220', '15', '7', 'Asthma and Other Allergies', null, '1', '2014-06-19 17:25:36', null, null, '06', null);
+INSERT INTO `lookuptypevalue` VALUES ('221', '15', '8', 'Attention Deficit Hyperactive Disorder (ADHD)', null, '1', '2014-06-19 17:26:43', null, null, '07', null);
+INSERT INTO `lookuptypevalue` VALUES ('222', '15', '9', 'Autism', null, '1', '2014-06-19 17:27:08', null, null, '08', null);
+INSERT INTO `lookuptypevalue` VALUES ('223', '15', '10', 'Blood Disorders', null, '1', '2014-06-19 17:27:29', null, null, '09', null);
+INSERT INTO `lookuptypevalue` VALUES ('224', '15', '11', 'Cancer', null, '1', '2014-06-19 17:27:43', null, null, '10', null);
+INSERT INTO `lookuptypevalue` VALUES ('225', '15', '12', 'Cardiac and other conditions of circulatory system', null, '1', '2014-06-19 17:28:43', null, null, '11', null);
+INSERT INTO `lookuptypevalue` VALUES ('226', '15', '13', 'Celebral Palsy', null, '1', '2014-06-19 17:29:08', null, null, '12', null);
+INSERT INTO `lookuptypevalue` VALUES ('227', '15', '14', 'Congenital Condition or Birth Injury', null, '1', '2014-06-19 17:30:28', null, null, '13', null);
+INSERT INTO `lookuptypevalue` VALUES ('228', '15', '15', 'Cystic Fibrosis', null, '1', '2014-06-19 17:31:14', null, null, '14', null);
+INSERT INTO `lookuptypevalue` VALUES ('229', '15', '16', 'Depressive and Other Mood Disorders', null, '1', '2014-06-19 17:31:59', null, null, '15', null);
+INSERT INTO `lookuptypevalue` VALUES ('230', '15', '17', 'Diabetes Mellitus', null, '1', '2014-06-19 17:32:40', null, null, '16', null);
+INSERT INTO `lookuptypevalue` VALUES ('231', '15', '18', 'Digestive', null, '1', '2014-06-19 17:38:24', null, null, '17', null);
+INSERT INTO `lookuptypevalue` VALUES ('232', '15', '19', 'Drug Abuse or Dependence', null, '1', '2014-06-19 17:39:01', null, null, '18', null);
+INSERT INTO `lookuptypevalue` VALUES ('233', '15', '20', 'Eating Disorders', null, '1', '2014-06-19 17:39:40', null, null, '19', null);
+INSERT INTO `lookuptypevalue` VALUES ('234', '15', '21', 'End-stage Renal Disease and other GenitourinarySystem Disorders', null, '1', '2014-06-19 17:43:18', null, null, '20', null);
+INSERT INTO `lookuptypevalue` VALUES ('235', '15', '22', 'Epilepsy', null, '1', '2014-06-19 18:16:45', null, null, '21', null);
+INSERT INTO `lookuptypevalue` VALUES ('236', '15', '23', 'HIV and AIDS', null, '1', '2014-06-19 18:17:15', null, null, '22', null);
+INSERT INTO `lookuptypevalue` VALUES ('237', '15', '24', 'Immune Deficiencies excluding HIV', null, '1', '2014-06-19 18:17:54', null, null, '23', null);
+INSERT INTO `lookuptypevalue` VALUES ('238', '15', '25', 'Mental Illness', null, '1', '2014-06-19 18:18:26', null, null, '24', null);
+INSERT INTO `lookuptypevalue` VALUES ('239', '15', '26', 'Mental Retardation', null, '1', '2014-06-19 18:19:06', null, null, '25', null);
+INSERT INTO `lookuptypevalue` VALUES ('240', '15', '27', 'Multiple Sclerosis', null, '1', '2014-06-19 18:19:48', null, null, '26', null);
+INSERT INTO `lookuptypevalue` VALUES ('241', '15', '28', 'Muscular Dystrophy', null, '1', '2014-06-19 18:36:32', null, null, '27', null);
+INSERT INTO `lookuptypevalue` VALUES ('242', '15', '29', 'Parkinson\\\'s Disease and other Neurological Disorders', null, '1', '2014-06-19 19:07:03', null, null, '28', null);
+INSERT INTO `lookuptypevalue` VALUES ('243', '15', '30', 'Personal Disorders', null, '1', '2014-06-19 19:09:39', null, null, '29', null);
+INSERT INTO `lookuptypevalue` VALUES ('244', '15', '31', 'Physical Disorders/Conditions', null, '1', '2014-06-19 19:09:53', '2014-06-19 19:10:18', null, '30', null);
+INSERT INTO `lookuptypevalue` VALUES ('245', '15', '32', 'Polio', null, '1', '2014-06-19 19:10:27', null, null, '31', null);
+INSERT INTO `lookuptypevalue` VALUES ('246', '15', '33', 'Respiratory Disorders other than Cystic Fibrosis', null, '1', '2014-06-19 19:11:19', null, null, '32', null);
+INSERT INTO `lookuptypevalue` VALUES ('247', '15', '34', 'Schizophrenia and other Personal Disorders', null, '1', '2014-06-19 19:12:08', null, null, '33', null);
+INSERT INTO `lookuptypevalue` VALUES ('248', '15', '35', 'Specific Learning Disabilities', null, '1', '2014-06-19 19:12:30', null, null, '34', null);
+INSERT INTO `lookuptypevalue` VALUES ('249', '15', '36', 'Spinal Cord Injury (SCI)', null, '1', '2014-06-19 19:13:01', '2014-06-19 19:13:15', null, '35', null);
+INSERT INTO `lookuptypevalue` VALUES ('250', '15', '37', 'Stroke', null, '1', '2014-06-19 19:13:33', null, null, '36', null);
+INSERT INTO `lookuptypevalue` VALUES ('251', '15', '38', 'Tramatic Brain Injury (TBI)', null, '1', '2014-06-19 19:14:01', null, null, '37', null);
+INSERT INTO `lookuptypevalue` VALUES ('252', '17', '3', 'Living with spouse', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('253', '17', '4', 'Living with relatives( grandparents; cousin etc)', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('254', '17', '5', 'Living with spouse and children', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('255', '17', '6', 'Living in temporary housing', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('256', '17', '7', 'Living by self / independent', null, '1', '2014-06-01 12:00:00', '2014-06-19 19:58:40', null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('257', '17', '8', 'Living in shelter', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('258', '17', '9', 'Living in supported housing, permanent', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('259', '17', '10', 'Other', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('260', '17', '11', 'Living in supported housing, transition', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('261', '17', '12', 'Living in residential housing', null, '1', '2014-06-01 12:00:00', '2014-06-19 19:58:59', null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('262', '18', '6', 'Calculator ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('263', '18', '7', 'Microsoft - Outlook ', null, '1', '2014-06-01 12:00:00', '2014-06-19 20:15:49', null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('264', '18', '8', 'Cashier ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('265', '18', '9', 'General Warehouse ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('266', '18', '10', 'CPR & First Aid', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('267', '18', '11', 'Data Entry ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('268', '18', '12', 'Microsoft - PowerPoint ', null, '1', '2014-06-01 12:00:00', '2014-06-19 20:15:58', null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('269', '18', '13', 'Customer Service ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('270', '18', '14', 'Inventory Clerk ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('271', '18', '15', 'CDL License Number ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('272', '18', '16', 'Financial Reports ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('273', '18', '17', 'Microsoft - Word ', null, '1', '2014-06-01 12:00:00', '2014-06-19 20:16:07', null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('274', '18', '18', 'Merchandiser ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('275', '18', '19', 'Maintenance ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('276', '18', '20', 'General Clerical ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('277', '18', '21', 'Computer ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('278', '18', '22', 'Sales Associate ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('279', '18', '23', 'Packer ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('280', '18', '24', 'Janitorial', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('281', '18', '25', 'Payroll Internet ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('282', '18', '26', 'Stock Room ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('283', '18', '27', 'CNA', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('284', '18', '28', 'Statistical ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('285', '18', '29', 'Typing ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('286', '18', '30', 'Email ', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('287', '18', '31', 'Switchboard', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('288', '18', '32', 'Bilingual', null, '1', '2014-06-01 12:00:00', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('290', '27', '1', 'Accounting', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('291', '27', '2', 'Customer Service', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('292', '27', '3', 'Janitorial/Custodial', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('293', '27', '4', 'Sales', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('294', '27', '5', 'Automobile', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('295', '27', '6', 'Data Entry', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('296', '27', '7', 'Laboratory', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('297', '27', '8', 'Security', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('298', '27', '9', 'Banking', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('299', '27', '10', 'Driver', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('300', '27', '11', 'Landscaping', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('301', '27', '12', 'Social Services', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('302', '27', '13', 'Bus Aide', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('303', '27', '14', 'Dishwasher', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('304', '27', '15', 'Manufacturing', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('305', '27', '16', 'Stock', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('306', '27', '17', 'Cart attendant', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('307', '27', '18', 'Food Prep', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('308', '27', '19', 'Nurse (CNA, RN, HHA)', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('309', '27', '20', 'Teacher/Aide', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('310', '27', '21', 'Cashier', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('311', '27', '22', 'Home Companion', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('312', '27', '23', 'Office/Clerical', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('313', '27', '24', 'Technician', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('314', '27', '25', 'Child Care', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('315', '27', '26', 'Hotel/Hospitality', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('316', '27', '27', 'Outdoors', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('317', '27', '28', 'Waiter/Hostess', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('318', '27', '29', 'Computers', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('319', '27', '30', 'Housekeeping', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('320', '27', '31', 'Receptionist/Secretarial', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('321', '27', '32', 'Warehouse', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('322', '27', '33', 'Cook', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('323', '27', '34', 'Human Services', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('324', '27', '35', 'Retail', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('325', '27', '36', 'Other', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('326', '27', '37', 'Cosmetologist', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('327', '27', '38', 'Restaurant/Food', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('328', '27', '39', 'Trades ex (Plumbing, Electrician and HVAC)', null, null, null, null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('330', '28', '1', 'Day', null, '1', '2014-06-20 12:27:09', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('331', '28', '2', 'Evening', null, '1', '2014-06-20 12:27:19', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('332', '28', '3', 'Night / Overnight ', null, '1', '2014-06-20 12:27:32', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('333', '28', '4', 'Weekend', null, '1', '2014-06-20 12:27:46', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('334', '28', '5', 'Afternoon', null, '1', '2014-06-20 12:27:53', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('335', '29', '1', 'Part-time', null, '1', '2014-06-20 12:29:59', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('336', '29', '2', 'Full-time', null, '1', '2014-06-20 12:30:12', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('337', '12', '8', 'Certification', null, '1', '2014-06-20 13:15:32', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('338', '30', '1', 'Math ', null, '1', '2014-06-20 13:33:06', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('339', '30', '2', 'Science ', null, '1', '2014-06-20 13:33:12', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('340', '30', '3', 'English ', null, '1', '2014-06-20 13:33:19', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('341', '30', '4', 'Industrial Arts', null, '1', '2014-06-20 13:33:28', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('342', '30', '5', 'Arts', null, '1', '2014-06-20 13:33:35', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('343', '30', '6', 'Social Studies', null, '1', '2014-06-20 13:33:43', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('344', '30', '7', 'Sports', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('345', '31', '1', 'Auditory, giving you verbal directions, explaining to you what I want you to do', null, '1', '2014-06-20 13:39:54', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('346', '31', '2', 'Physical prompting, pointing out and showing you how to do what I want you to do', null, '1', '2014-06-20 13:40:01', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('347', '31', '3', 'Hands on learner, letting you do it yourself with instructions', null, '1', '2014-06-20 13:40:10', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('348', '31', '4', 'Modeling (Demonstration), showing you how to do it', null, '1', '2014-06-20 13:40:18', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('349', '31', '5', 'Visual cues or information, leaving you with instructions or pictures on how to do it', null, '1', '2014-06-20 13:40:28', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('350', '32', '1', 'Behavoral Therapy', null, '1', '2014-06-24 19:44:24', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('351', '32', '2', 'Cognitive Therapy', null, '1', '2014-06-24 19:44:33', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('352', '32', '3', 'Counseling', null, '1', '2014-06-24 19:44:41', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('353', '32', '4', 'Dialysis Treatment', null, '1', '2014-06-24 19:44:50', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('354', '32', '5', 'Physical Therapy', null, '1', '2014-06-24 19:44:59', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('355', '32', '6', 'Psychotherapy Treatment', null, '1', '2014-06-24 19:45:08', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('356', '32', '7', 'Substance Abuse Treatment', null, '1', '2014-06-24 19:45:18', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('357', '33', '1', 'Excellent', null, '1', '2014-06-25 11:27:29', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('358', '33', '2', 'Good', null, '1', '2014-06-25 11:27:35', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('359', '33', '3', 'Fair', null, '1', '2014-06-25 11:27:40', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('360', '33', '4', 'Poor', null, '1', '2014-06-25 11:28:28', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('361', '34', '1', 'Your race', null, '1', '2014-07-01 11:55:08', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('362', '34', '2', 'Your age', null, '1', '2014-07-01 11:55:15', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('363', '34', '3', 'Your gender', null, '1', '2014-07-01 11:55:21', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('364', '34', '4', 'Your sexual orientation', null, '1', '2014-07-01 11:55:28', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('365', '34', '5', 'Your religion', null, '1', '2014-07-01 11:55:34', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('366', '34', '6', 'Your economic status', null, '1', '2014-07-01 11:55:41', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('367', '34', '7', 'Any group/social affiliations', null, '1', '2014-07-01 11:55:48', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('368', '35', '1', 'Participate in church activities', null, '1', '2014-07-01 13:52:36', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('369', '35', '2', 'Participate in social clubs', null, '1', '2014-07-01 13:52:42', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('370', '35', '3', 'Do volunteer work', null, '1', '2014-07-01 13:52:50', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('371', '35', '4', 'Attend sports events with others', null, '1', '2014-07-01 13:53:01', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('372', '35', '5', 'Participate in sports with others', null, '1', '2014-07-01 13:53:18', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('373', '35', '6', 'Attend community events', null, '1', '2014-07-01 13:53:23', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('374', '35', '7', 'Attend family gatherings', null, '1', '2014-07-01 13:53:30', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('375', '35', '8', 'Attend support group meetings', null, '1', '2014-07-01 13:54:08', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('376', '35', '9', 'Belong to a neighborhood association', null, '1', '2014-07-01 13:54:19', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('377', '35', '10', 'Belong to community organizations', null, '1', '2014-07-01 13:54:29', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('378', '36', '1', 'Residential', null, '1', '2014-07-01 14:48:48', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('379', '36', '2', 'Previous SE vendor', null, '1', '2014-07-01 14:48:54', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('380', '36', '3', 'Board of Social Services', null, '1', '2014-07-01 14:49:01', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('381', '36', '4', 'Psychologist/Psychiatrist', null, '1', '2014-07-01 14:49:09', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('382', '36', '5', 'DDD', null, '1', '2014-07-01 14:49:16', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('383', '36', '6', 'Support Groups', null, '1', '2014-07-01 14:49:24', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('384', '36', '7', 'DVR', null, '1', '2014-07-01 14:49:31', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('385', '36', '8', 'Mental/Behavioral Care', null, '1', '2014-07-01 14:49:37', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('386', '36', '9', 'CBVI', null, '1', '2014-07-01 14:49:44', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('387', '36', '10', 'Parole/Probation', null, '1', '2014-07-01 14:49:55', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('389', '37', '2', 'None', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('390', '37', '3', 'Motorized Wheelchair', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('391', '37', '4', 'Manual Wheelchair', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('392', '37', '5', 'Scooter', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('393', '37', '6', 'Chair/Stool', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('394', '37', '7', 'Guide Dog', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('395', '37', '8', 'Personal Aide', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('396', '37', '9', 'Other type:', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('397', '37', '10', 'Electronic Submission', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('398', '37', '11', 'Braille', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('399', '37', '12', 'CD (For Reader Program)', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('400', '37', '13', 'Sign Language Interpreter', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('401', '37', '14', 'Closed Captioning', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('402', '37', '15', 'Large Print', null, '1', '2014-06-20 13:33:51', '2014-07-01 17:46:42', null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('404', '37', '16', 'Assistive Listening Device', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('405', '37', '17', 'Physical Limitations', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('406', '37', '18', 'Lifting & Carrying', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('407', '37', '19', 'Sitting & Standing', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('408', '37', '20', 'Walking', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('409', '37', '21', 'Bending & Stooping', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('410', '37', '22', 'Climbing', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('411', '37', '23', 'Reaching', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('412', '37', '24', 'Hearing', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('414', '37', '25', 'Seeing', null, '1', '2014-06-20 13:33:51', null, null, null, null);
+INSERT INTO `lookuptypevalue` VALUES ('415', '38', '1', 'Quality of life/health', null, '1', '2014-07-01 18:34:31', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('416', '38', '2', 'Employment success', null, '1', '2014-07-01 18:34:41', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('417', '38', '3', 'Employment conditions (environmental, physical)', null, '1', '2014-07-01 18:34:58', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('418', '39', '1', 'Honorable ', null, '1', '2014-07-03 10:21:52', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('419', '39', '2', 'General under honorable conditions', null, '1', '2014-07-03 10:21:58', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('420', '39', '3', 'General, less than honorable', null, '1', '2014-07-03 10:22:04', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('421', '39', '4', 'Dishonorable', null, '1', '2014-07-03 10:22:10', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('422', '40', '1', 'Nightmares', null, '1', '2014-07-03 10:39:55', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('423', '40', '2', 'Flashbacks ', null, '1', '2014-07-03 10:40:01', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('424', '40', '3', 'Startle reflex', null, '1', '2014-07-03 10:40:08', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('425', '40', '4', 'Intrusive thoughts/memories ', null, '1', '2014-07-03 10:40:14', null, null, 'undefined', null);
+INSERT INTO `lookuptypevalue` VALUES ('426', '40', '5', 'Uncontrollable outbursts of anger', null, '1', '2014-07-03 10:40:20', null, null, 'undefined', null);
+
+-- ----------------------------
+-- Table structure for `payment`
+-- ----------------------------
+DROP TABLE IF EXISTS `payment`;
+CREATE TABLE `payment` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `clientid` int(11) unsigned DEFAULT NULL,
+  `invoiceid` int(11) unsigned DEFAULT NULL,
+  `paymentdate` date DEFAULT NULL,
+  `paymentamount` decimal(10,2) unsigned DEFAULT NULL,
+  `checkno` varchar(15) DEFAULT NULL,
+  `notes` varchar(500) DEFAULT NULL,
+  `datecreated` datetime DEFAULT NULL,
+  `createdby` int(11) unsigned DEFAULT NULL,
+  `lastupdatedate` datetime DEFAULT NULL,
+  `lastupdatedby` int(11) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_payment_invoiceid` (`invoiceid`),
+  KEY `fk_payment_clientid` (`clientid`),
+  CONSTRAINT `fk_payment_clientid` FOREIGN KEY (`clientid`) REFERENCES `client` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_payment_invoiceid` FOREIGN KEY (`invoiceid`) REFERENCES `invoice` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `lookuptypevalue` (`id`, `lookuptypeid`, `lookuptypevalue`, `lookupvaluedescription`, `info`, `createdby`, `datecreated`, `lastupdatedate`, `lastupdatedby`) VALUES
-(1,	1,	'1',	'Yes',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(2,	1,	'0',	'No',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(3,	2,	'Login',	'User login transaction',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(4,	2,	'Logout',	'User logout transaction',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(5,	2,	'Recover Password',	'User password recovery transaction',	NULL,	1,	'2012-03-01 12:00:00',	'2013-12-23 14:14:55',	NULL),
-(6,	3,	'10',	'10',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(7,	3,	'25',	'25',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(8,	3,	'50',	'50',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(9,	3,	'100',	'100',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(10,	4,	'Active',	'Active',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(11,	4,	'In Active',	'In Active',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(12,	3,	'250',	'100',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(13,	3,	'500',	'100',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(14,	3,	'All',	'100',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(19,	5,	'1',	'Male',	NULL,	1,	'2012-03-22 12:06:17',	NULL,	NULL),
-(20,	5,	'2',	'Female',	NULL,	1,	'2012-03-22 12:06:28',	NULL,	NULL),
-(21,	6,	'1',	'Not Started',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(22,	6,	'2',	'In Progress',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(23,	6,	'3',	'Completed',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(24,	7,	'1',	'Feedback',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(25,	7,	'2',	'Ask a Question',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(26,	7,	'3',	'Submit a Bug',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(27,	7,	'4',	'Sign up Problems',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(28,	7,	'5',	'Account compromised',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(29,	7,	'6',	'Failed to Login',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(30,	7,	'7',	'Suggestion',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(31,	7,	'8',	'Need Help',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(32,	7,	'9',	'Other',	NULL,	1,	'2012-03-01 12:00:00',	NULL,	NULL),
-(33,	8,	'1',	'Dr',	NULL,	1,	'2011-10-01 12:00:00',	'0000-00-00 00:00:00',	NULL),
-(34,	8,	'2',	'Ms',	NULL,	1,	'2011-10-01 12:00:00',	'0000-00-00 00:00:00',	NULL),
-(35,	8,	'3',	'Mr',	NULL,	1,	'2011-10-01 12:00:00',	'0000-00-00 00:00:00',	NULL),
-(36,	8,	'4',	'Mrs',	NULL,	1,	'2011-10-01 12:00:00',	'0000-00-00 00:00:00',	NULL),
-(37,	8,	'5',	'Eng',	NULL,	1,	'2011-10-01 12:00:00',	'0000-00-00 00:00:00',	NULL),
-(38,	8,	'6',	'Prof',	NULL,	1,	'2011-10-01 12:00:00',	'0000-00-00 00:00:00',	NULL),
-(39,	9,	'1',	'Physical Delivery',	NULL,	1,	'0000-00-00 00:00:00',	NULL,	NULL),
-(40,	9,	'2',	'Phone',	NULL,	1,	'0000-00-00 00:00:00',	NULL,	NULL),
-(41,	9,	'3',	'Email',	NULL,	1,	'0000-00-00 00:00:00',	NULL,	NULL),
-(42,	9,	'4',	'Fax',	NULL,	1,	'0000-00-00 00:00:00',	NULL,	NULL),
-(43,	10,	'1',	'Logged',	'Ticket received at CSR',	1,	'0000-00-00 00:00:00',	NULL,	NULL),
-(44,	10,	'2',	'Assigned',	'Ticket assigned to relevant directorate',	1,	'0000-00-00 00:00:00',	NULL,	NULL),
-(48,	10,	'3',	'Received',	'Ticket received at the assigned directorate',	1,	'0000-00-00 00:00:00',	NULL,	NULL),
-(49,	10,	'4',	'In Progress',	'Ticket allocated to a technician for resolution',	1,	'0000-00-00 00:00:00',	NULL,	NULL),
-(50,	10,	'5',	'Resolved',	'Ticket resolved by technician',	1,	'0000-00-00 00:00:00',	NULL,	NULL),
-(51,	10,	'6',	'Failed',	'Ticket has no resolution for query',	1,	'0000-00-00 00:00:00',	NULL,	NULL),
-(52,	10,	'7',	'Overdue',	'Ticket delivery delayed',	1,	'0000-00-00 00:00:00',	NULL,	NULL),
-(53,	10,	'8',	'Archived',	'Ticket has been archived',	1,	'0000-00-00 00:00:00',	NULL,	NULL),
-(54,	10,	'9',	'Technician Allocated',	'Technician has been assigned',	1,	'0000-00-00 00:00:00',	NULL,	NULL),
-(55,	11,	'1',	'Low',	NULL,	0,	'0000-00-00 00:00:00',	NULL,	NULL),
-(56,	11,	'2',	'Moderate',	NULL,	1,	'2013-12-06 19:34:07',	NULL,	NULL),
-(57,	11,	'3',	'Normal',	NULL,	1,	'2013-12-06 19:36:11',	NULL,	NULL),
-(58,	11,	'4',	'High',	NULL,	1,	'2013-12-06 19:36:47',	NULL,	NULL),
-(59,	11,	'5',	'Critical',	NULL,	1,	'2013-12-06 19:36:59',	NULL,	NULL),
-(60,	12,	'1',	'Poor',	NULL,	1,	'2013-12-06 19:37:33',	NULL,	NULL),
-(61,	12,	'2',	'Fair',	NULL,	1,	'2013-12-06 19:37:43',	NULL,	NULL),
-(62,	12,	'3',	'Good',	NULL,	1,	'2013-12-06 19:37:50',	NULL,	NULL),
-(63,	12,	'4',	'Very Good',	NULL,	1,	'2013-12-06 19:38:01',	NULL,	NULL),
-(64,	12,	'5',	'Excellent',	NULL,	1,	'2013-12-06 19:38:15',	NULL,	NULL),
-(68,	14,	'1',	'Level 01',	NULL,	1,	'2013-12-06 21:59:27',	'2014-01-07 19:51:49',	NULL),
-(69,	14,	'2',	'Level 02',	NULL,	1,	'2013-12-06 21:59:38',	'2014-01-07 19:51:49',	NULL),
-(70,	14,	'3',	'Level 3',	NULL,	1,	'2013-12-06 21:59:50',	NULL,	NULL),
-(71,	13,	'1',	'Metropolitan',	NULL,	1,	'2013-12-06 22:04:45',	NULL,	NULL),
-(72,	13,	'2',	'District',	NULL,	1,	'2013-12-06 22:04:54',	NULL,	NULL),
-(73,	13,	'3',	'Local',	NULL,	1,	'2013-12-06 22:05:05',	NULL,	NULL),
-(74,	16,	'1',	'Company',	NULL,	1,	'2013-12-06 22:08:22',	NULL,	NULL),
-(75,	16,	'2',	'Individual',	NULL,	1,	'2013-12-06 22:08:52',	NULL,	NULL),
-(76,	15,	'1',	'Community',	NULL,	1,	'2013-12-06 22:11:37',	NULL,	NULL),
-(77,	15,	'2',	'External',	NULL,	1,	'2013-12-06 22:11:48',	NULL,	NULL),
-(78,	17,	'0',	'Pending Activation',	NULL,	1,	'2013-12-06 22:16:10',	NULL,	NULL),
-(79,	17,	'1',	'Active',	NULL,	1,	'2013-12-06 22:16:24',	NULL,	NULL),
-(80,	17,	'2',	'Deactivated',	NULL,	1,	'2013-12-06 22:16:40',	NULL,	NULL),
-(81,	18,	'1',	'Enabled',	NULL,	1,	'2013-12-06 22:25:40',	NULL,	NULL),
-(82,	18,	'2',	'Disabled',	NULL,	1,	'2013-12-06 22:25:48',	NULL,	NULL),
-(84,	15,	'3',	'Service Provider',	NULL,	1,	'2013-12-07 16:33:06',	NULL,	NULL),
-(85,	15,	'4',	'Government',	NULL,	1,	'2014-01-07 19:50:10',	NULL,	NULL),
-(86,	9,	'5',	'Other',	NULL,	1,	'2014-03-25 11:11:03',	NULL,	NULL);
+-- ----------------------------
+-- Records of payment
+-- ----------------------------
 
-DROP TABLE IF EXISTS `message`;
-CREATE TABLE `message` (
-  `id` int(11) unsigned NOT NULL auto_increment,
-  `senderid` int(11) unsigned NOT NULL,
-  `parentid` int(11) unsigned default NULL,
-  `subject` varchar(255) NOT NULL,
-  `contents` blob NOT NULL,
-  `datecreated` datetime NOT NULL,
-  `commentid` int(11) unsigned default NULL,
-  `ledgerid` int(11) unsigned default NULL,
-  PRIMARY KEY  (`id`),
-  KEY `fk_message_senderid` (`senderid`),
-  KEY `fk_message_parentid` (`parentid`),
-  KEY `fk_message_commentid` (`commentid`),
-  KEY `fk_message_ledgerid` (`ledgerid`),
-  CONSTRAINT `fk_message_commentid` FOREIGN KEY (`commentid`) REFERENCES `comment` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_message_ledgerid` FOREIGN KEY (`ledgerid`) REFERENCES `ticket_ledger` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_message_parentid` FOREIGN KEY (`parentid`) REFERENCES `message` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_message_senderid` FOREIGN KEY (`senderid`) REFERENCES `useraccount` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+-- ----------------------------
+-- Table structure for `referral`
+-- ----------------------------
+DROP TABLE IF EXISTS `referral`;
+CREATE TABLE `referral` (
+  `id` int(11) unsigned NOT NULL,
+  `clientid` int(11) unsigned DEFAULT NULL,
+  `initialvoucherid` int(11) unsigned DEFAULT NULL,
+  `programid` int(11) unsigned DEFAULT NULL,
+  `funderid` int(11) unsigned DEFAULT NULL,
+  `servicetypeid` int(11) unsigned DEFAULT NULL,
+  `communication` tinyint(4) unsigned DEFAULT NULL,
+  `startdate` date DEFAULT NULL,
+  `status` tinyint(4) unsigned DEFAULT NULL,
+  `resumefilename` varchar(255) DEFAULT NULL,
+  `coverletterfilename` varchar(255) DEFAULT NULL,
+  `dvrsref` varchar(15) DEFAULT NULL,
+  `dddref` varchar(15) DEFAULT NULL,
+  `dvrscounselor` varchar(255) DEFAULT NULL,
+  `primarydiagnosis` tinyint(4) unsigned DEFAULT NULL,
+  `primarycause` tinyint(4) unsigned DEFAULT NULL,
+  `secondarydiagnosis` tinyint(4) unsigned DEFAULT NULL,
+  `secondarycause` tinyint(4) unsigned DEFAULT NULL,
+  `needsassessment` varchar(1000) DEFAULT NULL,
+  `employmentgoal` varchar(1000) DEFAULT NULL,
+  `datecreated` datetime DEFAULT NULL,
+  `createdby` int(11) unsigned DEFAULT NULL,
+  `lastupdatedate` datetime DEFAULT NULL,
+  `lastupdatedby` int(11) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_referral_voucherid` (`initialvoucherid`) USING BTREE,
+  KEY `fk_referral_clientid` (`clientid`),
+  CONSTRAINT `fk_referral_clientid` FOREIGN KEY (`clientid`) REFERENCES `client` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_referral_voucherid` FOREIGN KEY (`initialvoucherid`) REFERENCES `voucher` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `message` (`id`, `senderid`, `parentid`, `subject`, `contents`, `datecreated`, `commentid`, `ledgerid`) VALUES
-(41,	48,	NULL,	'Electrical Services Department allocated to Query Ref No# AA0056',	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Electrical Services,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0056<br />\n    <b>Issue: </b>Electricity meter faulty<br />\n    <b>Synopsis: </b><br />\n	meter burned<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Thandisizwe Moyi<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27788110596<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/22/2014<br />\n    <b>Date Due: </b>05/26/2014<br />\n    <b>Category: </b>Electricity<br />\n    <b>Type: </b>Meter not working<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NTY=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'2014-05-22 12:46:37',	NULL,	585),
-(42,	1,	NULL,	'Electrical Services Middleburg Department allocated to Query Ref No# AA0056',	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Electrical Services Middleburg,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0056<br />\n    <b>Issue: </b>Electricity meter faulty<br />\n    <b>Synopsis: </b><br />\n	meter burned<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Thandisizwe Moyi<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27788110596<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/22/2014<br />\n    <b>Date Due: </b>05/26/2014<br />\n    <b>Category: </b>Electricity<br />\n    <b>Type: </b>Meter not working<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NTY=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'2014-05-22 13:04:52',	NULL,	588),
-(43,	48,	NULL,	'Water Services Department allocated to Query Ref No# AA0057',	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Water Services,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0057<br />\n    <b>Issue: </b>Drain blocked <br />\n    <b>Synopsis: </b><br />\n	Sewerage drain is blocked<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Thando Bontiya<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27840642450<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/22/2014<br />\n    <b>Date Due: </b>05/23/2014<br />\n    <b>Category: </b>Water<br />\n    <b>Type: </b>Blocked meter<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NTc=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'2014-05-22 15:13:00',	NULL,	593),
-(44,	48,	NULL,	'Electrical Services Middleburg Department allocated to Query Ref No# AA0058',	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Electrical Services Middleburg,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0058<br />\n    <b>Issue: </b>Electricity meter faulty<br />\n    <b>Synopsis: </b><br />\n	Electricity meter is blank<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Neliswa Mbodli<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27848773521<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/22/2014<br />\n    <b>Date Due: </b>05/23/2014<br />\n    <b>Category: </b>Electricity<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NTg=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'2014-05-22 15:49:44',	NULL,	598),
-(45,	48,	NULL,	'Electrical Services Middleburg Department allocated to Query Ref No# AA0059',	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Electrical Services Middleburg,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0059<br />\n    <b>Issue: </b>Drain blocked<br />\n    <b>Synopsis: </b><br />\n	The drain is blocked<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Vicey Zonke<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27745036809<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/23/2014<br />\n    <b>Category: </b>Water<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NTk=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'2014-05-23 09:45:07',	NULL,	605),
-(46,	48,	NULL,	'Water Services Department allocated to Query Ref No# AA0059',	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Water Services,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0059<br />\n    <b>Issue: </b>Drain blocked<br />\n    <b>Synopsis: </b><br />\n	The drain is blocked<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Vicey Zonke<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27745036809<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/23/2014<br />\n    <b>Category: </b>Water<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NTk=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'2014-05-23 09:49:23',	NULL,	608),
-(47,	48,	NULL,	'Water Services Department allocated to Query Ref No# AA0060',	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Water Services,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0060<br />\n    <b>Issue: </b>Drain blocked<br />\n    <b>Synopsis: </b><br />\n	The drain is blocked <br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Ronel Meyron<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27845283493<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/23/2014<br />\n    <b>Category: </b>Water<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NjA=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'2014-05-23 11:51:40',	NULL,	617),
-(48,	48,	NULL,	'Water Services Department allocated to Query Ref No# AA0061',	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Water Services,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0061<br />\n    <b>Issue: </b>Drain blocked<br />\n    <b>Synopsis: </b><br />\n	The drain is blocked <br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Nombulelo Maki<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27835427077<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/23/2014<br />\n    <b>Category: </b>Water<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NjE=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'2014-05-23 12:07:10',	NULL,	624),
-(49,	48,	NULL,	'Water Services Department allocated to Query Ref No# AA0062',	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Water Services,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0062<br />\n    <b>Issue: </b>Leakage<br />\n    <b>Synopsis: </b><br />\n	Pipe leaks<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Mzukisi Makeleni<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27730829810<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/27/2014<br />\n    <b>Category: </b>Water<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Physical Delivery<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NjI=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'2014-05-23 12:25:42',	NULL,	631),
-(50,	48,	NULL,	'Electrical Services Middleburg Department allocated to Query Ref No# AA0063',	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Electrical Services Middleburg,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0063<br />\n    <b>Issue: </b>Street light Faulty<br />\n    <b>Synopsis: </b><br />\n	The whole area is dark<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Andrew Belling<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27733058581<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/27/2014<br />\n    <b>Category: </b>Electricity<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Physical Delivery<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NjM=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'2014-05-23 12:49:17',	NULL,	638),
-(51,	48,	NULL,	'Electrical Services Middleburg Department allocated to Query Ref No# AA0064',	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Electrical Services Middleburg,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0064<br />\n    <b>Issue: </b>Electricity meter faulty<br />\n    <b>Synopsis: </b><br />\n	The electricity meter is blank<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Venessa Stalenberg<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27737695335<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/26/2014<br />\n    <b>Category: </b>Electricity<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NjQ=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'2014-05-23 13:54:39',	NULL,	645),
-(52,	48,	NULL,	'Water Services Department allocated to Query Ref No# AA0065',	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Water Services,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0065<br />\n    <b>Issue: </b>Water meter leaks<br />\n    <b>Synopsis: </b><br />\n	water meter leaks<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Unathi Goerge<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27736010630<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/26/2014<br />\n    <b>Category: </b>Water<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NjU=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'2014-05-23 15:06:32',	NULL,	652),
-(53,	48,	NULL,	'Electrical Services Middleburg Department allocated to Query Ref No# AA0066',	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Electrical Services Middleburg,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0066<br />\n    <b>Issue: </b>Electricity meter faulty<br />\n    <b>Synopsis: </b><br />\n	Meter is blank<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Popi Westel<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27849996502<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/26/2014<br />\n    <b>Category: </b>Electricity<br />\n    <b>Type: </b>Meter not working<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NjY=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'2014-05-23 15:16:15',	NULL,	659),
-(54,	48,	NULL,	'Water Services Department allocated to Query Ref No# AA0067',	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Water Services,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0067<br />\n    <b>Issue: </b>Toilet blocked <br />\n    <b>Synopsis: </b><br />\n	Toilet is blocked<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Inxuba Yethemba Municipality<br />\n    <b>Email: </b>cpw.iym@mtnloaded.co.za<br />\n    <b>Phone: </b>27833557320<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/26/2014<br />\n    <b>Category: </b>Water<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/Njc=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'2014-05-23 15:33:44',	NULL,	667),
-(55,	48,	NULL,	'Status Update on Query Ref No# AA0067',	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n   	Hello Inxuba Yethemba Municipality, <br />\r\n<br />\r\nThis is an automated notification to inform you of the status of your Query with the update below;<br />\r\n<br />\r\nStatus of Query No# AA0067 updated to <b>Logged</b> <br />\r\n<br />\r\nThe plumber Carel Erasmus will attend your query<br />\r\n<br />\r\nIf you have any further questions or inquiries please do not hesitate to contact us. <br />\r\n<br />\r\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'2014-05-23 15:36:43',	NULL,	671),
-(56,	48,	NULL,	'Water Services Department allocated to Query Ref No# AA0068',	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Water Services,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0068<br />\n    <b>Issue: </b>Drain blocked<br />\n    <b>Synopsis: </b><br />\n	The drain is blocked <br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Dean Gedonas<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27737540992<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/23/2014<br />\n    <b>Category: </b>Water<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/Njg=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'2014-05-23 15:48:15',	NULL,	675),
-(57,	48,	NULL,	'Status Update on Query Ref No# AA0067',	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n   	Hello Inxuba Yethemba Municipality, <br />\r\n<br />\r\nThis is an automated notification to inform you of the status of your Query with the update below;<br />\r\n<br />\r\nStatus of Query No# AA0067 updated to <b>Logged</b> <br />\r\n<br />\r\nThe plumber Carel Erasmus will attend your query<br />\r\n<br />\r\nIf you have any further questions or inquiries please do not hesitate to contact us. <br />\r\n<br />\r\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'2014-05-23 15:52:48',	NULL,	680),
-(58,	48,	NULL,	'Electrical Services Middleburg Department allocated to Query Ref No# AA0069',	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Electrical Services Middleburg,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0069<br />\n    <b>Issue: </b>Power failure<br />\n    <b>Synopsis: </b><br />\n	The Kwanonzame Old Clinic dont have electricity<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Department of Health<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27824260685<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/23/2014<br />\n    <b>Category: </b>Electricity<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/Njk=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'2014-05-23 15:59:39',	NULL,	685),
-(59,	48,	NULL,	'Electrical Services Middleburg Department allocated to Query Ref No# AA0070',	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Electrical Services Middleburg,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0070<br />\n    <b>Issue: </b>Connection<br />\n    <b>Synopsis: </b><br />\n	Connect the electricity<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Lizzette De Klerk<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27748323855<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/23/2014<br />\n    <b>Category: </b>Electricity<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NzA=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'2014-05-23 16:15:44',	NULL,	691);
+-- ----------------------------
+-- Records of referral
+-- ----------------------------
+INSERT INTO `referral` VALUES ('1', null, null, '2', null, null, null, '2014-03-10', '0', null, null, null, null, null, null, null, null, null, null, null, '2014-05-14 15:20:37', '1', '2014-05-27 15:53:36', null);
+INSERT INTO `referral` VALUES ('6', null, null, '3', null, null, null, '2014-03-10', '0', null, null, null, null, null, null, null, null, null, null, null, '2014-05-23 11:49:14', '1', null, null);
+INSERT INTO `referral` VALUES ('9', null, null, '2', null, null, null, '2014-03-10', '0', null, null, null, null, null, null, null, null, null, null, null, '2014-05-23 12:48:32', '1', null, null);
+INSERT INTO `referral` VALUES ('10', null, null, '3', null, null, null, '2014-03-10', '0', null, null, null, null, null, null, null, null, null, null, null, '2014-05-23 13:53:19', '1', null, null);
+INSERT INTO `referral` VALUES ('11', null, null, '2', null, null, null, '2014-03-10', '1', null, null, null, null, null, null, null, null, null, null, null, '2014-05-23 15:05:41', '1', null, null);
+INSERT INTO `referral` VALUES ('12', null, '1', '6', '1', '3', null, '2014-03-10', '1', 'LoremIpsum.pdf', 'testcover.pdf', '125692', '', 'Mitchell Paterson', '1', '1', null, null, 'Pellentesque elementum risus in eros tempus, nec tincidunt tortor consequat. Nam feugiat leo non enim fermentum condimentum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Cras ut hendrerit magna.', 'ipsum dolor sit amet, consectetur adipiscing elit. Proin placerat.', '2014-05-23 15:15:14', '1', '2014-06-03 22:15:45', '1');
 
-DROP TABLE IF EXISTS `messagerecipient`;
-CREATE TABLE `messagerecipient` (
-  `id` int(11) unsigned NOT NULL auto_increment,
-  `messageid` int(11) unsigned NOT NULL,
-  `recipientid` int(11) unsigned NOT NULL,
-  `isread` tinyint(3) unsigned default NULL,
-  PRIMARY KEY  (`id`),
-  UNIQUE KEY `unique_messagerecipient` (`recipientid`,`messageid`),
-  KEY `fk_recipient_messageid` (`messageid`),
-  KEY `fk_recipient_recipientid` (`recipientid`),
-  CONSTRAINT `fk_messagerecipienet_messageid` FOREIGN KEY (`messageid`) REFERENCES `message` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_messagerecipienet_senderid` FOREIGN KEY (`recipientid`) REFERENCES `useraccount` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+-- ----------------------------
+-- Table structure for `service`
+-- ----------------------------
+DROP TABLE IF EXISTS `service`;
+CREATE TABLE `service` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `type` tinyint(4) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `alias` varchar(50) DEFAULT NULL,
+  `description` varchar(500) DEFAULT NULL,
+  `value` varchar(50) DEFAULT NULL,
+  `defaultrate` decimal(10,2) DEFAULT NULL,
+  `datecreated` datetime DEFAULT NULL,
+  `createdby` int(11) unsigned DEFAULT NULL,
+  `lastupdatedate` datetime DEFAULT NULL,
+  `lastupdatedby` int(11) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
 
-INSERT INTO `messagerecipient` (`id`, `messageid`, `recipientid`, `isread`) VALUES
-(55,	41,	43,	0),
-(56,	42,	55,	1),
-(57,	43,	44,	0),
-(58,	44,	55,	0),
-(59,	45,	55,	0),
-(60,	46,	44,	0),
-(61,	47,	44,	0),
-(62,	48,	44,	0),
-(63,	49,	44,	0),
-(64,	50,	55,	0),
-(65,	51,	55,	0),
-(66,	52,	44,	0),
-(67,	53,	55,	0),
-(68,	54,	44,	0),
-(69,	55,	44,	0),
-(70,	55,	48,	0),
-(71,	56,	44,	0),
-(72,	57,	44,	0),
-(73,	57,	48,	0),
-(74,	58,	55,	0),
-(75,	59,	55,	0);
+-- ----------------------------
+-- Records of service
+-- ----------------------------
+INSERT INTO `service` VALUES ('2', '2', 'Time-Limited Job Coaching', 'TLJC', null, null, null, '2014-05-28 09:50:57', '1', null, null);
+INSERT INTO `service` VALUES ('3', '2', 'Supported Employment Intensive Job Coaching', 'SEJC', null, null, null, '2014-05-28 09:50:57', '1', null, null);
+INSERT INTO `service` VALUES ('4', '2', 'American Sign Language Job Coaching', 'ASL', null, null, null, '2014-05-28 09:50:57', '1', null, null);
+INSERT INTO `service` VALUES ('5', '2', 'Long-Term Follow-Along', 'LTFA', null, null, null, '2014-05-28 09:50:57', '1', null, null);
+INSERT INTO `service` VALUES ('6', '1', 'Supported Employment', 'SE', null, null, null, '2014-05-28 09:50:57', '1', null, null);
+INSERT INTO `service` VALUES ('7', '1', 'Supported Coordination', 'SC', null, null, null, '2014-05-28 09:50:57', '1', null, null);
+INSERT INTO `service` VALUES ('9', '1', 'Trial Work Experience', 'TWE', null, null, null, '2014-05-28 09:50:57', '1', null, null);
+INSERT INTO `service` VALUES ('10', '2', 'Pre-Placement', 'Pre-Placement', null, null, null, '2014-05-28 09:50:57', '1', null, null);
+INSERT INTO `service` VALUES ('11', '3', 'REG-SE-LTFA', 'REG-SE-LTFA', null, null, null, '2014-05-28 09:50:57', '1', null, null);
+INSERT INTO `service` VALUES ('12', '3', 'MH-SE-LTFA', 'MH-SE-LTFA', null, null, null, '2014-05-28 09:50:57', '1', null, null);
+INSERT INTO `service` VALUES ('13', '3', 'ASL-SE-LTFA', 'ASL-SE-LTFA', null, null, null, '2014-05-28 09:50:57', '1', null, null);
+INSERT INTO `service` VALUES ('14', '3', 'GROUP-SE-LTFA', 'GROUP-SE-LTFA', null, null, null, '2014-05-28 09:50:57', '1', null, null);
+INSERT INTO `service` VALUES ('15', '3', 'DDD Employment', 'DDD Employment', null, null, null, '2014-05-28 09:50:57', '1', null, null);
+INSERT INTO `service` VALUES ('16', '3', 'Transition', 'Transition', null, null, null, '2014-05-28 09:50:57', '1', null, null);
 
+-- ----------------------------
+-- Table structure for `session`
+-- ----------------------------
 DROP TABLE IF EXISTS `session`;
 CREATE TABLE `session` (
-  `id` char(32) NOT NULL default '',
-  `modified` int(11) default NULL,
-  `lifetime` int(11) default NULL,
+  `id` char(32) NOT NULL DEFAULT '',
+  `modified` int(11) DEFAULT NULL,
+  `lifetime` int(11) DEFAULT NULL,
   `data` mediumtext,
-  PRIMARY KEY  (`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `session` (`id`, `modified`, `lifetime`, `data`) VALUES
-('03sbt6tmngf0hqgind53adoec7',	1397551772,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('0g2h5ak0fhabe85iopj15dboc6',	1398914828,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('0mnn7b14r12hcfh7nh8ilibc06',	1398882900,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('0o6uec9521favqlg8ve87vsjn6',	1400486562,	10800,	'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"45\";s:5:\"phone\";s:10:\"0822964667\";s:4:\"type\";s:1:\"2\";}'),
-('0p1solfosdv6fk6ibl46sv46t7',	1399013677,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('13f4jv41art3keohlu2q8j1qt1',	1397549834,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('1s17ucnentghcsf9e4ct2rr787',	1398994193,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('1ukeppciuae741vm1346htljk6',	1397634789,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('20gqo4i4k3ku9vic7scks68q96',	1398158419,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('268rsl0uu12j9s72j1pv24if40',	1397202859,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('2896mt5g0f574hvut247fne9q7',	1398991378,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('2ig1kak4lcdcqg5jthaoaml6t6',	1400411032,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('2kscvl5jb3vsqaomr9spajjf55',	1398848062,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('2msrtv0qk64vm4i6658svggn20',	1398349727,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('32m2sd2ej1bhitli8cpcj6ugc6',	1398348804,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('33456afpt9mjpe4qdulr5oh1f0',	1398233713,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('33aljlj1p67gls1sd180rheah2',	1397548532,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('34fk4nvmc3bvciu04b5k6312k4',	1398847288,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('34nenqk2kgab3e8ssmsolkma60',	1399015058,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('3b9mago87t9fv84n17lvtsmdk6',	1397228902,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('3c8uuuh3hs09ird98dkjigc0a6',	1398845857,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('3eltglv8su4se1tki9mi2tfbk4',	1397636128,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('3evk2o7h3e24r2gvflon896u60',	1398761783,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('3ga9hv1lldfb4lqujrf7k0jca4',	1398853244,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('3gn39td0d5651dh2v8no5kdau4',	1400064392,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('3mk9quu7pb75771ihf4bo9lcr4',	1398238333,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('3n2n1kg8585gu26s3js9b607g5',	1398882901,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('3nosdcpetm4ra0crqtdu1ud6l1',	1400141266,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('3rn1itnq3dh1t8pnstoru2bjj7',	1398947849,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('474aqj4c6famjd593fl8od7f33',	1397643851,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('493hnl2t1sovpd6si6is7d48s5',	1400763220,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('49ml59rtu3k1g5lpnc1db174a2',	1397203716,	10800,	'Default|a:14:{s:14:\"successmessage\";s:0:\"\";s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"48\";s:5:\"phone\";s:10:\"0787758486\";s:4:\"type\";s:1:\"2\";}'),
-('4c3bucbn5jf7rhjueddhemm0r3',	1400096300,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('4cfnpf1v3badrikulch2jh0hf5',	1398947736,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('4f1g39e1hqag4ecplbrn9agf92',	1398938084,	10800,	'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:5:\"phone\";s:10:\"0836246789\";s:4:\"type\";s:1:\"1\";}'),
-('4hsb39o0gqrq70edneda3mhqg0',	1397200355,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('4jp9hfke3jv9hlhcsghrdkvn15',	1398170014,	10800,	'Default|a:11:{s:14:\"successmessage\";s:0:\"\";s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('4ls0dkmeigi8ssdpnsu4lnlan4',	1398993648,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('4tu4hrrt95o8ds9td9fjhf2ai5',	1398845219,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('55e92hmmq930huoj3edau46m60',	1400073568,	10800,	'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"67\";s:5:\"phone\";s:10:\"0488015119\";s:4:\"type\";s:1:\"2\";}'),
-('576sicupd3f4labdg8d6evhcp4',	1398850460,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('5b6jpjd4go0dj669eo7mlqden3',	1398759353,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('5c2prl8pn32hdm6ujnhqhoave4',	1398844543,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('5fgnbtnk0q5viap9c9bnphds61',	1398754075,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('5jga215lt0fbu008clf4f0ha37',	1398178377,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('5qth4gsubfktasibvjrr8u1lf0',	1398848313,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('62fdnh2dpnhtdhus8tdmsq43i1',	1398753291,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('64v0kg925pfnf5mpuvml7qm6g7',	1398753246,	10800,	'Default|a:14:{s:14:\"successmessage\";s:0:\"\";s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"70\";s:5:\"phone\";s:10:\"0732125608\";s:4:\"type\";s:1:\"1\";}'),
-('6and6mukss91q5tt7uf57omh55',	1398170657,	10800,	'Default|a:14:{s:14:\"successmessage\";s:0:\"\";s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"66\";s:5:\"phone\";s:10:\"0488015000\";s:4:\"type\";s:1:\"6\";}'),
-('6g6egb21urivfq1p2q5ah7q2v1',	1398233872,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('6h5snc6ugl34a2psuuhmtr49n5',	1398845887,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('6i11lksntnq6brv04ppbu6g7j1',	1398946298,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('6k8qdgmrv7eafuskvsjhjbetr3',	1398786181,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('6kfto6m46io5ad8mc6e69c3od4',	1398841882,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('6r045b1490lipbag40131slnk1',	1398233818,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('6r8m1lurc86ofqp4v45pr2lq51',	1398233694,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('6tuchij8v23jbnvuaheslgojm5',	1400149253,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('730qr1u4fetqcv2961v1m356l0',	1398842354,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('75oahgfpheev968umusj2k0ms7',	1398882899,	10800,	''),
-('7bn0qnpke8ogg02ib9djlj3ba1',	1400579494,	10800,	'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"45\";s:5:\"phone\";s:10:\"0822964667\";s:4:\"type\";s:1:\"2\";}'),
-('7bqt4of5dcnu6bfpl39b144t65',	1398233818,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('7su4efpsfnlu84l9fb5ldtj9g3',	1400141528,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('7t3904op1bseqo1v0nas70o4u2',	1398497223,	10800,	'Default|a:14:{s:14:\"successmessage\";s:0:\"\";s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"69\";s:5:\"phone\";s:10:\"0733770290\";s:4:\"type\";s:1:\"3\";}'),
-('7ukpfbb2qsmr0j0o8qp8rrb5b7',	1398993091,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('830kf0iu0er99514iprvrbk060',	1400140696,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('847usjbbaj0ou5i7m8i5eh3ri0',	1400065032,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('878gg7rn0s77p8sbn560d745r7',	1400832527,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('87ts0q3amt9a46afd3ns026l26',	1397206994,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('88smog6b1iplufcmo7rdumda52',	1398159229,	10800,	'Default|a:14:{s:14:\"successmessage\";s:0:\"\";s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"52\";s:5:\"phone\";s:10:\"0488015000\";s:4:\"type\";s:1:\"7\";}'),
-('8bc0pjcnl5tc4tga8k4pg63i66',	1399014791,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('8hrvqubqee0rklvqjqlokefeu0',	1398436865,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('8ioo7uhbnj3hmo3ti477v9cpl1',	1398760322,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('8j4kulej3fmoo2lto8o5j1mvl6',	1398914303,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('8ubfggbb8vg1jeue6n5k1thbe4',	1398151038,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('8vhobv3knco3v7h101qrqetci5',	1398762917,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('91u6ubsum6cfvv9g1c6s5u86v7',	1400853317,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('927mubdqaae061dtf4vvf05pa1',	1398236186,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('92jqjidsncevpkis7lrhhp5ev7',	1398408202,	10800,	'Default|a:14:{s:14:\"successmessage\";s:0:\"\";s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"65\";s:5:\"phone\";s:10:\"0488015031\";s:4:\"type\";s:1:\"3\";}'),
-('95242garkjrnsd8mdsulekt044',	1400335271,	10800,	'Default|a:15:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:5:\"phone\";s:10:\"0836246789\";s:4:\"type\";s:1:\"1\";s:16:\"itemcountperpage\";s:2:\"10\";}'),
-('9598mu9lho5bmo7ftuvrou0qd6',	1398928645,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('9av2am9n9tp3d8930h6099rt23',	1398882898,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('9b8jkcdmh7e1qu3ok00p9peca4',	1397994130,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('9dd7ehn41tujcgv19bc0nhg364',	1398913867,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('9donln5scpt0s484st28p4kh02',	1398233701,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('9kkr5sfep18h8rtpmf70f77hg2',	1398254334,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('9nhg9ge9ahlechr84edagk3d87',	1398323064,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('9tf5l4fk8472vsg41gpqgo9f97',	1398233712,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('9v8ftc0s5seekjrborits3dq21',	1398237727,	10800,	'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"39\";s:5:\"phone\";s:0:\"\";s:4:\"type\";s:1:\"1\";}'),
-('a2s43finb8cuka3tt460658j20',	1398329245,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('a4r4jjcgui7a51gbdhjb77ccq6',	1398845578,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('a87rdegl4mkp1qvglcjv0oi3k4',	1398882897,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('alk0m5rdb8p5ebu5u4l35ahsu3',	1399014612,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('amspghhnonr47gms86tkktffq4',	1398408024,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('b5d00ffjsts0cjqp8m2n3177k2',	1398753291,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('b697irli11qvla8qbf3o6b2sc1',	1398159991,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ba65t2c1udc54ip2pf40gk3cf6',	1398322484,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('bdh2t63sl7mulj09ctbl1t8iv5',	1398170857,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('bgffj1999n0rv8iujp6gdi0bu3',	1398992895,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('bj72cmfbmd2gisjh8lhqa76m94',	1398327540,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('brfgk299vhtu89s1ih1nkpvmg2',	1398847210,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('brlb4fp39r95fkp7vc13nvchp2',	1398861846,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('btad31db5fkf9rlaal06ub8jq1',	1399360732,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('btg3ppjc303mfk3lt7a1krbk23',	1400754154,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('c2au3t6kvuv1rvmltc65mjds20',	1398914359,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('c2gv32js5suqetbm6jus11v316',	1400411401,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('c46rtptdkdktsl3dv0d6hjete0',	1398492719,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('c6c95n04pppvi608pu4ni68ad4',	1397541607,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('c8tmlj437ktm10oj1o64pj2s74',	1398156047,	10800,	'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:5:\"phone\";s:10:\"0836246789\";s:4:\"type\";s:1:\"1\";}'),
-('c9odqdmcqbbnesde12hsh7pj16',	1398852588,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('caoi868b375hgf0g5r6sj34ur5',	1400845575,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ccu05rk6hpgfd0hl5v9dh7bm17',	1400072581,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('cd44gd1n3moptnk6av01ppkce0',	1397635639,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('cfbg30dc11cmeuhr2lekmnc934',	1400752922,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ck1c6o21nc5jbt1l75t8l5u0v2',	1399300555,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ck5ehvcfs2ughn57hkvg8kki87',	1398945666,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ckk56b17i4p298rnjgpflgh5h7',	1398882900,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('cps2n1v0b20fr7bilmp3eq50q5',	1398870475,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('cpvg2oi5vag6o4behgpmukn8b7',	1398158942,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ct3qfn1ifughl8e1ruai9g3di4',	1399732227,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('d5o8e5s5r4rn72kpahmcpklgh3',	1398408311,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ddvcamm5gffn685nv1mofi7851',	1398786688,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('djbjhjdruemdl6hv6dhlmlmuh3',	1400892713,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('dn19qntv8gmbgrintrlheq27a2',	1398753245,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('dp8lidjjo57e7d9u09t2bsfma7',	1398149720,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('druo2upt35ap818m8hbbhgtkb4',	1398755694,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('dsduu911u6392otdnlnk8ivq20',	1400831860,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('dtf4cqerroeeae81e8nugs8nj5',	1398333678,	10800,	'Default|a:14:{s:14:\"successmessage\";s:0:\"\";s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"63\";s:5:\"phone\";s:10:\"0835093924\";s:4:\"type\";s:1:\"3\";}'),
-('e1a7uvusko3lf3lu0srqt81kh5',	1400076811,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('e6mfo0qa4l0q7ah3itjb3a22i0',	1399039039,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('e8tadb494ltqpjs08hqdh7mpt3',	1397286182,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ef6rbi4inoap4m4echsh0tvkv3',	1398846973,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('eljijhafa8dqcdl2o3g7vbfam2',	1398947366,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('em57kemhiri7hv3t6potapd7f5',	1399965930,	10800,	'Default|a:15:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:5:\"phone\";s:10:\"0836246789\";s:4:\"type\";s:1:\"1\";s:16:\"itemcountperpage\";s:2:\"10\";}'),
-('fa9kn25pjei4qd8noa3ltblnl3',	1400068423,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('fask9so3phoi0cet1vonf1k7l6',	1398869928,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('fe6avl6v3c98u22n8remlbh7n3',	1400772352,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('fhajrg1d4kqjvkvhotcfa5epo7',	1397654069,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('fpgtp94lt67fp7v8gf8h3vasu1',	1398842237,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('fvtnuhi5d7ou1fot8vmqite4s0',	1397398151,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('g3q4r78uum8g3eh3bqb0bdmvr0',	1398882900,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('g7a94odi1tfdgb4ahfsgujcao0',	1398159298,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('gem2sshmollsb4724pggo3pqa0',	1398882900,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('ghm02rj3nnr4hq86ddga0a3nn7',	1398842668,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('gi2m9k3kdc8a592p8h1kpf3ev3',	1400175255,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('gjakkf3c8lps531tid878vupd4',	1398844151,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('gjjevmcvd6l3v94bqcn8ccts32',	1398848300,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('gl2j5vj93ruqg1c3hc625iv9o5',	1398872351,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('gmdilf0tpsgfa8pjil00purov7',	1400141994,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('govp74apj6d3cij5bakglt2og5',	1398882898,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('gv0psacd5se7lstgfl7583l4j7',	1400136083,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('h660r5l6gq588qcoo8boat7116',	1400758334,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('h7u3u566gptjauo0fms9r48je3',	1398843805,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ha3kivg07775qq2gtau0jkp7k1',	1399550334,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('hd8bt47bp3jnvqik1nv25d2471',	1397554998,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('hicpfmsk70m359j7hlithvesn0',	1400105966,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('hkk734dr07brj21o8qeo806pv4',	1400892500,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('hv9nm64h34lh7cua4kegu4e573',	1398845309,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('i6ff86130rqq935r6ghaspq7e6',	1398882900,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('i74m7id9nvcnimbh6m027pcv70',	1398233818,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('ia8jjbfv2amjh852886r89c0e2',	1397206567,	10800,	'Default|a:14:{s:14:\"successmessage\";s:0:\"\";s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"56\";s:5:\"phone\";s:10:\"0488015084\";s:4:\"type\";s:1:\"2\";}'),
-('icq1rut8lf6stb96ilgq4nqhr6',	1398233817,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('idj7s6pjfsmdd73ocpdh372v02',	1398235679,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('ilmt6t2qrqcibqbl75l687rt77',	1397483488,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('irhfu16fa7c79qjjl6tik0ea91',	1400066284,	10800,	'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"72\";s:5:\"phone\";s:10:\"0835468723\";s:4:\"type\";s:1:\"2\";}'),
-('iuamqsp6eclt39frg0qvpl11b7',	1400854707,	10800,	'Default|a:19:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"48\";s:5:\"phone\";s:10:\"0787758486\";s:4:\"type\";s:1:\"2\";s:32:\"departmentallocationnotification\";s:0:\"\";s:20:\"logquerynotification\";s:0:\"\";s:28:\"clientallocationnotification\";s:0:\"\";s:30:\"clientstatusupdatenotification\";s:0:\"\";s:9:\"msgreturn\";s:4:\"json\";}'),
-('iukn4o244remec4g3v5s3o7pu7',	1400064395,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('j6j91dhntimbg9l4405ivr1g72',	1398993560,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ja20oa6d95bgsoi7t74mgmdoh4',	1400072888,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('jcagd1jdrismn1o639t0c0g3q4',	1398239603,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('jge0kvhsqp2l5gv0j69g63lnh3',	1398945009,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('jjgu4uirci69n10j5fe5c9u835',	1398914309,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('jknqbtobao14t1ikpro04b3sc3',	1398158942,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('jmsdpasd39acm6npt1cuhcbav6',	1398841033,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('jtc88i933tai7gr357l8tmgj05',	1397635622,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('k0o2pplp059vkfk84tqmcl3ji7',	1398853550,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('k14ljjj62k70lpk0b2goirtb07',	1400832284,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('k613ak8btr4s20ud2fdn9imaa4',	1399014564,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('k6fpul8lc7tjqqkev31nnqv0i6',	1398332750,	10800,	'Default|a:14:{s:14:\"successmessage\";s:0:\"\";s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"68\";s:5:\"phone\";s:10:\"0783252997\";s:4:\"type\";s:1:\"2\";}'),
-('k8j15e5o6ldnjjfqp9hu98h550',	1397472457,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('kbodn9gen34c5n0mngucee99m6',	1400753100,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('kc7q1b6kbtikurc682ordgrgj7',	1398753118,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('kcac61fq9prdgd41d6tdqodla6',	1398852974,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ke5rudjqv80s72libe5jf7uqj4',	1398844723,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('kj49j6rlgjn8n30oip7m80lmh7',	1400844726,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('km6fm0uk6n7225io1iruem6ad2',	1398233694,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('km94lcvt90uvukeq9lc7ts6qp5',	1398854996,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('knq3fjs9c7gauvs4soqkhr51q5',	1398946708,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ks9l3mhvokl1ufi7de24fhv7f0',	1398848240,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('kudnct92rdvqe31g9nv3i014r4',	1397376345,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('l1hve2bon2t45ps7jlr1sp5j97',	1400065528,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('l3pe5jt9a947e488ebd1hdbll0',	1397564114,	10800,	'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:5:\"phone\";s:10:\"0836246789\";s:4:\"type\";s:1:\"1\";}'),
-('l9injc91a9rfq5d8ode48b19e2',	1398882900,	10800,	'Default|a:3:{s:11:\"initialized\";b:1;s:6:\"errors\";s:26:\"Please enter Email Address\";s:10:\"formvalues\";a:3:{s:10:\"controller\";s:4:\"user\";s:6:\"action\";s:10:\"checklogin\";s:6:\"module\";s:7:\"default\";}}'),
-('lhb58vl300huoat2cpc46a7fu0',	1398234456,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('lj8sogmd6pfrt3qbpr7bvlhq06',	1398882899,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('llakj1atjlbc3ka2hs4jndaim3',	1400068522,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('lm24afre9q69c6jed1vrkbj5e3',	1400752984,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('lqh7prh9saothrekiahcb5npj1',	1398915072,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('lqkdhfigpf0s35er1q9jenc8q0',	1400832322,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ltnrg41cb56eh8b5smo7e6rri1',	1400073467,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ltovavudds4jrrfia3aifnmss5',	1398239752,	10800,	'Default|a:14:{s:14:\"successmessage\";s:0:\"\";s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"64\";s:5:\"phone\";s:10:\"0488015015\";s:4:\"type\";s:1:\"3\";}'),
-('lvc79vq86hovv2vfaifs94s553',	1397207238,	10800,	'Default|a:14:{s:14:\"successmessage\";s:0:\"\";s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"57\";s:5:\"phone\";s:10:\"0488015094\";s:4:\"type\";s:1:\"3\";}'),
-('m3a6q88h8tfuj6jpr8cd3bc174',	1398780064,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('m6hepodp0i7ue1n59v0qb4e9g3',	1398918770,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('mdc3mmudnuqnhufns9l1biljc3',	1398917678,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ml6m0r01s0lq8fp99hin7upj83',	1397563006,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ml8ist3jbe7f0k6ks8e1k9ku63',	1397199880,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('mlaabh0dsp1jca6ktjvoi63q54',	1399039842,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('mnprf46nco7a8gkj2mdm6l5356',	1398992498,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('mrub2viek8vg0856o6g3erf4u7',	1399284391,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('mtddun1q2rel8bj4q9ol04bn12',	1400830320,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('n02ib9p9mf6t8egq695n0u57m4',	1397725149,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('n3o2ktk22pahjb40irr9ie8hk7',	1398753291,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('n3pfmvfdfikigmeosae9rubt14',	1400073581,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('n7i422n2aog7r4avnefmu5d1g6',	1397212497,	10800,	'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:5:\"phone\";s:10:\"0836246789\";s:4:\"type\";s:1:\"1\";}'),
-('njlkltg9mi1irvncgole995b56',	1398845128,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('nk0rou7de55q04ted4amvnen71',	1398845222,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('nl42veoh99baa2a6pv1i3257o7',	1397566069,	10800,	'Default|a:14:{s:14:\"successmessage\";s:0:\"\";s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"53\";s:5:\"phone\";s:10:\"0488015000\";s:4:\"type\";s:1:\"6\";}'),
-('nsntmj7t9mtepjopdn0j02icb3',	1398859703,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('o3dp8429dtiu1s5ih7gaekca31',	1398847529,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('o4t65dem1jmu2f1mum5jq3shc2',	1400074854,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('o8qm37bmt9rjjt90u191lil0q0',	1399034005,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ochgsgkmj5acu2pqnigu8fv812',	1398169682,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('odt02mctededromk9pkoubqbb5',	1398233694,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('oe7akahpuhir4u01peub6i1il3',	1398149666,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('of7frmfle41tujbervd2n1m797',	1398159878,	10800,	'Default|a:14:{s:14:\"successmessage\";s:0:\"\";s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"49\";s:5:\"phone\";s:10:\"0488015000\";s:4:\"type\";s:1:\"7\";}'),
-('ohtoubf1374jac2egc4n12uke0',	1397827265,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('okfqkuodu0h9rin0016csok985',	1398882901,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('omi31df5meoe0761cnd754m5b6',	1398993806,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ontgcojhmooi1l8hhcphmpmaj4',	1397468246,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('or30bmmq5p4gv9jrn514mi7125',	1398913446,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ot759tu1vc5nmmmk1jegqkdig4',	1400140931,	10800,	'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"49\";s:5:\"phone\";s:10:\"0488015000\";s:4:\"type\";s:1:\"7\";}'),
-('ovh0qg3m4c11sccat18ql9b9h7',	1397464215,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('p5ss0971rsq7crth4ekgmv12f0',	1400070949,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('pbgr26inoo91mj3pfbcsfide90',	1400076236,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('pcd673jkb03i2d0nhn9952hjl4',	1397923055,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('pciq3816bciekmv4b39e2jahm3',	1399031088,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('pcs1fu1si0fgkql6jft6ktem27',	1397921112,	10800,	'Default|a:20:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"39\";s:5:\"phone\";s:0:\"\";s:4:\"type\";s:1:\"1\";s:20:\"logquerynotification\";s:0:\"\";s:16:\"itemcountperpage\";s:2:\"10\";s:30:\"clientstatusupdatenotification\";s:0:\"\";s:6:\"unread\";s:1:\"0\";s:10:\"newmsghtml\";s:137:\"<a title=\"Messages\" href=\"/public/message/list\"><img src=\"/public/images/email.png\">Messages (<label class=\"unread\">0 Unread</label>)</a>\";s:9:\"msgreturn\";s:4:\"json\";}'),
-('pi3s7rpg1vti1ad1aocknub0h0',	1398233702,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('pinn07r77aucl98nfnoeemav81',	1398158248,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('pkl23gr389t7cs109a6mhuhen5',	1398233694,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('pkqv7aeuavfoq3p870d3ep5db1',	1398882900,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('plgpfdc65cl2gpca4b3uve3j42',	1398235340,	10800,	'Default|a:16:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"67\";s:5:\"phone\";s:10:\"0488015119\";s:4:\"type\";s:1:\"2\";s:32:\"departmentallocationnotification\";s:0:\"\";s:28:\"clientallocationnotification\";s:0:\"\";}'),
-('ppjo5dnbs5ks94dgn025vmir36',	1400068495,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ppjtfu71v136e3ob0nuv462f70',	1400772328,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('pprv2lu9epkgefnhuada0hfag6',	1398882260,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('pqccteu33rpe7vpl3l12j25s21',	1398234454,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('pqe90n9hvefd6lsergpck1gdr2',	1398149490,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('prce4p9ajpioq73tf3t1nlae23',	1398882901,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('pt9evh1hvb5m8srr8kposvjbb7',	1398915057,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('q1onds4tn9qpeospddujpabpn1',	1400074583,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('qbqbrtfoe1rk2g35dt5qt811p4',	1400135362,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('qc9qsm2dgroqijjqblppie4de7',	1398779973,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('qe33s8ktuns2iscj1qvl89fkl5',	1397470512,	10800,	'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"59\";s:5:\"phone\";s:10:\"0488015089\";s:4:\"type\";s:1:\"3\";}'),
-('qtkd3ja0e5ufpa1p261viji3b5',	1400659306,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('r0k0s244j4q7iientjv7eccqj6',	1398322294,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('r2em1iqijvdgimrdf5na529cp4',	1398882901,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('r3mdgaid678jmpkfql4bk8vdm3',	1398882900,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('rcdd9c32pv9j8vj5rr0ehjk8r3',	1399187182,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('re6fjat57rbvte1vcajpcgq951',	1399559253,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('rfq8bgdqofasej140eaobueqg2',	1400074648,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('rkqssie6nan5urhkabu69m90t1',	1399010742,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('rli49psjg53scri6oaesbk4ik5',	1400605586,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('rmfccgdgmn2ptu97pel7d8pt13',	1400840756,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('s0b78tvj4tvsjvod18b6ki8l27',	1398845262,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('s3c01gtoluv62c02u4t51kt3a0',	1398766162,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('s64rdiuvfljo2pt1fcned3ot51',	1400071794,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('s6g9dl0va4s14lu0iffeetbcl0',	1397202500,	10800,	'Default|a:14:{s:14:\"successmessage\";s:0:\"\";s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"55\";s:5:\"phone\";s:10:\"0498021380\";s:4:\"type\";s:1:\"3\";}'),
-('s935aa0jt83ckl5f2vm5o46337',	1400930119,	10800,	'Default|a:15:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"39\";s:5:\"phone\";s:0:\"\";s:4:\"type\";s:1:\"1\";s:16:\"itemcountperpage\";s:2:\"25\";}'),
-('sau1m9u075bk3j663j2gl0q2u5',	1397580108,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('skqk3c3bpa2sa91qpmvadb1m03',	1398323063,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('skr9shmvk0bobmq8ha41sdesd5',	1398882897,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('spvq3a22b7kgh7hrkhikedc6n0',	1400752924,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('sqobrmkohokb22qmfflqrnoi27',	1400082148,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('t63de1h54rufj6bsijkb32ado5',	1397411703,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('t6pom2iurnum3hn9nah17c3ha4',	1398841994,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('t80fmfrdfrfn1k0k4bm0ij8em6',	1400068478,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ta19cau5s14ticsnp0cik0j7j0',	1398787324,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('takt6c2f8uot51dd5elfbmgvv0',	1399003432,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('tc1kuaeivmlrfvifremoipda03',	1398844399,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('te5da4ak3s5t0um7h526p88qe7',	1398882901,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('tgqj47gs1l15e12iac6gaktv22',	1398233870,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('tjm2919u741el7mr58mmqddir6',	1397541934,	10800,	'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:47:\"The following errors occured <ul><li></li></ul>\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:3:{s:10:\"controller\";s:7:\"profile\";s:6:\"action\";s:14:\"processpicture\";s:6:\"module\";s:7:\"default\";}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:2:\"63\";s:5:\"phone\";s:10:\"0835468723\";s:4:\"type\";s:1:\"3\";}'),
-('tqgq57n0rv96fm6holjjk2adi6',	1397733172,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('trtrp1h0dgffpe0hqse2rkaq15',	1400756810,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('uc2dbqic9p43shkopjpb8l1sv5',	1397297430,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('uc3vq4euos06q43megmslfqs44',	1398994450,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('ug9s8l44rs8qgsil2ku6t513o6',	1400075645,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('uj0e1ivhm6q03kfa4jg2ej0h93',	1398882900,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('upfqocp5n2tsd61j559gg11f13',	1397298088,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('v3t0dan9qo9nbjbtaqegg83cr4',	1398332957,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('v9r4jj5b04up3gglugc4hjr9r2',	1398882715,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('vl9iqh5798o2jkncth4kq5v1p4',	1398882898,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('vpcbpbnrqq6tpggb1ond792pq7',	1398237213,	10800,	'Default|a:1:{s:11:\"initialized\";b:1;}'),
-('vqdcgm4i20r23bfaoqd1av9es4',	1398846109,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('vshcm9jpjc2jemgf485ncumbq4',	1398319401,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('vstmn3m2fkos993d0re1pva0o4',	1397206471,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}'),
-('vv6hn5tk3jktsqehj0ti9e2so3',	1398845678,	10800,	'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}');
+-- ----------------------------
+-- Records of session
+-- ----------------------------
+INSERT INTO `session` VALUES ('08bm4dgd4834fog6q27slkb5a5', '1401812663', '21104000', 'Default|a:12:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:16:\"itemcountperpage\";s:2:\"10\";}');
+INSERT INTO `session` VALUES ('32cs8amrbeq7cc9o8o9t2e96q5', '1403694365', '21104000', 'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:4:\"type\";s:1:\"1\";s:16:\"itemcountperpage\";s:2:\"10\";}');
+INSERT INTO `session` VALUES ('39klfv1p8p1shjaebalqhe6820', '1402343414', '21104000', 'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:4:\"type\";s:1:\"1\";s:16:\"itemcountperpage\";s:2:\"10\";}');
+INSERT INTO `session` VALUES ('5r5e8666p8p7qsr548prf5bm11', '1403080476', '21104000', 'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:4:\"type\";s:1:\"1\";s:16:\"itemcountperpage\";s:2:\"10\";}');
+INSERT INTO `session` VALUES ('6gikrko381o14jhprafsgm8j90', '1404380855', '21104000', 'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:4:\"type\";s:1:\"1\";s:16:\"itemcountperpage\";s:2:\"10\";}');
+INSERT INTO `session` VALUES ('7ib1dtkj8cq642ah1bfc8mv821', '1401824433', '21104000', 'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:4:\"type\";s:1:\"1\";s:16:\"itemcountperpage\";s:2:\"10\";}');
+INSERT INTO `session` VALUES ('b4tvh3500lo4te73qb2gn3lt36', '1403596667', '21104000', 'Default|a:13:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:4:\"type\";s:1:\"1\";}');
+INSERT INTO `session` VALUES ('eeudtg6hpl2kkbaqb26dhirkc1', '1401693181', '21104000', 'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:4:\"type\";s:1:\"1\";s:16:\"itemcountperpage\";s:2:\"10\";}');
+INSERT INTO `session` VALUES ('fc7bgrq5ncuiurnef3d6a7pa16', '1401089166', '21104000', 'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}');
+INSERT INTO `session` VALUES ('gc83vl5d6lp09ool0o668te294', '1401113799', '21104000', 'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:5:\"phone\";s:10:\"0836246789\";s:4:\"type\";s:1:\"1\";}');
+INSERT INTO `session` VALUES ('j59h7ksrvea2l8hrbuvr90nbc7', '1401089874', '21104000', 'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}');
+INSERT INTO `session` VALUES ('jel4kp2igcm3sbc4mpknrilrf2', '1401109043', '21104000', 'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}');
+INSERT INTO `session` VALUES ('jh468g0lmkp0dq9u3tcacco4u4', '1401099648', '21104000', 'Default|a:11:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";}');
+INSERT INTO `session` VALUES ('p2mgk7goj8c17c6ategktgrhs7', '1401194808', '21104000', 'Default|a:13:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:4:\"type\";s:1:\"1\";}');
+INSERT INTO `session` VALUES ('p5tjhckc57tdfkgk4tm6hd2772', '1401295890', '21104000', 'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:4:\"type\";s:1:\"1\";s:16:\"itemcountperpage\";s:2:\"10\";}');
+INSERT INTO `session` VALUES ('ptsv4b4p64ssknv9lm5t66bvt6', '1404155794', '21104000', 'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:4:\"type\";s:1:\"1\";s:16:\"itemcountperpage\";s:2:\"10\";}');
+INSERT INTO `session` VALUES ('rrs791nm4s71l4ppidtbjq89l5', '1401952402', '21104000', 'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:4:\"type\";s:1:\"1\";s:16:\"itemcountperpage\";s:2:\"10\";}');
+INSERT INTO `session` VALUES ('tnkmmj6hhtuojqq3kvl15a7qd3', '1403542291', '21104000', 'Default|a:14:{s:11:\"initialized\";b:1;s:6:\"errors\";s:0:\"\";s:14:\"successmessage\";s:0:\"\";s:10:\"formvalues\";a:0:{}s:13:\"invitesuccess\";s:0:\"\";s:13:\"custommessage\";s:0:\"\";s:14:\"custommessage1\";s:0:\"\";s:14:\"custommessage2\";s:0:\"\";s:14:\"custommessage3\";s:0:\"\";s:14:\"custommessage4\";s:0:\"\";s:14:\"custommessage5\";s:0:\"\";s:6:\"userid\";s:1:\"1\";s:4:\"type\";s:1:\"1\";s:16:\"itemcountperpage\";s:2:\"10\";}');
 
-DROP TABLE IF EXISTS `ticket`;
-CREATE TABLE `ticket` (
-  `id` int(11) unsigned NOT NULL auto_increment,
-  `refno` varchar(8) default NULL,
-  `title` varchar(255) default NULL,
-  `description` varchar(1000) default NULL,
-  `clientid` int(11) unsigned default NULL,
-  `departmentid` int(11) unsigned default NULL,
-  `category` int(11) unsigned default NULL,
-  `tickettype` tinyint(4) unsigned default NULL,
-  `ticketsource` tinyint(4) unsigned default NULL,
-  `datereceived` datetime default NULL,
-  `receivedbyid` int(11) unsigned default NULL,
-  `receivername` varchar(255) default NULL,
-  `status` tinyint(4) unsigned default NULL,
-  `priority` tinyint(4) unsigned default NULL,
-  `duedate` datetime default NULL,
-  `closedate` datetime default NULL,
-  `parentid` int(11) unsigned default NULL,
-  `resolution` varchar(500) default NULL,
-  `datecreated` datetime default NULL,
-  `createdby` int(11) unsigned default NULL,
-  `lastupdatedate` datetime default NULL,
-  `lastupdatedby` int(11) unsigned default NULL,
-  `sendupdatestoemail` tinyint(4) unsigned default NULL,
-  `sendupdatestophone` tinyint(4) unsigned default NULL,
-  `logupdatesenttoemail` tinyint(4) unsigned default NULL,
-  `logupdatesenttophone` tinyint(4) unsigned default NULL,
-  `attachment` varchar(255) default NULL,
-  `isarchived` tinyint(4) default '0',
-  PRIMARY KEY  (`id`),
-  KEY `fk_ticket_clientid` (`clientid`),
-  KEY `fk_ticket_receivedbyid` (`receivedbyid`),
-  KEY `fk_ticket_parentid` (`parentid`),
-  CONSTRAINT `fk_ticket_clientid` FOREIGN KEY (`clientid`) REFERENCES `client` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_ticket_parentid` FOREIGN KEY (`parentid`) REFERENCES `ticket` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_ticket_receivedbyid` FOREIGN KEY (`receivedbyid`) REFERENCES `useraccount` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-INSERT INTO `ticket` (`id`, `refno`, `title`, `description`, `clientid`, `departmentid`, `category`, `tickettype`, `ticketsource`, `datereceived`, `receivedbyid`, `receivername`, `status`, `priority`, `duedate`, `closedate`, `parentid`, `resolution`, `datecreated`, `createdby`, `lastupdatedate`, `lastupdatedby`, `sendupdatestoemail`, `sendupdatestophone`, `logupdatesenttoemail`, `logupdatesenttophone`, `attachment`, `isarchived`) VALUES
-(56,	'AA0056',	'Electricity meter faulty',	'meter burned',	64,	38,	1,	4,	2,	'2014-05-22 00:00:00',	48,	NULL,	9,	3,	'2014-05-26 00:00:00',	NULL,	NULL,	NULL,	'2014-05-22 12:40:26',	48,	'2014-05-23 09:19:01',	NULL,	1,	1,	0,	0,	NULL,	0),
-(57,	'AA0057',	'Drain blocked ',	'Sewerage drain is blocked',	65,	23,	7,	11,	2,	'2014-05-22 00:00:00',	48,	NULL,	2,	3,	'2014-05-23 00:00:00',	NULL,	NULL,	NULL,	'2014-05-22 15:09:39',	48,	'2014-05-22 15:12:59',	NULL,	1,	1,	0,	0,	NULL,	0),
-(58,	'AA0058',	'Electricity meter faulty',	'Electricity meter is blank',	66,	38,	1,	6,	2,	'2014-05-22 00:00:00',	48,	NULL,	5,	3,	'2014-05-23 00:00:00',	'2014-05-23 11:26:19',	NULL,	'Your matter has been resolved ',	'2014-05-22 15:48:46',	48,	'2014-05-23 11:26:19',	NULL,	1,	1,	0,	0,	NULL,	0),
-(59,	'AA0059',	'Drain blocked',	'The drain is blocked',	67,	23,	7,	12,	2,	'2014-05-23 00:00:00',	48,	NULL,	1,	3,	'2014-05-23 00:00:00',	NULL,	NULL,	NULL,	'2014-05-23 09:42:47',	48,	'2014-05-23 11:37:27',	NULL,	1,	1,	0,	0,	NULL,	0),
-(60,	'AA0060',	'Drain blocked',	'The drain is blocked ',	68,	23,	7,	12,	2,	'2014-05-23 00:00:00',	48,	NULL,	1,	3,	'2014-05-23 00:00:00',	NULL,	NULL,	NULL,	'2014-05-23 11:49:14',	48,	'2014-05-23 11:53:30',	NULL,	1,	1,	0,	0,	NULL,	0),
-(61,	'AA0061',	'Drain blocked',	'The drain is blocked ',	69,	23,	7,	12,	2,	'2014-05-23 00:00:00',	48,	NULL,	1,	3,	'2014-05-23 00:00:00',	NULL,	NULL,	NULL,	'2014-05-23 11:58:46',	48,	'2014-05-23 12:09:03',	NULL,	1,	1,	0,	0,	NULL,	0),
-(62,	'AA0062',	'Leakage',	'Pipe leaks',	70,	23,	7,	12,	1,	'2014-05-23 00:00:00',	48,	NULL,	1,	3,	'2014-05-27 00:00:00',	NULL,	NULL,	NULL,	'2014-05-23 12:24:10',	48,	'2014-05-23 12:27:58',	NULL,	1,	1,	0,	0,	NULL,	0),
-(63,	'AA0063',	'Street light Faulty',	'The whole area is dark',	71,	38,	1,	6,	1,	'2014-05-23 00:00:00',	48,	NULL,	1,	3,	'2014-05-27 00:00:00',	NULL,	NULL,	NULL,	'2014-05-23 12:48:32',	48,	'2014-05-23 12:50:58',	NULL,	1,	1,	0,	0,	NULL,	0),
-(64,	'AA0064',	'Electricity meter faulty',	'The electricity meter is blank',	72,	38,	1,	6,	2,	'2014-05-23 00:00:00',	48,	NULL,	1,	3,	'2014-05-26 00:00:00',	NULL,	NULL,	NULL,	'2014-05-23 13:53:19',	48,	'2014-05-23 13:56:05',	NULL,	1,	1,	0,	0,	NULL,	0),
-(65,	'AA0065',	'Water meter leaks',	'water meter leaks',	73,	23,	7,	12,	2,	'2014-05-23 00:00:00',	48,	NULL,	1,	3,	'2014-05-26 00:00:00',	NULL,	NULL,	NULL,	'2014-05-23 15:05:41',	48,	'2014-05-23 15:08:15',	NULL,	1,	1,	0,	0,	NULL,	0),
-(66,	'AA0066',	'Electricity meter faulty',	'Meter is blank',	74,	38,	1,	4,	2,	'2014-05-23 00:00:00',	48,	NULL,	1,	3,	'2014-05-26 00:00:00',	NULL,	NULL,	NULL,	'2014-05-23 15:15:14',	48,	'2014-05-23 15:19:43',	NULL,	1,	1,	0,	0,	NULL,	0),
-(67,	'AA0067',	'Toilet blocked ',	'Toilet is blocked',	75,	23,	7,	12,	2,	'2014-05-23 00:00:00',	48,	NULL,	1,	3,	'2014-05-26 00:00:00',	NULL,	NULL,	NULL,	'2014-05-23 15:32:29',	48,	'2014-05-23 15:36:43',	NULL,	1,	1,	1,	0,	NULL,	0),
-(68,	'AA0068',	'Drain blocked',	'The drain is blocked ',	76,	23,	7,	12,	2,	'2014-05-23 00:00:00',	48,	NULL,	1,	3,	'2014-05-23 00:00:00',	NULL,	NULL,	NULL,	'2014-05-23 15:47:07',	48,	'2014-05-23 15:50:19',	NULL,	1,	1,	0,	0,	NULL,	0),
-(69,	'AA0069',	'Power failure',	'The Kwanonzame Old Clinic dont have electricity',	77,	38,	1,	6,	2,	'2014-05-23 00:00:00',	48,	NULL,	1,	3,	'2014-05-23 00:00:00',	NULL,	NULL,	NULL,	'2014-05-23 15:58:25',	48,	'2014-05-23 16:01:34',	NULL,	1,	1,	0,	0,	NULL,	0),
-(70,	'AA0070',	'Connection',	'Connect the electricity',	78,	38,	1,	6,	2,	'2014-05-23 00:00:00',	48,	NULL,	1,	3,	'2014-05-23 00:00:00',	NULL,	NULL,	NULL,	'2014-05-23 16:14:59',	48,	'2014-05-23 16:18:22',	NULL,	1,	1,	0,	0,	NULL,	0);
-
-DROP TABLE IF EXISTS `ticket_feedback`;
-CREATE TABLE `ticket_feedback` (
-  `id` int(11) unsigned NOT NULL auto_increment,
-  `ticketid` int(10) unsigned default NULL,
-  `clientid` int(10) unsigned default NULL,
-  `rating` tinyint(4) unsigned default NULL,
-  `remarks` varchar(1000) default NULL,
-  `feedbackdate` datetime default NULL,
-  `addedbyid` int(11) unsigned default NULL,
-  PRIMARY KEY  (`id`),
-  KEY `fk_ticket_feedback_ticketid` (`ticketid`),
-  KEY `fk_ticket_feedback_clientid` (`clientid`),
-  KEY `fk_ticket_feedback_addedbyid` (`addedbyid`),
-  CONSTRAINT `fk_ticket_feedback_addedbyid` FOREIGN KEY (`addedbyid`) REFERENCES `useraccount` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_ticket_feedback_clientid` FOREIGN KEY (`clientid`) REFERENCES `client` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_ticket_feedback_ticketid` FOREIGN KEY (`ticketid`) REFERENCES `ticket` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
-DROP TABLE IF EXISTS `ticket_ledger`;
-CREATE TABLE `ticket_ledger` (
-  `id` int(11) unsigned NOT NULL auto_increment,
-  `ticketid` int(11) unsigned default NULL,
-  `departmentid` int(11) unsigned default NULL,
-  `eventtype` tinyint(4) unsigned default NULL,
-  `status` tinyint(4) unsigned default NULL,
-  `section` tinyint(4) unsigned default NULL,
-  `eventdate` datetime default NULL,
-  `executedbyid` int(11) unsigned default NULL,
-  `actionplan` varchar(1000) default NULL,
-  `remarks` varchar(1000) default NULL,
-  `percentagecompletion` tinyint(4) unsigned default NULL,
-  `notification` varchar(10000) default NULL,
-  `subject` varchar(255) default NULL,
-  `emails` varchar(500) default NULL,
-  `phones` varchar(255) default NULL,
-  PRIMARY KEY  (`id`),
-  KEY `fk_ticket_ledger_ticketid` (`ticketid`),
-  KEY `fk_ticket_ledger_executedbyid` (`executedbyid`),
-  KEY `fk_ticket_ledger_departmentid` (`departmentid`),
-  CONSTRAINT `fk_ticket_ledger_departmentid` FOREIGN KEY (`departmentid`) REFERENCES `department` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_ticket_ledger_executedbyid` FOREIGN KEY (`executedbyid`) REFERENCES `useraccount` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_ticket_ledger_ticketid` FOREIGN KEY (`ticketid`) REFERENCES `ticket` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-INSERT INTO `ticket_ledger` (`id`, `ticketid`, `departmentid`, `eventtype`, `status`, `section`, `eventdate`, `executedbyid`, `actionplan`, `remarks`, `percentagecompletion`, `notification`, `subject`, `emails`, `phones`) VALUES
-(582,	56,	NULL,	1,	1,	1,	'2014-05-22 12:40:26',	48,	NULL,	'Query successfully Logged. Reference No# AA0056 generated',	NULL,	NULL,	NULL,	NULL,	NULL),
-(583,	56,	NULL,	3,	NULL,	1,	'2014-05-22 12:40:30',	48,	NULL,	'Acknowledgement sms and reference sent to 27788110596',	NULL,	'Hello Thandisizwe Moyi, \nThis is to acknowledge receipt of your Query with Reference No# AA0056. \nWe shall continue to notify you of any updates to this Query. ',	NULL,	NULL,	'27788110596'),
-(584,	56,	22,	4,	2,	2,	'2014-05-22 12:46:37',	48,	NULL,	'Query No# AA0056 assigned to <b>Electrical Services</b> Department',	NULL,	NULL,	NULL,	NULL,	NULL),
-(585,	56,	NULL,	5,	NULL,	2,	'2014-05-22 12:46:37',	48,	NULL,	'Electrical Services Department notified on Query assignment. Email sent to mteza@iym.gov.za, amos@iym.gov.za',	NULL,	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Electrical Services,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0056<br />\n    <b>Issue: </b>Electricity meter faulty<br />\n    <b>Synopsis: </b><br />\n	meter burned<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Thandisizwe Moyi<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27788110596<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/22/2014<br />\n    <b>Date Due: </b>05/26/2014<br />\n    <b>Category: </b>Electricity<br />\n    <b>Type: </b>Meter not working<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NTY=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'Electrical Services Department allocated to Query Ref No# AA0056',	'mteza@iym.gov.za, amos@iym.gov.za',	NULL),
-(586,	56,	NULL,	8,	NULL,	2,	'2014-05-22 12:46:38',	48,	NULL,	'Client notified on Department allocation. Sms sent to 27788110596',	NULL,	'Hello Thandisizwe Moyi, \n This is to let you know that the Electrical Services Department has been allocated to handle the Query with Ref No# AA0056. \n ',	NULL,	NULL,	'27788110596'),
-(587,	56,	38,	4,	2,	2,	'2014-05-22 13:04:51',	48,	NULL,	'Query No# AA0056 assigned to <b>Electrical Services Middleburg</b> Department',	NULL,	NULL,	NULL,	NULL,	NULL),
-(588,	56,	NULL,	5,	NULL,	2,	'2014-05-22 13:04:52',	48,	NULL,	'Electrical Services Middleburg Department notified on Query assignment. Email sent to francois.iym@mymtnmail.co.za',	NULL,	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Electrical Services Middleburg,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0056<br />\n    <b>Issue: </b>Electricity meter faulty<br />\n    <b>Synopsis: </b><br />\n	meter burned<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Thandisizwe Moyi<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27788110596<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/22/2014<br />\n    <b>Date Due: </b>05/26/2014<br />\n    <b>Category: </b>Electricity<br />\n    <b>Type: </b>Meter not working<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NTY=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'Electrical Services Middleburg Department allocated to Query Ref No# AA0056',	'francois.iym@mymtnmail.co.za',	NULL),
-(589,	56,	NULL,	8,	NULL,	2,	'2014-05-22 13:04:52',	48,	NULL,	'Client notified on Department allocation. Sms sent to 27788110596',	NULL,	'Hello Thandisizwe Moyi, \n This is to let you know that the Electrical Services Middleburg Department has been allocated to handle the Query with Ref No# AA0056. \n ',	NULL,	NULL,	'27788110596'),
-(590,	57,	NULL,	1,	1,	1,	'2014-05-22 15:09:39',	48,	NULL,	'Query successfully Logged. Reference No# AA0057 generated',	NULL,	NULL,	NULL,	NULL,	NULL),
-(591,	57,	NULL,	3,	NULL,	1,	'2014-05-22 15:09:40',	48,	NULL,	'Acknowledgement sms and reference sent to 27840642450',	NULL,	'Hello Thando Bontiya, \nThis is to acknowledge receipt of your Query with Reference No# AA0057. \nWe shall continue to notify you of any updates to this Query. ',	NULL,	NULL,	'27840642450'),
-(592,	57,	23,	4,	2,	2,	'2014-05-22 15:13:00',	48,	NULL,	'Query No# AA0057 assigned to <b>Water Services</b> Department',	NULL,	NULL,	NULL,	NULL,	NULL),
-(593,	57,	NULL,	5,	NULL,	2,	'2014-05-22 15:13:00',	48,	NULL,	'Water Services Department notified on Query assignment. Email sent to mashiyald@gmail.com, amos@iym.gov.za',	NULL,	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Water Services,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0057<br />\n    <b>Issue: </b>Drain blocked <br />\n    <b>Synopsis: </b><br />\n	Sewerage drain is blocked<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Thando Bontiya<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27840642450<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/22/2014<br />\n    <b>Date Due: </b>05/23/2014<br />\n    <b>Category: </b>Water<br />\n    <b>Type: </b>Blocked meter<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NTc=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'Water Services Department allocated to Query Ref No# AA0057',	'mashiyald@gmail.com, amos@iym.gov.za',	NULL),
-(594,	57,	NULL,	8,	NULL,	2,	'2014-05-22 15:13:01',	48,	NULL,	'Client notified on Department allocation. Sms sent to 27840642450',	NULL,	'Hello Thando Bontiya, \n This is to let you know that the Water Services Department has been allocated to handle the Query with Ref No# AA0057. \n ',	NULL,	NULL,	'27840642450'),
-(595,	58,	NULL,	1,	1,	1,	'2014-05-22 15:48:46',	48,	NULL,	'Query successfully Logged. Reference No# AA0058 generated',	NULL,	NULL,	NULL,	NULL,	NULL),
-(596,	58,	NULL,	3,	NULL,	1,	'2014-05-22 15:48:47',	48,	NULL,	'Acknowledgement sms and reference sent to 27848773521, 0837495132',	NULL,	'Hello Neliswa Mbodli, \nThis is to acknowledge receipt of your Query with Reference No# AA0058. \nWe shall continue to notify you of any updates to this Query. ',	NULL,	NULL,	'27848773521, 0837495132'),
-(597,	58,	38,	4,	2,	2,	'2014-05-22 15:49:44',	48,	NULL,	'Query No# AA0058 assigned to <b>Electrical Services Middleburg</b> Department',	NULL,	NULL,	NULL,	NULL,	NULL),
-(598,	58,	NULL,	5,	NULL,	2,	'2014-05-22 15:49:44',	48,	NULL,	'Electrical Services Middleburg Department notified on Query assignment. Email sent to francois.iym@mymtnmail.co.za',	NULL,	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Electrical Services Middleburg,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0058<br />\n    <b>Issue: </b>Electricity meter faulty<br />\n    <b>Synopsis: </b><br />\n	Electricity meter is blank<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Neliswa Mbodli<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27848773521<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/22/2014<br />\n    <b>Date Due: </b>05/23/2014<br />\n    <b>Category: </b>Electricity<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NTg=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'Electrical Services Middleburg Department allocated to Query Ref No# AA0058',	'francois.iym@mymtnmail.co.za',	NULL),
-(599,	58,	NULL,	8,	NULL,	2,	'2014-05-22 15:49:45',	48,	NULL,	'Client notified on Department allocation. Sms sent to 27848773521, 0837495132',	NULL,	'Hello Neliswa Mbodli, \n This is to let you know that the Electrical Services Middleburg Department has been allocated to handle the Query with Ref No# AA0058. \n ',	NULL,	NULL,	'27848773521, 0837495132'),
-(600,	56,	NULL,	NULL,	9,	3,	'2014-05-23 09:19:01',	48,	NULL,	'Status of Query No# AA0056 updated to <b>Technician Allocated</b>',	NULL,	'',	NULL,	NULL,	NULL),
-(601,	56,	NULL,	11,	NULL,	3,	'2014-05-23 09:19:05',	48,	NULL,	'Client notified of Status update. Sms sent to 27788110596',	NULL,	'This is to let you know that the status of the Query with Ref No# AA0056 has changed to Technician Allocated',	NULL,	NULL,	'27788110596'),
-(602,	59,	NULL,	1,	1,	1,	'2014-05-23 09:42:47',	48,	NULL,	'Query successfully Logged. Reference No# AA0059 generated',	NULL,	NULL,	NULL,	NULL,	NULL),
-(603,	59,	NULL,	3,	NULL,	1,	'2014-05-23 09:42:48',	48,	NULL,	'Acknowledgement sms and reference sent to 27745036809',	NULL,	'Hello Vicey Zonke, \nThis is to acknowledge receipt of your Query with Reference No# AA0059. \nWe shall continue to notify you of any updates to this Query. ',	NULL,	NULL,	'27745036809'),
-(604,	59,	38,	4,	2,	2,	'2014-05-23 09:45:06',	48,	NULL,	'Query No# AA0059 assigned to <b>Electrical Services Middleburg</b> Department',	NULL,	NULL,	NULL,	NULL,	NULL),
-(605,	59,	NULL,	5,	NULL,	2,	'2014-05-23 09:45:07',	48,	NULL,	'Electrical Services Middleburg Department notified on Query assignment. Email sent to francois.iym@mymtnmail.co.za',	NULL,	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Electrical Services Middleburg,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0059<br />\n    <b>Issue: </b>Drain blocked<br />\n    <b>Synopsis: </b><br />\n	The drain is blocked<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Vicey Zonke<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27745036809<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/23/2014<br />\n    <b>Category: </b>Water<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NTk=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'Electrical Services Middleburg Department allocated to Query Ref No# AA0059',	'francois.iym@mymtnmail.co.za',	NULL),
-(606,	59,	NULL,	8,	NULL,	2,	'2014-05-23 09:45:08',	48,	NULL,	'Client notified on Department allocation. Sms sent to 27745036809',	NULL,	'Hello Vicey Zonke, \n This is to let you know that the Electrical Services Middleburg Department has been allocated to handle the Query with Ref No# AA0059. \n ',	NULL,	NULL,	'27745036809'),
-(607,	59,	23,	4,	2,	2,	'2014-05-23 09:49:23',	48,	NULL,	'Query No# AA0059 assigned to <b>Water Services</b> Department',	NULL,	NULL,	NULL,	NULL,	NULL),
-(608,	59,	NULL,	5,	NULL,	2,	'2014-05-23 09:49:23',	48,	NULL,	'Water Services Department notified on Query assignment. Email sent to mashiyald@gmail.com, amos@iym.gov.za',	NULL,	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Water Services,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0059<br />\n    <b>Issue: </b>Drain blocked<br />\n    <b>Synopsis: </b><br />\n	The drain is blocked<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Vicey Zonke<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27745036809<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/23/2014<br />\n    <b>Category: </b>Water<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NTk=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'Water Services Department allocated to Query Ref No# AA0059',	'mashiyald@gmail.com, amos@iym.gov.za',	NULL),
-(609,	59,	NULL,	8,	NULL,	2,	'2014-05-23 09:49:24',	48,	NULL,	'Client notified on Department allocation. Sms sent to 27745036809',	NULL,	'Hello Vicey Zonke, \n This is to let you know that the Water Services Department has been allocated to handle the Query with Ref No# AA0059. \n ',	NULL,	NULL,	'27745036809'),
-(610,	58,	NULL,	NULL,	5,	3,	'2014-05-23 11:26:19',	48,	'Your matter has been resolved ',	'Status of Query No# AA0058 updated to <b>Resolved</b>',	NULL,	'',	NULL,	NULL,	NULL),
-(611,	58,	NULL,	11,	NULL,	3,	'2014-05-23 11:26:19',	48,	NULL,	'Client notified of Status update. Sms sent to 27848773521, 0837495132',	NULL,	'This is to let you know that the status of the Query with Ref No# AA0058 has changed to Resolved',	NULL,	NULL,	'27848773521, 0837495132'),
-(612,	59,	NULL,	NULL,	1,	3,	'2014-05-23 11:37:27',	48,	NULL,	'Status of Query No# AA0059 updated to <b>Logged</b>',	NULL,	'',	NULL,	NULL,	NULL),
-(613,	59,	NULL,	11,	NULL,	3,	'2014-05-23 11:37:27',	48,	NULL,	'Client notified of Status update. Sms sent to 27745036809',	NULL,	'This is to let you know that the status of the Query with Ref No# AA0059 has changed to Logged',	NULL,	NULL,	'27745036809'),
-(614,	60,	NULL,	1,	1,	1,	'2014-05-23 11:49:14',	48,	NULL,	'Query successfully Logged. Reference No# AA0060 generated',	NULL,	NULL,	NULL,	NULL,	NULL),
-(615,	60,	NULL,	3,	NULL,	1,	'2014-05-23 11:49:14',	48,	NULL,	'Acknowledgement sms and reference sent to 27845283493',	NULL,	'Hello Ronel Meyron, \nThis is to acknowledge receipt of your Query with Reference No# AA0060. \nWe shall continue to notify you of any updates to this Query. ',	NULL,	NULL,	'27845283493'),
-(616,	60,	23,	4,	2,	2,	'2014-05-23 11:51:39',	48,	NULL,	'Query No# AA0060 assigned to <b>Water Services</b> Department',	NULL,	NULL,	NULL,	NULL,	NULL),
-(617,	60,	NULL,	5,	NULL,	2,	'2014-05-23 11:51:40',	48,	NULL,	'Water Services Department notified on Query assignment. Email sent to mashiyald@gmail.com, amos@iym.gov.za',	NULL,	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Water Services,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0060<br />\n    <b>Issue: </b>Drain blocked<br />\n    <b>Synopsis: </b><br />\n	The drain is blocked <br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Ronel Meyron<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27845283493<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/23/2014<br />\n    <b>Category: </b>Water<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NjA=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'Water Services Department allocated to Query Ref No# AA0060',	'mashiyald@gmail.com, amos@iym.gov.za',	NULL),
-(618,	60,	NULL,	8,	NULL,	2,	'2014-05-23 11:51:40',	48,	NULL,	'Client notified on Department allocation. Sms sent to 27845283493',	NULL,	'Hello Ronel Meyron, \n This is to let you know that the Water Services Department has been allocated to handle the Query with Ref No# AA0060. \n ',	NULL,	NULL,	'27845283493'),
-(619,	60,	NULL,	NULL,	1,	3,	'2014-05-23 11:53:30',	48,	NULL,	'Status of Query No# AA0060 updated to <b>Logged</b>',	NULL,	'',	NULL,	NULL,	NULL),
-(620,	60,	NULL,	11,	NULL,	3,	'2014-05-23 11:53:30',	48,	NULL,	'Client notified of Status update. Sms sent to 27845283493',	NULL,	'This is to let you know that the status of the Query with Ref No# AA0060 has changed to Logged',	NULL,	NULL,	'27845283493'),
-(621,	61,	NULL,	1,	1,	1,	'2014-05-23 11:58:46',	48,	NULL,	'Query successfully Logged. Reference No# AA0061 generated',	NULL,	NULL,	NULL,	NULL,	NULL),
-(622,	61,	NULL,	3,	NULL,	1,	'2014-05-23 11:58:46',	48,	NULL,	'Acknowledgement sms and reference sent to 27835427077',	NULL,	'Hello Nombulelo Maki, \nThis is to acknowledge receipt of your Query with Reference No# AA0061. \nWe shall continue to notify you of any updates to this Query. ',	NULL,	NULL,	'27835427077'),
-(623,	61,	23,	4,	2,	2,	'2014-05-23 12:07:09',	48,	NULL,	'Query No# AA0061 assigned to <b>Water Services</b> Department',	NULL,	NULL,	NULL,	NULL,	NULL),
-(624,	61,	NULL,	5,	NULL,	2,	'2014-05-23 12:07:10',	48,	NULL,	'Water Services Department notified on Query assignment. Email sent to mashiyald@gmail.com, amos@iym.gov.za',	NULL,	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Water Services,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0061<br />\n    <b>Issue: </b>Drain blocked<br />\n    <b>Synopsis: </b><br />\n	The drain is blocked <br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Nombulelo Maki<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27835427077<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/23/2014<br />\n    <b>Category: </b>Water<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NjE=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'Water Services Department allocated to Query Ref No# AA0061',	'mashiyald@gmail.com, amos@iym.gov.za',	NULL),
-(625,	61,	NULL,	8,	NULL,	2,	'2014-05-23 12:07:10',	48,	NULL,	'Client notified on Department allocation. Sms sent to 27835427077',	NULL,	'Hello Nombulelo Maki, \n This is to let you know that the Water Services Department has been allocated to handle the Query with Ref No# AA0061. \n ',	NULL,	NULL,	'27835427077'),
-(626,	61,	NULL,	NULL,	1,	3,	'2014-05-23 12:09:03',	48,	NULL,	'Status of Query No# AA0061 updated to <b>Logged</b>',	NULL,	'',	NULL,	NULL,	NULL),
-(627,	61,	NULL,	11,	NULL,	3,	'2014-05-23 12:09:03',	48,	NULL,	'Client notified of Status update. Sms sent to 27835427077',	NULL,	'This is to let you know that the status of the Query with Ref No# AA0061 has changed to Logged',	NULL,	NULL,	'27835427077'),
-(628,	62,	NULL,	1,	1,	1,	'2014-05-23 12:24:10',	48,	NULL,	'Query successfully Logged. Reference No# AA0062 generated',	NULL,	NULL,	NULL,	NULL,	NULL),
-(629,	62,	NULL,	3,	NULL,	1,	'2014-05-23 12:24:11',	48,	NULL,	'Acknowledgement sms and reference sent to 27730829810',	NULL,	'Hello Mzukisi Makeleni, \nThis is to acknowledge receipt of your Query with Reference No# AA0062. \nWe shall continue to notify you of any updates to this Query. ',	NULL,	NULL,	'27730829810'),
-(630,	62,	23,	4,	2,	2,	'2014-05-23 12:25:41',	48,	NULL,	'Query No# AA0062 assigned to <b>Water Services</b> Department',	NULL,	NULL,	NULL,	NULL,	NULL),
-(631,	62,	NULL,	5,	NULL,	2,	'2014-05-23 12:25:42',	48,	NULL,	'Water Services Department notified on Query assignment. Email sent to mashiyald@gmail.com, amos@iym.gov.za',	NULL,	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Water Services,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0062<br />\n    <b>Issue: </b>Leakage<br />\n    <b>Synopsis: </b><br />\n	Pipe leaks<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Mzukisi Makeleni<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27730829810<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/27/2014<br />\n    <b>Category: </b>Water<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Physical Delivery<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NjI=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'Water Services Department allocated to Query Ref No# AA0062',	'mashiyald@gmail.com, amos@iym.gov.za',	NULL),
-(632,	62,	NULL,	8,	NULL,	2,	'2014-05-23 12:25:43',	48,	NULL,	'Client notified on Department allocation. Sms sent to 27730829810',	NULL,	'Hello Mzukisi Makeleni, \n This is to let you know that the Water Services Department has been allocated to handle the Query with Ref No# AA0062. \n ',	NULL,	NULL,	'27730829810'),
-(633,	62,	NULL,	NULL,	1,	3,	'2014-05-23 12:27:58',	48,	NULL,	'Status of Query No# AA0062 updated to <b>Logged</b>',	NULL,	'',	NULL,	NULL,	NULL),
-(634,	62,	NULL,	11,	NULL,	3,	'2014-05-23 12:28:02',	48,	NULL,	'Client notified of Status update. Sms sent to 27730829810',	NULL,	'This is to let you know that the status of the Query with Ref No# AA0062 has changed to Logged',	NULL,	NULL,	'27730829810'),
-(635,	63,	NULL,	1,	1,	1,	'2014-05-23 12:48:32',	48,	NULL,	'Query successfully Logged. Reference No# AA0063 generated',	NULL,	NULL,	NULL,	NULL,	NULL),
-(636,	63,	NULL,	3,	NULL,	1,	'2014-05-23 12:48:33',	48,	NULL,	'Acknowledgement sms and reference sent to 27733058581',	NULL,	'Hello Andrew Belling, \nThis is to acknowledge receipt of your Query with Reference No# AA0063. \nWe shall continue to notify you of any updates to this Query. ',	NULL,	NULL,	'27733058581'),
-(637,	63,	38,	4,	2,	2,	'2014-05-23 12:49:17',	48,	NULL,	'Query No# AA0063 assigned to <b>Electrical Services Middleburg</b> Department',	NULL,	NULL,	NULL,	NULL,	NULL),
-(638,	63,	NULL,	5,	NULL,	2,	'2014-05-23 12:49:17',	48,	NULL,	'Electrical Services Middleburg Department notified on Query assignment. Email sent to francois.iym@mymtnmail.co.za',	NULL,	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Electrical Services Middleburg,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0063<br />\n    <b>Issue: </b>Street light Faulty<br />\n    <b>Synopsis: </b><br />\n	The whole area is dark<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Andrew Belling<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27733058581<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/27/2014<br />\n    <b>Category: </b>Electricity<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Physical Delivery<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NjM=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'Electrical Services Middleburg Department allocated to Query Ref No# AA0063',	'francois.iym@mymtnmail.co.za',	NULL),
-(639,	63,	NULL,	8,	NULL,	2,	'2014-05-23 12:49:21',	48,	NULL,	'Client notified on Department allocation. Sms sent to 27733058581',	NULL,	'Hello Andrew Belling, \n This is to let you know that the Electrical Services Middleburg Department has been allocated to handle the Query with Ref No# AA0063. \n ',	NULL,	NULL,	'27733058581'),
-(640,	63,	NULL,	NULL,	1,	3,	'2014-05-23 12:50:58',	48,	NULL,	'Status of Query No# AA0063 updated to <b>Logged</b>',	NULL,	'',	NULL,	NULL,	NULL),
-(641,	63,	NULL,	11,	NULL,	3,	'2014-05-23 12:50:58',	48,	NULL,	'Client notified of Status update. Sms sent to 27733058581',	NULL,	'This is to let you know that the status of the Query with Ref No# AA0063 has changed to Logged',	NULL,	NULL,	'27733058581'),
-(642,	64,	NULL,	1,	1,	1,	'2014-05-23 13:53:19',	48,	NULL,	'Query successfully Logged. Reference No# AA0064 generated',	NULL,	NULL,	NULL,	NULL,	NULL),
-(643,	64,	NULL,	3,	NULL,	1,	'2014-05-23 13:53:20',	48,	NULL,	'Acknowledgement sms and reference sent to 27737695335',	NULL,	'Hello Venessa Stalenberg, \nThis is to acknowledge receipt of your Query with Reference No# AA0064. \nWe shall continue to notify you of any updates to this Query. ',	NULL,	NULL,	'27737695335'),
-(644,	64,	38,	4,	2,	2,	'2014-05-23 13:54:39',	48,	NULL,	'Query No# AA0064 assigned to <b>Electrical Services Middleburg</b> Department',	NULL,	NULL,	NULL,	NULL,	NULL),
-(645,	64,	NULL,	5,	NULL,	2,	'2014-05-23 13:54:39',	48,	NULL,	'Electrical Services Middleburg Department notified on Query assignment. Email sent to francois.iym@mymtnmail.co.za',	NULL,	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Electrical Services Middleburg,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0064<br />\n    <b>Issue: </b>Electricity meter faulty<br />\n    <b>Synopsis: </b><br />\n	The electricity meter is blank<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Venessa Stalenberg<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27737695335<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/26/2014<br />\n    <b>Category: </b>Electricity<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NjQ=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'Electrical Services Middleburg Department allocated to Query Ref No# AA0064',	'francois.iym@mymtnmail.co.za',	NULL),
-(646,	64,	NULL,	8,	NULL,	2,	'2014-05-23 13:54:40',	48,	NULL,	'Client notified on Department allocation. Sms sent to 27737695335',	NULL,	'Hello Venessa Stalenberg, \n This is to let you know that the Electrical Services Middleburg Department has been allocated to handle the Query with Ref No# AA0064. \n ',	NULL,	NULL,	'27737695335'),
-(647,	64,	NULL,	NULL,	1,	3,	'2014-05-23 13:56:05',	48,	NULL,	'Status of Query No# AA0064 updated to <b>Logged</b>',	NULL,	'',	NULL,	NULL,	NULL),
-(648,	64,	NULL,	11,	NULL,	3,	'2014-05-23 13:56:06',	48,	NULL,	'Client notified of Status update. Sms sent to 27737695335',	NULL,	'This is to let you know that the status of the Query with Ref No# AA0064 has changed to Logged',	NULL,	NULL,	'27737695335'),
-(649,	65,	NULL,	1,	1,	1,	'2014-05-23 15:05:41',	48,	NULL,	'Query successfully Logged. Reference No# AA0065 generated',	NULL,	NULL,	NULL,	NULL,	NULL),
-(650,	65,	NULL,	3,	NULL,	1,	'2014-05-23 15:05:42',	48,	NULL,	'Acknowledgement sms and reference sent to 27736010630',	NULL,	'Hello Unathi Goerge, \nThis is to acknowledge receipt of your Query with Reference No# AA0065. \nWe shall continue to notify you of any updates to this Query. ',	NULL,	NULL,	'27736010630'),
-(651,	65,	23,	4,	2,	2,	'2014-05-23 15:06:31',	48,	NULL,	'Query No# AA0065 assigned to <b>Water Services</b> Department',	NULL,	NULL,	NULL,	NULL,	NULL),
-(652,	65,	NULL,	5,	NULL,	2,	'2014-05-23 15:06:32',	48,	NULL,	'Water Services Department notified on Query assignment. Email sent to mashiyald@gmail.com, amos@iym.gov.za',	NULL,	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Water Services,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0065<br />\n    <b>Issue: </b>Water meter leaks<br />\n    <b>Synopsis: </b><br />\n	water meter leaks<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Unathi Goerge<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27736010630<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/26/2014<br />\n    <b>Category: </b>Water<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NjU=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'Water Services Department allocated to Query Ref No# AA0065',	'mashiyald@gmail.com, amos@iym.gov.za',	NULL),
-(653,	65,	NULL,	8,	NULL,	2,	'2014-05-23 15:06:32',	48,	NULL,	'Client notified on Department allocation. Sms sent to 27736010630',	NULL,	'Hello Unathi Goerge, \n This is to let you know that the Water Services Department has been allocated to handle the Query with Ref No# AA0065. \n ',	NULL,	NULL,	'27736010630'),
-(654,	65,	NULL,	NULL,	1,	3,	'2014-05-23 15:08:15',	48,	NULL,	'Status of Query No# AA0065 updated to <b>Logged</b>',	NULL,	'',	NULL,	NULL,	NULL),
-(655,	65,	NULL,	11,	NULL,	3,	'2014-05-23 15:08:15',	48,	NULL,	'Client notified of Status update. Sms sent to 27736010630',	NULL,	'This is to let you know that the status of the Query with Ref No# AA0065 has changed to Logged',	NULL,	NULL,	'27736010630'),
-(656,	66,	NULL,	1,	1,	1,	'2014-05-23 15:15:14',	48,	NULL,	'Query successfully Logged. Reference No# AA0066 generated',	NULL,	NULL,	NULL,	NULL,	NULL),
-(657,	66,	NULL,	3,	NULL,	1,	'2014-05-23 15:15:15',	48,	NULL,	'Acknowledgement sms and reference sent to 27849996502',	NULL,	'Hello Popi Westel, \nThis is to acknowledge receipt of your Query with Reference No# AA0066. \nWe shall continue to notify you of any updates to this Query. ',	NULL,	NULL,	'27849996502'),
-(658,	66,	38,	4,	2,	2,	'2014-05-23 15:16:15',	48,	NULL,	'Query No# AA0066 assigned to <b>Electrical Services Middleburg</b> Department',	NULL,	NULL,	NULL,	NULL,	NULL),
-(659,	66,	NULL,	5,	NULL,	2,	'2014-05-23 15:16:15',	48,	NULL,	'Electrical Services Middleburg Department notified on Query assignment. Email sent to francois.iym@mymtnmail.co.za',	NULL,	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Electrical Services Middleburg,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0066<br />\n    <b>Issue: </b>Electricity meter faulty<br />\n    <b>Synopsis: </b><br />\n	Meter is blank<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Popi Westel<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27849996502<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/26/2014<br />\n    <b>Category: </b>Electricity<br />\n    <b>Type: </b>Meter not working<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NjY=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'Electrical Services Middleburg Department allocated to Query Ref No# AA0066',	'francois.iym@mymtnmail.co.za',	NULL),
-(660,	66,	NULL,	8,	NULL,	2,	'2014-05-23 15:16:16',	48,	NULL,	'Client notified on Department allocation. Sms sent to 27849996502',	NULL,	'Hello Popi Westel, \n This is to let you know that the Electrical Services Middleburg Department has been allocated to handle the Query with Ref No# AA0066. \n ',	NULL,	NULL,	'27849996502'),
-(661,	66,	NULL,	NULL,	1,	3,	'2014-05-23 15:19:43',	48,	NULL,	'Status of Query No# AA0066 updated to <b>Logged</b>',	NULL,	'',	NULL,	NULL,	NULL),
-(662,	66,	NULL,	11,	NULL,	3,	'2014-05-23 15:19:44',	48,	NULL,	'Client notified of Status update. Sms sent to 27849996502',	NULL,	'This is to let you know that the status of the Query with Ref No# AA0066 has changed to Logged',	NULL,	NULL,	'27849996502'),
-(663,	67,	NULL,	1,	1,	1,	'2014-05-23 15:32:29',	48,	NULL,	'Query successfully Logged. Reference No# AA0067 generated',	NULL,	NULL,	NULL,	NULL,	NULL),
-(664,	67,	NULL,	2,	NULL,	1,	'2014-05-23 15:32:29',	48,	NULL,	'Acknowledgement email and reference sent to cpw.iym@mtnloaded.co.za',	NULL,	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Hello Inxuba Yethemba Municipality,<br /><br />\n    \n    This is to acknowledge receipt of your Query that has been successfully logged in to our system with the summary below;<br /><br />\n    \n    <b>Reference No: </b>AA0067<br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Category: </b>General<br /><br />\n    \n    <b>Issue: </b>Toilet blocked <br />\n    <b>Synopsis: </b><br />\n	Toilet is blocked<br /><br />\n\n	We shall be notifying you in future of any updates to this Query.<br /><br />\n	\n	If you have any questions please dont hesitate to contact us.<br /><br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'Query with Ref No# AA0067 Logged',	'cpw.iym@mtnloaded.co.za',	NULL),
-(665,	67,	NULL,	3,	NULL,	1,	'2014-05-23 15:32:30',	48,	NULL,	'Acknowledgement sms and reference sent to 27833557320',	NULL,	'Hello Inxuba Yethemba Municipality, \nThis is to acknowledge receipt of your Query with Reference No# AA0067. \nWe shall continue to notify you of any updates to this Query. ',	NULL,	NULL,	'27833557320'),
-(666,	67,	23,	4,	2,	2,	'2014-05-23 15:33:44',	48,	NULL,	'Query No# AA0067 assigned to <b>Water Services</b> Department',	NULL,	NULL,	NULL,	NULL,	NULL),
-(667,	67,	NULL,	5,	NULL,	2,	'2014-05-23 15:33:44',	48,	NULL,	'Water Services Department notified on Query assignment. Email sent to mashiyald@gmail.com, amos@iym.gov.za',	NULL,	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Water Services,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0067<br />\n    <b>Issue: </b>Toilet blocked <br />\n    <b>Synopsis: </b><br />\n	Toilet is blocked<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Inxuba Yethemba Municipality<br />\n    <b>Email: </b>cpw.iym@mtnloaded.co.za<br />\n    <b>Phone: </b>27833557320<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/26/2014<br />\n    <b>Category: </b>Water<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/Njc=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'Water Services Department allocated to Query Ref No# AA0067',	'mashiyald@gmail.com, amos@iym.gov.za',	NULL),
-(668,	67,	NULL,	7,	NULL,	2,	'2014-05-23 15:33:44',	48,	NULL,	'Client notified on Department allocation. Email sent to cpw.iym@mtnloaded.co.za',	NULL,	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Hello Inxuba Yethemba Municipality,<br /><br />\n    \n    This is an automated notification to let you know that the Water Services Department has been allocated to handle your Query.<br /><br />\n    \n	We shall continue to email you any updates to this Query.<br /><br />\n	\n	If you have any questions please dont hesitate to contact us.<br /><br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'Department allocated to Query Ref No# AA0067',	'cpw.iym@mtnloaded.co.za',	NULL),
-(669,	67,	NULL,	8,	NULL,	2,	'2014-05-23 15:33:45',	48,	NULL,	'Client notified on Department allocation. Sms sent to 27833557320',	NULL,	'Hello Inxuba Yethemba Municipality, \n This is to let you know that the Water Services Department has been allocated to handle the Query with Ref No# AA0067. \n ',	NULL,	NULL,	'27833557320'),
-(671,	67,	NULL,	10,	NULL,	3,	'2014-05-23 15:36:43',	48,	NULL,	'Client notified of Status update. Email sent to cpw.iym@mtnloaded.co.za',	NULL,	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n   	Hello Inxuba Yethemba Municipality, <br />\r\n<br />\r\nThis is an automated notification to inform you of the status of your Query with the update below;<br />\r\n<br />\r\nStatus of Query No# AA0067 updated to <b>Logged</b> <br />\r\n<br />\r\nThe plumber Carel Erasmus will attend your query<br />\r\n<br />\r\nIf you have any further questions or inquiries please do not hesitate to contact us. <br />\r\n<br />\r\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'Status Update on Query Ref No# AA0067',	'cpw.iym@mtnloaded.co.za',	NULL),
-(672,	68,	NULL,	1,	1,	1,	'2014-05-23 15:47:07',	48,	NULL,	'Query successfully Logged. Reference No# AA0068 generated',	NULL,	NULL,	NULL,	NULL,	NULL),
-(673,	68,	NULL,	3,	NULL,	1,	'2014-05-23 15:47:08',	48,	NULL,	'Acknowledgement sms and reference sent to 27737540992',	NULL,	'Hello Dean Gedonas, \nThis is to acknowledge receipt of your Query with Reference No# AA0068. \nWe shall continue to notify you of any updates to this Query. ',	NULL,	NULL,	'27737540992'),
-(674,	68,	23,	4,	2,	2,	'2014-05-23 15:48:14',	48,	NULL,	'Query No# AA0068 assigned to <b>Water Services</b> Department',	NULL,	NULL,	NULL,	NULL,	NULL),
-(675,	68,	NULL,	5,	NULL,	2,	'2014-05-23 15:48:15',	48,	NULL,	'Water Services Department notified on Query assignment. Email sent to mashiyald@gmail.com, amos@iym.gov.za',	NULL,	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Water Services,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0068<br />\n    <b>Issue: </b>Drain blocked<br />\n    <b>Synopsis: </b><br />\n	The drain is blocked <br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Dean Gedonas<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27737540992<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/23/2014<br />\n    <b>Category: </b>Water<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/Njg=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'Water Services Department allocated to Query Ref No# AA0068',	'mashiyald@gmail.com, amos@iym.gov.za',	NULL),
-(676,	68,	NULL,	8,	NULL,	2,	'2014-05-23 15:48:16',	48,	NULL,	'Client notified on Department allocation. Sms sent to 27737540992',	NULL,	'Hello Dean Gedonas, \n This is to let you know that the Water Services Department has been allocated to handle the Query with Ref No# AA0068. \n ',	NULL,	NULL,	'27737540992'),
-(677,	68,	NULL,	NULL,	1,	3,	'2014-05-23 15:50:19',	48,	NULL,	'Status of Query No# AA0068 updated to <b>Logged</b>',	NULL,	'',	NULL,	NULL,	NULL),
-(678,	68,	NULL,	11,	NULL,	3,	'2014-05-23 15:50:20',	48,	NULL,	'Client notified of Status update. Sms sent to 27737540992',	NULL,	'This is to let you know that the status of the Query with Ref No# AA0068 has changed to Logged',	NULL,	NULL,	'27737540992'),
-(679,	67,	NULL,	NULL,	1,	3,	'2014-05-23 15:52:48',	48,	NULL,	'Status of Query No# AA0067 updated to <b>Logged</b>',	NULL,	'',	NULL,	NULL,	NULL),
-(680,	67,	NULL,	10,	NULL,	3,	'2014-05-23 15:52:48',	48,	NULL,	'Client notified of Status update. Email sent to cpw.iym@mtnloaded.co.za',	NULL,	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n   	Hello Inxuba Yethemba Municipality, <br />\r\n<br />\r\nThis is an automated notification to inform you of the status of your Query with the update below;<br />\r\n<br />\r\nStatus of Query No# AA0067 updated to <b>Logged</b> <br />\r\n<br />\r\nThe plumber Carel Erasmus will attend your query<br />\r\n<br />\r\nIf you have any further questions or inquiries please do not hesitate to contact us. <br />\r\n<br />\r\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'Status Update on Query Ref No# AA0067',	'cpw.iym@mtnloaded.co.za',	NULL),
-(681,	67,	NULL,	11,	NULL,	3,	'2014-05-23 15:52:49',	48,	NULL,	'Client notified of Status update. Sms sent to 27833557320',	NULL,	'This is to let you know that the status of the Query with Ref No# AA0067 has changed to Logged',	NULL,	NULL,	'27833557320'),
-(682,	69,	NULL,	1,	1,	1,	'2014-05-23 15:58:25',	48,	NULL,	'Query successfully Logged. Reference No# AA0069 generated',	NULL,	NULL,	NULL,	NULL,	NULL),
-(683,	69,	NULL,	3,	NULL,	1,	'2014-05-23 15:58:26',	48,	NULL,	'Acknowledgement sms and reference sent to 27824260685',	NULL,	'Hello Department of Health, \nThis is to acknowledge receipt of your Query with Reference No# AA0069. \nWe shall continue to notify you of any updates to this Query. ',	NULL,	NULL,	'27824260685'),
-(684,	69,	38,	4,	2,	2,	'2014-05-23 15:59:38',	48,	NULL,	'Query No# AA0069 assigned to <b>Electrical Services Middleburg</b> Department',	NULL,	NULL,	NULL,	NULL,	NULL),
-(685,	69,	NULL,	5,	NULL,	2,	'2014-05-23 15:59:38',	48,	NULL,	'Electrical Services Middleburg Department notified on Query assignment. Email sent to francois.iym@mymtnmail.co.za',	NULL,	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Electrical Services Middleburg,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0069<br />\n    <b>Issue: </b>Power failure<br />\n    <b>Synopsis: </b><br />\n	The Kwanonzame Old Clinic dont have electricity<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Department of Health<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27824260685<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/23/2014<br />\n    <b>Category: </b>Electricity<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/Njk=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'Electrical Services Middleburg Department allocated to Query Ref No# AA0069',	'francois.iym@mymtnmail.co.za',	NULL),
-(686,	69,	NULL,	8,	NULL,	2,	'2014-05-23 15:59:39',	48,	NULL,	'Client notified on Department allocation. Sms sent to 27824260685',	NULL,	'Hello Department of Health, \n This is to let you know that the Electrical Services Middleburg Department has been allocated to handle the Query with Ref No# AA0069. \n ',	NULL,	NULL,	'27824260685'),
-(687,	69,	NULL,	NULL,	1,	3,	'2014-05-23 16:01:34',	48,	NULL,	'Status of Query No# AA0069 updated to <b>Logged</b>',	NULL,	'',	NULL,	NULL,	NULL),
-(688,	70,	NULL,	1,	1,	1,	'2014-05-23 16:15:00',	48,	NULL,	'Query successfully Logged. Reference No# AA0070 generated',	NULL,	NULL,	NULL,	NULL,	NULL),
-(689,	70,	NULL,	3,	NULL,	1,	'2014-05-23 16:15:00',	48,	NULL,	'Acknowledgement sms and reference sent to 27748323855',	NULL,	'Hello Lizzette De Klerk, \nThis is to acknowledge receipt of your Query with Reference No# AA0070. \nWe shall continue to notify you of any updates to this Query. ',	NULL,	NULL,	'27748323855'),
-(690,	70,	38,	4,	2,	2,	'2014-05-23 16:15:44',	48,	NULL,	'Query No# AA0070 assigned to <b>Electrical Services Middleburg</b> Department',	NULL,	NULL,	NULL,	NULL,	NULL),
-(691,	70,	NULL,	5,	NULL,	2,	'2014-05-23 16:15:44',	48,	NULL,	'Electrical Services Middleburg Department notified on Query assignment. Email sent to francois.iym@mymtnmail.co.za',	NULL,	'<table style=\"width:700px; margin:0; position:relative;\">	\n    <tr>\n    	<td style=\"padding:20px 25px; margin:0; background-color:#797b79;\"><span style=\"color: #6f6f6f; font-size: 25px; font-weight: bold; height:30px; padding:10px 30px; background-color:#dddddd; display:inline-block; width:auto;\">Q1</span></td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0; padding:25px 25px 25px 15px; background-color:#fafdff; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px; line-height: 1.2em;\">    \n    <tr>\n    	<td>\n    Attn Electrical Services Middleburg,<br /><br />\n    \n    A new Query has been allocated to this Department with details below:<br /><br />\n    \n    <b style=\"color:#42B521;\">Summary</b><br />\n    <b>Reference No: </b>AA0070<br />\n    <b>Issue: </b>Connection<br />\n    <b>Synopsis: </b><br />\n	Connect the electricity<br /><br />\n	\n    <b style=\"color:#42B521;\">Client Details</b><br />\n    <b>Client: </b>Lizzette De Klerk<br />\n    <b>Email: </b><br />\n    <b>Phone: </b>27748323855<br /><br />\n    \n    <b style=\"color:#42B521;\">Query Details</b><br />\n    <b>Date Received: </b>05/23/2014<br />\n    <b>Date Due: </b>05/23/2014<br />\n    <b>Category: </b>Electricity<br />\n    <b>Type: </b>General<br />\n    <b>Source: </b>Phone<br />\n    <b>Receieved By: </b>Linda Diena<br /><br />\n    \n	To view more details about this query click on the link below:<br />\n	http://q1.bsaconsulting.co.za/public/query/view/id/NzA=/<br /><br />\n	\n	If the page fails to open, copy the activation link and paste it in the address window of the browser.<br />\n    \n 			\n            <br />Q1 Support<br />admin@bsaconsulting.co.za        </td>\n    </tr>\n</table>\n<table style=\"width:700px; margin:0;\">	\n    <tr>\n    	<td style=\"padding:0; margin:0; background-color:#797b79; color:#ffffff; padding-top:10px; padding-bottom:10px; padding-left:10px; font-family: Arial, Helvetica, Tahoma, sans-serif; font-size:15px;\"><a style=\"color:#ffffff;\" href=\"http://q1.bsaconsulting.co.za/public\">http://q1.bsaconsulting.co.za/public</a></td>\n    </tr>\n</table>',	'Electrical Services Middleburg Department allocated to Query Ref No# AA0070',	'francois.iym@mymtnmail.co.za',	NULL),
-(692,	70,	NULL,	8,	NULL,	2,	'2014-05-23 16:15:45',	48,	NULL,	'Client notified on Department allocation. Sms sent to 27748323855',	NULL,	'Hello Lizzette De Klerk, \n This is to let you know that the Electrical Services Middleburg Department has been allocated to handle the Query with Ref No# AA0070. \n ',	NULL,	NULL,	'27748323855'),
-(693,	70,	NULL,	NULL,	1,	3,	'2014-05-23 16:18:22',	48,	NULL,	'Status of Query No# AA0070 updated to <b>Logged</b>',	NULL,	'',	NULL,	NULL,	NULL),
-(694,	70,	NULL,	11,	NULL,	3,	'2014-05-23 16:18:23',	48,	NULL,	'Client notified of Status update. Sms sent to 27748323855',	NULL,	'This is to let you know that the status of the Query with Ref No# AA0070 has changed to Logged',	NULL,	NULL,	'27748323855');
-
-DROP TABLE IF EXISTS `ticket_uploads`;
-CREATE TABLE `ticket_uploads` (
-  `id` int(11) unsigned NOT NULL auto_increment,
-  `ticketid` int(11) unsigned default NULL,
-  `filename` varchar(255) default NULL,
-  `type` tinyint(4) unsigned default '1',
-  `dateuploaded` datetime default NULL,
-  `uploadedbyid` int(11) unsigned default NULL,
-  `notes` varchar(1000) default NULL,
-  PRIMARY KEY  (`id`),
-  KEY `fk_ticket_ledger_ticketid` (`ticketid`),
-  KEY `fk_ticket_ledger_uploadedbyid` (`uploadedbyid`),
-  CONSTRAINT `ticket_uploads_ticketid` FOREIGN KEY (`ticketid`) REFERENCES `ticket` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
+-- ----------------------------
+-- Table structure for `useraccount`
+-- ----------------------------
 DROP TABLE IF EXISTS `useraccount`;
 CREATE TABLE `useraccount` (
-  `id` int(11) unsigned NOT NULL auto_increment,
-  `type` tinyint(4) default NULL,
-  `firstname` varchar(50) default NULL,
-  `lastname` varchar(50) default NULL,
-  `othernames` varchar(50) default NULL,
-  `username` varchar(15) default NULL,
-  `email` varchar(50) default NULL,
-  `email2` varchar(50) default NULL,
-  `phone` varchar(15) default NULL,
-  `phone2` varchar(15) default NULL,
-  `password` varchar(50) default '',
-  `gender` tinyint(4) default NULL,
-  `dateofbirth` date default NULL,
-  `isactive` tinyint(4) unsigned default '0',
-  `activationkey` varchar(50) default NULL,
-  `activationdate` datetime default NULL,
-  `agreedtoterms` tinyint(1) unsigned default '0',
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `type` tinyint(4) DEFAULT NULL,
+  `firstname` varchar(50) DEFAULT NULL,
+  `lastname` varchar(50) DEFAULT NULL,
+  `othernames` varchar(50) DEFAULT NULL,
+  `initial` varchar(6) DEFAULT NULL,
+  `username` varchar(15) DEFAULT NULL,
+  `password` varchar(50) DEFAULT '',
+  `email` varchar(50) DEFAULT NULL,
+  `email2` varchar(50) DEFAULT NULL,
+  `trx` varchar(50) DEFAULT NULL,
+  `home` varchar(15) DEFAULT NULL,
+  `work` varchar(15) DEFAULT NULL,
+  `cell` varchar(15) DEFAULT NULL,
+  `ext` varchar(6) DEFAULT NULL,
+  `ssn` varchar(15) DEFAULT NULL,
+  `gender` tinyint(4) DEFAULT NULL,
+  `dateofbirth` date DEFAULT NULL,
+  `isactive` tinyint(4) unsigned DEFAULT '0',
+  `activationkey` varchar(50) DEFAULT NULL,
+  `activationdate` datetime DEFAULT NULL,
+  `agreedtoterms` tinyint(1) unsigned DEFAULT '0',
   `bio` mediumtext,
-  `profilephoto` varchar(255) default '',
-  `notes` varchar(1000) default NULL,
-  `securityquestion` tinyint(4) unsigned default NULL,
-  `securityanswer` tinyint(4) unsigned default NULL,
-  `phone_actkey` varchar(10) default NULL,
-  `phone2_actkey` varchar(10) default NULL,
-  `phone_isactivated` tinyint(4) unsigned default NULL,
-  `phone2_isactivated` tinyint(4) unsigned default NULL,
-  `country` varchar(2) default NULL,
-  `city` varchar(50) default NULL,
-  `town` varchar(50) default NULL,
-  `postalcode` varchar(15) default NULL,
-  `address` varchar(255) default NULL,
-  `isinvited` tinyint(4) unsigned default NULL,
-  `hasacceptedinvite` tinyint(4) unsigned default NULL,
-  `invitedbyid` int(11) unsigned default NULL,
-  `dateinvited` date default NULL,
-  `datecreated` datetime default NULL,
-  `createdby` int(11) unsigned default NULL,
-  `lastupdatedate` datetime default NULL,
-  `lastupdatedby` int(11) unsigned default NULL,
-  `departmentid` int(11) unsigned default NULL,
-  PRIMARY KEY  (`id`),
-  KEY `index_useraccount_isactive` USING BTREE (`isactive`),
+  `profilephoto` varchar(255) DEFAULT '',
+  `notes` varchar(1000) DEFAULT NULL,
+  `securityquestion` tinyint(4) unsigned DEFAULT NULL,
+  `securityanswer` tinyint(4) unsigned DEFAULT NULL,
+  `country` varchar(2) DEFAULT NULL,
+  `city` varchar(255) DEFAULT NULL,
+  `state` varchar(2) DEFAULT NULL,
+  `county` tinyint(4) unsigned DEFAULT NULL,
+  `zipcode` varchar(15) DEFAULT NULL,
+  `addressline1` varchar(255) DEFAULT NULL,
+  `addressline2` varchar(255) DEFAULT NULL,
+  `isinvited` tinyint(4) unsigned DEFAULT NULL,
+  `hasacceptedinvite` tinyint(4) unsigned DEFAULT NULL,
+  `invitedbyid` int(11) unsigned DEFAULT NULL,
+  `dateinvited` date DEFAULT NULL,
+  `datecreated` datetime DEFAULT NULL,
+  `createdby` int(11) unsigned DEFAULT NULL,
+  `lastupdatedate` datetime DEFAULT NULL,
+  `lastupdatedby` int(11) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_useraccount_isactive` (`isactive`) USING BTREE,
   KEY `index_useraccount_username` (`username`),
-  KEY `index_useraccount_phone` (`phone`),
-  KEY `index_useraccount_email` (`email`),
-  KEY `index_useraccount_phone_isactivated` (`phone_isactivated`),
-  KEY `index_useraccount_phone2_isactivated` (`phone2_isactivated`),
-  KEY `fk_profile_departmentid` (`departmentid`),
-  CONSTRAINT `fk_profile_departmentid` FOREIGN KEY (`departmentid`) REFERENCES `department` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `index_useraccount_email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 
-INSERT INTO `useraccount` (`id`, `type`, `firstname`, `lastname`, `othernames`, `username`, `email`, `email2`, `phone`, `phone2`, `password`, `gender`, `dateofbirth`, `isactive`, `activationkey`, `activationdate`, `agreedtoterms`, `bio`, `profilephoto`, `notes`, `securityquestion`, `securityanswer`, `phone_actkey`, `phone2_actkey`, `phone_isactivated`, `phone2_isactivated`, `country`, `city`, `town`, `postalcode`, `address`, `isinvited`, `hasacceptedinvite`, `invitedbyid`, `dateinvited`, `datecreated`, `createdby`, `lastupdatedate`, `lastupdatedby`, `departmentid`) VALUES
-(1,	1,	'Unathi',	'Torico',	'Peterson',	'amalinzi',	'admin@bsaconsulting.co.za',	'',	'0836246789',	'',	'538dfdc60c01d6cfdc326e7eaa6a0ff45875887f',	2,	'1950-01-01',	1,	'',	'2013-10-01 00:00:00',	1,	'',	'1397411346.jpg',	'',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'ZA',	'East London',	'Chiselhurst',	'5247',	'3 Linden Road Chiselhurst',	NULL,	0,	NULL,	NULL,	'2013-09-27 15:23:38',	1,	'2014-04-13 19:51:12',	1,	NULL),
-(39,	1,	'Jin',	'Browning',	NULL,	'jbrowning',	'm.herman@fituganda.com',	NULL,	'',	NULL,	'5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8',	1,	NULL,	1,	'',	'2014-04-04 15:24:29',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'',	'',	'',	'',	NULL,	0,	1,	'2014-03-30',	'2014-03-30 21:43:57',	1,	'2014-05-24 12:53:17',	1,	NULL),
-(40,	3,	'test',	'department',	NULL,	'department',	'hmanmstw@gmail.com',	NULL,	'1234567892',	NULL,	'5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8',	1,	NULL,	1,	'',	'2014-04-04 15:29:38',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	39,	'2014-04-04',	'2014-04-04 15:26:30',	1,	'2014-04-04 15:29:38',	NULL,	1),
-(41,	2,	'test',	'customer care',	NULL,	'custocare',	'hmusiitwa@outlook.com',	NULL,	'1254878584',	NULL,	'5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8',	1,	NULL,	1,	'',	'2014-04-04 15:30:32',	1,	NULL,	'1396614748.jpg',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	39,	'2014-04-04',	'2014-04-04 15:28:46',	1,	'2014-04-04 15:32:29',	NULL,	NULL),
-(42,	7,	'Amos',	'Mthetho',	NULL,	'amos001',	'amos@iym.gov.za',	NULL,	'0734678798',	NULL,	'f7c3bc1d808e04732adf679965ccc34ca7ae3441',	1,	NULL,	1,	'',	'2014-04-06 17:06:42',	1,	NULL,	'1396796352.jpg',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nP.O. Box 24\r\nCradock\r\n5880',	NULL,	0,	1,	'2014-04-05',	'2014-04-05 09:48:38',	1,	'2014-04-30 08:56:53',	1,	NULL),
-(43,	3,	'Mtheza',	'Sipunzi',	NULL,	'mteza001',	'mteza@iym.gov.za',	NULL,	'0715808668',	NULL,	'85512f17e19d85600a7e92175fc16d0c3d900661',	1,	NULL,	1,	'',	'2014-04-07 09:27:35',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nP.O. Box 24\r\nCradock\r\n5880',	NULL,	0,	1,	'2014-04-07',	'2014-04-05 10:05:16',	1,	'2014-04-07 09:27:35',	1,	22),
-(44,	3,	'Lulama',	'Mashiya',	NULL,	'mashiya001',	'mashiyald@gmail.com',	NULL,	'0760783803',	NULL,	'818123518bfcc05ddda99f9e39b91cf9c331b5a6',	1,	NULL,	1,	'',	'2014-04-08 20:20:38',	1,	NULL,	'1396992377.jpg',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Ixuba Yethemba Municipality \r\nTechnical Services\r\nHigh Street\r\nCradock\r\n5880',	NULL,	0,	1,	'2014-04-07',	'2014-04-07 17:36:02',	1,	'2014-04-08 23:26:17',	NULL,	23),
-(45,	2,	'Nomzamo',	'Myo',	NULL,	'Nomzamo001',	'nomzamo@iym.gov.za',	NULL,	'0822964667',	NULL,	'5f249f96f0ab043c9d82cf489bee827fff425f06',	2,	NULL,	1,	'',	'2014-04-24 09:14:45',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Ixuba Yethemba Municipality\r\nTechnical Services\r\nHigh Street Cradock\r\n5880',	NULL,	0,	1,	'2014-04-14',	'2014-04-07 17:39:04',	1,	'2014-04-24 09:14:45',	1,	NULL),
-(46,	3,	'Avela',	'Mashaba',	NULL,	'Avela001',	'avelamashaba@yahoo.com',	NULL,	'0722619996',	NULL,	'71852e6d715b0d46c404f53a97f4b804ccd80c24',	1,	NULL,	1,	'',	'2014-04-24 09:04:31',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Ixuba Yethemba Municipality\r\nTechnical Services\r\nHigh Street\r\nCradock\r\n5880',	NULL,	0,	1,	'2014-04-14',	'2014-04-07 17:48:03',	1,	'2014-04-24 09:04:31',	1,	33),
-(47,	2,	'Ncedisa',	'Sindelo',	NULL,	'ncedisa001',	'ncedisa_sindelo@yahoo.com',	NULL,	'0796272759',	NULL,	'0eef1471010fd9c398da1a8070e0a4e1049d3802',	2,	NULL,	1,	'',	'2014-04-10 09:48:09',	1,	NULL,	'1397128657.jpg',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nTechnical Services\r\nHigh Street\r\nCradock\r\n5880',	NULL,	0,	1,	'2014-04-10',	'2014-04-10 08:54:36',	1,	'2014-04-10 13:17:37',	1,	NULL),
-(48,	2,	'Linda',	'Diena',	NULL,	'linda001',	'linda@iym.gov.za',	NULL,	'0787758486',	NULL,	'30ad6a6cf299ddcbda5695bfd9ad40d62e64b886',	2,	NULL,	1,	'',	'2014-05-22 12:23:13',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Middleburg',	'Middleburg',	'',	'Inxuba Yethemba Municipality\r\nTechnical Services Department\r\nMidlleburg',	NULL,	0,	1,	'2014-04-10',	'2014-04-10 09:13:35',	1,	'2014-05-22 12:23:13',	1,	NULL),
-(49,	7,	'Lennox',	'Sobahle',	NULL,	'lennox001',	'lennox@iym.gov.za',	NULL,	'0488015000',	NULL,	'e3a7bd45945072f9ad0b0f275df3d7cf60d7a9ea',	1,	NULL,	1,	'',	'2014-04-22 11:44:09',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nNo 1 JA Calata Street\r\nCradock\r\n5880',	NULL,	0,	1,	'2014-04-14',	'2014-04-10 11:24:43',	1,	'2014-04-22 11:44:09',	1,	NULL),
-(50,	7,	'Bafo',	'Sigenu',	NULL,	'Bafo001',	'thanduxolo@iym.gov.za',	NULL,	'0488015045',	NULL,	'ef995496fc6aab4961b4688f7231cf3120fc36b7',	1,	NULL,	1,	'',	'2014-04-10 16:27:07',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nNo. 1 Calata Street\r\nCradock\r\n5880',	NULL,	0,	1,	'2014-04-10',	'2014-04-10 15:37:35',	1,	'2014-04-10 16:27:07',	1,	NULL),
-(51,	7,	'Lulamile ',	'Joyiyasi',	NULL,	'lulamile001',	'lulamile@iym.gov.za',	NULL,	'0488015000',	NULL,	'',	1,	NULL,	0,	'2bf9c8',	NULL,	0,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nNo. 1 Calata Street\r\nCradock\r\n5880',	1,	0,	1,	'2014-05-20',	'2014-04-10 15:41:31',	1,	'2014-05-20 19:05:29',	1,	NULL),
-(52,	7,	'Noluthando',	'Majiba',	NULL,	'noluthando001',	'majiba@iym.gov.za',	NULL,	'0488015000',	NULL,	'03e30b5dae0aaded715f0acbcc18dc471d11a1ab',	2,	NULL,	1,	'',	'2014-04-22 11:26:11',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nNo. 1 Calata Street\r\nCradock\r\n5880',	NULL,	0,	1,	'2014-04-22',	'2014-04-10 15:43:52',	1,	'2014-04-22 11:26:11',	1,	NULL),
-(53,	6,	'Mzwandile',	'Tantsi',	NULL,	'mzwandile001',	'mzwandile@iym.gov.za',	NULL,	'0488015000',	NULL,	'5027f39a0337ab35f5174a2a89f1eba8a4332f6d',	1,	NULL,	1,	'',	'2014-04-15 14:46:04',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nNo. 1 Calata Street\r\nCradock\r\n5880',	NULL,	0,	1,	'2014-04-14',	'2014-04-10 15:48:40',	1,	'2014-04-15 14:46:04',	1,	NULL),
-(54,	2,	'Khanyisile',	'Claasen',	NULL,	'khanyi001',	'khanyiclaasen@iym.gov.za',	NULL,	'0488015000',	NULL,	'8d6e34f987851aa599257d3831a1af040886842f',	2,	NULL,	1,	'',	'2014-04-10 16:08:17',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nNo. 1 Calata Street\r\nCradock\r\n5880',	NULL,	0,	1,	'2014-04-10',	'2014-04-10 16:00:18',	1,	'2014-04-10 16:08:17',	1,	NULL),
-(55,	3,	'Francois',	'Joubert',	NULL,	'francois001',	'francois.iym@mymtnmail.co.za',	NULL,	'0498021380',	NULL,	'8eae5a81b498b6901ac2960d91e28a8de19d8e8c',	1,	NULL,	1,	'',	'2014-04-11 09:47:38',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Middleburg',	'Middleburg',	'5900',	'Inxuba Yethemba Municipality\r\nElectrical section\r\nVin Niekerk Street\r\nMiddleburg\r\n5900',	NULL,	0,	1,	'2014-04-11',	'2014-04-11 08:56:40',	1,	'2014-04-11 09:47:38',	1,	22),
-(56,	2,	'Portia',	'Nyembe',	NULL,	'portia001',	'portia@iym.gov.za',	NULL,	'0488015084',	NULL,	'20352ce9e0b2336023b3def7fc7095910d3a0a3b',	2,	NULL,	1,	'',	'2014-04-11 10:55:09',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nNo. 1 Calata Street\r\nCradock\r\n5880',	NULL,	0,	1,	'2014-04-11',	'2014-04-11 10:23:33',	1,	'2014-04-11 10:55:09',	NULL,	NULL),
-(57,	3,	'Siyabulela',	'Salman',	NULL,	'siyabulela001',	'siyabulela@iym.gov.za',	NULL,	'0488015094',	NULL,	'fe32ba2f477d5b12d8de0753ba0e876daa0bccdc',	1,	NULL,	1,	'',	'2014-04-11 11:06:25',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nNo. 1 Calata Street\r\nCradock\r\n5880',	NULL,	0,	1,	'2014-04-11',	'2014-04-11 10:26:56',	1,	'2014-04-11 11:06:25',	1,	15),
-(58,	3,	'Lineo',	'Bebeza',	NULL,	'lineo001',	'lineobebeza@gmail.com',	NULL,	'0488015000',	NULL,	'',	2,	NULL,	0,	'7117a4',	NULL,	0,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nNo. 1 Calata Street\r\nCradock\r\n5880',	1,	0,	1,	'2014-05-20',	'2014-04-11 10:38:09',	1,	'2014-05-20 19:04:37',	1,	27),
-(59,	3,	'Nokuzola',	'James',	NULL,	'nokuzola001',	'zola@iym.gov.za',	NULL,	'0488015089',	NULL,	'2eb35aa62cccb9eae7da326426819477d25aebc5',	2,	NULL,	1,	'',	'2014-04-14 12:07:10',	1,	NULL,	'1397470216.jpg',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nNo. 1 Calata Street\r\nCradock\r\n5880',	NULL,	0,	1,	'2014-04-11',	'2014-04-11 10:43:42',	1,	'2014-04-14 12:10:16',	NULL,	10),
-(61,	3,	'Frieda',	'De Jager',	NULL,	'frieda001',	'frieda@iym.gov.za',	NULL,	'0488015117',	NULL,	'81506e60eee71dc76c4134679bb4df3d66491c5e',	2,	NULL,	1,	'',	'2014-05-15 10:13:10',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nNo. 1 Calata Street \r\nCradock\r\n5880',	1,	0,	1,	'2014-04-14',	'2014-04-11 16:18:00',	1,	'2014-05-15 10:13:10',	1,	6),
-(62,	2,	'Nondumiso',	'Klaas',	NULL,	'nomdumiso001',	'nondumiso@iym.gov.za',	NULL,	'0488015019',	NULL,	'',	2,	NULL,	0,	'c4ed88',	NULL,	0,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nNo. 1 Calata Street \r\nCradock\r\n5880',	1,	0,	70,	'2014-05-14',	'2014-04-11 16:28:11',	1,	'2014-05-14 12:52:42',	70,	NULL),
-(63,	3,	'Renthia',	'Crouse',	NULL,	'renwil123',	'renthia@iym.gov.za',	NULL,	'0835093924',	NULL,	'd96e1bcbfb79586ef9bff4163a0d5d0c00920320',	2,	NULL,	1,	'',	'2014-04-24 12:00:46',	1,	NULL,	'1397541834.jpg',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nNo. 1 Calata Street \r\nCradock\r\n5880',	NULL,	0,	1,	'2014-04-11',	'2014-04-11 16:32:06',	1,	'2014-04-24 12:00:46',	NULL,	1),
-(64,	3,	'Ludwe',	'Hanana',	NULL,	'ludwe001',	'ludwe@iym.gov.za',	NULL,	'0488015015',	NULL,	'0584499f22e80f1d21fe6c0aab6d1540c77a9ff4',	1,	NULL,	1,	'',	'2014-04-23 09:54:23',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nNo. 1 Calata Street \r\nCradock\r\n5880',	NULL,	0,	1,	'2014-04-14',	'2014-04-11 16:40:05',	1,	'2014-04-23 09:54:23',	1,	1),
-(65,	3,	'Alda-Lea',	'Hufkie',	NULL,	'alda001',	'alda@iym.gov.za',	NULL,	'0488015031',	NULL,	'bd43603cdea5b89753c2db1f8887bf7231745d3b',	2,	NULL,	1,	'',	'2014-04-25 08:41:22',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nNo. 1 Calata Street \r\nCradock\r\n5880',	NULL,	0,	1,	'2014-04-14',	'2014-04-11 16:46:10',	1,	'2014-04-25 08:41:22',	1,	1),
-(66,	6,	'Nyameka',	'Goniwe',	NULL,	'nyameka001',	'nyameka@iym.gov.za',	NULL,	'0488015000',	NULL,	'55f7cf422ef0465d5012f983441b17c88583ce20',	2,	NULL,	1,	'',	'2014-04-22 14:38:14',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nNo. 1 Calata Street \r\nCradock\r\n5880',	NULL,	0,	1,	'2014-04-22',	'2014-04-11 16:56:16',	1,	'2014-04-22 14:38:14',	1,	NULL),
-(67,	2,	'Sonwabise',	'Panziso',	NULL,	'sosh001',	'sosh@iym.gov.za',	NULL,	'0488015119',	NULL,	'72643a955463dfb52fe11f0161050cb31c517370',	1,	NULL,	1,	'',	'2014-04-22 08:55:15',	1,	NULL,	'1398159533.jpg',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nNo. 1 Calata Street\r\nCradock\r\n5880',	NULL,	0,	1,	'2014-04-22',	'2014-04-22 08:50:32',	1,	'2014-04-22 11:38:53',	NULL,	NULL),
-(68,	2,	'Siviwe',	'Lemoen',	NULL,	'siviwe001',	'slemoen1@gmail.com',	NULL,	'0783252997',	NULL,	'2ff5e238f0a783b1c4e1cb6abe837ec0a187fc63',	1,	NULL,	1,	'',	'2014-04-24 11:43:40',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nNo. 1 Calata Street\r\nCradock\r\n5880',	NULL,	0,	1,	'2014-04-24',	'2014-04-24 10:33:04',	1,	'2014-04-24 11:43:40',	1,	NULL),
-(69,	3,	'Lucille',	'Charmaine',	NULL,	'lucille001',	'lucille@iym.gov.za',	NULL,	'0733770290',	NULL,	'0f418541e056e5cf804c4ce89755c4670358df0b',	2,	NULL,	1,	'',	'2014-04-26 09:26:11',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nNo. 1 Calata Street\r\nCradock\r\n5880',	NULL,	0,	1,	'2014-04-24',	'2014-04-24 10:44:16',	1,	'2014-04-26 09:26:11',	NULL,	29),
-(70,	1,	'Sonwabo',	'Luzipo',	NULL,	'sonwabo001',	'sonwabo@iym.gov.za',	NULL,	'0732125608',	NULL,	'92412a4a94f8d8463c8e124e749474888331e838',	1,	NULL,	1,	'',	'2014-04-29 08:32:58',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nNumber 1 Calata Street\r\nCradock\r\n5880',	NULL,	0,	1,	'2014-04-25',	'2014-04-25 16:38:37',	1,	'2014-04-29 08:32:58',	NULL,	NULL),
-(71,	6,	'Lena',	'Davids',	NULL,	'lena001',	'lena@iym.gov.za',	NULL,	'0743771704',	NULL,	'',	2,	NULL,	0,	'2861a3',	NULL,	0,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock',	'Cradock',	'5880',	'Inxuba Yethemba Municipality\r\nNo. 1 Calata Street\r\nCradock\r\n5880',	1,	0,	1,	'2014-05-20',	'2014-04-29 17:41:55',	1,	'2014-05-20 19:03:19',	1,	NULL),
-(72,	2,	'Thando',	'Sindelo',	NULL,	'thando001',	'thando@iym.gov.za',	NULL,	'0835468723',	NULL,	'ed82d78e50c7136b01146bfcbae901663947af6f',	1,	NULL,	1,	'',	'2014-05-14 13:08:05',	1,	NULL,	'',	NULL,	NULL,	NULL,	NULL,	NULL,	0,	0,	'ZA',	'Cradock ',	'Cradock',	'5881',	'24 Qhina Street\r\nLingelihle ',	NULL,	0,	1,	'2014-05-14',	'2014-05-14 13:05:04',	1,	'2014-05-14 13:15:06',	1,	NULL);
+-- ----------------------------
+-- Records of useraccount
+-- ----------------------------
+INSERT INTO `useraccount` VALUES ('1', '1', 'Edward ', 'Lawrence', 'Peterson', '', 'admin', '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8', 'admin@devmail.infomacorp.com', '', null, '(609) 510-3388', '', '', '', '', '1', '1950-01-01', '1', '', '2013-10-01 00:00:00', '1', '', '1401812058.jpg', '', null, null, 'US', '', 'NJ', '5', '', '', '', null, '0', null, null, '2014-05-00 00:00:00', '1', '2014-06-03 19:21:53', '1');
+INSERT INTO `useraccount` VALUES ('2', '4', 'Jin', 'Browning', null, null, 'jbrowning', '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8', 'test1@devmail.infomacorp.com', null, null, '(609) 209-1001', null, null, null, null, '1', null, '1', '', '2014-04-04 15:24:29', '1', null, '', null, null, null, 'US', '', 'NJ', '1', null, null, null, null, '0', null, null, '2014-05-21 15:24:38', '1', '2014-05-24 12:53:17', '1');
+INSERT INTO `useraccount` VALUES ('3', '2', 'Wing', 'Graves', null, null, 'wgraves', '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8', 'test2@devmail.infomacorp.com', null, null, '(609) 209-1002', null, null, null, null, '1', null, '1', '', '2014-04-08 20:20:38', '1', null, null, null, null, null, 'US', null, 'NJ', '14', null, null, null, null, '0', null, null, '2014-05-22 15:23:38', '1', '2014-04-08 23:26:17', null);
+INSERT INTO `useraccount` VALUES ('4', '2', 'Brownell', 'Park', null, null, 'bpark', '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8', 'test3@devmail.infomacorp.com', null, null, '(609) 209-1003', null, null, null, null, '1', null, '1', '', '2014-04-24 09:14:45', '1', null, '', null, null, null, 'US', null, 'NJ', '9', null, null, null, null, '0', null, null, '2014-05-23 15:23:38', '1', '2014-04-24 09:14:45', '1');
+INSERT INTO `useraccount` VALUES ('5', '3', 'Adrine', 'Max', null, null, 'amax', '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8', 'test4@devmail.infomacorp.com', null, null, '(609) 209-1004', null, null, null, null, '1', null, '1', '', '2014-04-24 09:04:31', '1', null, '', null, null, null, 'US', null, 'NJ', '2', null, null, null, null, '0', null, null, '2014-05-24 15:23:38', '1', '2014-04-24 09:04:31', '1');
+INSERT INTO `useraccount` VALUES ('6', '2', 'Linda', 'Diena', null, null, 'lind', '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8', 'test5@devmail.infomacorp.com', null, null, '(609) 209-1005', null, null, null, null, '2', null, '1', '', '2014-05-22 12:23:13', '1', null, '', null, null, null, 'US', null, 'NJ', '9', null, null, null, null, '0', null, null, '2014-05-25 15:23:38', '1', '2014-05-22 12:23:13', '1');
 
-DROP TABLE IF EXISTS `userdetail`;
-CREATE TABLE `userdetail` (
-  `id` int(11) unsigned NOT NULL auto_increment,
-  `type` tinyint(4) unsigned default NULL,
-  `userid` int(11) unsigned default NULL,
-  `clientid` int(11) unsigned default NULL,
-  `departmentid` int(11) unsigned default NULL,
-  PRIMARY KEY  (`id`),
-  KEY `fk_userdetail_userid` (`userid`),
-  KEY `fk_userdetail_clientid` (`clientid`),
-  KEY `fk_userdetail_departmentid` (`departmentid`),
-  KEY `fk_userdetail_type` (`type`),
-  CONSTRAINT `fk_userdetail_clientid` FOREIGN KEY (`clientid`) REFERENCES `client` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_userdetail_departmentid` FOREIGN KEY (`departmentid`) REFERENCES `department` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_userdetail_userid` FOREIGN KEY (`userid`) REFERENCES `useraccount` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+-- ----------------------------
+-- Table structure for `voucher`
+-- ----------------------------
+DROP TABLE IF EXISTS `voucher`;
+CREATE TABLE `voucher` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `parentid` int(11) unsigned DEFAULT NULL,
+  `type` tinyint(4) unsigned DEFAULT '1',
+  `clientid` int(11) unsigned DEFAULT NULL,
+  `referralid` int(11) unsigned DEFAULT NULL,
+  `servicetypeid` int(11) unsigned DEFAULT NULL,
+  `description` varchar(500) DEFAULT NULL,
+  `voucherno` varchar(50) DEFAULT NULL,
+  `faprefix` varchar(15) DEFAULT NULL,
+  `favoucherno` varchar(50) DEFAULT NULL,
+  `dateapproved` date DEFAULT NULL,
+  `startdate` date DEFAULT NULL,
+  `invoicedate` date DEFAULT NULL,
+  `enddate` date DEFAULT NULL,
+  `status` tinyint(4) unsigned DEFAULT NULL,
+  `hours` decimal(10,2) unsigned DEFAULT NULL,
+  `days` tinyint(4) unsigned DEFAULT NULL,
+  `rate` decimal(10,2) unsigned DEFAULT NULL,
+  `employmentgoal` varchar(1000) DEFAULT NULL,
+  `notes` varchar(1000) DEFAULT NULL,
+  `isrenewable` tinyint(4) unsigned DEFAULT NULL,
+  `datecreated` datetime DEFAULT NULL,
+  `createdby` int(11) unsigned DEFAULT NULL,
+  `lastupdatedate` datetime DEFAULT NULL,
+  `lastupdatedby` int(11) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_voucher_clientid` (`clientid`),
+  KEY `fk_voucher_parentid` (`parentid`),
+  KEY `fk_voucher_servicetypeid` (`servicetypeid`),
+  KEY `fk_voucher_type` (`type`),
+  KEY `fk_voucher_status` (`status`),
+  CONSTRAINT `fk_voucher_clientid` FOREIGN KEY (`clientid`) REFERENCES `client` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_voucher_parentid` FOREIGN KEY (`parentid`) REFERENCES `voucher` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_voucher_servicetypeid` FOREIGN KEY (`servicetypeid`) REFERENCES `service` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
-
--- 2014-05-24 13:16:14
+-- ----------------------------
+-- Records of voucher
+-- ----------------------------
+INSERT INTO `voucher` VALUES ('1', null, '1', '12', null, '3', 'preplacement evaluation and intensive monitoring', 'TS0005', 'FA-', null, '2014-03-04', '2014-03-10', null, '2014-07-31', '1', '20.00', '30', '51.00', null, null, null, '2014-05-29 17:20:05', '1', '2014-07-03 12:14:53', '1');
+INSERT INTO `voucher` VALUES ('2', '1', '2', '12', null, '13', null, '', null, 'FA-Jun-2014', '2014-06-10', '2014-06-02', null, '2014-06-30', '2', '12.00', '30', '55.00', null, null, '0', '2014-06-17 16:28:31', '1', '2014-06-17 18:06:59', null);

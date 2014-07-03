@@ -90,6 +90,10 @@
 .padding20 {
     padding: 20px;
 }
+.divider2 {
+    clear: both;
+    height: 2px;
+}
 .divider5 {
     clear: both;
     height: 5px;
@@ -198,6 +202,9 @@
 .85width, td.85width, .form-horizontal input.85width, .form-horizontal select.85width {
 	width:85%;
 }
+.90width, td.90width, select.90width, input.90width, .form-control.90width {
+	width:90%;
+}
 .94width, td.94width, select.94width, .form-horizontal input.94width  {
 	width:94%;
 }
@@ -274,7 +281,7 @@ select.auto, .auto, td.auto, table.auto {
 	font-size:12px;
 	font-weight:normal;
 }
-.hidden, .hidden_row, .hidden_column, .hidden_container {
+.hidden, .hidden_row, .hidden_column, .hidden_container, .hidden_row_input, .hidden_row_med, .hidden_row_person, .hidden_row_family, .hidden_row_educ, .hidden_row_job, .hidden_row_ref {
 	display:none;
 }
 .nowrapping, td.nowrapping, th.nowrapping {
@@ -614,7 +621,7 @@ li.display_box.selected {
 .peoplelist .peoplewrapper {
     background: none repeat scroll 0 0 #FFFFFF;
     border: 1px solid #CCCCCC;
-    height: 140px;
+    height: 150px;
     margin-bottom: 20px;
     padding: 15px;
 }

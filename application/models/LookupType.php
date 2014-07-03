@@ -103,22 +103,7 @@ class LookupType extends BaseEntity  {
 		$conn = Doctrine_Manager::connection();
 		$resultvalues = $conn->fetchAll("SELECT * FROM lookuptypevalue WHERE lookuptypeid = '".$this->getID()."' order by lookupvaluedescription asc ");
 		if($this->getName() == 'COMMODITY_CATEGORIES'){
-			$resultvalues = $conn->fetchAll("SELECT c.id as id, c.id as lookuptypevalue, c.name as lookupvaluedescription FROM commodity_category c order by lookupvaluedescription asc ");
-		}
-		if($this->getName() == 'COMMODITY_UNITS'){
-			$resultvalues = $conn->fetchAll("SELECT c.id as id, c.id as lookuptypevalue, c.name as lookupvaluedescription FROM commodity_unit c order by lookupvaluedescription asc ");
-		} 
-		if($this->getName() == 'FORUM_CATEGORIES'){
-			$resultvalues = $conn->fetchAll("SELECT c.value as id, c.value as lookuptypevalue, c.name as lookupvaluedescription, c.id as lineid FROM category c WHERE c.parentid = 115 order by lookupvaluedescription asc ");
-		}
-		if($this->getName() == 'DIRECTORY_CATEGORIES' || $this->getName() == 'INFOTRADE_SECTORS'){
-			$resultvalues = $conn->fetchAll("SELECT c.id as id, c.id as lookuptypevalue, c.name as lookupvaluedescription FROM sector c WHERE c.status = 1 order by lookupvaluedescription asc ");
-		}
-		if($this->getName() == 'PRIORITY_COMMODITIES'){
-			$resultvalues = $conn->fetchAll("SELECT c.id as id, c.id as lookuptypevalue, c.name as lookupvaluedescription FROM commodity c WHERE c.ispriority = 1 order by lookupvaluedescription asc ");
-		}
-		if($this->getName() == 'PRICE_CATEGORIES'){
-			$resultvalues = $conn->fetchAll("SELECT c.id as id, c.id as lookuptypevalue, c.name as lookupvaluedescription FROM price_category c WHERE c.id <> '' order by lookupvaluedescription asc ");
+			// $resultvalues = $conn->fetchAll("SELECT c.id as id, c.id as lookuptypevalue, c.name as lookupvaluedescription FROM commodity_category c order by lookupvaluedescription asc ");
 		}
 		return $resultvalues;	
 	}

@@ -7,12 +7,12 @@ class LookupTypeValue extends BaseEntity {
 		parent::setTableDefinition();
 		
 		$this->setTableName('lookuptypevalue');
-		$this->hasColumn('lookuptypeid', 'integer', null, array('notnull' => true, 'notblank' => true));
-		$this->hasColumn('lookuptypevalue', 'string', 50, array('notnull' => true, 'notblank' => true));
+		$this->hasColumn('lookuptypeid', 'integer', null, array('notblank' => true));
+		$this->hasColumn('lookuptypevalue', 'string', 50, array('notblank' => true));
 		$this->hasColumn('lookupvaluedescription', 'string', 500);
-		
-		# add the unique constraints
-		// $this->unique("lookuptypeid", "lookuptypevalue");
+		$this->hasColumn('alias', 'string', 500);
+		$this->hasColumn('code', 'string', 500);
+		$this->hasColumn('info', 'string', 65535);
 	}
 	
 	function setUp() {

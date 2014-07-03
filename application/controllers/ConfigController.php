@@ -1,5 +1,5 @@
 <?php
-class ConfigController extends SecureController   {
+class ConfigController extends IndexController   {
 
 	/**
 	 * @see SecureController::getResourceForACL()
@@ -18,27 +18,27 @@ class ConfigController extends SecureController   {
 	 */
 	function getActionforACL() {
 		$action = strtolower($this->getRequest()->getActionName()); 
-		if($action == "processcategories" || $action == "processglobalconfig" || $action == "processpicture" || $action == "croppicture"){
+		if($action == "processvariables" || $action == "processglobal"){
 			return ACTION_EDIT;
 		}
-		if($action == "categories" || $action == "globalconfig") {
+		if($action == "variables" || $action == "global") {
 			return ACTION_LIST; 
 			// return ACTION_VIEW;
 		}
 		return parent::getActionforACL(); 
 	}
 	
-	function categoriesAction(){
+	function variablesAction(){
     	// parent::listAction();
     }
     
-	function categoriessearchAction(){
-		$this->_helper->redirector->gotoSimple("categories", "config", 
+	function variablessearchAction(){
+		$this->_helper->redirector->gotoSimple("variables", "config", 
     											$this->getRequest()->getModuleName(),
     											array_remove_empty(array_merge_maintain_keys($this->_getAllParams(), $this->getRequest()->getQuery())));
 	}
 	
-	function processcategoriesAction(){
+	function processvariablesAction(){
 		$session = SessionWrapper::getInstance(); 
      	$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender(TRUE);
@@ -51,110 +51,49 @@ class ConfigController extends SecureController   {
 			$haserror = true;
 			$session->setVar(ERROR_MESSAGE, 'Error: No value specified for addition');
 			$session->setVar(FORM_VALUES, $formvalues);
-			$this->_helper->redirector->gotoUrl($this->view->baseUrl('config/categories/'.$formvalues['lookupid']));
+			$this->_helper->redirector->gotoUrl($this->view->baseUrl('config/variables/'.$formvalues['lookupid']));
 		}
-		$successurl = $this->view->baseUrl('config/categories/type/'.$formvalues['lookupid']);
+		$successurl = $this->view->baseUrl('config/variables/type/'.$formvalues['lookupid']);
 		$type_ext = '';
 		// debugMessage()
 		// exit();
 		switch ($formvalues['lookupid']){
-			case 10:
-			case 14:
-			case 17:
-			case 18:
-			case 20:
-				if($formvalues['lookupid'] == 17){
-					$classname = 'CommodityUnit';
-				}
-				if($formvalues['lookupid'] == 18){
-					$classname = 'CommodityCategory';
-				}
-				if($formvalues['lookupid'] == 10){
-					$classname = 'Category';
-				}
-				if($formvalues['lookupid'] == 20 || $formvalues['lookupid'] == 14){
-					$classname = 'Sector';
-				}
-				$object = new $classname();
-				$dataarray = array('id' => $formvalues['id'],
-									'name' => trim($formvalues['value']),
-									'createdby' => $session->getVar('userid')
-							);
-				if(!isArrayKeyAnEmptyString('parentid', $formvalues)){
-					$dataarray['parentid'] = $formvalues['parentid'];
-				}
-				if($formvalues['lookupid'] == 10){
-					$dataarray['parentid'] = 115;
-					$dataarray['type'] = 4;
-					$dataarray['value'] = $formvalues['index'];
-				}
-				if($formvalues['lookupid'] == 20 || $formvalues['lookupid'] == 14){
-					$dataarray['status'] = 1;
-					$dataarray['sortorder'] = $formvalues['index'];
-				}			
-				if(!isArrayKeyAnEmptyString('id', $formvalues)){
-					$object->populate($formvalues['id']);
-				}
-				
-				$object->processPost($dataarray);
-				/*debugMessage($object->toArray());
-				debugMessage('errors are '.$object->getErrorStackAsString()); exit();*/
-				 
-				if($object->hasError()){
-					$haserror = true;
-					$session->setVar(ERROR_MESSAGE, $object->getErrorStackAsString());
-					$session->setVar(FORM_VALUES, $formvalues);
-				} else {
-					try {
-						$object->save();
-						if(isArrayKeyAnEmptyString('id', $formvalues)){
-							$session->setVar(SUCCESS_MESSAGE, "Successfully saved");
-						} else {
-							$session->setVar(SUCCESS_MESSAGE, "Successfully updated");
-						}
-						$successurl = $this->view->baseUrl('config/categories/type/'.$formvalues['lookupid']);
-					} catch (Exception $e) {
-						$session->setVar(ERROR_MESSAGE, $e->getMessage()."<br />".$object->getErrorStackAsString());
-						$session->setVar(FORM_VALUES, $formvalues);
-					}
-				}
-				break;
-				
 			default:
-				$lookupvalue = new LookupTypeValue();
-				$dataarray = array('id' => $formvalues['id'],
-									'lookuptypeid' => $formvalues['lookupid'], 
-									'lookuptypevalue' => $formvalues['index'], 
-									'lookupvaluedescription' => trim($formvalues['value']),
-									'createdby' => $session->getVar('userid')
-							);
-				
-				if(!isArrayKeyAnEmptyString('id', $formvalues)){
-					$lookupvalue->populate($formvalues['id']);
-				}
-				// unset($dataarray['id']);
-				$lookupvalue->processPost($dataarray);
-				/*debugMessage($lookupvalue->toArray());
-		    	debugMessage('errors are '.$lookupvalue->getErrorStackAsString());*/
-				
-				if($lookupvalue->hasError()){
-					$haserror = true;
-					$session->setVar(ERROR_MESSAGE, $lookupvalue->getErrorStackAsString());
-					$session->setVar(FORM_VALUES, $formvalues);
-				} else {
-					try {
-						$lookupvalue->save();
-						if(isArrayKeyAnEmptyString('id', $formvalues)){
-							$session->setVar(SUCCESS_MESSAGE, "Successfully saved");
-						} else {
-							$session->setVar(SUCCESS_MESSAGE, "Successfully updated");
-						}
-					} catch (Exception $e) {
-						$session->setVar(ERROR_MESSAGE, $e->getMessage()."<br />".$lookupvalue->getErrorStackAsString());
-						$session->setVar(FORM_VALUES, $formvalues);
+			$lookupvalue = new LookupTypeValue();
+			$dataarray = array('id' => $formvalues['id'],
+								'lookuptypeid' => $formvalues['lookupid'], 
+								'lookuptypevalue' => $formvalues['index'], 
+								'lookupvaluedescription' => addslashes(decode(trim($formvalues['value']))),
+								'alias' => trim($formvalues['alias']),
+								'createdby' => $session->getVar('userid')
+						);
+			
+			if(!isArrayKeyAnEmptyString('id', $formvalues)){
+				$lookupvalue->populate($formvalues['id']);
+			}
+			// unset($dataarray['id']);
+			$lookupvalue->processPost($dataarray);
+			debugMessage($lookupvalue->toArray());
+	    	debugMessage('errors are '.$lookupvalue->getErrorStackAsString()); // exit();
+			
+			if($lookupvalue->hasError()){
+				$haserror = true;
+				$session->setVar(ERROR_MESSAGE, $lookupvalue->getErrorStackAsString());
+				$session->setVar(FORM_VALUES, $formvalues);
+			} else {
+				try {
+					$lookupvalue->save();
+					if(isArrayKeyAnEmptyString('id', $formvalues)){
+						$session->setVar(SUCCESS_MESSAGE, "Successfully saved");
+					} else {
+						$session->setVar(SUCCESS_MESSAGE, "Successfully updated");
 					}
+				} catch (Exception $e) {
+					$session->setVar(ERROR_MESSAGE, $e->getMessage()."<br />".$lookupvalue->getErrorStackAsString());
+					$session->setVar(FORM_VALUES, $formvalues);
 				}
-				break;
+			}
+			break;
 		}
 		// debugMessage($successurl);// exit(); 
 		
@@ -183,17 +122,17 @@ class ConfigController extends SecureController   {
     	return false;
     }*/
     
-	function globalconfigAction(){
+	function globalAction(){
     	// parent::listAction();
     }
     
-	function globalconfigsearchAction(){
-		$this->_helper->redirector->gotoSimple("globalconfig", "config", 
+	function globalsearchAction(){
+		$this->_helper->redirector->gotoSimple("global", "config", 
     											$this->getRequest()->getModuleName(),
     											array_remove_empty(array_merge_maintain_keys($this->_getAllParams(), $this->getRequest()->getQuery())));
 	}
 	
-	function processglobalconfigAction(){
+	function processglobalAction(){
 		$session = SessionWrapper::getInstance(); 
      	$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender(TRUE);

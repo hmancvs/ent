@@ -35,6 +35,12 @@
 		$formvalues = $session->getVar(FORM_VALUES);
 		$voucher->processPost($formvalues);
 	}
+	
+	$services = getServiceTypes();
+	$faservices = getFAServiceTypes();
+	$programs = getPrograms();
+	$funders = getFunders();
+	$voucherstatuses = getVoucherStatuses();
 ?>
 <script>
 	$(document).ready(function() {

@@ -1,6 +1,6 @@
 <?php
 
-class ClientController extends IndexController  {
+class ClientController extends SecureController {
 	
 	/**
 	 * Override unknown actions to enable ACL checking 

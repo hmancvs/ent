@@ -25,16 +25,32 @@
         </li>
     <?php } ?>
     <?php if ($acl->checkPermission('Application Settings', ACTION_LIST)) { ?>
+    	<li class="nav dropdown">
+            <a class="gonowhere"><span class="glyphicon glyphicon-cog"></span> Variable Maintenance </a>
+            <ul class="subNav">
+            	<li><a href="<?php echo $this->baseUrl('config/variables'); ?>">Programs</a></li>
+                <li><a href="<?php echo $this->baseUrl('config/variables'); ?>">Voucher Service Types</a></li>
+                <li><a href="<?php echo $this->baseUrl('config/variables'); ?>">F/A Service Types</a></li>
+                <li><a href="<?php echo $this->baseUrl('config/variables'); ?>">Disability Codes</a></li>
+                <li><a href="<?php echo $this->baseUrl('config/variables'); ?>">Disability Cause Codes</a></li>
+            </ul>
+        </li>
+    <?php } ?>
+    <?php if ($acl->checkPermission('Application Settings', ACTION_LIST)) { ?>
         <li class="nav dropdown">
             <a class="gonowhere"><span class="glyphicon glyphicon-cog"></span> System </a>
             <ul class="subNav">
                 <?php if ($acl->checkPermission('User Account', ACTION_CREATE)) { ?>	
                     <li><a href="<?php echo $this->baseUrl('profile'); ?>">New User</a></li>
                 <?php } ?>
-                <li href="<?php echo $this->baseUrl('profile/list'); ?>"><a>User Profiles</a></li>
-                <!--<li><a >User Roles</a></li>-->
-                <!--<li><a >Variable Maintenance</a></li>
-                <li><a >Global Configuration</a></li>-->
+                <?php if ($acl->checkPermission('User Account', ACTION_LIST)) { ?>
+                	<li><a href="<?php echo $this->baseUrl('profile/list'); ?>">User Profiles</a></li>
+                <?php } ?>
+                <?php if ($acl->checkPermission('Role', ACTION_LIST)) { ?>
+                	<li><a href="<?php echo $this->baseUrl('role/list'); ?>">User Roles</a></li>
+                <?php } ?>
+                <li><a href="<?php echo $this->baseUrl('config/variables'); ?>">System Variables</a></li>
+                <li><a href="<?php echo $this->baseUrl('config/global'); ?>">Global Configuration</a></li>
             </ul>	
         </li>
     <?php } ?>

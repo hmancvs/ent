@@ -302,9 +302,12 @@ ul, ol {
     font-family: 'Glyphicons Halflings';  /* essential for enabling glyphicon */
     content: "\e114";    /* adjust as needed, taken from bootstrap.css */
     float: left;        /* adjust as needed */
-    color: white;         /* adjust as needed */
+    color: #ffffff;         /* adjust as needed */
 	font-size:14px;
 	margin-right:15px;
+}
+.panel-heading .accordion-toggle.dark:after {
+	color:#333333;
 }
 .panel-heading .accordion-toggle.collapsed:after {
     /* symbol for "collapsed" panels */
@@ -498,6 +501,9 @@ ul, ol {
 	width:2000px;
 	margin-bottom:4px;
 }
-.table.list thead tr th {
-	/*white-space:nowrap;*/
+span.edit, .buttons {
+	display:none;
+}
+.table tbody tr.editable:hover td .buttons {
+	display:block;
 }
