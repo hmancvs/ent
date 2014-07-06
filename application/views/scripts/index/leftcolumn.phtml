@@ -25,14 +25,17 @@
         </li>
     <?php } ?>
     <?php if ($acl->checkPermission('Application Settings', ACTION_LIST)) { ?>
-    	<li class="nav dropdown">
+    	<li class="nav dropdown active">
             <a class="gonowhere"><span class="glyphicon glyphicon-cog"></span> Variable Maintenance </a>
-            <ul class="subNav">
-            	<li><a href="<?php echo $this->baseUrl('config/variables'); ?>">Programs</a></li>
-                <li><a href="<?php echo $this->baseUrl('config/variables'); ?>">Voucher Service Types</a></li>
-                <li><a href="<?php echo $this->baseUrl('config/variables'); ?>">F/A Service Types</a></li>
-                <li><a href="<?php echo $this->baseUrl('config/variables'); ?>">Disability Codes</a></li>
-                <li><a href="<?php echo $this->baseUrl('config/variables'); ?>">Disability Cause Codes</a></li>
+            <ul class="subNav" <?php echo $controller == 'config' ? 'style="display:block;"' : ''; ?>>
+            	<li <?php echo $request->type == 41 ? 'class="active"' : ''; ?>><a href="<?php echo $this->baseUrl('config/variables/type/41'); ?>">Programs</a></li>
+                <li <?php echo $request->type == 42 ? 'class="active"' : ''; ?>><a href="<?php echo $this->baseUrl('config/variables/type/42'); ?>">Voucher Service Types</a></li>
+                <li <?php echo $request->type == 44 ? 'class="active"' : ''; ?>><a href="<?php echo $this->baseUrl('config/variables/type/44'); ?>">F/A Service Types</a></li>
+                <li <?php echo $request->type == 15 ? 'class="active"' : ''; ?>><a href="<?php echo $this->baseUrl('config/variables/type/15'); ?>">Disability Codes</a></li>
+                <li <?php echo $request->type == 16 ? 'class="active"' : ''; ?>><a href="<?php echo $this->baseUrl('config/variables/type/16'); ?>">Disability Cause Codes</a></li>
+                <li <?php echo $request->type == 43 ? 'class="active"' : ''; ?>><a href="<?php echo $this->baseUrl('config/variables/type/43'); ?>">Funders</a></li>
+                <li <?php echo $request->type == 45 ? 'class="active"' : ''; ?>><a href="<?php echo $this->baseUrl('config/variables/type/45'); ?>">Employers</a></li>
+                <li><a href="<?php echo $this->baseUrl('config/variables'); ?>">All Variables</a></li>
             </ul>
         </li>
     <?php } ?>

@@ -35,19 +35,6 @@ $(document).ready(function() {
 	$('.desclabel').html('<?php echo $description; ?>');
 	$('.pageicon').html('<span class="glyphicon glyphicon-list-alt"></span>');
 	
-	// custom date picker options
-	var dateofbirthOpts = datepickerOpts;
-	var startfrom = '<?php echo date('Y'); ?>';
-	dateofbirthOpts.yearRange = "-<?php echo date('Y')-1900; ?>:-0"; 
-	dateofbirthOpts.minDate = "-<?php echo date('Y'); ?>Y";
-	datepickerOpts.maxDate = new Date("Dec 31, "+startfrom);	
-	$("#dateofbirth").datepicker(dateofbirthOpts);
-	
-	dateofbirthOpts.yearRange = "-<?php echo date('Y')-2010; ?>:-0"; 
-	// datepickerOpts.maxDate = new Date();
-	// $("#dateapproved, #referraldate, #assessmentdate, #startdate, #enddate, #invoicedate, #medicalstartdate, #activitydate, #dateavailable").datepicker(dateofbirthOpts);
-	$(".datefield").datepicker(dateofbirthOpts);
-	
 	var tab = '<?php echo $tab; ?>';
 	$("#tabtitle").html($("#tab_"+tab+" a."+tab).html());
 	
@@ -102,7 +89,7 @@ $(document).ready(function() {
 			</div>
             <div id="finance">
                 <form id="form-finance" class="form-horizontal finance">
-                <?php if($request->tab == 'activity'){ ?>
+                <?php if($request->tab == 'finance'){ ?>
                 
                 <?php } ?>
                 </form>

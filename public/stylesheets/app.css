@@ -1,3 +1,4 @@
+
 /* ========================================================
 * ENTS Custom
 *
@@ -506,4 +507,7 @@ span.edit, .buttons {
 }
 .table tbody tr.editable:hover td .buttons {
 	display:block;
+}
+.modal-body {
+	padding-bottom:0;
 }

@@ -428,7 +428,7 @@ class Client extends BaseEntity {
 						'status'=> $formvalues['status'], 
 						'startdate' => changeDateFromPageToMySQLFormat($formvalues['assignstartdate']), 
 						'createdby'=> $formvalues['createdby'],
-						'role'=> $formvalues['role']						
+						'role'=> 2						
 					)
 			);
 			$formvalues['assignments'] = $assignments;
@@ -491,6 +491,12 @@ class Client extends BaseEntity {
 		}
 		if(isArrayKeyAnEmptyString('convictedofmisdemeanor', $formvalues)){
 			unset($formvalues['convictedofmisdemeanor']);
+		}
+		if(isArrayKeyAnEmptyString('traveldistance', $formvalues)){
+			unset($formvalues['traveldistance']);
+		}
+		if(isArrayKeyAnEmptyString('desiredhourlyrate', $formvalues)){
+			unset($formvalues['desiredhourlyrate']);
 		}
 		
 		if(isArrayKeyAnEmptyString('therapytreatment', $formvalues)){
@@ -625,6 +631,9 @@ class Client extends BaseEntity {
 					}
 					if(!isArrayKeyAnEmptyString('value3', $value)){
 						$detailsarray[$mds]['value3'] = $value['value3'];
+					}
+					if(!isArrayKeyAnEmptyString('familydetails_value3_'.$key, $formvalues)){
+						$detailsarray[$mds]['value3'] = $formvalues['familydetails_value3_'.$key];
 					}
 					if(!isArrayKeyAnEmptyString('value4', $value)){
 						$detailsarray[$mds]['value4'] = $value['value4'];
@@ -867,11 +876,12 @@ class Client extends BaseEntity {
 				}
 				$increment++;
 			}
+			// debugMessage($jobsarray);
 		}
 		
 		if(count($jobsarray) > 0){
 			// $formvalues['jobs'] = $jobsarray; debugMessage($jobsarray);
-			$formvalues['jobs'] = multidimensional_array_merge($existing_jobs, $jobsarray);
+			$formvalues['jobs'] = multidimensional_array_merge($jobsarray, $existing_jobs); debugMessage($formvalues['jobs']);
 		} else {
 			unset($formvalues['jobs']);
 		}
@@ -1002,7 +1012,7 @@ class Client extends BaseEntity {
 			}
 		}
 		
-		// debugMessage($formvalues); // exit(); 
+		debugMessage($formvalues); // exit(); 
 		parent::processPost($formvalues);
 	}
 	
@@ -1401,7 +1411,7 @@ class Client extends BaseEntity {
 	}
 	# return an array of income sources
 	function getIncomeSourcesArray(){
-		return isEmptyString($this->getIncomeSources()) ? '' : explode(',',preg_replace('!\s+!', '', trim($this->getIncomeSources())));
+		return isEmptyString($this->getIncomeSources()) ? array() : explode(',',preg_replace('!\s+!', '', trim($this->getIncomeSources())));
 	}
 	# return list of income sources for client
 	function getListofIncomeSources(){
@@ -1631,6 +1641,30 @@ class Client extends BaseEntity {
 				break;
 		}
 		return $data;
+	}
+	# determine relationship text
+	function getRelationshipText(){
+		$text = '';
+		if(!is_numeric($this->getRelationship())){
+			$text = $this->getRelationship();
+		}
+		$rships = getAllRelationshipOptions();
+		if(!isArrayKeyAnEmptyString($this->getRelationship(), $rships)){
+			$text = $rships[$this->getRelationship()];
+		}
+		return $text;
+	}
+	# determine alt relationship text
+	function getRelationship2Text(){
+		$text = '';
+		if(!is_numeric($this->getRelationship2())){
+			$text = $this->getRelationship2();
+		}
+		$rships = getAllRelationshipOptions();
+		if(!isArrayKeyAnEmptyString($this->getRelationship2(), $rships)){
+			$text = $rships[$this->getRelationship2()];
+		}
+		return $text;
 	}
 }
 ?>

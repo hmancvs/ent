@@ -55,11 +55,11 @@ class ClientController extends SecureController {
 	    		$clientfolder = "client_".$client->getID();
 	    	}
 	    	if(!is_dir($destination_path.$clientfolder)){
-	    		mkdir($destination_path.$clientfolder, 0755);
+	    		mkdir($destination_path.$clientfolder, 0777);
 	    	}
-	
+			
 	    	// set the destination for 
-	    	$upload->setDestination($destination_path.$clientfolder.DIRECTORY_SEPARATOR); // exit();
+	    	$upload->setDestination($destination_path.$clientfolder.DIRECTORY_SEPARATOR);
 	    	
 	    	// current timestamp
 	    	$cur_timestamp = mktime();

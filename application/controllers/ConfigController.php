@@ -18,7 +18,7 @@ class ConfigController extends IndexController   {
 	 */
 	function getActionforACL() {
 		$action = strtolower($this->getRequest()->getActionName()); 
-		if($action == "processvariables" || $action == "processglobal"){
+		if($action == "processvariables" || $action == "processglobal" || $action == "add"){
 			return ACTION_EDIT;
 		}
 		if($action == "variables" || $action == "global") {
@@ -28,6 +28,10 @@ class ConfigController extends IndexController   {
 		return parent::getActionforACL(); 
 	}
 	
+	function addAction(){
+    	// parent::listAction();
+    }
+    
 	function variablesAction(){
     	// parent::listAction();
     }
@@ -44,7 +48,12 @@ class ConfigController extends IndexController   {
 		$this->_helper->viewRenderer->setNoRender(TRUE);
 		
 		$formvalues = $this->_getAllParams();
-		debugMessage($formvalues);
+		// debugMessage($formvalues);
+		if(isArrayKeyAnEmptyString('noreload', $formvalues)){
+			$hasnoreload = false; 	
+		} else {
+			$hasnoreload = true;
+		}
 		
 		$haserror = false;
 		if(isArrayKeyAnEmptyString('value', $formvalues)){
@@ -55,16 +64,40 @@ class ConfigController extends IndexController   {
 		}
 		$successurl = $this->view->baseUrl('config/variables/type/'.$formvalues['lookupid']);
 		$type_ext = '';
+		$alias = '';
+		if(!isArrayKeyAnEmptyString('alias', $formvalues)){
+			$alias= trim($formvalues['alias']);
+			if($alias == 'undefined'){
+				$alias = '';
+			}
+		}
+		
 		// debugMessage()
 		// exit();
 		switch ($formvalues['lookupid']){
 			default:
 			$lookupvalue = new LookupTypeValue();
+			$lookuptype = new LookupType();
+			$lookuptype->populate($formvalues['lookupid']);
+				
+			$index = '';
+			if($hasnoreload){
+				$index = $lookuptype->getNextInsertIndex();
+				$value  = trim($formvalues['value']);
+			} else {
+				if(isArrayKeyAnEmptyString('index', $formvalues)){
+					$index = $formvalues['index'];
+				} else {
+					$index = $lookuptype->getNextInsertIndex();
+				}
+				$value  = addslashes(decode(trim($formvalues['value'])));
+			}
+			
 			$dataarray = array('id' => $formvalues['id'],
 								'lookuptypeid' => $formvalues['lookupid'], 
-								'lookuptypevalue' => $formvalues['index'], 
-								'lookupvaluedescription' => addslashes(decode(trim($formvalues['value']))),
-								'alias' => trim($formvalues['alias']),
+								'lookuptypevalue' => $index, 
+								'lookupvaluedescription' => $value,
+								'alias' => $alias,
 								'createdby' => $session->getVar('userid')
 						);
 			
@@ -73,9 +106,10 @@ class ConfigController extends IndexController   {
 			}
 			// unset($dataarray['id']);
 			$lookupvalue->processPost($dataarray);
-			debugMessage($lookupvalue->toArray());
-	    	debugMessage('errors are '.$lookupvalue->getErrorStackAsString()); // exit();
+			// debugMessage($lookupvalue->toArray());
+	    	// debugMessage('errors are '.$lookupvalue->getErrorStackAsString()); // exit();
 			
+	    	$result = array('id'=>'', 'name'=>'');
 			if($lookupvalue->hasError()){
 				$haserror = true;
 				$session->setVar(ERROR_MESSAGE, $lookupvalue->getErrorStackAsString());
@@ -83,11 +117,14 @@ class ConfigController extends IndexController   {
 			} else {
 				try {
 					$lookupvalue->save();
-					if(isArrayKeyAnEmptyString('id', $formvalues)){
-						$session->setVar(SUCCESS_MESSAGE, "Successfully saved");
-					} else {
-						$session->setVar(SUCCESS_MESSAGE, "Successfully updated");
+					if(!$hasnoreload){
+						if(isArrayKeyAnEmptyString('id', $formvalues)){
+							$session->setVar(SUCCESS_MESSAGE, "Successfully saved");
+						} else {
+							$session->setVar(SUCCESS_MESSAGE, "Successfully updated");
+						}
 					}
+					$result = array('id'=>$lookupvalue->getlookuptypevalue(), 'name'=>$lookupvalue->getlookupvaluedescription(), 'alias'=>$lookupvalue->getalias());
 				} catch (Exception $e) {
 					$session->setVar(ERROR_MESSAGE, $e->getMessage()."<br />".$lookupvalue->getErrorStackAsString());
 					$session->setVar(FORM_VALUES, $formvalues);
@@ -97,7 +134,11 @@ class ConfigController extends IndexController   {
 		}
 		// debugMessage($successurl);// exit(); 
 		
-		$this->_helper->redirector->gotoUrl($successurl);		
+		if(!$hasnoreload){
+			$this->_helper->redirector->gotoUrl($successurl);	
+		} else {
+			echo json_encode($result);
+		}
 	}
 	
 	/*function deleteAction() {

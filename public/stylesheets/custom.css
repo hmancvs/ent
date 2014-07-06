@@ -730,7 +730,7 @@ li.display_box.selected {
 }
 
 /* Custom Tabs */
-#tabs.ui-tabs .ui-tabs-nav li {
+#tabs.ui-tabs ul.ui-tabs-nav > li {
 	min-width: 120px;
 }
 #tabs.ui-tabs .ui-widget-content {

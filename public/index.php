@@ -18,13 +18,15 @@ set_include_path(implode(PATH_SEPARATOR, array(
     realpath(APPLICATION_PATH . '/includes/wideimage'), # wide image library
     get_include_path(),
 )));
-
+define('OWNER_COMPANY', 'ENTS');
 // public folder directory
 if(APPLICATION_ENV == 'production'){
-	define('PUBLICFOLDER', '/');	
+	define('PUBLICFOLDER', 'public_html');	
+	$host_split = explode('.',$_SERVER['HTTP_HOST']);	
 } 
 if(APPLICATION_ENV == 'staging'){
 	define('PUBLICFOLDER', 'public');
+	$host_split = explode('.',$_SERVER['HTTP_HOST']);
 }
 if(APPLICATION_ENV == 'development'){
 	define('PUBLICFOLDER', 'public');

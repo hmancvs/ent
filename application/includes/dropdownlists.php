@@ -744,7 +744,7 @@
 	}
 	# return programs
 	function getPrograms($value = ''){
-		$query = "SELECT s.id as optionvalue, concat(s.alias,'-',s.name) as optiontext FROM service s where s.type = 1 order by optiontext ";
+		$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.alias,' - ',l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_PROGRAMS' order by ABS(l.alias) ";
 		// debugMessage($query); exit();
 		$array = getOptionValuesFromDatabaseQuery($query);
 		if(!isEmptyString($value)){
@@ -758,7 +758,7 @@
 	}
 	# return service types
 	function getServiceTypes($value = ''){
-		$query = "SELECT s.id as optionvalue, s.alias as optiontext FROM service s where s.type = 2 order by optiontext ";
+		$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.alias,' - ',l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'VOUCHER_SERVICE_TYPES' order by ABS(l.alias) ";
 		// debugMessage($query); exit();
 		$array = getOptionValuesFromDatabaseQuery($query);
 		if(!isEmptyString($value)){
@@ -772,7 +772,7 @@
 	}
 	# return the follow along types
 	function getFAServiceTypes($value = ''){
-		$query = "SELECT s.id as optionvalue, s.alias as optiontext FROM service s where s.type = 3 order by optiontext ";
+		$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.alias,' - ',l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'FA_SERVICE_TYPES' order by ABS(l.alias) ";
 		// debugMessage($query); exit();
 		$array = getOptionValuesFromDatabaseQuery($query);
 		if(!isEmptyString($value)){
@@ -1284,7 +1284,21 @@
 	}
 	# determine the client problems associated with military combat
 	function getAllCombatProblems($value = ''){
-		$query = "SELECT l.lookuptypevalue as optionvalue, trim(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_MILITARY _COMBAT_PROBLEMS' ";
+		$query = "SELECT l.lookuptypevalue as optionvalue, trim(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_MILITARY_COMBAT_PROBLEMS' ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			if(!isArrayKeyAnEmptyString($value, $array)){
+				return $array[$value];
+			} else {
+				return '';
+			}
+		}
+		return $array;
+	}
+	# determine the relationship options
+	function getAllRelationshipOptions($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, trim(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_RELATIONSHIP' order by optiontext ";
 		// debugMessage($query); exit();
 		$array = getOptionValuesFromDatabaseQuery($query);
 		if(!isEmptyString($value)){

@@ -49,7 +49,7 @@ class Company extends BaseEntity {
 		if(isArrayKeyAnEmptyString('defaultrate', $formvalues)){
 			unset($formvalues['defaultrate']);
 		}
-		// debugMessage($formvalues); exit(); 
+		debugMessage($formvalues); // exit(); 
 		parent::processPost($formvalues);
 	}
 }
