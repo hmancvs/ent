@@ -1,0 +1,57 @@
+
+<div class="row-fluid margin0">
+    <div class="col-md-12 padding0">
+        <div class="btn-group pull-right">
+            <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                Actions <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <?php if(!$client->hasBeenAssignedCoach()){ ?>
+                    <li><a class="<?php echo !$client->isActive() ? 'alert-dialog' : 'addpopup'; ?>" href="<?php echo $this->baseUrl("client/assign/clientid/".$client->getID()."/pgc/true/type/start"); ?>" message="This Account is closed and updates are disabled." title="Assign to User" rel="Assign Coach to Client" formtitle="indexform" successurl="<?php echo $this->viewurl; ?>" action="<?php echo $this->baseUrl("assignment/create"); ?>">Assign Coach</a></li>
+                <?php } else { ?>
+                    <li><a class="<?php echo !$client->isActive() ? 'alert-dialog' : 'addpopup'; ?>" href="<?php echo $this->baseUrl("client/assign/clientid/".$client->getID()."/pgc/true/type/end"); ?>" message="This Account is closed and updates are disabled." title="De-assign to User" rel="De-assign Coach from Client" formtitle="indexform" successurl="<?php echo $this->viewurl; ?>" action="<?php echo $this->baseUrl("assignment/deassign"); ?>">Deassign Coach</a></li>
+                <?php } ?>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="divider5"></div>
+<table class="table table-condensed table-striped table-responsive viewtable">
+    <thead>
+        <tr>
+            <th class="centeralign" style="width:15px;">#</th>
+            <th>Name of User</th>
+            <th style="width:12%;">Role</th>
+            <th style="width:22%;">Duration</th>
+            <th style="width:10%;">Status</th>
+            <th style="width:20%;">Assigned By</th>
+            <th style="width:15%;">Date Assigned</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php 
+            $assigments = $client->getClientAssignments(); // debugMessage($assigments->toArray());													
+            $countusers = $assigments->count();
+        ?>
+        <?php if($countusers == 0){ ?>
+            <tr>
+                <td colspan="7"><div class="alert alert-warning">No Users currently allocated</div></td>
+            </tr>
+        <?php } else { ?>
+            <?php 
+                $counter = 1;
+                foreach($assigments as $user){
+            ?>
+            <tr>
+                <td class="centeralign"><?php echo $counter; ?></td>
+                <td><?php echo $user->getUser()->getName(); ?></td>
+                <td>Coach</td>
+                <td><?php echo isEmptyString($user->getEndDate()) ? formatDateAndTime($user->getStartDate(), false).' - To date' : formatDateAndTime($user->getStartDate(), false).' - '.formatDateAndTime($user->getEndDate(), false); ?></td>
+                <td><?php echo isEmptyString($user->getEndDate()) ? 'Active' : 'Closed'; ?></td>
+                <td><?php echo $user->getCreator()->getName(); ?></td>
+                <td><?php echo formatDateAndTime($user->getDateCreated(), false); ?></td>
+            </tr>
+            <?php $counter++; } ?>
+        <?php } ?>
+    </tbody>
+</table>

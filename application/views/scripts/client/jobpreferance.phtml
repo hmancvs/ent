@@ -1,0 +1,335 @@
+<div class="panel-body well-sm">
+    <div class="form-group">
+        <div class="col-md-6">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_employmentgoal_label'); ?>:</label>
+            <div class="col-md-12">
+                <?php $goals = getAllEmploymentGoalOptions(); ?>
+                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getjobpreferred(), $goals) ? '': $goals[$client->getjobpreferred()]; ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <?php
+                        $dropdown = new Zend_Form_Element_Select('jobpreferred',
+                                            array(
+                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $goals, array('0'=>$this->translate("global_addvariable_label"))),
+                                                'view' => new Zend_View(),
+                                                'decorators' => array('ViewHelper'),
+                                                'class' => array('form-control','input-sm','configvariable'),
+												'lookupid' => 27,
+												'fieldid' => 'jobpreferred',
+												'fieldlabel' => 'Client Employment Goal Sectors',
+												'doubleappendid' => 'jobpreferred1'
+                                            )
+                        );  
+                        $dropdown->setValue($client->getjobpreferred()); 
+                        echo $dropdown->render();
+                    ?><input type="hidden" name="jobpreferred_old" id="jobpreferred_old" class="form-control" value="<?php echo $client->getjobpreferred(); ?>" />
+                </div>
+                <?php } ?>
+            </div> 
+        </div>
+        <div class="col-md-6">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_alt_employmentgoal_label'); ?>:</label>
+            <div class="col-md-12">
+                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getjobpreferred1(), $goals) ? '': $goals[$client->getjobpreferred1()]; ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <?php
+                        $dropdown = new Zend_Form_Element_Select('jobpreferred1',
+                                            array(
+                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $goals, array('0'=>$this->translate("global_addvariable_label"))),
+                                                'view' => new Zend_View(),
+                                                'decorators' => array('ViewHelper'),
+                                                'class' => array('form-control','input-sm','configvariable'),
+												'lookupid' => 27,
+												'fieldid' => 'jobpreferred1',
+												'fieldlabel' => 'Client Employment Goal Sectors',
+												'doubleappendid' => 'jobpreferred'
+                                            )
+                        );  
+                        $dropdown->setValue($client->getjobpreferred1()); 
+                        echo $dropdown->render();
+                    ?><input type="hidden" name="jobpreferred1_old" id="jobpreferred1_old" class="form-control" value="<?php echo $client->getjobpreferred1(); ?>" />
+                </div>
+                <?php } ?>
+            </div> 
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-12">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_availability_label'); ?>:</label>
+            <div class="col-md-12">
+                <?php $workshifts = getAllWorkshiftOptions(); ?>
+                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getworkshift(), $workshifts) ? '': $workshifts[$client->getworkshift()]; ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <?php 
+                        foreach($workshifts as $key => $value){
+                    ?>
+                        <label class="radio-inline">
+                          <input type="radio" id="workshift_<?php echo $key; ?>" name="workshift" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo $key == $client->getworkshift() ? 'checked' : ''; ?>> <?php echo $value; ?>
+                        </label>
+                    <?php } ?>
+                </div>
+                <?php } ?>
+            </div> 
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-12">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_workdesired_label'); ?>:</label>
+            <div class="col-md-12">
+                <?php $jobtypes = getAllJobTypes(); ?>
+                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getjobtype(), $jobtypes) ? '': $jobtypes[$client->getjobtype()]; ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <?php 
+                        foreach($jobtypes as $key => $value){
+                    ?>
+                        <label class="radio-inline">
+                          <input type="radio" id="jobtype_<?php echo $key; ?>" class="disableoutsidesection" name="jobtype" value="<?php echo $key; ?>" <?php echo $key == $client->getjobtype() ? 'checked' : ''; ?>><?php echo $value; ?>
+                        </label>
+                    <?php } ?>
+                </div>
+                <?php } ?>
+            </div> 
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-6">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_dateavailable_label'); ?>:</label>
+            <div class="col-md-12">
+                <p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($client->getdateavailable()); ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit"><div class="divider5"></div>
+                    <input type="text" class="form-control input-sm datefield readonly width100" name="dateavailable" id="dateavailable" value="<?php echo changeMySQLDateToPageFormat($client->getdateavailable()); ?>" />
+                </div>
+                <?php } ?>
+            </div> 
+        </div>
+        <div class="col-md-6">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_hoursavailable_label'); ?>:</label>
+            <div class="col-md-12">
+                <p class="form-control-static nullifempty view"><?php echo $client->gethoursavailableperweek(); ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <input type="text" name="hoursavailableperweek" id="hoursavailableperweek" class="form-control input-sm width100" value="<?php echo $client->gethoursavailableperweek(); ?>" />
+                </div>
+                <?php } ?>
+            </div> 
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-12">
+            <label class="col-md-12 control-label">Details of Availability:</label>
+            <div class="col-md-12">
+                <?php
+                    $fromdetails = $client->getAssessmentDetails(3, 1);
+                    $todetails = $client->getAssessmentDetails(3, 2);
+                    $wkdays = array(1=>'Mon',2=>'Tue',3=>'Wed',4=>'Thur',5=>'Fri',6=>'Sat',7=>'Sun');
+                ?>
+                
+                <p class="form-control-static nullifempty view">
+                    <table class="table table-condensed table-bordered table-responsive viewtable" style="margin-bottom:10px;">
+                        <thead>
+                            <tr>
+                                <th class="centeralign" style="width:50px;"></th>
+                                <?php foreach($wkdays as $key => $day){ ?>
+                                    <th class="centeralign"><?php echo $day; ?></th>
+                                <?php } ?>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="bolded">From</td>
+                                <?php foreach($wkdays as $key => $day){ 
+                                    ${'value_'.$key} = '';
+                                    if($key == 1){
+                                        ${'value_'.$key} = $fromdetails->get(0)->getValue1();
+                                    }
+                                    if($key == 2){
+                                        ${'value_'.$key} = $fromdetails->get(0)->getValue2();
+                                    }
+                                    if($key == 3){
+                                        ${'value_'.$key} = $fromdetails->get(0)->getValue3();
+                                    }
+                                    if($key == 4){
+                                        ${'value_'.$key} = $fromdetails->get(0)->getValue4();
+                                    }
+                                    if($key == 5){
+                                        ${'value_'.$key} = $fromdetails->get(0)->getValue5();
+                                    }
+                                    if($key == 6){
+                                        ${'value_'.$key} = $fromdetails->get(0)->getValue6();
+                                    }
+                                    if($key == 7){
+                                        ${'value_'.$key} = $fromdetails->get(0)->getValue7();
+                                    }
+                                ?>
+                                    <td class="centeralign"><?php echo ${'value_'.$key}; ?></td>
+                                <?php } ?>
+                            </tr>
+                            <tr>
+                                <td class="bolded">To</td>
+                                <?php foreach($wkdays as $key => $day){ 
+                                    ${'value_'.$key} = '';
+                                    if($key == 1){
+                                        ${'value_'.$key} = $todetails->get(0)->getValue1();
+                                    }
+                                    if($key == 2){
+                                        ${'value_'.$key} = $todetails->get(0)->getValue2();
+                                    }
+                                    if($key == 3){
+                                        ${'value_'.$key} = $todetails->get(0)->getValue3();
+                                    }
+                                    if($key == 4){
+                                        ${'value_'.$key} = $todetails->get(0)->getValue4();
+                                    }
+                                    if($key == 5){
+                                        ${'value_'.$key} = $todetails->get(0)->getValue5();
+                                    }
+                                    if($key == 6){
+                                        ${'value_'.$key} = $todetails->get(0)->getValue6();
+                                    }
+                                    if($key == 7){
+                                        ${'value_'.$key} = $todetails->get(0)->getValue7();
+                                    }
+                                ?>
+                                    <td class="centeralign"><?php echo ${'value_'.$key}; ?></td>
+                                <?php } ?>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <input type="text" id="hasweeklyschedule_1" name="hasweeklyschedule_1" class="hidden form-control disableoutsidesection" value="1" />
+                    <input type="text" id="hasweeklyschedule_2" name="hasweeklyschedule_2" class="hidden form-control disableoutsidesection" value="2" />
+                    <input type="text" id="hasweeklyschedule_1_id" name="hasweeklyschedule_1_id" class="hidden form-control disableoutsidesection" value="<?php echo $fromdetails->get(0)->getID(); ?>" />
+                    <input type="text" id="hasweeklyschedule_2_id" name="hasweeklyschedule_2_id" class="hidden form-control disableoutsidesection" value="<?php echo $todetails->get(0)->getID(); ?>" />
+                    <table class="table table-condensed table-bordered table-responsive viewtable" style="margin-bottom:10px;">
+                        <thead>
+                            <tr>
+                                <th class="centeralign" style="width:50px;"></th>
+                                <?php foreach($wkdays as $key => $day){ ?>
+                                    <th class="centeralign"><?php echo $day; ?></th>
+                                <?php } ?>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="bolded">From</td>
+                                <?php foreach($wkdays as $key => $day){ 
+                                    ${'value_'.$key} = '';
+                                    if($key == 1){
+                                        ${'value_'.$key} = $fromdetails->get(0)->getValue1();
+                                    }
+                                    if($key == 2){
+                                        ${'value_'.$key} = $fromdetails->get(0)->getValue2();
+                                    }
+                                    if($key == 3){
+                                        ${'value_'.$key} = $fromdetails->get(0)->getValue3();
+                                    }
+                                    if($key == 4){
+                                        ${'value_'.$key} = $fromdetails->get(0)->getValue4();
+                                    }
+                                    if($key == 5){
+                                        ${'value_'.$key} = $fromdetails->get(0)->getValue5();
+                                    }
+                                    if($key == 6){
+                                        ${'value_'.$key} = $fromdetails->get(0)->getValue6();
+                                    }
+                                    if($key == 7){
+                                        ${'value_'.$key} = $fromdetails->get(0)->getValue7();
+                                    }
+                                ?>
+                                    <td class="centeralign"><input type="text" id="value_<?php echo $key; ?>_1" name="value_<?php echo $key; ?>_1" class="form-control input-sm" value="<?php echo ${'value_'.$key}; ?>" /></td>
+                                <?php } ?>
+                            </tr>
+                            <tr>
+                                <td class="bolded">To</td>
+                                <?php foreach($wkdays as $key => $day){ 
+                                    ${'value_'.$key} = '';
+                                    if($key == 1){
+                                        ${'value_'.$key} = $todetails->get(0)->getValue1();
+                                    }
+                                    if($key == 2){
+                                        ${'value_'.$key} = $todetails->get(0)->getValue2();
+                                    }
+                                    if($key == 3){
+                                        ${'value_'.$key} = $todetails->get(0)->getValue3();
+                                    }
+                                    if($key == 4){
+                                        ${'value_'.$key} = $todetails->get(0)->getValue4();
+                                    }
+                                    if($key == 5){
+                                        ${'value_'.$key} = $todetails->get(0)->getValue5();
+                                    }
+                                    if($key == 6){
+                                        ${'value_'.$key} = $todetails->get(0)->getValue6();
+                                    }
+                                    if($key == 7){
+                                        ${'value_'.$key} = $todetails->get(0)->getValue7();
+                                    }
+                                ?>
+                                    <td class="centeralign"><input type="text" id="value_<?php echo $key; ?>_2" name="value_<?php echo $key; ?>_2" class="form-control input-sm" value="<?php echo ${'value_'.$key}; ?>" /></td>
+                                <?php } ?>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <?php } ?>
+            </div> 
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-6">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_traveldistance_label'); ?>:</label>
+            <div class="col-md-12">
+                <p class="form-control-static nullifempty view"><?php echo $client->gettraveldistance(); ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <input type="text" name="traveldistance" id="traveldistance" class="form-control width100 isdecimal" value="<?php echo $client->gettraveldistance(); ?>" />
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_desiredhourlyrate_label'); ?>:</label>
+            <div class="col-md-12">
+                <p class="form-control-static nullifempty view"><?php echo $client->getdesiredhourlyrate(); ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <input type="text" name="desiredhourlyrate" id="desiredhourlyrate" class="form-control width100 isdecimal" value="<?php echo $client->getdesiredhourlyrate(); ?>" />
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-6">
+            <label class="col-md-12 control-label"><?php echo $this->translate('job_transport_label'); ?>:</label>
+            <div class="col-md-12">
+                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->gettransportation(), $transportmodes) ? '' : $transportmodes[$client->gettransportation()]; ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <?php
+                        $dropdown = new Zend_Form_Element_Select('transportation',
+                                            array(
+                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $transportmodes, array('0'=>$this->translate("global_addvariable_label"))),
+                                                'view' => new Zend_View(),
+                                                'decorators' => array('ViewHelper'),
+												'class' => array('form-control','input-sm','configvariable'),
+												'lookupid' => 19,
+												'fieldid' => 'transportation',
+												'fieldlabel' => $this->translate("job_transport_label")
+                                            )
+                        );  
+                        $dropdown->setValue($client->gettransportation()); 
+                        echo $dropdown->render();
+                    ?><input type="hidden" class="form-control" name="transportation_old" id="transportation_old" value="<?php echo $client->gettransportation(); ?>" />
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+</div>

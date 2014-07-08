@@ -1,0 +1,263 @@
+<div class="panel-body well-sm">
+    <div class="col-md-12 padding0">
+        <div class="form-group">
+            <div class="col-md-12">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_empdifficulty_label'); ?>:</label>
+                <div class="divider10"></div>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view">
+                        <table class="table table-condensed table-bordered table-responsive viewtable" style="margin-bottom:10px; width:300px;">
+                            <thead>
+                                <tr>
+                                    <th style="width:80%;">Factor</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                    $difficultyoptions = getAllEmploymentDifficultyOptions();
+                                    $existing_values = $client->getCurrentDifficultyOptionsArray();											
+                                ?>
+                                <?php 
+                                    foreach($difficultyoptions as $key => $value){
+                                ?>
+                                <tr>
+                                    <td><?php echo $value; ?></td>
+                                    <td class="centeralign"><?php echo in_array($key, $existing_values) ? 'Yes' : 'No'; ?></td>
+                                </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
+                    </p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <table class="table table-condensed table-bordered table-responsive viewtable" style="margin-bottom:10px; width:300px;">
+                            <thead>
+                                <tr>
+                                    <th style="width:80%;">Factor</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                    foreach($difficultyoptions as $key => $value){
+                                ?>
+                                <tr>
+                                    <td><?php echo $value; ?></td>
+                                    <td class="centeralign"><input type="checkbox" id="employmentdifficulty_<?php echo $key; ?>" name="employmentdifficultyids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked' : ''; ?> /></td>
+                                </tr>
+                                <?php } ?>
+                                <input type="hidden" name="employmentdifficulty_old" class="form-control" value="<?php echo $client->getemploymentdifficulty(); ?>" />
+                            </tbody>
+                        </table>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_difficultydetails_label'); ?>:</label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getdifficultydetails(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <textarea class="form-control expanding" id="difficultydetails" name="difficultydetails"><?php echo $client->getdifficultydetails(); ?></textarea>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_events_label'); ?>:</label>
+                <div class="divider10"></div>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view">
+                        <table class="table table-condensed table-bordered table-responsive viewtable" style="margin-bottom:10px; width:300px;">
+                            <thead>
+                                <tr>
+                                    <th style="width:80%;">Event</th>
+                                    <th>Now</th>
+                                    <th>Past</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                    $clientevents = getAllClientEvents();
+                                    $current_values = $client->getCurrentEventsArray();											
+                                    $past_values = $client->getPastEventsArray();											
+                                ?>
+                                <?php 
+                                    foreach($clientevents as $key => $value){
+                                ?>
+                                <tr>
+                                    <td><?php echo $value; ?></td>
+                                    <td class="centeralign"><?php echo in_array($key, $current_values) ? 'Yes' : 'No'; ?></td>
+                                    <td class="centeralign"><?php echo in_array($key, $past_values) ? 'Yes' : 'No'; ?></td>
+                                </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
+                    </p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <table class="table table-condensed table-bordered table-responsive viewtable" style="margin-bottom:10px; width:300px;">
+                            <thead>
+                                <tr>
+                                    <th style="width:80%;">Event</th>
+                                    <th>Now</th>
+                                    <th>Past</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                    foreach($clientevents as $key => $value){
+                                ?>
+                                <tr>
+                                    <td><?php echo $value; ?></td>
+                                    <td class="centeralign"><input type="checkbox" id="currentevents_<?php echo $key; ?>" name="currenteventids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $current_values) ? 'checked' : ''; ?> /></td>
+                                    <td class="centeralign"><input type="checkbox" id="pastevents_<?php echo $key; ?>" name="pasteventids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $past_values) ? 'checked' : ''; ?> /></td>
+                                </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_supportservices_label'); ?>:</label>
+                <div class="col-md-12">
+                    <?php $supportservices = getAllClientSupportServices(); ?>
+                    <p class="form-control-static nullifempty view"><?php echo count($client->getSupportServicesArray())  == 0 ? '': $client->getListofClientSupportServices(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                    	<div id="container_supportservicesids">
+							<?php 
+                                $existing_values = $client->getSupportServicesArray();
+                                foreach($supportservices as $key => $value){
+                            ?>
+                                <label class="checkbox notbolded col-md-3">
+                                  <input type="checkbox" id="supportservices_<?php echo $key; ?>" name="supportservicesids[]" value="<?php echo $key; ?>" class="disableoutsidesection" <?php echo in_array($key, $existing_values) ? 'checked' : ''; ?>><?php echo $value; ?>
+                                </label>
+                            <?php } ?>
+                            <input type="hidden" name="supportservices_old" class="form-control" value="<?php echo $client->getsupportservices(); ?>" />
+                    	</div>
+                        <div class="divider5"></div>
+                        <a class="gonowhere checkothertrigger" fieldid="supportservicesids" lookupid="36" fieldlabel="Client List of Support Services " fieldtype="checkbox" checkclasses="checkbox notbolded col-md-3" checkname="supportservicesids[]" checkid="supportservices_"><?php echo $this->translate("global_addoption_label"); ?></a>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_jobassistcontact_label'); ?>:</label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getjobassistcontact(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <textarea class="form-control expanding" id="jobassistcontact" name="jobassistcontact"><?php echo $client->getjobassistcontact(); ?></textarea>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_awareofopportunities_label'); ?>:</label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getawareofopportunities(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <textarea class="form-control expanding" id="awareofopportunities" name="awareofopportunities"><?php echo $client->getawareofopportunities(); ?></textarea>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_assistivedevice_label'); ?>:</label>
+                <div class="col-md-12">
+                    <?php $supportservices = getAllSpecialAccomodationOptions(); ?>
+                    <p class="form-control-static nullifempty view"><?php echo count($client->getClientSpecialAccomodationArray())  == 0 ? '': $client->getListofClientSupportServices(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                    	<div id="container_assistivedeviceids">
+							<?php 
+                                $existing_values = $client->getSupportServicesArray();
+                                foreach($supportservices as $key => $value){
+                            ?>
+                                <label class="checkbox notbolded col-md-3">
+                                  <input type="checkbox" id="assistivedevice_<?php echo $key; ?>" name="assistivedeviceids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked' : ''; ?>><?php echo $value; ?>
+                                </label>
+                            <?php } ?>
+                            <input type="hidden" name="assistivedevice_old" class="form-control" value="<?php echo $client->getassistivedevice(); ?>" />
+                      	</div>
+                        <div class="divider5"></div>
+                        <a class="gonowhere checkothertrigger" fieldid="assistivedeviceids" lookupid="37" fieldlabel="Client Employment Job Accomodations" fieldtype="checkbox" checkclasses="checkbox notbolded col-md-3" checkname="assistivedeviceids[]" checkid="assistivedevice_"><?php echo $this->translate("global_addoption_label"); ?></a>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_selfstrengths_label'); ?>
+                </label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getselfstrengths(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <textarea class="form-control expanding" id="selfstrengths" name="selfstrengths"><?php echo $client->getselfstrengths(); ?></textarea>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_selfabilities_label'); ?></label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getselfabilities(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <textarea class="form-control expanding" id="selfabilities" name="selfabilities"><?php echo $client->getselfabilities(); ?></textarea>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_potentialbarriers_label'); ?></label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getpotentialbarriers(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <textarea class="form-control expanding" id="potentialbarriers" name="potentialbarriers"><?php echo $client->getpotentialbarriers(); ?></textarea>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <label class="col-md-12 control-label">
+                <span class="blocked notbolded"><?php echo $this->translate('client_barriersolutions_label'); ?></label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getpotentialbarriers(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <textarea class="form-control expanding" id="barriersolutions" name="barriersolutions"><?php echo $client->getbarriersolutions(); ?></textarea>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

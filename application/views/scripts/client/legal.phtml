@@ -1,0 +1,85 @@
+<div class="panel-body well-sm">
+    <div class="col-md-12 padding0">
+        <div class="form-group">
+            <div class="col-md-6">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_onprobation_label'); ?>:</label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getonprobation() == 1 ? 'Yes' : 'No'; ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <label class="radio-inline">
+                          <input type="radio" id="experiencedlearningproblems_1" name="onprobation" class="disableoutsidesection" value="1" <?php echo $client->getonprobation() == 1 ? 'checked' : ''; ?>>Yes
+                        </label>
+                        <label class="radio-inline">
+                          <input type="radio" id="experiencedlearningproblems_0" name="onprobation" class="disableoutsidesection" value="0" <?php echo $client->getonprobation() == 0 ? 'checked' : ''; ?>>No
+                        </label>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_convictedoffelony_label'); ?>:</label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getconvictedoffelony() == 1 ? 'Yes' : 'No'; ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <label class="radio-inline">
+                          <input type="radio" id="convictedoffelony_1" name="convictedoffelony" class="disableoutsidesection" value="1" <?php echo $client->getconvictedoffelony() == 1 ? 'checked' : ''; ?>>Yes
+                        </label>
+                        <label class="radio-inline">
+                          <input type="radio" id="convictedoffelony_0" name="convictedoffelony" class="disableoutsidesection" value="0" <?php echo $client->getconvictedoffelony() == 0 ? 'checked' : ''; ?>>No
+                        </label>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-6">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_convictedofmisdemeanor_label'); ?>:</label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getconvictedofmisdemeanor() == 1 ? 'Yes' : 'No'; ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <label class="radio-inline">
+                          <input type="radio" id="convictedofmisdemeanor_1" name="convictedofmisdemeanor" class="disableoutsidesection" value="1" <?php echo $client->getconvictedofmisdemeanor() == 1 ? 'checked' : ''; ?>>Yes
+                        </label>
+                        <label class="radio-inline">
+                          <input type="radio" id="convictedofmisdemeanor_0" name="convictedofmisdemeanor" class="disableoutsidesection" value="0" <?php echo $client->getconvictedofmisdemeanor() == 0 ? 'checked' : ''; ?>>No
+                        </label>
+                    </div>
+					<?php } ?>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-6">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_employertheftcase_label'); ?>:</label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getemployertheftcase() == 1 ? 'Yes' : 'No'; ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <label class="radio-inline">
+                          <input type="radio" id="employertheftcase_1" name="employertheftcase" class="disableoutsidesection" value="1" <?php echo $client->getemployertheftcase() == 1 ? 'checked' : ''; ?>>Yes
+                        </label>
+                        <label class="radio-inline">
+                          <input type="radio" id="employertheftcase_0" name="employertheftcase" class="disableoutsidesection" value="0" <?php echo $client->getemployertheftcase() == 0 ? 'checked' : ''; ?>>No
+                        </label>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_theftcasedetails_label'); ?>:</label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->gettheftcasedetails(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <textarea class="form-control expanding" id="theftcasedetails" name="theftcasedetails"><?php echo $client->gettheftcasedetails(); ?></textarea>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

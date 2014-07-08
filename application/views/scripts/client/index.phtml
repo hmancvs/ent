@@ -58,7 +58,7 @@
 		$('.view, .update_trigger').addClass('hidden').hide();
 		
 		// form wizard
-		/*
+		/**/
 		$('#indexform').stepy({
 			block: true,
 			validate: true,
@@ -79,7 +79,7 @@
 		$(".button-back").addClass('btn btn-default btn-lg');
 		$(".button-next").addClass('btn btn-primary btn-lg'); 
 		$(".finish").html('').prepend('<span class="glyphicon glyphicon-ok"></span> Finish').addClass('btn btn-success btn-lg');
-		$(".step legend").hide();*/
+		$(".step legend").hide();
 		
 		// validation 
 		$("#indexform").validate({		
@@ -150,11 +150,11 @@
 					
                     <fieldset title="Bio Data" id="account">
                         <legend>Step 1</legend>
-                        <?php //require APPLICATION_PATH."/views/scripts/client/bio.phtml"; ?>
+                        <?php require APPLICATION_PATH."/views/scripts/client/bio.phtml"; ?>
                     </fieldset>
                     <fieldset title="Referral Information">
                         <legend>Step 2</legend>
-                        <?php //require APPLICATION_PATH."/views/scripts/client/referral.phtml"; ?>
+                        <?php require APPLICATION_PATH."/views/scripts/client/referral.phtml"; ?>
                     </fieldset>
                     <fieldset title="Intake Assessment">
                         <legend>Step 3</legend>
@@ -172,7 +172,7 @@
                                             <?php require APPLICATION_PATH."/views/scripts/client/attachment.phtml"; ?>
                                         </div>
                                     </div>
-                                    <?php if(false){ ?>
+                                    <?php // if(false){ ?>
                                     <div class="panel panel-default" id="assess2">
                                         <div class="panel-heading">
                                             <h4 class="panel-title"><a class="accordion-toggle dark" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col2"> Medical Information</a> </h4>
@@ -183,7 +183,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <?php } ?>
+                                    <?php // } ?>
                                     <div class="panel panel-default" id="assess3">
                                         <div class="panel-heading">
                                             <h4 class="panel-title"><a class="accordion-toggle dark collapsed" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col3"> Family and Living</a> </h4>
@@ -195,7 +195,7 @@
                                         </div>
                                     </div>
                                     
-                                    <?php if(false){ ?>
+                                    <?php // if(false){ ?>
                                     <div class="panel panel-default" id="assess4">
                                         <div class="panel-heading">
                                             <h4 class="panel-title"><a class="accordion-toggle dark collapsed" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col4"> Employment Preferrences</a> </h4>
@@ -285,7 +285,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <?php } ?>
+                                    <?php // } ?>
                                 </div>
                             </div>
                         </fieldset>
@@ -295,14 +295,14 @@
                     	<fieldset class="fieldsetcontainer">
                             <legend>Emergency Information</legend>
                             <div class="panel-body well-sm">
-                                <?php // require APPLICATION_PATH."/views/scripts/client/emergency.phtml"; ?>
+                                <?php require APPLICATION_PATH."/views/scripts/client/emergency.phtml"; ?>
                             </div>
                         </fieldset>
                         <div class="divider10"></div>
                     </fieldset>
                     <fieldset title="Assign to User">
                         <legend>Step 5</legend>
-                        <?php if(false){ ?>
+                        <?php //if(false){ ?>
                     	<fieldset class="fieldsetcontainer">
                             <legend>Job Coach</legend>
                             <div class="panel-body well-sm">
@@ -339,7 +339,7 @@
                                 </div>
                             </div>
                         </fieldset>
-                        <?php } ?>
+                        <?php //} ?>
                         <div class="divider10"></div>
                     </fieldset>
                     <button type="submit" class="btn btn-primary finish" id="complete"><i class="glyphicon glyphicon-arrow-right"></i> Complete</button>

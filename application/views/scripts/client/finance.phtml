@@ -1,0 +1,612 @@
+ <?php
+ 	$baseview = $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/finance');
+	$baseview_pay = $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/finance/section/payment');
+	$baseview_inv = $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/finance/section/invoice');
+	
+	$tabtitle = '';
+	if(isEmptyString($request->section)){
+		$request->setParam('section', 'invoice');
+		$section = 'invoice';
+	}
+	
+	if($request->section == 'invoice'){
+		$tabtitle = 'Invoices';
+		$invoice = new Invoice();
+		$invoice_count = '';
+		if($step == 'view'){
+			$invoices = $client->getClientInvoices(); // debugMessage($invoices->toArray());
+			$invoice_count = $invoices->count();
+		}
+		if(!isEmptyString($request->invid)){
+			$invoice_count = '';
+			$invoice->populate(decode($request->invid)); // debugMessage($invoice->toArray());
+		}
+		if($step == 'new' ){
+			$invoice_count = '';
+			$invoice->setClientID($client->getID());
+			if(!isEmptyString($request->vid)){
+				$invoice->setVoucherID(decode($request->vid));
+			}
+		}
+		
+		if(!isEmptyString($session->getVar(ERROR_MESSAGE))){ 
+			$formvalues = $session->getVar(FORM_VALUES);
+			$invoice->processPost($formvalues);
+		}
+	}
+	
+	if($request->section == 'payment'){
+		$tabtitle = 'Payments';
+		$payment = new Payment();
+		
+		if($step == 'view'){
+			$payments = $client->getClientPayments(); // debugMessage($invoices->toArray());
+			$payment_count = $payments->count();
+		}
+		if(!isEmptyString($request->pid)){
+			$payment_count = '';
+			$payment->populate(decode($request->pid)); // debugMessage($invoice->toArray());
+		}
+		if($step == 'new' ){
+			$payment_count = '';
+			$payment->setClientID($client->getID());
+			if(!isEmptyString($request->invid)){
+				$payment->setInvoiceID(decode($request->invid));
+				$invoice = new Invoice();
+				$invoice->populate(decode($request->invid));
+				$payment->setVoucherID($invoice->getVoucherID());
+				$payment->setInvoiceID($invoice->getID());
+				$payment->setPaymentAmount($invoice->getInvoiceAmount());
+			}
+		}
+		
+		if(!isEmptyString($session->getVar(ERROR_MESSAGE))){ 
+			$formvalues = $session->getVar(FORM_VALUES);
+			$payment->processPost($formvalues);
+		}
+	}
+?>
+<script>
+$(document).ready(function() {
+	var dateofbirthOpts = datepickerOpts;
+	dateofbirthOpts.yearRange = "-<?php echo date('Y')-2010; ?>:-0"; 
+	var startfrom = '<?php echo date('Y'); ?>';
+	datepickerOpts.maxDate = new Date("Dec 31, "+startfrom);
+	$(".datefield").datepicker(dateofbirthOpts);
+	$('#tabtitle').html('<?php echo $tabtitle; ?>');
+	
+	<?php if($step == 'edit' || $step == 'new'){ ?>
+		$('.edit, .requiredmark, .save_trigger, .cancel_trigger').removeClass('hidden');
+		$('.form-control-static.view, .update_trigger').addClass('hidden');
+		
+		$(".save_trigger, .save").click(function(e){
+			e.preventDefault();
+			<?php if($request->section == 'invoice'){ ?>
+				var status = $("#status").val();
+				if ($("#form-invoice").valid()) {
+					$.blockUI({ message: '<?php echo $blockcontent; ?>' }); 
+					$("#form-invoice").submit();
+				}
+			<?php } ?>
+			
+			<?php if($request->section == 'payment'){ ?>
+				if ($("#form-payment").valid()) {
+					$.blockUI({ message: '<?php echo $blockcontent; ?>' }); 
+					$("#form-payment").submit();
+				}
+			<?php } ?>
+		});
+	<?php } ?>
+	
+	
+}); 
+</script>
+
+<?php if($request->section == 'invoice'){ ?>	        
+<form id="form-invoice" class="form-horizontal invoice" role="form" action="<?php echo $this->baseUrl("invoice/create"); ?>" method="post">
+	<div class="btn-group pull-right" style="margin-top:-10px;">
+        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+            Invoice Actions <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <?php if($section == 'invoice' && $step == 'view'){ ?>
+				<?php if($acl->checkPermission('Invoice', ACTION_CREATE) && isEmptyString($request->invid)){ ?>	
+                    <li><a href="<?php echo $baseview_inv.'/step/new'; ?>" title="New Invoice"><i class="glyphicon glyphicon-plus"></i> New Invoice</a></li>
+                <?php } ?>
+                <?php if($acl->checkPermission('Invoice', ACTION_EDIT) && !isEmptyString($request->invid)){ ?>	
+                	<li><a class="<?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'update_trigger'; ?>" message="This Account is closed and updates are disabled!" href="<?php echo $baseview_inv.'/step/edit/invid/'.encode($invoice->getID()); ?>" title="Update"><i class="glyphicon glyphicon-pencil"></i> Update Voucher</a></li>
+                <?php } ?>
+            <?php } ?>
+            <?php if($acl->checkPermission('Invoice', ACTION_DELETE) && !isEmptyString($request->invid)){ ?>
+				<?php 
+                    $isdeletable = true;
+                    $message = 'message="'.$this->translate('global_delete_confirm_message_nonote').'"';
+                    if(!$client->isActive()){
+                        $isdeletable = false;
+                        $message = 'message="This Account is closed and updates are disabled!"';
+                    }
+                ?>
+                <li><a class="gonowhere <?php echo !$isdeletable ? 'alert-dialog' : 'confirm-dialog'; ?>" title="Delete" <?php echo $message; ?> action="<?php echo $this->baseUrl('client/delete/id/'.encode($invoice->getID())."/entityname/Invoice/successurl/".encode($baseview_inv)); ?>"><i class="glyphicon glyphicon-remove"></i> Delete Invoice</a></li>
+            <?php } ?>
+            <?php if($acl->checkPermission('Invoice', ACTION_LIST)){ ?>
+	            <li><a href="<?php echo $baseview_inv.'/step/view'; ?>" title="Invoice History"><i class="glyphicon glyphicon-list"></i> Invoice History</a></li>
+            <?php } ?>
+            <?php if($acl->checkPermission('Payment', ACTION_LIST)){ ?>
+	            <li><a href="<?php echo $baseview_pay; ?>" title="Payment History"><i class="glyphicon glyphicon-list"></i> Payment History</a></li>
+            <?php } ?>
+        </ul>
+    </div>
+    <?php if($step == 'edit' || $step == 'new'){ ?>
+        <input type="hidden" id="entityname" name="entityname" value="Invoice" />
+        <input type="hidden" id="id" name="id" value="<?php echo encode($invoice->getID()); ?>" />
+        <input type="hidden" id="clientid" name="clientid" value="<?php echo $client->getID(); ?>" />
+        <input type="hidden" class="successurl" id="<?php echo URL_SUCCESS; ?>" name="<?php echo URL_SUCCESS; ?>" value="<?php echo encode($baseview_inv); ?>" />
+        <input type="hidden" class="failureurl" id="<?php echo URL_FAILURE; ?>" name="<?php echo URL_FAILURE; ?>" value="<?php echo encode($this->viewurl); ?>" />
+        <input type="hidden" id="<?php echo SUCCESS_MESSAGE; ?>" name="<?php echo SUCCESS_MESSAGE; ?>" value="<?php echo $successmessage; ?>" />
+        <input type="hidden" id="nosuccessid" name="nosuccessid" value="1" />
+    <?php } ?>
+    <div class="panel-body padding0">
+    	<div class="divider10"></div>
+		<?php if($step == 'new'){ ?>
+            <h5 class="inline margin0 bolded">New Invoice</h5>
+            <div class="separator"></div>
+            <div class="divider10"></div>
+        <?php } ?>
+        <?php if($step == 'edit'){ ?>
+            <h5 class="inline margin0 bolded">Update Invoice</h5>
+            <div class="separator"></div>
+            <div class="divider10"></div>
+        <?php } ?>
+        <div class="row-fluid margin0">
+            <div class="col-md-12 padding0 pull-right rightalign">
+                <?php if($step == 'edit' || $step == 'new'){ ?>
+                    <p class="margin0 lineblocked">
+                        <button type="submit" class="btn btn-success btn-sm button-submit save_trigger save" name="save"><i class="glyphicon glyphicon-ok"></i> <?php echo $step == 'new' ? $this->translate('global_button_save') : $this->translate('global_button_save_changes'); ?></button>
+                    </p>
+                    <p class="margin0 lineblocked">
+                        <a class="btn btn-default btn-sm cancel cancel_trigger"><i class="glyphicon glyphicon-remove"></i> <?php echo $this->translate('global_button_cancel'); ?></a>
+                    </p>
+                <?php } ?>
+            </div>
+        </div>
+       	<?php if($invoice_count == 0 && $step == 'view' && isEmptyString($request->invid)){ ?>
+        	<div class="divider15"></div>
+            <div style="clear:both;" class="alert alert-warning margin5">There are currently no invoices for <strong><?php echo $client->getName(); ?></strong></div>
+        <?php } ?>
+       
+		<?php if($invoice_count > 0 && $step == 'view' && isEmptyString($request->invid)) { ?>
+            <div class="pagedescription">Viewing details for <strong><?php echo $invoice_count == 1 ? '1 Invoice' : $invoice_count.' Invoices'; ?></strong></div>
+        <?php } ?>
+       	<?php if(!isEmptyString($request->invid) || $step == 'edit' || $step == 'new'){ ?>
+        
+        <script>
+			$(document).ready(function() {
+				// validation 
+				$("#form-invoice").validate({		
+					// define the validation rules one field at a time
+					rules: {
+						voucherid: "required",
+						invoiceno: "required",
+						invoicedate: "required",
+						hourstaken: {
+							required: true
+						},
+						description: "required"
+					}, 
+					// the messages for each of the fields being validated
+					messages: {		
+						voucherid: "<?php echo $this->translate("invoice_voucherid_error"); ?>",
+						invoiceno: "<?php echo $this->translate("invoice_invoiceno_error"); ?>",
+						invoicedate: "<?php echo $this->translate("invoice_invoicedate_error"); ?>",
+						hourstaken: {
+							required: "<?php echo $this->translate("invoice_hourstaken_error"); ?>"
+						},
+						description: "<?php echo $this->translate("invoice_description_error"); ?>"
+					},
+					// custom error positions
+					errorPlacement: function(error, element) {
+						switch(element.attr("name")){					
+							default:
+							if(element.hasClass("useid_error")){
+								error.appendTo("#"+element.attr("id")+"_error");
+							} else {
+								error.appendTo("#"+element.attr("name")+"_error");
+							}
+							break;
+						}			
+					}
+				});
+				
+				$("#voucherid").change(function(){
+					var vid = $(this).val();
+					if(!isEmptyString(vid)){
+						var url = '<?php echo $baseview_inv.'/step/new/vid/'; ?>'+base64_encode(vid);
+						$.blockUI({ message: uiblockcontent}); 
+						window.location.href = url;	
+					}
+				});
+				
+				$(".computeamount").keyup(function(){
+					var rate = $("#rate").val();
+					var hours = $("#hourstaken").val();
+					var amount = '0.00';
+					// alert(rate); alert(hours);
+					if(!isEmptyString(rate) && !isEmptyString(hours) && IsValidDecimal(hours)){
+						amount = (parseFloat(rate)*parseFloat(hours)).toFixed(2);
+						$("#amount_computed").html(amount);
+						$("#invoiceamount").val(amount);
+					} else {
+						$("#amount_computed").html(amount);
+					}
+				});
+				$(".computeamount").trigger("keyup");
+			}); 
+			</script>
+            <fieldset class="fieldsetcontainer">
+                <legend>Invoice Details</legend>
+                <div class="panel-body well-sm makerelative">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("invoice_voucherid_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo $invoice->getVoucher()->isFollowAlong() ? $invoice->getVoucher()->getfavoucherno() :  $invoice->getVoucher()->getVoucherNo(); ?></p>
+                                <div class="edit">
+                                    <?php
+										$vouchers = getVouchersForClient($client->getID());
+                                        $dropdown = new Zend_Form_Element_Select('voucherid',
+                                                            array(
+                                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $vouchers),
+                                                                'view' => new Zend_View(),
+                                                                'decorators' => array('ViewHelper'),
+                                                                'class' => array('form-control','input-sm','width150')
+                                                            )
+                                        );  
+                                        $dropdown->setValue($invoice->getvoucherid()); 
+                                        echo $dropdown->render();
+                                    ?>
+                                    <div id="voucherid_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("invoice_invoiceno_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo $invoice->getinvoiceno(); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm width125" id="invoiceno" name="invoiceno" value="<?php echo $invoice->getinvoiceno(); ?>" />
+                                    <div id="invoiceno_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("invoice_invoicedate_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($invoice->getInvoiceDate()); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm datefield readonly width100" name="invoicedate" id="invoicedate" value="<?php echo changeMySQLDateToPageFormat($invoice->getInvoiceDate()); ?>" />
+                                    <div id="invoicedate_error"></div>
+                                </div>      
+                            </div>
+                        </div>
+                         <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("invoice_rate_label"); ?>:</label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo formatNumber($invoice->getVoucher()->getRate()); ?></p> 
+                                <div class="edit">
+                                    <?php echo formatNumber($invoice->getVoucher()->getRate()); ?>
+                                    <input type="hidden" name="rate" id="rate" class="computeamount" value="<?php echo $invoice->getVoucher()->getRate(); ?>" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("invoice_hourstaken_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo formatNumber($invoice->getHourstaken()); ?></p> 
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm width100 isdecimal computeamount" id="hourstaken" name="hourstaken" value="<?php echo $invoice->getHourstaken(); ?>" /><div id="hourstaken_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("invoice_amount_label"); ?> <?php echo '<small>($)</small>'; ?>:</label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo $invoice->getInvoiceAmount(); ?></p>
+                                <div class="edit">
+                                    <span id="amount_computed"><?php echo $invoice->getInvoiceAmount(); ?></span>
+                                    <input type="hidden" name="invoiceamount" id="invoiceamount" value="<?php echo $invoice->getInvoiceAmount(); ?>" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("invoice_description_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo $invoice->getdescription(); ?></p> 
+                                <div class="edit">
+                                    <textarea class="form-control expanding" id="description" name="description"><?php echo $invoice->getdescription(); ?></textarea><div id="description_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("invoice_verifiedby_label"); ?>: </label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo $invoice->getverifiedby(); ?></p> 
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm" id="verifiedby" name="verifiedby" value="<?php echo $invoice->getverifiedby(); ?>" /><div id="verifiedby_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        <?php } ?>
+        <?php if(isEmptyString($request->invid) && $step == 'view') { ?>
+            <div class="divider5"></div>
+            <div class="col-md-12 padding0">
+            	<div class="listcontainer">
+                    <table class="table list table-striped table-responsive viewtable">
+                        <thead>
+                            <tr>
+                                <th class="centeralign" style="width:15px;">Details</th>
+                                <th class="nowrapping">Invoice No# <img src="<?php echo $this->baseUrl('images/spacer.gif'); ?>" style="width:15px; height:2px;" /></th>
+                                <th class="nowrapping">Voucher No# <img src="<?php echo $this->baseUrl('images/spacer.gif'); ?>" style="width:35px; height:2px;" /></th>
+                                <th class="nowrapping">Invoice Date <img src="<?php echo $this->baseUrl('images/spacer.gif'); ?>" style="width:10px; height:2px;" /></th>
+                                <th class="nowrapping">Hours Taken</th>
+                                <th class="nowrapping">Invoice Amount ($)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           <?php 
+                                $counter = 1;
+                                foreach($invoices as $invoice){ 
+									$voucherno = $invoice->getVoucher()->getVoucherNo();
+									if($invoice->getVoucher()->isFollowAlong()){
+										$voucherno = $invoice->getVoucher()->getfavoucherno();
+									}
+                            ?>
+                                <tr>
+                                    <td class="centeralign"><a href="<?php echo $baseview_inv.'/step/view/invid/'.encode($invoice->getID()); ?>" class="btn btn-default btn-xs">View</a></td>
+                                    <td><?php echo $invoice->getInvoiceNo(); ?></td>
+                                    <td><?php echo $voucherno; ?></td>
+                                    <td><?php echo formatDateAndTime($invoice->getInvoiceDate(), false); ?></td>
+                                    <td><?php echo $invoice->getHoursTaken(); ?></td>
+                                    <td><?php echo $invoice->getInvoiceAmount(); ?></td>
+                                </tr>
+                            <?php $counter++; } ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        <?php } ?>
+    </div>
+</form>
+<?php } ?>
+<?php if($request->section == 'payment'){ ?>	        
+<form id="form-payment" class="form-horizontal payment" role="form" action="<?php echo $this->baseUrl("payment/create"); ?>" method="post">
+	<div class="btn-group pull-right" style="margin-top:-10px;">
+        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+            Payment Actions <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <?php if($section == 'payment' && $step == 'view'){ ?>
+				<?php if($acl->checkPermission('Payment', ACTION_CREATE) && isEmptyString($request->pid)){ ?>	
+                    <li><a href="<?php echo $baseview_pay.'/step/new'; ?>" title="New Payment"><i class="glyphicon glyphicon-plus"></i> New Payment</a></li>
+                <?php } ?>
+                <?php if($acl->checkPermission('Payment', ACTION_EDIT) && !isEmptyString($request->pid)){ ?>	
+                	<li><a class="<?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'update_trigger'; ?>" message="This Account is closed and updates are disabled!" href="<?php echo $baseview_pay.'/step/edit/pid/'.encode($payment->getID()); ?>" title="Update"><i class="glyphicon glyphicon-pencil"></i> Update Payment</a></li>
+                <?php } ?>
+            <?php } ?>
+            <?php if($acl->checkPermission('Payment', ACTION_DELETE) && !isEmptyString($request->pid)){ ?>
+				<?php 
+                    $isdeletable = true;
+                    $message = 'message="'.$this->translate('global_delete_confirm_message_nonote').'"';
+                    if(!$client->isActive()){
+                        $isdeletable = false;
+                        $message = 'message="This Account is closed and updates are disabled!"';
+                    }
+                ?>
+                <li><a class="gonowhere <?php echo !$isdeletable ? 'alert-dialog' : 'confirm-dialog'; ?>" title="Delete"<?php echo $message; ?> action="<?php echo $this->baseUrl('client/delete/id/'.encode($payment->getID())."/entityname/Payment/successurl/".encode($baseview_pay)); ?>"><i class="glyphicon glyphicon-remove"></i> Delete Payment</a></li>
+            <?php } ?>
+            <?php if($acl->checkPermission('Payment', ACTION_LIST)){ ?>
+	            <li><a href="<?php echo $baseview_pay.'/step/view'; ?>" title="Payment History"><i class="glyphicon glyphicon-list"></i> Payment History</a></li>
+            <?php } ?>
+            <?php if($acl->checkPermission('Invoice', ACTION_LIST)){ ?>
+	            <li><a href="<?php echo $baseview_inv.'/step/view'; ?>" title="Invoice History"><i class="glyphicon glyphicon-list"></i> Invoice History</a></li>
+            <?php } ?>
+        </ul>
+    </div>
+    <?php if($step == 'edit' || $step == 'new'){ ?>
+        <input type="hidden" id="entityname" name="entityname" value="Payment" />
+        <input type="hidden" id="id" name="id" value="<?php echo encode($payment->getID()); ?>" />
+        <input type="hidden" id="clientid" name="clientid" value="<?php echo $client->getID(); ?>" />
+        <input type="hidden" class="successurl" id="<?php echo URL_SUCCESS; ?>" name="<?php echo URL_SUCCESS; ?>" value="<?php echo encode($baseview_pay); ?>" />
+        <input type="hidden" class="failureurl" id="<?php echo URL_FAILURE; ?>" name="<?php echo URL_FAILURE; ?>" value="<?php echo encode($this->viewurl); ?>" />
+        <input type="hidden" id="<?php echo SUCCESS_MESSAGE; ?>" name="<?php echo SUCCESS_MESSAGE; ?>" value="<?php echo $successmessage; ?>" />
+        <input type="hidden" id="nosuccessid" name="nosuccessid" value="1" />
+        <input type="hidden" name="voucherid" id="voucherid" value="<?php echo $payment->getVoucherID(); ?>" />
+    <?php } ?>
+    <div class="panel-body padding0">
+    	<div class="divider10"></div>
+		<?php if($step == 'new'){ ?>
+            <h5 class="inline margin0 bolded">New Payment</h5>
+            <div class="separator"></div>
+            <div class="divider10"></div>
+        <?php } ?>
+        <?php if($step == 'edit'){ ?>
+            <h5 class="inline margin0 bolded">Update Payment</h5>
+            <div class="separator"></div>
+            <div class="divider10"></div>
+        <?php } ?>
+        <div class="row-fluid margin0">
+            <div class="col-md-12 padding0 pull-right rightalign">
+                <?php if($step == 'edit' || $step == 'new'){ ?>
+                    <p class="margin0 lineblocked">
+                        <button type="submit" class="btn btn-success btn-sm button-submit save_trigger save" name="save"><i class="glyphicon glyphicon-ok"></i> <?php echo $step == 'new' ? $this->translate('global_button_save') : $this->translate('global_button_save_changes'); ?></button>
+                    </p>
+                    <p class="margin0 lineblocked">
+                        <a class="btn btn-default btn-sm cancel cancel_trigger"><i class="glyphicon glyphicon-remove"></i> <?php echo $this->translate('global_button_cancel'); ?></a>
+                    </p>
+                <?php } ?>
+            </div>
+        </div>
+       	<?php if($payment_count == 0 && $step == 'view' && isEmptyString($request->pid)){ ?>
+        	<div class="divider15"></div>
+            <div style="clear:both;" class="alert alert-warning margin5">There are currently no payments for <strong><?php echo $client->getName(); ?></strong></div>
+        <?php } ?>
+       
+		<?php if($payment_count > 0 && $step == 'view' && isEmptyString($request->pid)) { ?>
+            <div class="pagedescription">Viewing details for <strong><?php echo $payment_count == 1 ? '1 Payment' : $payment_count.' Payments'; ?></strong></div>
+        <?php } ?>
+       	<?php if(!isEmptyString($request->pid) || $step == 'edit' || $step == 'new'){ ?>
+        
+        <script>
+			$(document).ready(function() {
+				// validation 
+				$("#form-payment").validate({		
+					// define the validation rules one field at a time
+					rules: {
+						invoiceid: "required",
+						voucherid: "required",
+						paymentdate: "required",
+						paymentamount: {
+							required: true
+						}
+					}, 
+					// the messages for each of the fields being validated
+					messages: {		
+						invoiceid: "<?php echo $this->translate("payment_invoiceid_error"); ?>",
+						voucherid: "<?php echo $this->translate("payment_voucherid_error"); ?>",
+						paymentdate: "<?php echo $this->translate("payment_paymentdate_error"); ?>",
+						paymentamount: {
+							required: "<?php echo $this->translate("payment_paymentamount_error"); ?>"
+						}
+					},
+					// custom error positions
+					errorPlacement: function(error, element) {
+						switch(element.attr("name")){					
+							default:
+								if(element.hasClass("useid_error")){
+									error.appendTo("#"+element.attr("id")+"_error");
+								} else {
+									error.appendTo("#"+element.attr("name")+"_error");
+								}
+								break;
+						}			
+					}
+				});
+				
+				$("#invoiceid").change(function(){
+					var invid = $(this).val();
+					if(!isEmptyString(invid)){
+						var url = '<?php echo $baseview_pay.'/step/new/invid/'; ?>'+base64_encode(invid);
+						$.blockUI({ message: uiblockcontent}); 
+						window.location.href = url;	
+					}
+				});
+			}); 
+			</script>
+            <fieldset class="fieldsetcontainer">
+                <legend>Payment Details</legend>
+                <div class="panel-body well-sm makerelative">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("payment_invoiceid_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo $payment->getInvoice()->getInvoiceNo(); ?></p>
+                                <div class="edit">
+                                    <?php
+										$invoices = getInvoicesForClient($client->getID());
+                                        $dropdown = new Zend_Form_Element_Select('invoiceid',
+                                                            array(
+                                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $invoices),
+                                                                'view' => new Zend_View(),
+                                                                'decorators' => array('ViewHelper'),
+                                                                'class' => array('form-control','input-sm','width150')
+                                                            )
+                                        );  
+                                        $dropdown->setValue($payment->getInvoiceID()); 
+                                        echo $dropdown->render();
+                                    ?>
+                                    <div id="invoiceid_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("payment_paymentdate_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($payment->getPaymentDate()); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm datefield readonly width100" name="paymentdate" id="paymentdate" value="<?php echo changeMySQLDateToPageFormat($payment->getPaymentDate()); ?>" />
+                                    <div id="paymentdate_error"></div>
+                                </div>      
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("payment_amount_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo formatNumber($payment->getPaymentAmount()); ?></p> 
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm width100 isdecimal" id="paymentamount" name="paymentamount" value="<?php echo $payment->getPaymentAmount(); ?>" /><div id="paymentamount_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("payment_ref_label"); ?>:</label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo $payment->getRefNo(); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm width150" id="refno" name="refno" value="<?php echo $payment->getRefNo(); ?>" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("payment_receivedby_label"); ?>: </label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo $payment->getreceivedby(); ?></p> 
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm" id="receivedby" name="receivedby" value="<?php echo $payment->getreceivedby(); ?>" /><div id="receivedby_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        <?php } ?>
+        <?php if(isEmptyString($request->pid) && $step == 'view') { ?>
+            <div class="divider5"></div>
+            <div class="col-md-12 padding0">
+            	<div class="listcontainer">
+                    <table class="table list table-striped table-responsive viewtable">
+                        <thead>
+                            <tr>
+                                <th class="centeralign" style="width:15px;">Details</th>
+                                <th class="nowrapping">Payment Date <img src="<?php echo $this->baseUrl('images/spacer.gif'); ?>" style="width:10px; height:2px;" /></th>
+                                <th class="nowrapping">Invoice No# <img src="<?php echo $this->baseUrl('images/spacer.gif'); ?>" style="width:15px; height:2px;" /></th>
+                                <th class="nowrapping">Voucher No# <img src="<?php echo $this->baseUrl('images/spacer.gif'); ?>" style="width:35px; height:2px;" /></th>
+                                <th class="nowrapping">Amount ($) <img src="<?php echo $this->baseUrl('images/spacer.gif'); ?>" style="width:15px; height:2px;" /></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           <?php 
+                                $counter = 1;
+                                foreach($payments as $payment){ 
+									$voucherno = $payment->getVoucher()->getVoucherNo();
+									if($payment->getVoucher()->isFollowAlong()){
+										$voucherno = $payment->getVoucher()->getfavoucherno();
+									}
+                            ?>
+                                <tr>
+                                    <td class="centeralign"><a href="<?php echo $baseview_pay.'/step/view/pid/'.encode($payment->getID()); ?>" class="btn btn-default btn-xs">View</a></td>
+                                    <td><?php echo formatDateAndTime($payment->getPaymentDate(), false); ?></td>
+                                    <td><a href="<?php echo $baseview_inv.'/step/view/invid/'.encode($payment->getInvoiceID()); ?>"><?php echo $payment->getInvoice()->getInvoiceNo(); ?></a></td>
+                                    <td><?php echo $voucherno; ?></td>
+                                    <td><?php echo $payment->getPaymentAmount(); ?></td>
+                                </tr>
+                            <?php $counter++; } ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        <?php } ?>
+    </div>
+</form>
+<?php } ?>

@@ -36,41 +36,59 @@
 		$voucher->processPost($formvalues);
 	}
 	
-	$services = getServiceTypes();
-	$faservices = getFAServiceTypes();
+	$services = getServiceTypes(); $services_noalias = getServiceTypes('', false);
+	$faservices = getFAServiceTypes(); $faservices_noalias = getFAServiceTypes('', false);
 	$programs = getPrograms();
 	$funders = getFunders();
 	$voucherstatuses = getVoucherStatuses();
 ?>
 <script>
-	$(document).ready(function() {
-		<?php if($step == 'edit' || $step == 'new'){ ?>
-			$('.edit, .requiredmark, .save_trigger, .cancel_trigger').removeClass('hidden');
-			$('.form-control-static.view, .update_trigger').addClass('hidden');
-			
-			$(".save_trigger, .save").click(function(e){
-				e.preventDefault();
-				var status = $("#status").val();
-				if ($("#form-voucher").valid()) {
-					$.blockUI({ message: '<?php echo $blockcontent; ?>' }); 
-					$("#form-voucher").submit();
-				}
-			});
-			
-			$("#servicetypeid").change(function(e){
-				var value = $(this).val();
-				if(value == 3 || value == 5){
-					enableContainerByID('intensive');
-					$("#type").attr('checked', true);
-				} else {
-					disableContainerByID('intensive');
-					$("#type").attr('checked', false);
-				}
-			});
-			$("#servicetypeid").trigger('change');
-			
-		<?php } ?>
-	}); 
+$(document).ready(function() {
+	var dateofbirthOpts = datepickerOpts;
+	dateofbirthOpts.yearRange = "-<?php echo date('Y')-2010; ?>:-0"; 
+	var startfrom = '<?php echo date('Y'); ?>';
+	datepickerOpts.maxDate = new Date("Dec 31, "+startfrom);
+	$(".datefield").datepicker(dateofbirthOpts);
+	
+	<?php if($step == 'edit' || $step == 'new'){ ?>
+		$('.edit, .requiredmark, .save_trigger, .cancel_trigger').removeClass('hidden');
+		$('.form-control-static.view, .update_trigger').addClass('hidden');
+		
+		$(".save_trigger, .save").click(function(e){
+			e.preventDefault();
+			var status = $("#status").val();
+			if ($("#form-voucher").valid()) {
+				$.blockUI({ message: '<?php echo $blockcontent; ?>' }); 
+				$("#form-voucher").submit();
+			}
+		});
+		
+		$("#servicetypeid").change(function(e){
+			var value = $(this).val();
+			if(value == 3 || value == 5){
+				enableContainerByID('intensive');
+				$("#type").attr('checked', true);
+			} else {
+				disableContainerByID('intensive');
+				$("#type").attr('checked', false);
+			}
+		});
+		$("#servicetypeid").trigger('change');
+		
+		$(".computeamount").keyup(function(){
+			var rate = $("#rate").val();
+			var hours = $("#hours").val();
+			// alert(rate); alert(hours);
+			if(!isEmptyString(rate) && !isEmptyString(hours)){
+				$("#amount_computed").html((parseFloat(rate)*parseFloat(hours)).toFixed(2));
+			} else {
+				$("#amount_computed").html('0.00');
+			}
+		});
+		$(".computeamount").trigger("keyup");
+	<?php } ?>
+	
+}); 
 </script>	        
 <form id="form-voucher" class="form-horizontal voucher" role="form" action="<?php echo $this->baseUrl("voucher/create"); ?>" method="post">
 	<div class="btn-group pull-right" style="margin-top:-10px;">
@@ -124,7 +142,6 @@
         <input type="hidden" class="failureurl" id="<?php echo URL_FAILURE; ?>" name="<?php echo URL_FAILURE; ?>" value="<?php echo encode($this->viewurl); ?>" />
         <input type="hidden" id="<?php echo SUCCESS_MESSAGE; ?>" name="<?php echo SUCCESS_MESSAGE; ?>" value="<?php echo $successmessage; ?>" />
         <input type="hidden" id="nosuccessid" name="nosuccessid" value="1" />
-        <input type="hidden" name="type" id="type" value="<?php echo $voucher->getType(); ?>" />
         <input type="hidden" name="parentid" id="parentid" value="<?php echo $voucher->getParentID(); ?>" />
     <?php } ?>
     <div class="panel-body padding0">
@@ -316,7 +333,7 @@
                                 <div class="col-md-8">
                                     <p class="form-control-static nullifempty view"><?php echo $voucher->getfaprefix(); ?></p>
                                     <div class="edit">
-                                        <label class="checkbox-inline" style="margin-bottom:5px;"><input type="checkbox" name="type" id="type" value="2" /> This Voucher is Intensive</label>
+                                        <label class="checkbox-inline" style="margin-bottom:5px;"><input type="checkbox" name="type" id="type" value="<?php echo $voucher->getType(); ?>" <?php echo isEmptyString($voucher->getfaprefix()) ? '': 'checked'; ?> /> This Voucher is Intensive</label>
                                         <input type="text" class="form-control input-sm width125" id="faprefix" name="faprefix" value="<?php echo $voucher->getfaprefix(); ?>" />
                                         <div id="faprefix_error"></div>
                                     </div>
@@ -334,7 +351,7 @@
                             <div class="col-md-8">
                                 <p class="form-control-static nullifempty view"><?php echo $voucher->getHours(); ?></p> 
                                 <div class="edit">
-                                    <input type="text" class="form-control input-sm width100 isdecimal" id="hours" name="hours" value="<?php echo $voucher->getHours(); ?>" />
+                                    <input type="text" class="form-control input-sm width100 isdecimal computeamount" id="hours" name="hours" value="<?php echo $voucher->getHours(); ?>" />
                                     <input type="hidden" class="form-control" name="hours_old" id="hours_old" value="<?php echo $voucher->getHours(); ?>" />
                                     <div id="hours_error"></div>
                                 </div>
@@ -345,13 +362,24 @@
                             <div class="col-md-8">
                                 <p class="form-control-static nullifempty view"><?php echo isEmptyString($voucher->getRate()) ? '' : $config->country->currencysymbol.$voucher->getRate().'/Hr'; ?></p> 
                                 <div class="edit">
-                                    <input type="text" class="form-control input-sm width100 isdecimal" id="rate" name="rate" value="<?php echo $voucher->getRate(); ?>" />
+                                    <input type="text" class="form-control input-sm width100 isdecimal computeamount" id="rate" name="rate" value="<?php echo $voucher->getRate(); ?>" />
                                     <input type="hidden" class="form-control" name="rate_old" id="rate_old" value="<?php echo $voucher->getRate(); ?>" />
                                     <div id="rate_error"></div>
                                 </div>
                             </div>
                         </div>
                         <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("voucher_voucheramount_label"); ?> <?php echo '<small>($)</small>'; ?>:</label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo $voucher->getHours() * $voucher->getRate(); ?></p>
+                                <div class="edit">
+                                    <span id="amount_computed"><?php echo $voucher->getHours() * $voucher->getRate(); ?></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                    	<div class="form-group">
                             <label class="col-md-4 control-label"><?php echo $this->translate("voucher_status_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                             <div class="col-md-8">
                                 <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($voucher->getStatus(), $voucherstatuses) ? '' : $voucherstatuses[$voucher->getStatus()]; ?></p>
@@ -371,9 +399,7 @@
                                 </div>      
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                    	<div class="form-group">
+                        <div class="form-group">
                             <label class="col-md-4 control-label"><?php echo $this->translate("voucher_dateapproved_label"); ?>: 
 								<?php if(!$isfollowalong){ ?>	
                                     <?php echo $this->translate("global_required_field_marker"); ?>
@@ -522,7 +548,6 @@
                                 <th class="nowrapping">Status <img src="<?php echo $this->baseUrl('images/spacer.gif'); ?>" style="width:75px; height:2px;" /></th>
                                 <th class="nowrapping">Date Approved <img src="<?php echo $this->baseUrl('images/spacer.gif'); ?>" style="width:10px; height:2px;" /></th>
                                 <th class="nowrapping">Start Date <img src="<?php echo $this->baseUrl('images/spacer.gif'); ?>" style="width:20px; height:2px;" /></th>
-                                <th class="nowrapping">Invoice Date <img src="<?php echo $this->baseUrl('images/spacer.gif'); ?>" style="width:20px; height:2px;" /></th>
                                 <th class="nowrapping">Hrs Approved</th>
                                 <th class="nowrapping">Rate ($/Hr)<img src="<?php echo $this->baseUrl('images/spacer.gif'); ?>" style="width:20px; height:2px;" /></th>
                             </tr>
@@ -532,10 +557,10 @@
                                 $counter = 1;
                                 foreach($vouchers as $voucher){ 
 									$isfollowalong = false;
-									$servicetype = isArrayKeyAnEmptyString($voucher->getServiceTypeID(), $services) ? '': $services[$voucher->getServiceTypeID()];
+									$servicetype = isArrayKeyAnEmptyString($voucher->getServiceTypeID(), $services_noalias) ? '': $services_noalias[$voucher->getServiceTypeID()];
 									if($voucher->getType() == 2 && !isEmptyString($voucher->getParentID())){
 										$isfollowalong = true;
-										$servicetype = isArrayKeyAnEmptyString($voucher->getServiceTypeID(), $faservices) ? '': $faservices[$voucher->getServiceTypeID()];
+										$servicetype = isArrayKeyAnEmptyString($voucher->getServiceTypeID(), $faservices_noalias) ? '': $faservices_noalias[$voucher->getServiceTypeID()];
 									}
                             ?>
                                 <tr>
@@ -552,7 +577,6 @@
                                     <td><?php echo isArrayKeyAnEmptyString($voucher->getStatus(), $voucherstatuses) ? '' : $voucherstatuses[$voucher->getStatus()]; ?></td>
                                     <td><?php echo formatDateAndTime($voucher->getDateApproved(), false); ?></td>
                                     <td><?php echo formatDateAndTime($voucher->getStartDate(), false); ?></td>
-                                    <td><?php echo formatDateAndTime($voucher->getInvoiceDate(), false); ?></td>
                                     <td class="centeralign"><?php echo $voucher->gethours(); ?></td>
                                     <td><?php echo $voucher->getRate(); ?></td>
                                 </tr>

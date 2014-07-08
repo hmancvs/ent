@@ -1,0 +1,98 @@
+<div class="col-md-12 padding0">
+    <div class="form-group">
+        <div class="col-md-12">
+            <div class="divider10"></div>
+            <div class="col-md-12">
+                <?php
+                    $sections = array (
+                        1 => array('label'=>'Medical Condition (Health)', 'field'=>'medicalconditions', 'data' => $client->getAssessmentDataArray(1)),
+                        2 => array('label'=>'Physical Limitations or Disability (Health)', 'field'=>'physicallimatations', 'data' => $client->getAssessmentDataArray(2)),
+                        3 => array('label'=>'Psychological Limitations or Disability (Health)', 'field'=>'psychologicallimitations', 'data' => $client->getAssessmentDataArray(3)),
+                        4 => array('label'=>'Medication Regimen (Health)', 'field'=>'medicationregimen', 'data' => $client->getAssessmentDataArray(4)),
+                        5 => array('label'=>'Nutritional Status (Health)', 'field'=>'nutritionalstatus', 'data' => $client->getAssessmentDataArray(5)),
+                        6 => array('label'=>'Living Conditions (Health)', 'field'=>'livingconditions', 'data' => $client->getAssessmentDataArray(6)),
+                        7 => array('label'=>'Lifestyle (Sexuality , Substance Use/Abuse)', 'field'=>'lifestyle', 'data' => $client->getAssessmentDataArray(7)),
+                        8 => array('label'=>'Access to Medical Services (Safety)', 'field'=>'medicalaccesssafety', 'data' => $client->getAssessmentDataArray(8)),
+                        9 => array('label'=>'Living Environment and Location (Safety)', 'field'=>'livingenvironment', 'data' => $client->getAssessmentDataArray(9)),
+                        10 => array('label'=>'Transportation (Safety)', 'field'=>'transportationsafety', 'data' => $client->getAssessmentDataArray(10)),
+                        11 => array('label'=>'Relationships/Social Environments (Safety)', 'field'=>'socialrships', 'data' => $client->getAssessmentDataArray(11))
+                    );
+                ?>
+                <p class="form-control-static nullifempty view">
+                    <table class="table table-condensed table-bordered table-responsive viewtable">
+                        <thead>
+                            <tr>
+                                <th class="centeralign" style="width:30px;"></th>
+                                <th><h4 class="col-md-12">Potential Risks to Health and Safety</h4></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php 
+                                foreach($sections as $key => $thesection){
+                                    $data = $thesection['data'];
+									// debugMessage($data);
+                            ?>
+                                <tr>
+                                    <td class="centeralign"><?php echo $key; ?>.</td>
+                                    <td style="padding-top:0;">
+                                        <label class="col-md-12 control-label notbolded" style="color:#00436D; font-size:16px;"><?php echo $thesection['label']; ?></label>
+                                        <div class="col-md-12">
+                                            <div class="divider10"></div>
+                                            <p class="bolded"><?php echo $this->translate('client_impactsorpotential_label'); ?>:</p>
+                                            <p><?php echo $this->translate('client_lifequality_label'); ?> - <?php echo $data[0] == 1 ? 'Yes' : 'No'; ?></p>
+                                            <p><?php echo $this->translate('client_empsuccess_label'); ?> - <?php echo $data[1] == 1 ? 'Yes' : 'No'; ?></p>
+                                            <div class="divider10"></div>
+                                            <p class="bolded"><?php echo $this->translate('client_impactedby_label'); ?>:</p>
+                                            <p><?php echo $this->translate('client_empconditions_label'); ?> - <?php echo $data[2] == 1 ? 'Yes' : 'No'; ?></p>
+                                            <div class="divider10"></div>
+                                            <p class="bolded"><?php echo $this->translate('client_issuesneeded_label'); ?></p>
+                                            <p class="blocked"><?php echo decode($data[3]); ?></p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+                </p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <input type="text" name="hasassessment_questions" id="hasassessment_questions" class="hidden disableoutsidesection form-control" value="1" />
+                    <table class="table table-condensed table-bordered table-responsive viewtable">
+                        <thead>
+                            <tr>
+                                <th class="centeralign" style="width:30px;"></th>
+                                <th><h4 class="col-md-12">Potential Risks to Health and Safety</h4></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php 
+                                foreach($sections as $key => $thesection){
+                                    $data = $thesection['data'];
+                            ?>
+                                <tr>
+                                    <td class="centeralign"><?php echo $key; ?>.</td>
+                                    <td style="padding-top:0;">
+                                        <label class="col-md-12 control-label notbolded" style="color:#00436D; font-size:16px;"><?php echo $thesection['label']; ?></label>
+                                        <div class="col-md-12">
+                                            <div class="divider10"></div>
+                                            <p class="bolded"><?php echo $this->translate('client_impactsorpotential_label'); ?>:</p>
+                                            <p><label class="checkbox-inline"><input type="checkbox" name="qn_<?php echo $key; ?>_0" id="qn_<?php echo $key; ?>_0" class="disableoutsidesection" value="1" <?php echo $data[0] == 1 ? 'checked' : ''; ?>/> <?php echo $this->translate('client_lifequality_label'); ?></label></p>
+                                            <p><label class="checkbox-inline"><input type="checkbox" name="qn_<?php echo $key; ?>_1" id="qn_<?php echo $key; ?>_1" class="disableoutsidesection" value="1" <?php echo $data[1] == 1 ? 'checked' : ''; ?>/> <?php echo $this->translate('client_empsuccess_label'); ?></label></p>
+                                            <div class="divider10"></div>
+                                            <p class="bolded"><?php echo $this->translate('client_impactedby_label'); ?>:</p>
+                                            <p><label class="checkbox-inline"><input type="checkbox" name="qn_<?php echo $key; ?>_2" id="qn_<?php echo $key; ?>_2" class="disableoutsidesection" value="1" <?php echo $data[2] == 1 ? 'checked' : ''; ?> /> <?php echo $this->translate('client_empconditions_label'); ?></label></p>
+                                            <div class="divider10"></div>
+                                            <p class="bolded"><?php echo $this->translate('client_issuesneeded_label'); ?></p>
+                                            <p class="blocked"><textarea id="qn_<?php echo $key; ?>_3" name="qn_<?php echo $key; ?>_3" class="form-control expanding"><?php echo decode($data[3]); ?></textarea></p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+</div>

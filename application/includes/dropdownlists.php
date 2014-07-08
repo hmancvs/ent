@@ -743,8 +743,13 @@
 		// return true;
 	}
 	# return programs
-	function getPrograms($value = ''){
-		$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.alias,' - ',l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_PROGRAMS' order by ABS(l.alias) ";
+	function getPrograms($value = '', $aliased = true){
+		if($aliased){
+			$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.alias,' - ',l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_PROGRAMS' ";
+		} else {
+			$query = "SELECT l.lookuptypevalue as optionvalue, l.alias as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_PROGRAMS' ";
+		}
+		
 		// debugMessage($query); exit();
 		$array = getOptionValuesFromDatabaseQuery($query);
 		if(!isEmptyString($value)){
@@ -757,9 +762,14 @@
 		return $array;
 	}
 	# return service types
-	function getServiceTypes($value = ''){
-		$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.alias,' - ',l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'VOUCHER_SERVICE_TYPES' order by ABS(l.alias) ";
-		// debugMessage($query); exit();
+	function getServiceTypes($value = '', $aliased = true){
+		if($aliased){
+			$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.alias,' - ',l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'VOUCHER_SERVICE_TYPES' ";
+		} else {
+			$query = "SELECT l.lookuptypevalue as optionvalue, l.alias as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'VOUCHER_SERVICE_TYPES' ";
+		}
+		
+		// debugMessage($query); // exit();
 		$array = getOptionValuesFromDatabaseQuery($query);
 		if(!isEmptyString($value)){
 			if(!isArrayKeyAnEmptyString($value, $array)){
@@ -771,9 +781,14 @@
 		return $array;
 	}
 	# return the follow along types
-	function getFAServiceTypes($value = ''){
-		$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.alias,' - ',l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'FA_SERVICE_TYPES' order by ABS(l.alias) ";
-		// debugMessage($query); exit();
+	function getFAServiceTypes($value = '', $aliased = true){
+		if($aliased){
+			$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.alias,' - ',l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'FA_SERVICE_TYPES' ";
+		} else {
+			$query = "SELECT l.lookuptypevalue as optionvalue, l.alias as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'FA_SERVICE_TYPES' ";
+		}
+		
+		// debugMessage($query); // exit();
 		$array = getOptionValuesFromDatabaseQuery($query);
 		if(!isEmptyString($value)){
 			if(!isArrayKeyAnEmptyString($value, $array)){
@@ -1299,6 +1314,39 @@
 	# determine the relationship options
 	function getAllRelationshipOptions($value = ''){
 		$query = "SELECT l.lookuptypevalue as optionvalue, trim(l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_RELATIONSHIP' order by optiontext ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			if(!isArrayKeyAnEmptyString($value, $array)){
+				return $array[$value];
+			} else {
+				return '';
+			}
+		}
+		return $array;
+	}
+	# fetch all vouchers for this client
+	function getVouchersForClient($clientid){
+		$query = "SELECT v.id as optionvalue, IF((v.parentid <> '' AND v.type = '2'), v.favoucherno, v.voucherno) as optiontext FROM voucher AS v WHERE v.clientid = '".$clientid."' order by v.startdate ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		return $array;
+	}
+	# determine the invoices for client
+	function getInvoicesForClient($clientid){
+		$query = "SELECT i.id as optionvalue, i.invoiceno as optiontext FROM invoice AS i WHERE i.clientid = '".$clientid."' order by i.invoicedate ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		return $array;
+	}
+	# fetch all the activity codes for billable interventions
+	function getAllActivityCodes($value = '', $aliased=true){
+		if($aliased){
+			$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.alias,' - ',l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'ACTIVITY_CODES' ";
+		} else {
+			$query = "SELECT l.lookuptypevalue as optionvalue, l.alias as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'ACTIVITY_CODES' ";
+		}
+		
 		// debugMessage($query); exit();
 		$array = getOptionValuesFromDatabaseQuery($query);
 		if(!isEmptyString($value)){

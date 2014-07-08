@@ -1,0 +1,121 @@
+<div class="panel-body well-sm">
+    <div class="col-md-12 padding0">
+        <div class="form-group">
+            <div class="col-md-6">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_isveteran_label'); ?></label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getisveteran() == 1 ? 'Yes' : 'No'; ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <label class="radio-inline">
+                          <input type="radio" id="isveteran_1" name="isveteran" value="1" class="disableoutsidesection" <?php echo $client->getisveteran() == 1 ? 'checked' : ''; ?>>Yes
+                        </label>
+                        <label class="radio-inline">
+                          <input type="radio" id="isveteran_0" name="isveteran" value="0" class="disableoutsidesection" <?php echo $client->getisveteran() == 0 ? 'checked' : ''; ?>>No
+                        </label>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_rank_label'); ?>:</label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getrank(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <input type="text" id="rank" name="rank" class="form-control input-sm" value="<?php echo $client->getrank(); ?>" />
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-6">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_servicebranch_label'); ?>:</label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getservicebranch(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <input type="text" id="servicebranch" name="servicebranch" class="form-control input-sm" value="<?php echo $client->getservicebranch(); ?>" />
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_technicalspeciality_label'); ?>:</label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->gettechnicalspeciality(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <input type="text" id="technicalspeciality" name="technicalspeciality" class="form-control input-sm" value="<?php echo $client->gettechnicalspeciality(); ?>" />
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_dischargetype_label'); ?>:</label>
+                <div class="col-md-12">
+                    <?php $dischargeoptions = getAllMilitaryDischargeOptions(); ?>
+                    <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getdischargetype(), $dischargeoptions) ? '': $dischargeoptions[$client->getdischargetype()]; ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <?php 
+                            foreach($dischargeoptions as $key => $value){
+                        ?>
+                            <label class="radio-inline">
+                              <input type="radio" id="dischargetype_<?php echo $key; ?>" name="dischargetype" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo $key == $client->getdischargetype() ? 'checked' : ''; ?>> <?php echo $value; ?>
+                            </label>
+                        <?php } ?>
+                    </div>
+                    <?php } ?>
+                </div> 
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-6">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_iscombat_label'); ?>:</label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getiscombat() == 1 ? 'Yes' : 'No'; ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <label class="radio-inline">
+                          <input type="radio" id="iscombat_1" name="iscombat" class="disableoutsidesection" value="1" <?php echo $client->getiscombat() == 1 ? 'checked' : ''; ?>>Yes
+                        </label>
+                        <label class="radio-inline">
+                          <input type="radio" id="iscombat_0" name="iscombat" class="disableoutsidesection" value="0" <?php echo $client->getiscombat() == 0 ? 'checked' : ''; ?>>No
+                        </label>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_combatproblemsids_label'); ?></label>
+                <div class="col-md-12">
+                    <?php $combatproblems = getAllCombatProblems(); ?>
+                    <p class="form-control-static nullifempty view"><?php echo count($client->getCombatProblemsArray())  == 0 ? '': $client->getListofCombatProblems(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                    	<div id="container_combatproblemsids">
+							<?php 
+                                $existing_values = $client->getCombatProblemsArray();
+                                foreach($combatproblems as $key => $value){
+                            ?>
+                                <label class="checkbox notbolded">
+                                  <input type="checkbox" id="combatproblems_<?php echo $key; ?>" name="combatproblemsids[]" value="<?php echo $key; ?>"  <?php echo in_array($key, $existing_values) ? 'checked' : ''; ?>><?php echo $value; ?>
+                                </label>
+                            <?php } ?>
+                        </div>
+                        <div class="divider5"></div>
+                        <a class="gonowhere checkothertrigger" fieldid="combatproblemsids" lookupid="40" fieldlabel="Client Military Combat Problems" fieldtype="checkbox" checkclasses="checkbox notbolded" checkname="combatproblemsids[]" checkid="combatproblems_"><?php echo $this->translate('global_addoption_label'); ?></a>
+                        <input type="hidden" name="combatproblems_old" class="form-control" value="<?php echo $client->getcombatproblems(); ?>" />
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

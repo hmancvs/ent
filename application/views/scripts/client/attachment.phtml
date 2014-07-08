@@ -1,0 +1,63 @@
+<div class="panel-body" style="min-height:0; height:auto;">
+    <div class="form-group">
+        <div class="col-md-6">
+            <label class="col-md-12 control-label"><?php echo $this->translate("client_resume_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+            <div class="col-md-6">
+                <p class="form-control-static nullifempty view"><?php echo $client->getResumeLink(); ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit" id="resume">
+                    <div id="beforesave_resume">
+                        <label class="blocked small">Upload a file (Max size <?php echo formatBytes($config->uploads->docmaximumfilesize); ?>)</label>
+                        <div class="fileinput-holder input-group col-md-12 padding0">
+                            <div id="filenamedisplay" class="fileinput-preview uneditable-input form-control">No file selected..</div>
+                            <div class="input-group-btn">
+                                <span class="fileinput-btn btn btn-default">Browse
+                                    <input type="file" name="resumefilename" id="resumefilename" class="form-control file input-sm inline" data-style="fileinput" />
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="aftersave_resume">
+                        <input type="text" name="resumefilename_old" id="resumefilename_old" class="form-control hidden" value="<?php echo $client->getResumeFilename(); ?>" />
+                        <p class="form-control-static nullifempty"><?php echo $client->getResumeFilename(); ?></p> 
+                    </div>
+                    <?php if($client->hasResume()){ ?>
+                        <div class="divider5"></div>
+                        <a class="gonowhere btn btn-default btn-xs reupload" id="reupload_resume" rel="resume"><span class="glyphicon glyphicon-refresh"></span> Re-upload</a> <img src="<?php echo $this->baseUrl('images/loader.gif'); ?>" class="hidden" id="loading_resume" />
+                    <?php } ?>
+                    <div id="resumefilename_error"></div>
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label class="col-md-12 control-label"><?php echo $this->translate("client_cover_label"); ?>:</label>
+            <div class="col-md-6">
+                <p class="form-control-static nullifempty view"><?php echo $client->getCoverletterLink(); ?></p>  
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit" id="cover">
+                    <div id="beforesave_cover">
+                        <label class="blocked small">Upload a file (Max size <?php echo formatBytes($config->uploads->docmaximumfilesize); ?>)</label>
+                        <div class="fileinput-holder input-group col-md-12 padding0">
+                            <div id="filenamedisplay" class="fileinput-preview uneditable-input form-control">No file selected..</div>
+                            <div class="input-group-btn">
+                                <span class="fileinput-btn btn btn-default">Browse
+                                    <input type="file" name="coverletterfilename" id="coverletterfilename" class="form-control file input-sm inline" data-style="fileinput" />
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="aftersave_cover">
+                        <input type="text" name="coverletterfilename_old" class="form-control hidden" id="coverletterfilename_old" value="<?php echo $client->getCoverLetterFilename(); ?>" />
+                        <p class="form-control-static nullifempty"><?php echo $client->getCoverLetterFilename(); ?></p> 
+                    </div>
+                    <?php if($client->getCoverletterLink()){ ?>
+                        <div class="divider5"></div>
+                        <a class="gonowhere btn btn-default btn-xs reupload" id="reupload_cover" rel="cover"><span class="glyphicon glyphicon-refresh"></span> Re-upload</a> <img src="<?php echo $this->baseUrl('images/loader.gif'); ?>" class="hidden" id="loading_cover" />
+                    <?php } ?>
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+</div>

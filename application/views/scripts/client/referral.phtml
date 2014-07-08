@@ -1,0 +1,240 @@
+<script>
+$(document).ready(function() {
+	var dateofbirthOpts = datepickerOpts;
+	dateofbirthOpts.yearRange = "-<?php echo date('Y')-2010; ?>:-0"; 
+	var startfrom = '<?php echo date('Y'); ?>';
+	datepickerOpts.maxDate = new Date("Dec 31, "+startfrom);
+	$(".datefield").datepicker(dateofbirthOpts);
+	
+	$(".computeamount").keyup(function(){
+		var rate = $("#rate").val();
+		var hours = $("#hours").val();
+		// alert(rate); alert(hours);
+		if(!isEmptyString(rate) && !isEmptyString(hours)){
+			$("#amount_computed").html((parseFloat(rate)*parseFloat(hours)).toFixed(2));
+		} else {
+			$("#amount_computed").html('0.00');
+		}
+	});
+	$(".computeamount").trigger("keyup");
+});
+</script>
+<fieldset class="fieldsetcontainer">
+    <legend>Initial Service Voucher</legend>
+    <div class="panel-body well-sm">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="col-md-4 control-label"><?php echo $this->translate("client_program_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                <div class="col-md-8">
+                    <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getProgramID(), $programs) ? '': $programs[$client->getProgramID()]; ?></p>
+                    <?php if(($step == 'edit' && $section == 'referral' || $step == 'new')){ ?>
+                    <div class="edit">
+                        <?php
+                            $dropdown = new Zend_Form_Element_Select('programid',
+                                                array(
+                                                    'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $programs, array('0'=>$this->translate("global_addvariable_label"))),
+                                                    'view' => new Zend_View(),
+                                                    'decorators' => array('ViewHelper'),
+                                                    'class' => array('form-control','input-sm','configvariable'),
+													'lookupid' => 41,
+													'fieldid' => 'programid',
+													'fieldlabel' => $this->translate("client_program_label"),
+													'hasalias' => '1'
+                                                )
+                            );  
+                            $dropdown->setValue($client->getProgramID()); 
+                            echo $dropdown->render();
+                        ?>
+                        <input type="hidden" class="form-control" name="initialvoucherid" id="initialvoucherid" value="<?php echo $client->getInitialVoucherID(); ?>" />
+                        
+                        <div id="programid_error"></div>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label"><?php echo $this->translate("client_funder_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                <div class="col-md-8">
+                    <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getFunderID(), $funders) ? '': $funders[$client->getFunderID()]; ?></p>
+                    <?php if(($step == 'edit' && $section == 'referral' || $step == 'new')){ ?>
+                    <div class="edit">
+                        <?php
+                            $dropdown = new Zend_Form_Element_Select('funderid',
+                                                array(
+                                                    'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $funders),
+                                                    'view' => new Zend_View(),
+                                                    'decorators' => array('ViewHelper'),
+                                                    'class' => array('form-control','input-sm',)
+                                                )
+                            );  
+                            $dropdown->setValue($client->getFunderID()); 
+                            echo $dropdown->render();
+                        ?>
+                        <div id="funderid_error"></div>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label"><?php echo $this->translate("voucher_servicetypeid_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                <div class="col-md-8">
+                    <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getServiceTypeID(), $services) ? '': $services[$client->getServiceTypeID()]; ?></p>
+                    <?php if(($step == 'edit' && $section == 'referral' || $step == 'new')){ ?>
+                    <div class="edit">
+                        <?php
+                            $dropdown = new Zend_Form_Element_Select('servicetypeid',
+                                                array(
+                                                    'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $services, array('0'=>$this->translate("global_addvariable_label"))),
+                                                    'view' => new Zend_View(),
+                                                    'decorators' => array('ViewHelper'),
+                                                    'class' => array('form-control','input-sm','configvariable'),
+													'lookupid' => 42,
+													'fieldid' => 'servicetypeid',
+													'fieldlabel' => $this->translate("voucher_servicetypeid_label"),
+													'hasalias' => '1'
+                                                )
+                            );  
+                            $dropdown->setValue($client->getServiceTypeID()); 
+                            echo $dropdown->render();
+                        ?>
+                        <div id="servicetypeid_error"></div>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label"><?php echo $this->translate("client_objective_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                <div class="col-md-8">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getemploymentgoal(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'referral' || $step == 'new')){ ?>
+                    <div class="edit">
+                        <textarea id="employmentgoal" name="employmentgoal" class="form-control"><?php echo $client->getemploymentgoal(); ?></textarea>
+                        <div id="employmentgoal_error"></div>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label"><?php echo $this->translate("voucher_units_label"); ?> <?php echo '<small>(Hrs)</small>'; ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                <div class="col-md-8">
+                    <p class="form-control-static nullifempty view"><?php echo formatNumber($client->getInitialVoucher()->getHours()); ?></p> 
+                    <?php if(($step == 'edit' && $section == 'referral' || $step == 'new')){ ?>
+                    <div class="edit">
+                        <input type="text" class="form-control input-sm width100 isdecimal computeamount" id="hours" name="hours" value="<?php echo $client->getInitialVoucher()->getHours(); ?>" />
+                        <input type="hidden" class="form-control" name="hours_old" id="hours_old" value="<?php echo $client->getInitialVoucher()->getHours(); ?>" />
+                        <div id="hours_error"></div>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label"><?php echo $this->translate("voucher_voucherrate_label"); ?> <?php echo '<small>('.$config->country->currencysymbol.'/Hr)</small>'; ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                <div class="col-md-8">
+                    <p class="form-control-static nullifempty view"><?php echo isEmptyString($client->getInitialVoucher()->getRate()) ? '' : $client->getInitialVoucher()->getRate(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'referral' || $step == 'new')){ ?>
+                    <div class="edit">
+                        <input type="text" class="form-control input-sm width100 isdecimal computeamount" id="rate" name="rate" value="<?php echo $client->getInitialVoucher()->getRate(); ?>" />
+                        <input type="hidden" class="form-control" name="rate_old" id="rate_old" value="<?php echo $client->getInitialVoucher()->getRate(); ?>" />
+                        <div id="rate_error"></div>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label"><?php echo $this->translate("voucher_voucheramount_label"); ?> <?php echo '<small>($)</small>'; ?>:</label>
+                <div class="col-md-8">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getInitialVoucher()->getHours() * $client->getInitialVoucher()->getRate(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'referral' || $step == 'new')){ ?>
+                    <div class="edit">
+                        <span id="amount_computed"><?php echo $client->getInitialVoucher()->getHours() * $client->getInitialVoucher()->getRate(); ?></span>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="col-md-4 control-label">Voucher No#: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                <div class="col-md-8">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getInitialVoucher()->getVoucherNo(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'referral' || $step == 'new')){ ?>
+                    <div class="edit">
+                        <input type="text" class="form-control input-sm width150" id="voucherno" name="voucherno" value="<?php echo $client->getInitialVoucher()->getVoucherNo(); ?>" />
+                        <div id="voucherno_error"></div>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label"><?php echo $this->translate("client_dvrsref_label"); ?>:</label>
+                <div class="col-md-8">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getDvrsRef(); ?></p> 
+                    <?php if(($step == 'edit' && $section == 'referral' || $step == 'new')){ ?>
+                    <div class="edit">
+                        <input type="text" class="form-control input-sm width150" id="dvrsref" name="dvrsref" value="<?php echo $client->getDvrsRef(); ?>" />
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label"><?php echo $this->translate("client_authorizedby_label"); ?> <small class="blocked">(DVRS Counsellor):</small></label>
+                <div class="col-md-8">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getDvrsCounselor(); ?></p> 
+                    <?php if(($step == 'edit' && $section == 'referral' || $step == 'new')){ ?>
+                    <div class="edit">
+                        <input type="text" class="form-control input-sm" id="dvrscounselor" name="dvrscounselor" value="<?php echo $client->getDvrsCounselor(); ?>" />
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label"><?php echo $this->translate("voucher_dateapproved_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                <div class="col-md-8">
+                    <p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($client->getInitialVoucher()->getDateApproved()); ?></p>
+                    <?php if(($step == 'edit' && $section == 'referral' || $step == 'new')){ ?>
+                    <div class="edit"><div class="divider5"></div>
+                        <input type="text" class="form-control input-sm datefield readonly width100" name="dateapproved" id="dateapproved" value="<?php echo changeMySQLDateToPageFormat($client->getInitialVoucher()->getDateApproved()); ?>" />
+                        <div id="dateapproved_error"></div>
+                    </div>
+                    <?php } ?>    
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label"><?php echo $this->translate("client_referraldate_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                <div class="col-md-8">
+                    <p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($client->getreferraldate()); ?></p>
+                    <?php if(($step == 'edit' && $section == 'referral' || $step == 'new')){ ?>
+                    <div class="edit"><div class="divider5"></div>
+                        <input type="text" class="form-control input-sm datefield readonly width100" name="referraldate" id="referraldate" value="<?php echo changeMySQLDateToPageFormat($client->getreferraldate()); ?>" />
+                        <div id="referraldate_error"></div>
+                    </div>
+                    <?php } ?>        
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label"><?php echo $this->translate("voucher_startdate_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                <div class="col-md-8">
+                    <p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($client->getInitialVoucher()->getstartdate()); ?></p>
+                    <?php if(($step == 'edit' && $section == 'referral' || $step == 'new')){ ?>
+                    <div class="edit"><div class="divider5"></div>
+                        <input type="text" class="form-control input-sm datefield readonly width100" name="startdate" id="startdate" value="<?php echo changeMySQLDateToPageFormat($client->getInitialVoucher()->getstartdate()); ?>" />
+                        <div id="startdate_error"></div>
+                    </div>      
+                    <?php } ?> 
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label"><?php echo $this->translate("voucher_enddate_label"); ?>:</label>
+                <div class="col-md-8">
+                    <p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($client->getInitialVoucher()->getEnddate()); ?></p>
+                    <?php if(($step == 'edit' && $section == 'referral' || $step == 'new')){ ?>
+                    <div class="edit"><div class="divider5"></div>
+                        <input type="text" class="form-control input-sm datefield readonly width100" name="enddate" id="enddate" value="<?php echo changeMySQLDateToPageFormat($client->getInitialVoucher()->getenddate()); ?>" />
+                        <div id="enddate_error"></div>
+                    </div> 
+                    <?php } ?>      
+                </div>
+            </div>
+        </div>
+    </div>
+</fieldset>

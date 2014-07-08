@@ -29,9 +29,17 @@
 	$vouchers = getClientVouchers($client->getID());
 	$hrsremaining = $activity->getVoucher()->getHoursRemaining();
 	$services = getServiceTypes();
+	$actcodes = getAllActivityCodes();
+	$actcodes_noalias = getAllActivityCodes('', false);
 ?>
 <script>
 	$(document).ready(function() {
+		var dateofbirthOpts = datepickerOpts;
+		dateofbirthOpts.yearRange = "-<?php echo date('Y')-2010; ?>:-0"; 
+		var startfrom = '<?php echo date('Y'); ?>';
+		datepickerOpts.maxDate = new Date("Dec 31, "+startfrom);
+		$(".datefield").datepicker(dateofbirthOpts);
+		
 		<?php if($step == 'edit' || $step == 'new'){ ?>
 			// validation 
 			$("#form-activity").validate({		
@@ -55,7 +63,8 @@
 						required: true,
 						min: 0.5,
 						maxhours: true 
-					}
+					},
+					actcode: "required"
 				}, 
 				// the messages for each of the fields being validated
 				messages: {		
@@ -76,7 +85,8 @@
 					billablehours: {
 						required: "<?php echo $this->translate("activity_billablehours_error"); ?>",
 						min: "Minimum allowed is 0.5 hours"
-					}
+					},
+					actcode: "<?php echo $this->translate("activity_code_error"); ?>"
 				},
 				// custom error positions
 				errorPlacement: function(error, element) {
@@ -330,6 +340,27 @@
 									?>
                                     <div id="coachid_error"></div>
                                 </div>      
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("activity_code_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($activity->getActCode(), $actcodes) ? '': $actcodes[$activity->getActCode()]; ?></p>
+                                <div class="edit">
+                                    <?php
+										
+										$dropdown = new Zend_Form_Element_Select('actcode',
+															array(
+																'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $actcodes),
+																'view' => new Zend_View(),
+																'decorators' => array('ViewHelper'),
+																'class' => array('form-control','input-sm'),
+															)
+										);  
+										$dropdown->setValue($activity->getActCode()); 
+										echo $dropdown->render();
+									?><div id="actcode_error"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -606,6 +637,7 @@
                                 <th class="nowrapping"><?php echo $this->translate('voucher_voucherno_label'); ?></th>
                                 <th class="nowrapping"><?php echo $this->translate('activity_activitydate_label'); ?></th>
                                 <th class="nowrapping"><?php echo $this->translate('activity_coach_label'); ?><img src="<?php echo $this->baseUrl('images/spacer.gif'); ?>" style="width:75px; height:2px;" /></th>
+                                <th class="nowrapping"><?php echo $this->translate('activity_code_label'); ?></th>
                                 <th class="nowrapping"><?php echo $this->translate('activity_starttime_label'); ?></th>
                                 <th class="nowrapping"><?php echo $this->translate('activity_endtime_label'); ?></th>
                                 <th class="nowrapping"><?php echo $this->translate('activity_break_label'); ?></th>
@@ -623,6 +655,7 @@
                                     <td><?php echo $activity->getVoucher()->isFollowAlong() ? $activity->getVoucher()->getfavoucherno(): $activity->getVoucher()->getvoucherno(); ?></td>
                                     <td><?php echo formatDateAndTime($activity->getActivityDate(), false); ?></td>
                                     <td><?php echo $activity->getCoach()->getName(); ?></td>
+                                    <td><?php echo isArrayKeyAnEmptyString($activity->getActCode(), $actcodes_noalias) ? '': $actcodes_noalias[$activity->getActCode()]; ?></td>
                                     <td><?php echo date('H:i a', strtotime($activity->getStartTime())); ?></td>
                                     <td><?php echo date('H:i a', strtotime($activity->getEndTime())); ?></td>
                                     <td><?php echo formatNumber($activity->getBreakHours()); ?></td>

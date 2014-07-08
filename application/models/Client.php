@@ -1666,5 +1666,25 @@ class Client extends BaseEntity {
 		}
 		return $text;
 	}
+	# determine the invoices for client ordered by date
+	function getClientInvoices(){
+		$query = Doctrine_Query::create()->from('Invoice i')
+		->where("i.clientid = '".$this->getID()."'")->orderby('i.invoicedate');
+		$result = $query->execute();
+		if($result){
+			return $result;
+		}
+		return new Invoice();
+	}
+	# determine the payments effected
+	function getClientPayments(){
+		$query = Doctrine_Query::create()->from('Payment p')
+		->where("p.clientid = '".$this->getID()."'")->orderby('p.paymentdate');
+		$result = $query->execute();
+		if($result){
+			return $result;
+		}
+		return new Payment();
+	}
 }
 ?>

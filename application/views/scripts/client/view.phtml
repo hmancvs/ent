@@ -88,11 +88,9 @@ $(document).ready(function() {
                 <?php } ?>
 			</div>
             <div id="finance">
-                <form id="form-finance" class="form-horizontal finance">
                 <?php if($request->tab == 'finance'){ ?>
-                
+                	<?php require APPLICATION_PATH."/views/scripts/client/finance.phtml"; ?>
                 <?php } ?>
-                </form>
 			</div>
             <div id="report">
                 <form id="form-report" class="form-horizontal report">

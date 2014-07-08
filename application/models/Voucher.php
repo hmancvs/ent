@@ -36,7 +36,6 @@ class Voucher extends BaseEntity {
 		
 		# set the custom error messages
        	$this->addCustomErrorMessages(array(
-       									// "clientid.notblank" => $this->translate->_("voucher_clientid_error"),
        									"servicetypeid.notblank" => $this->translate->_("voucher_servicetypeid_error"),
        									"hours.notblank" => $this->translate->_("voucher_hours_error")
        	       						));
@@ -52,15 +51,6 @@ class Voucher extends BaseEntity {
 						'foreign' => 'id',
 				)
 		);
-		
-	}
-	/**
-	 * Custom model validation
-	 */
-	function validate() {
-		# execute the column validation 
-		parent::validate();
-		// debugMessage($this->toArray(true));
 		
 	}
 	/**

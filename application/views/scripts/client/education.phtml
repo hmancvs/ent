@@ -1,0 +1,247 @@
+<div class="col-md-12">
+    <div class="form-group">
+        <div class="col-md-6 padding0">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_education_label'); ?>:</label>
+            <div class="col-md-12">
+                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->geteducationlevel(), $educationlevels) ? '' : $educationlevels[$client->geteducationlevel()]; ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <?php
+                        $dropdown = new Zend_Form_Element_Select('educationlevel',
+                                            array(
+                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $educationlevels, array('0'=>$this->translate("global_addvariable_label"))),
+                                                'view' => new Zend_View(),
+                                                'decorators' => array('ViewHelper'),
+                                                'class' => array('form-control','input-sm','configvariable'),
+												'lookupid' => 12,
+												'fieldid' => 'educationlevel',
+												'fieldlabel' => $this->translate("client_education_label")
+                                            )
+                        );  
+                        $dropdown->setValue($client->geteducationlevel()); 
+                        echo $dropdown->render();
+                    ?><input type="hidden" class="form-control" name="educationlevel_old" id="educationlevel_old" value="<?php echo $client->geteducationlevel(); ?>" />
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+    <div class="divider15"></div>
+    <div class="form-group">
+        <div class="col-md-12 padding0">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_educ_background_label'); ?>:</label>
+            <div class="col-md-12">
+                <p class="form-control-static nullifempty view">
+                    <table class="table table-condensed table-striped table-responsive viewtable" style="margin-bottom:10px;">
+                        <thead>
+                            <tr>
+                                <th class="centeralign" style="width:15px;">#</th>
+                                <th><?php echo $this->translate('client_educ_school_label'); ?></th>
+                                <th style="width:20%;"><?php echo $this->translate('client_educ_location_label'); ?></th>
+                                <th style="width:25%;"><?php echo $this->translate('client_educ_award_label'); ?></th>
+                                <th style="width:20%;"><?php echo $this->translate('client_educ_duration_label'); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php 
+                                $educationdetails = $client->getAssessmentDetails(4); // debugMessage($assigments->toArray());													
+                                $count_educationdetails = $educationdetails->count();
+                            ?>
+                            <?php if($count_educationdetails == 0){ ?>
+                                <tr>
+                                    <td></td>
+                                    <td>--</td>
+                                    <td>--</td>
+                                    <td>--</td>
+                                    <td>--</td>
+                                </tr>
+                            <?php } else { ?>
+                                <?php 
+                                    $counter = 1;
+                                    foreach($educationdetails as $award){
+                                ?>
+                                <tr>
+                                    <td class="centeralign"><?php echo $counter; ?></td>
+                                    <td><?php echo $award->getValue1(); ?></td>
+                                    <td><?php echo $award->getValue2(); ?></td>
+                                    <td><?php echo $award->getValue4(); ?></td>
+                                    <td><?php echo $award->getValue5(); ?></td>
+                                </tr>
+                                <?php $counter++; } ?>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+            	</p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <table class="table table-condensed table-striped table-responsive viewtable" style="margin-bottom:10px;">
+                        <thead>
+                            <tr>
+                                <th class="centeralign" style="width:15px;">#</th>
+                                <th><?php echo $this->translate('client_educ_school_label'); ?></th>
+                                <th style="width:20%;"><?php echo $this->translate('client_educ_location_label'); ?></th>
+                                <th style="width:25%;"><?php echo $this->translate('client_educ_award_label'); ?></th>
+                                <th style="width:20%;"><?php echo $this->translate('client_educ_duration_label'); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php 
+                                $counter = 1;
+                                $nooflines = $count_educationdetails;
+                                $e = 0; $x = 0;
+                                 foreach($educationdetails as $education){
+                                     $class = "visible_row_educ";
+                            ?>
+                            <tr class="<?php echo $class; ?> row_educ_<?php echo $e; ?>" id="row_educ_<?php echo $e; ?>">
+                                <td class="centeralign"><a heduc="javascript: doNothing();" title="<?php echo $this->translate("global_button_remove"); ?>" id="row_educ_<?php echo $e; ?>" class="removeline btn btn-xs btn-default" rel="educ">&times;</a>
+                                    <input type="hidden" id="educdetails_id_<?php echo $e; ?>" class="form-control" name="educdetails[<?php echo md5($e); ?>][id]" value="<?php echo $education->getID(); ?>" />
+                                </td>
+                                <td><input type="text" class="form-control input-sm" name="educdetails[<?php echo md5($e); ?>][value1]" id="educdetails_value1_<?php echo $e; ?>" value="<?php echo $education->getValue1(); ?>" /></td>
+                                <td><input type="text" class="form-control input-sm" name="educdetails[<?php echo md5($e); ?>][value2]" id="educdetails_value2_<?php echo $e; ?>" value="<?php echo $education->getValue2(); ?>" /></td>
+                                <td><input type="text" class="form-control input-sm" name="educdetails[<?php echo md5($e); ?>][value4]" id="educdetails_value4_<?php echo $e; ?>" value="<?php echo $education->getValue4(); ?>" /></td>
+                                <td><input type="text" class="form-control input-sm" name="educdetails[<?php echo md5($e); ?>][value5]" id="educdetails_value5_<?php echo $e; ?>" value="<?php echo $education->getValue5(); ?>" /></td>
+                            </tr>
+                            <?php $e++; $x++; $counter++; } ?>
+                            <?php 
+                                $defaultlines = 2;
+                                if($nooflines >= 2){
+                                    $defaultlines = $nooflines + 1;
+                                }
+                                for($i = $e; $i<10; $i++){
+                                    // debugMessage($i);
+                                    $class = "visible_row_educ";
+                                    if($i >= $defaultlines){
+                                        $class = "hidden_row_educ";
+                                    }
+                                
+                            ?>
+                                <tr class="<?php echo $class; ?> row_educ_<?php echo $i; ?>" id="row_educ_<?php echo $i; ?>">
+                                    <td class="centeralign"><a heduc="javascript: doNothing();" title="<?php echo $this->translate("global_button_remove"); ?>" id="row_educ_<?php echo $i; ?>" class="removeline btn btn-xs btn-default" rel="educ">&times;</a>
+                                    </td>
+                                    <td><input type="text" class="form-control input-sm" name="educdetails[<?php echo md5($i); ?>][value1]" id="educdetails_value1_<?php echo $i; ?>" value="" /></td>
+                                    <td><input type="text" class="form-control input-sm" name="educdetails[<?php echo md5($i); ?>][value2]" id="educdetails_value2_<?php echo $i; ?>" value="" /></td>
+                                    <td><input type="text" class="form-control input-sm" name="educdetails[<?php echo md5($i); ?>][value4]" id="educdetails_value4_<?php echo $i; ?>" value="" /></td>
+                                    <td><input type="text" class="form-control input-sm" name="educdetails[<?php echo md5($i); ?>][value5]" id="educdetails_value5_<?php echo $i; ?>" value="" /></td>
+                                </tr>
+                            <?php $x++; } ?>
+                            <tr>
+                                <td></td>
+                                <td colspan="4"><a heduc="javascript: void(0)" title="Add another" class="addline btn btn-primary btn-xs pull-left" id="educ">Add Row</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-12 padding0">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_disableoutsidesection_label'); ?>:</label>
+            <div class="col-md-12">
+                <p class="form-control-static nullifempty view"><?php echo $client->getcontactschooltoverify() == 1 ? 'Yes' : 'No'; ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <label class="radio-inline">
+                      <input type="radio" id="contactschooltoverify_1" name="contactschooltoverify" class="disableoutsidesection" value="1" <?php echo $client->getcontactschooltoverify() == 1 ? 'checked' : ''; ?>>Yes
+                    </label>
+                    <label class="radio-inline">
+                      <input type="radio" id="contactschooltoverify_0" name="contactschooltoverify" class="disableoutsidesection" value="0" <?php echo $client->getcontactschooltoverify() == 0 ? 'checked' : ''; ?>>No
+                    </label>
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-6 padding0">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_experiencedlearningproblems_label'); ?>:</label>
+            <div class="col-md-12">
+                <p class="form-control-static nullifempty view"><?php echo $client->getexperiencedlearningproblems() == 1 ? 'Yes' : 'No'; ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <label class="radio-inline">
+                      <input type="radio" id="experiencedlearningproblems_1" name="experiencedlearningproblems" class="disableoutsidesection" value="1" <?php echo $client->getexperiencedlearningproblems() == 1 ? 'checked' : ''; ?>>Yes
+                    </label>
+                    <label class="radio-inline">
+                      <input type="radio" id="experiencedlearningproblems_0" name="experiencedlearningproblems" class="disableoutsidesection" value="0" <?php echo $client->getexperiencedlearningproblems() == 0 ? 'checked' : ''; ?>>No
+                    </label>
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+        <div class="col-md-6 padding0">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_learningproblems_label'); ?>:</label>
+            <div class="col-md-12">
+                <p class="form-control-static nullifempty view"><?php echo $client->getlearningproblems(); ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <textarea class="form-control expanding" id="learningproblems" name="learningproblems"><?php echo $client->getlearningproblems(); ?></textarea>
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-12 padding0">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_academicskillsdetails_label'); ?>:</label>
+            <div class="col-md-12">
+                <p class="form-control-static nullifempty view"><?php echo $client->getacademicskillsdetails(); ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <textarea class="form-control expanding" id="academicskillsdetails" name="academicskillsdetails"><?php echo $client->getacademicskillsdetails(); ?></textarea>
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-12 padding0">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_formaleducinterestsids_label'); ?>:</label>
+            <div class="col-md-12">
+                <?php $interestoptions = getAllClientInterestsOptions(); ?>
+                <p class="form-control-static nullifempty view"><?php echo count($client->getFormalEducInterestsArray())  == 0 ? '': $client->getListofFormalEducInterests(); ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                	<div id="container_formaleducinterestsids">
+						<?php 
+                            $existing_values = $client->getFormalEducInterestsArray();
+                            foreach($interestoptions as $key => $value){
+                        ?>
+                            <label class="checkbox notbolded col-md-3">
+                              <input type="checkbox" id="formaleducinterests_<?php echo $key; ?>" name="formaleducinterestsids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked' : 1; ?>><?php echo $value; ?>
+                            </label>
+                        <?php } ?>
+                    </div>
+                    <div class="divider5"></div>
+                    <a class="gonowhere checkothertrigger" fieldid="formaleducinterestsids" lookupid="30" fieldlabel="Client Education Subjects of Interest" fieldtype="checkbox" checkclasses="checkbox notbolded col-md-3" checkname="formaleducinterestsids[]" checkid="formaleducinterests_"><?php echo $this->translate('global_addoption_label'); ?></a>
+                </div>
+                <?php } ?>
+            </div> 
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-12 padding0">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_learningstylesids_label'); ?>:</label>
+            <div class="col-md-12">
+                <?php $styles = getAllClientLearningStyles(); ?>
+                <p class="form-control-static nullifempty view"><?php echo count($client->getLearningStylesArray())  == 0 ? '': $client->getListofLearningStyles(); ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <div id="container_learningstylesids">
+					<?php 
+                        $existing_values = $client->getLearningStylesArray();
+                        foreach($styles as $key => $value){
+                    ?>
+                        <label class="checkbox notbolded">
+                          <input type="checkbox" id="learningstyles_<?php echo $key; ?>" name="learningstylesids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked' : ''; ?>><?php echo $value; ?>
+                        </label>
+                    <?php } ?>
+                    </div>
+                    <div class="divider5"></div>
+                    <a class="gonowhere checkothertrigger" fieldid="learningstylesids" lookupid="31" fieldlabel="Client Education Preferred Learning Styles" fieldtype="checkbox" checkclasses="checkbox notbolded" checkname="learningstylesids[]" checkid="learningstyles_"><?php echo $this->translate('global_addoption_label'); ?></a>
+                </div>
+                <?php } ?>
+            </div> 
+        </div>
+    </div>
+</div>

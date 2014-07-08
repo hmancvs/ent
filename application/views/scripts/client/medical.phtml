@@ -1,0 +1,328 @@
+<div class="panel-body well-sm">
+    <div class="form-group">
+        <div class="col-md-6">
+            <label class="col-md-12 control-label"><?php echo $this->translate("client_pdiagnosis_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+            <div class="col-md-12">
+                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getPrimaryDiagnosis(), $disabilitycodes) ? '': '<small class="bolded">Impairment</small>: '.$disabilitycodes_notaliased[$client->getPrimaryDiagnosis()]; ?></p>
+                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getPrimaryCause(), $causecodes) ? '': '<small class="bolded">Cause</small>: '.$disabilitycodes_notaliased[$client->getPrimaryCause()]; ?></p>
+                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getPrimaryDiagnosis(), $disabilitycodes) && isArrayKeyAnEmptyString($client->getPrimaryCause(), $causecodes) ? '': '<small class="bolded">Disability Code</small>: '.getDisabilityCodeForClient($client->getPrimaryDiagnosis(), $client->getPrimaryCause()); ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <div class="divider5"></div>
+                    <?php
+                        $dropdown = new Zend_Form_Element_Select('primarydiagnosis',
+                                            array(
+                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select an Impairment >'), $disabilitycodes, array('0'=>$this->translate("global_addvariable_label"))),
+                                                'view' => new Zend_View(),
+                                                'decorators' => array('ViewHelper'),
+                                                'class' => array('form-control','input-sm','configvariable'),
+												'lookupid' => 14,
+												'fieldid' => 'primarydiagnosis',
+												'fieldlabel' => $this->translate("client_pdiagnosis_label"),
+												'hasalias' => '1',
+												'doubleappendid' => 'secondarydiagnosis'
+                                            )
+                        );  
+                        $dropdown->setValue($client->getPrimaryDiagnosis()); 
+                        echo $dropdown->render();
+                    ?>
+                    <input type="hidden" name="primarydiagnosis_old" class="form-control" id="primarydiagnosis_old" value="<?php echo $client->getPrimaryDiagnosis(); ?>" />                                   
+                    <div id="primarydiagnosis_error"></div>
+                    <div class="divider5"></div>
+                    <?php
+                        $dropdown = new Zend_Form_Element_Select('primarycause',
+                                            array(
+                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select a Cause>'), $causecodes, array('0'=>$this->translate("global_addvariable_label"))),
+                                                'view' => new Zend_View(),
+                                                'decorators' => array('ViewHelper'),
+                                                'class' => array('form-control','input-sm','configvariable'),
+												'lookupid' => 15,
+												'fieldid' => 'primarycause',
+												'fieldlabel' => 'Disability Cause',
+												'hasalias' => '1',
+												'doubleappendid' => 'secondarycause'
+                                            )
+                        );  
+                        $dropdown->setValue($client->getPrimaryCause()); 
+                        echo $dropdown->render();
+                    ?>
+                    <input type="hidden" name="primarycause_old" id="primarycause_old" class="form-control" value="<?php echo $client->getPrimaryCause(); ?>" />
+                    <div id="primarycause_error"></div>
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label class="col-md-12 control-label"><?php echo $this->translate("client_sdiagnosis_label"); ?>:</label>
+            <div class="col-md-12">
+                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getSecondaryDiagnosis(), $disabilitycodes) ? '': '<small class="bolded">Impairment</small>: '.$disabilitycodes_notaliased[$client->getSecondaryDiagnosis()]; ?></p>
+                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getSecondaryCause(), $causecodes) ? '': '<small class="bolded">Cause</small>: '.$causecodes_notaliased[$client->getSecondaryCause()]; ?></p>
+                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getSecondaryDiagnosis(), $disabilitycodes) && isArrayKeyAnEmptyString($client->getSecondaryCause(), $causecodes) ? '': '<small class="bolded">Disability Code</small>: '.getDisabilityCodeForClient($client->getSecondaryDiagnosis(), $client->getSecondaryCause()); ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <div class="divider5"></div>
+                    <?php
+                        $dropdown = new Zend_Form_Element_Select('secondarydiagnosis',
+                                            array(
+                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select an Impairment >'), $disabilitycodes, array('0'=>$this->translate("global_addvariable_label"))),
+                                                'view' => new Zend_View(),
+                                                'decorators' => array('ViewHelper'),
+                                                'class' => array('form-control','input-sm','configvariable'),
+												'lookupid' => 14,
+												'fieldid' => 'secondarydiagnosis',
+												'fieldlabel' => $this->translate("client_sdiagnosis_label"),
+												'hasalias' => '1',
+												'doubleappendid' => 'primarydiagnosis'
+                                            )
+                        );  
+                        $dropdown->setValue($client->getSecondaryDiagnosis()); 
+                        echo $dropdown->render();
+                    ?>
+                    <input type="hidden" name="secondarydiagnosis_old" id="secondarydiagnosis_old" class="form-control" value="<?php echo $client->getSecondaryDiagnosis(); ?>" />
+                    <div class="divider5"></div>
+                    <?php
+                        $dropdown = new Zend_Form_Element_Select('secondarycause',
+                                            array(
+                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select a Cause>'), $causecodes, array('0'=>$this->translate("global_addvariable_label"))),
+                                                'view' => new Zend_View(),
+                                                'decorators' => array('ViewHelper'),
+                                                'class' => array('form-control','input-sm','configvariable'),
+												'lookupid' => 15,
+												'fieldid' => 'secondarycause',
+												'fieldlabel' => 'Disability Cause',
+												'hasalias' => '1',
+												'doubleappendid' => 'primarycause'
+                                            )
+                        );  
+                        $dropdown->setValue($client->getSecondaryCause()); 
+                        echo $dropdown->render();
+                    ?>
+                    <input type="hidden" name="secondarycause_old" class="form-control" id="secondarycause_old" value="<?php echo $client->getSecondaryCause(); ?>" />
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+    <div class="separator"></div>
+    <div class="form-group">
+        <div class="col-md-12">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_currentmedication_label'); ?>:</label>
+            <div class="divider5"></div>
+            <p class="form-control-static nullifempty view padding10">
+                <table class="table table-condensed table-striped table-responsive viewtable" style="margin-bottom:10px;">
+                    <thead>
+                        <tr>
+                            <th class="centeralign" style="width:15px;">#</th>
+                            <th>Type</th>
+                            <th style="width:10%;">Strength</th>
+                            <th style="width:15%;">Dosage</th>
+                            <th style="width:25%;">Side Effects</th>
+                            <th style="width:25%;">Benefits / Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                            $medications = $client->getMedicationDetails(); // debugMessage($assigments->toArray());													
+                            $count_medications = $medications->count();
+                        ?>
+                        <?php if($count_medications == 0){ ?>
+                            <tr>
+                                <td></td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                            </tr>
+                        <?php } else { ?>
+                            <?php 
+                                $counter = 1;
+                                foreach($medications as $medication){
+                            ?>
+                            <tr>
+                                <td class="centeralign"><?php echo $counter; ?></td>
+                                <td><?php echo $medication->getType(); ?></td>
+                                <td><?php echo $medication->getStrength(); ?></td>
+                                <td><?php echo $medication->getDosage(); ?></td>
+                                <td><?php echo $medication->getsidedefects(); ?></td>
+                                <td><?php echo $medication->getpurpose(); ?></td>
+                            </tr>
+                            <?php $counter++; } ?>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            </p>
+            <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+            <div class="edit padding10">
+                <table class="table table-condensed table-striped table-responsive viewtable" style="margin-bottom:10px;">
+                    <thead>
+                        <tr>
+                            <th class="centeralign" style="width:15px;">#</th>
+                            <th>Type</th>
+                            <th style="width:15%;">Strength</th>
+                            <th style="width:15%;">Dosage</th>
+                            <th style="width:22%;">Side Effects</th>
+                            <th style="width:22%;">Benefits / Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                            $counter = 1;
+                            $nooflines = $medications->count();
+                            $e = 0; $x = 0;
+                            foreach($medications as $medication){
+                                 $class = "visible_row_med";
+                        ?>
+                            <tr class="<?php echo $class; ?> row_med_<?php echo $e; ?>" id="row_med_<?php echo $e; ?>">
+                                <td class="centeralign"><a href="javascript: doNothing();" title="<?php echo $this->translate("global_button_remove"); ?>" id="row_med_<?php echo $e; ?>" class="removeline btn btn-xs btn-default" rel="med">&times;</a>
+                                <input type="hidden" id="medicationdetails_id_<?php echo $e; ?>" name="medicationdetails[<?php echo md5($e); ?>][id]" class="disableoutsidesection" value="<?php echo $medication->getID(); ?>" /></td>
+                                <td><textarea class="form-control expanding" name="medicationdetails[<?php echo md5($e); ?>][type]" id="medicationdetails_type_<?php echo $e; ?>"><?php echo $medication->getType(); ?></textarea>
+                                <div id="medicationdetails_type_<?php echo $e; ?>_error"></div></td>
+                                <td><textarea class="form-control expanding" name="medicationdetails[<?php echo md5($e); ?>][strength]" id="medicationdetails_strength_<?php echo $e; ?>"><?php echo $medication->getStrength(); ?></textarea>
+                                <div id="medicationdetails_strength_<?php echo $e; ?>_error"></div></td>
+                                <td><textarea class="form-control expanding" name="medicationdetails[<?php echo md5($e); ?>][dosage]" id="medicationdetails_dosage_<?php echo $e; ?>"><?php echo $medication->getDosage(); ?></textarea></td>
+                                <td><textarea class="form-control expanding" name="medicationdetails[<?php echo md5($e); ?>][sidedefects]" id="medicationdetails_sidedefects_<?php echo $e; ?>"><?php echo $medication->getsidedefects(); ?></textarea>
+                                <div id="medicationdetails_sidedefects_<?php echo $e; ?>_error"></div></td>
+                                <td><textarea class="form-control expanding" name="medicationdetails[<?php echo md5($e); ?>][purpose]" id="medicationdetails_purpose_<?php echo $e; ?>"><?php echo $medication->getpurpose(); ?></textarea>
+                                <div id="medicationdetails_purpose_<?php echo $e; ?>_error"></div></td>
+                            </tr>
+                        <?php $e++; $x++; $counter++; } ?>
+                        <?php 
+                            $defaultlines = 3;
+                            if($nooflines >= 3){
+                                $defaultlines = $nooflines + 1;
+                            }
+                            for($i = $e; $i<10; $i++){
+                                // debugMessage($i);
+                                $class = "visible_row_med";
+                                if($i >= $defaultlines){
+                                    $class = "hidden_row_med";
+                                }
+                            
+                        ?>
+                            <tr class="<?php echo $class; ?> row_med_<?php echo $i; ?>" id="row_med_<?php echo $i; ?>">
+                                <td class="centeralign"><a href="javascript: doNothing();" title="<?php echo $this->translate("global_button_remove"); ?>" id="row_med_<?php echo $i; ?>" class="removeline btn btn-xs btn-default" rel="med">&times;</a>
+                                <td><textarea class="form-control expanding" name="medicationdetails[<?php echo md5($i); ?>][type]" id="medicationdetails_type_<?php echo $i; ?>"></textarea>
+                                <div id="medicationdetails_type_<?php echo $i; ?>_error"></div></td>
+                                <td><textarea class="form-control expanding" name="medicationdetails[<?php echo md5($i); ?>][strength]" id="medicationdetails_strength_<?php echo $i; ?>"></textarea>
+                                <div id="medicationdetails_strength_<?php echo $i; ?>_error"></div></td>
+                                <td><textarea class="form-control expanding" name="medicationdetails[<?php echo md5($i); ?>][dosage]" id="medicationdetails_dosage_<?php echo $i; ?>"></textarea></td>
+                                <td><textarea class="form-control expanding" name="medicationdetails[<?php echo md5($i); ?>][sidedefects]" id="medicationdetails_sidedefects_<?php echo $i; ?>"></textarea></td>
+                                <div id="medicationdetails_sidedefects_<?php echo $i; ?>_error"></div></td>
+                                <td><textarea class="form-control expanding" name="medicationdetails[<?php echo md5($i); ?>][purpose]" id="medicationdetails_purpose_<?php echo $i; ?>"></textarea>
+                                <div id="medicationdetails_purpose_<?php echo $i; ?>_error"></div></td>
+                            </tr>
+                        <?php $x++; } ?>
+                        <tr>
+                            <td></td>
+                            <td><a href="javascript: void(0)" title="Add another" class="addline btn btn-primary btn-xs pull-left" id="med">Add Row</a></td>
+                            <td colspan="4"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <?php } ?>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-12">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_jobaccomodations_label'); ?>:</label>
+            <div class="col-md-12">
+                <p class="form-control-static nullifempty view"><?php echo $client->getrequiresmedicalaccomodation() == 1 ? 'Yes' : 'No'; ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <label class="radio-inline">
+                      <input type="radio" id="requiresmedicalaccomodation_1" class="disableoutsidesection" name="requiresmedicalaccomodation" value="1" <?php echo $client->getrequiresmedicalaccomodation() == 1 ? 'checked' : ''; ?>>Yes
+                    </label>
+                    <label class="radio-inline">
+                      <input type="radio" id="requiresmedicalaccomodation_0" class="disableoutsidesection" name="requiresmedicalaccomodation" value="0" <?php echo $client->getrequiresmedicalaccomodation() == 0 ? 'checked' : ''; ?>>No
+                    </label>
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-12">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_jobaccomodations_sideeffects_label'); ?>:</label>
+            <div class="col-md-12">
+                <?php
+                    $physical_acmds = $client->getAssessmentDetails(1,1);
+                    $env_acmds = $client->getAssessmentDetails(1,2);
+                    $inst_acmds = $client->getAssessmentDetails(1,3);
+                ?>
+                <p class="form-control-static nullifempty view">
+                    <table class="table table-condensed table-responsive viewtable" style="margin-bottom:10px;">
+                        <thead>
+                            <tr>
+                                <th style="width:33%;">Physical</th>
+                                <th style="width:33%;">Environmental</th>
+                                <th style="width:33%;">Instructional</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><?php echo isEmptyString($physical_acmds->get(0)->getValue1()) ? '--' : $physical_acmds->get(0)->getValue1(); ?></td>
+                                <td><?php echo isEmptyString($env_acmds->get(0)->getValue1()) ? '--' : $env_acmds->get(0)->getValue1(); ?></td>
+                                <td><?php echo isEmptyString($inst_acmds->get(0)->getValue1()) ? '--' : $inst_acmds->get(0)->getValue1(); ?></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <table class="table table-condensed table-responsive viewtable" style="margin-bottom:10px;">
+                        <thead>
+                            <tr>
+                                <th style="width:33%;">Physical</th>
+                                <th style="width:33%;">Environmental</th>
+                                <th style="width:33%;">Instructional</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        
+                            <tr>
+                                <td><textarea id="physicaljb1_value" name="physicaljb1_value" class="form-control expanding"><?php echo $physical_acmds->get(0)->getValue1(); ?></textarea>
+                                <input type="hidden" class="form-control" name="physicaljb1_id" value="<?php echo $physical_acmds->get(0)->getID(); ?>" /></td>
+                                <td><textarea id="envjb1_value" name="envjb1_value" class="form-control expanding"><?php echo $env_acmds->get(0)->getValue1(); ?></textarea>
+                                <input type="hidden" class="form-control" name="envjb1_id" value="<?php echo $env_acmds->get(0)->getID(); ?>" /></td>
+                                <td><textarea id="instjb1_value" name="instjb1_value" class="form-control expanding"><?php echo $inst_acmds->get(0)->getValue1(); ?></textarea>
+                                <input type="hidden" class="form-control" name="instjb1_id" value="<?php echo $inst_acmds->get(0)->getID(); ?>" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-6">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_therapy_label'); ?>:</label>
+            <div class="col-md-12">
+                <?php $therapytreatments = getAllTherapyTreatments();
+                ?>
+                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->gettherapytreatment(), $therapytreatments) ? '': $therapytreatments[$client->gettherapytreatment()]; ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <?php
+                        $dropdown = new Zend_Form_Element_Select('therapytreatment',
+                                            array(
+                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $therapytreatments, array('0'=>$this->translate("global_addvariable_label"))),
+                                                'view' => new Zend_View(),
+                                                'decorators' => array('ViewHelper'),
+                                                'class' => array('form-control','input-sm','configvariable'),
+												'lookupid' => 32,
+												'fieldid' => 'therapytreatment',
+												'fieldlabel' => $this->translate("client_therapy_label")
+                                            )
+                        );  
+                        $dropdown->setValue($client->gettherapytreatment()); 
+                        echo $dropdown->render();
+                    ?><input type="hidden" name="therapytreatment_old" class="form-control" id="therapytreatment_old" value="<?php echo $client->gettherapytreatment(); ?>" />
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+</div>

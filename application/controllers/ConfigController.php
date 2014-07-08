@@ -48,7 +48,7 @@ class ConfigController extends IndexController   {
 		$this->_helper->viewRenderer->setNoRender(TRUE);
 		
 		$formvalues = $this->_getAllParams();
-		// debugMessage($formvalues);
+		debugMessage($formvalues);
 		if(isArrayKeyAnEmptyString('noreload', $formvalues)){
 			$hasnoreload = false; 	
 		} else {
@@ -73,7 +73,6 @@ class ConfigController extends IndexController   {
 		}
 		
 		// debugMessage()
-		// exit();
 		switch ($formvalues['lookupid']){
 			default:
 			$lookupvalue = new LookupTypeValue();
@@ -85,7 +84,7 @@ class ConfigController extends IndexController   {
 				$index = $lookuptype->getNextInsertIndex();
 				$value  = trim($formvalues['value']);
 			} else {
-				if(isArrayKeyAnEmptyString('index', $formvalues)){
+				if(!isArrayKeyAnEmptyString('index', $formvalues)){
 					$index = $formvalues['index'];
 				} else {
 					$index = $lookuptype->getNextInsertIndex();

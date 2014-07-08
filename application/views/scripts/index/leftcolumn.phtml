@@ -10,13 +10,13 @@
 ?>
 <ul id="mainNav">
     <li class="nav-header" style="height:30px; background: none repeat scroll 0 0 #DDDDDD; border-bottom: 1px solid #CCCCCC; height: 32px;"></li>
-    <li id="navDashboard" class="nav active">
-        <a href="<?php echo $this->baseUrl('dashboard'); ?>" style="font-weight:bold;"><span class="glyphicon glyphicon-indent-left"></span> Quicklinks</a>				
+    <li id="navDashboard" class="nav">
+        <a style="font-weight:bold;"><span class="glyphicon glyphicon-indent-left"></span> Quicklinks</a>				
     </li>
     <?php if ($acl->checkPermission('Client', ACTION_LIST)) { ?>	
-        <li class="nav dropdown">
+        <li class="nav dropdown <?php echo $controller == 'client' ? 'active' : ''; ?>">
             <a class="gonowhere"><span class="glyphicon glyphicon-user"></span> Manage Clients</a>
-            <ul class="subNav client">
+            <ul class="subNav client" <?php echo $controller == 'client' ? 'style="display:block;"' : ''; ?>>
                 <li><a href="<?php echo $this->baseUrl('client/list'); ?>">Clients</a></li>
                 <?php if ($acl->checkPermission('Client', ACTION_CREATE)) { ?>	
                 	<li><a href="<?php echo $this->baseUrl('client'); ?>">New Client</a></li>
@@ -25,7 +25,7 @@
         </li>
     <?php } ?>
     <?php if ($acl->checkPermission('Application Settings', ACTION_LIST)) { ?>
-    	<li class="nav dropdown active">
+    	<li class="nav dropdown <?php echo $controller == 'config' ? 'active' : ''; ?>">
             <a class="gonowhere"><span class="glyphicon glyphicon-cog"></span> Variable Maintenance </a>
             <ul class="subNav" <?php echo $controller == 'config' ? 'style="display:block;"' : ''; ?>>
             	<li <?php echo $request->type == 41 ? 'class="active"' : ''; ?>><a href="<?php echo $this->baseUrl('config/variables/type/41'); ?>">Programs</a></li>
@@ -40,9 +40,9 @@
         </li>
     <?php } ?>
     <?php if ($acl->checkPermission('Application Settings', ACTION_LIST)) { ?>
-        <li class="nav dropdown">
+        <li class="nav dropdown <?php echo $controller == 'profile' ? 'active' : ''; ?>">
             <a class="gonowhere"><span class="glyphicon glyphicon-cog"></span> System </a>
-            <ul class="subNav">
+            <ul class="subNav" <?php echo $controller == 'profile' ? 'style="display:block;"' : ''; ?>>
                 <?php if ($acl->checkPermission('User Account', ACTION_CREATE)) { ?>	
                     <li><a href="<?php echo $this->baseUrl('profile'); ?>">New User</a></li>
                 <?php } ?>

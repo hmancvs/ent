@@ -1,0 +1,95 @@
+// define the validation rules one field at a time
+rules: {
+    // bio
+    firstname: "required",
+    lastname: "required",
+    gender: "required",
+    ssn: "required",
+    state: "required",
+    city: "required",
+    zipcode: "required",
+    addressline1: "required",
+    phonecount: {
+        phonecount_validate: true
+    },
+    
+    // referral
+    programid: "required",
+    funderid: "required",
+    servicetypeid: "required",
+    employmentgoal: "required",
+    hours: {
+        required: true
+    },
+    rate: {
+        required: true
+    },
+    voucherno: "required",
+    dateapproved: "required",
+    startdate: "required",
+    referraldate: "required",
+    
+    // attachment
+    resumefilename: "required",
+    
+    // medical
+    primarydiagnosis: "required",
+    primarycause: "required",
+    
+    // assignment
+    userid: "required",
+    role: "required",
+    assignstartdate: "required"		
+}, 
+// the messages for each of the fields being validated
+messages: {
+    // bio	
+    firstname: "<?php echo $this->translate("client_firstname_error"); ?>",
+    lastname: "<?php echo $this->translate("client_lastname_error"); ?>",
+    gender: "<?php echo $this->translate("client_gender_error"); ?>",
+    ssn: "<?php echo $this->translate("client_ssn_error"); ?>",
+    state: "<?php echo $this->translate("client_state_error"); ?>",
+    city: "<?php echo $this->translate("client_city_error"); ?>",
+    zipcode: "<?php echo $this->translate("client_zipcode_error"); ?>",
+    addressline1: "<?php echo $this->translate("client_addressline1_error"); ?>",
+    
+    // referral
+    programid: "<?php echo $this->translate("client_programid_error"); ?>",
+    funderid: "<?php echo $this->translate("client_funderid_error"); ?>",
+    servicetypeid: "<?php echo $this->translate("client_servicetypeid_error"); ?>",
+    employmentgoal: "<?php echo $this->translate("client_employmentgoal_error"); ?>",
+    hours: {
+        required: "<?php echo $this->translate("client_hours_error"); ?>"
+    },
+    rate: {
+        required: "<?php echo $this->translate("client_rate_error"); ?>"
+    },	
+    voucherno: "<?php echo $this->translate("client_voucherno_error"); ?>",
+    dateapproved: "<?php echo $this->translate("client_dateapproved_error"); ?>",
+    referraldate: "<?php echo $this->translate("client_referraldate_error"); ?>",
+    startdate: "<?php echo $this->translate("client_datereceived_error"); ?>",
+    
+    // attachment
+    resumefilename: "<?php echo $this->translate("client_resumefilename_error"); ?>",
+    
+    // medical
+    primarydiagnosis: "<?php echo $this->translate("client_primarydiagnosis_error"); ?>",
+    primarycause: "<?php echo $this->translate("client_primarycause_error"); ?>",
+    
+    // assignment
+    userid: "<?php echo $this->translate("client_userid_error"); ?>",
+    role: "<?php echo $this->translate("client_assign_role_error"); ?>",
+    assignstartdate: "<?php echo $this->translate("client_assign_startdate_error"); ?>"
+},
+// custom error positions
+errorPlacement: function(error, element) {
+    switch(element.attr("name")){					
+        default:
+            if(element.hasClass("useid_error")){
+                error.appendTo("#"+element.attr("id")+"_error");
+            } else {
+                error.appendTo("#"+element.attr("name")+"_error");
+            }
+            break;
+    }			
+}

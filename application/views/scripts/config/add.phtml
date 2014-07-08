@@ -1,0 +1,67 @@
+<?php
+	require_once APPLICATION_PATH.'/includes/header.php';
+	// debugMessage($request);
+?>
+<script>
+	$(document).ready(function() {
+		$("#configform").validate({		
+			// define the validation rules one field at a time
+			rules: {
+				value: "required",
+				alias: "required"
+			}, 
+			// the messages for each of the fields being validated
+			messages: {		
+				value: "Please enter Value",
+				alias: "Please enter Alias"
+			},
+			// custom error positions
+			errorPlacement: function(error, element) {
+				switch(element.attr("name")){					
+					default:
+						error.appendTo("#"+element.attr("name")+"_error")
+						break;
+				}			
+			}
+		});
+		
+	}); 
+</script>
+<div class="popupwindow">
+    <form class="form-horizontal padding0 margin0" id="configform" method="post">
+        <input type="hidden" id="id" name="id" value="" />
+        <input type="hidden" id="lookupid" name="lookupid" value="<?php echo $request->lookupid; ?>" />
+        <input type="hidden" id="noreload" name="noreload" value="1" />
+        <input type="hidden" id="fieldid" name="fieldid" value="<?php echo $request->fieldid; ?>" />
+        <input type="hidden" id="hasalias" name="hasalias" value="<?php echo $request->hasalias; ?>" />
+        <input type="hidden" id="doubleappendid" name="doubleappendid" value="<?php echo $request->doubleappendid; ?>" />
+        <input type="hidden" id="formid" name="formid" value="configform" />
+        <input type="hidden" id="checkclasses" name="checkclasses" value="<?php echo $request->checkclasses; ?>" />
+        <input type="hidden" id="checkname" name="checkname" value="<?php echo $request->checkname; ?>" />
+        <input type="hidden" id="checkid" name="checkid" value="<?php echo $request->checkid; ?>" />
+        <input type="hidden" id="appendclass" name="appendclass" value="<?php echo $request->appendclass; ?>" />
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Value: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                    <div class="col-md-8 padding0">
+                        <input type="text" name="value" id="value" class="form-control input-sm" value="" />
+                    </div>
+                    <div id="value_error" class="col-md-offset-3"></div>
+                </div>
+                <?php if($request->hasalias == '1'){ ?>
+                    <div class="form-group" id="aliasrow">
+                        <label class="col-md-3 control-label">Alias: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                        <div class="col-md-8 padding0">
+                            <input type="text" name="alias" id="alias" class="form-control input-sm width150" value="" />
+                        </div>
+                        <div id="alias_error" class="col-md-offset-3"></div>
+                    </div>
+                <?php } ?>
+            </div>
+        </div>    
+    </form>
+</div>    
+<?php
+	require_once APPLICATION_PATH.'/includes/footer.php';
+?>
