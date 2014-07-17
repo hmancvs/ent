@@ -66,38 +66,42 @@ $(document).ready(function() {
     <div id="tabs">
         <?php require APPLICATION_PATH."/views/scripts/client/leftcolumn.phtml"; ?>
         <div class="col-md-9 tab-content makerelative padding0 xtestborder clearfix" id="center">
-        	<h4 id="tabtitle"></h4>
+        	
         	<div id="profile">
             	<?php if($tab == 'profile'){ ?>
+                	<h4 id="xtabtitle">Profile</h4>
                     <?php require APPLICATION_PATH."/views/scripts/client/profile.phtml"; ?>
 				<?php } ?>
 			</div> 
             <div id="employment">
             	<?php if($tab == 'employment'){ ?>
+                	<h4 id="xtabtitle">Employment</h4>
                 	<?php require APPLICATION_PATH."/views/scripts/client/employment.phtml"; ?>
                 <?php } ?>
 			</div>
             <div id="voucher">
 				<?php if($request->tab == 'voucher'){ ?>
+                	<h4 id="xtabtitle">Voucher History</h4>
 					<?php require APPLICATION_PATH."/views/scripts/client/voucher.phtml"; ?>
                 <?php } ?>
 			</div>
             <div id="activity">
 				<?php if($request->tab == 'activity'){ ?>
+                	<h4 id="xtabtitle">Interventions</h4>
                 	<?php require APPLICATION_PATH."/views/scripts/client/activity.phtml"; ?>
                 <?php } ?>
 			</div>
             <div id="finance">
                 <?php if($request->tab == 'finance'){ ?>
+                	<h4 id="xtabtitle" class="hideonprint">Invoices and Payments</h4>
                 	<?php require APPLICATION_PATH."/views/scripts/client/finance.phtml"; ?>
                 <?php } ?>
 			</div>
             <div id="report">
-                <form id="form-report" class="form-horizontal report">
                 <?php if($request->tab == 'report'){ ?>
-                
+                	<h4 id="xtabtitle" class="hideonprint">Reports</h4>
+                	<?php require APPLICATION_PATH."/views/scripts/report/dashboard.phtml"; ?>
                 <?php } ?>
-                </form>
 			</div>
      	</div> 
     </div>

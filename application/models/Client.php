@@ -1686,5 +1686,25 @@ class Client extends BaseEntity {
 		}
 		return new Payment();
 	}
+	# determine the client's billable hours reports
+	function getClientBillableHoursReport($type = 1){
+		$query = Doctrine_Query::create()->from('ActivityReport r')
+		->where("r.clientid = '".$this->getID()."' AND r.type = '".$type."' ")->orderby('r.reportdate');
+		$result = $query->execute();
+		if($result){
+			return $result;
+		}
+		return new ActivityReport();
+	}
+	# fetch the intervention log for a period
+	function getAllInterventionsForReport($startdate, $enddate, $voucherid){
+		$query = Doctrine_Query::create()->from('Activity a')
+		->where("a.clientid = '".$this->getID()."' AND a.voucherid = '".$voucherid."' AND TO_DAYS(a.activitydate) BETWEEN TO_DAYS('".$startdate."') AND TO_DAYS('".$enddate."') ")->orderby('a.activitydate asc');
+		$result = $query->execute();
+		if($result){
+			return $result;
+		}
+		return new Activity();
+	}
 }
 ?>

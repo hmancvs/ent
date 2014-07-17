@@ -11,11 +11,13 @@ class Invoice extends BaseEntity {
 		$this->hasColumn('voucherid', 'integer', null, array('notblank' => true));
 		$this->hasColumn('invoiceno', 'string', 50, array('notblank' => true));
 		$this->hasColumn('invoicedate','date', null, array('notblank' => true));
-		$this->hasColumn('invoiceamount', 'decimal', 11, array('notblank' => true, 'default'=>'0.0'));
-		$this->hasColumn('hourstaken', 'decimal', 11, array('notblank' => true));
+		$this->hasColumn('invoiceamount', 'decimal', 11, array('notblank' => true, 'default'=>'0.00'));
+		$this->hasColumn('hourstaken', 'decimal', 11, array('notblank' => true, 'default'=>'0.00'));
 		$this->hasColumn('hoursremaining', 'decimal', 11);
 		$this->hasColumn('description', 'string', 500);
 		$this->hasColumn('verifiedby', 'string', 50);
+		$this->hasColumn('reportid', 'integer', null);
+		$this->hasColumn('terms', 'string', 500, array('default'=>'Net 30'));
 	}
 	
 	# Contructor method for custom initialization
@@ -48,6 +50,18 @@ class Invoice extends BaseEntity {
 		$this->hasOne('Voucher as voucher',
 				array(
 						'local' => 'voucherid',
+						'foreign' => 'id',
+				)
+		);
+		$this->hasOne('ActivityReport as report',
+				array(
+						'local' => 'reportid',
+						'foreign' => 'id',
+				)
+		);
+		$this->hasOne('UserAccount as verifier',
+				array(
+						'local' => 'verifiedby',
 						'foreign' => 'id',
 				)
 		);

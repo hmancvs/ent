@@ -2,6 +2,7 @@
  	$baseview = $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/finance');
 	$baseview_pay = $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/finance/section/payment');
 	$baseview_inv = $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/finance/section/invoice');
+	require_once APPLICATION_PATH.'/../'.PUBLICFOLDER.'/mpdf/mpdf.php';
 	
 	$tabtitle = '';
 	if(isEmptyString($request->section)){
@@ -26,6 +27,14 @@
 			$invoice->setClientID($client->getID());
 			if(!isEmptyString($request->vid)){
 				$invoice->setVoucherID(decode($request->vid));
+			}
+			if(!isEmptyString($request->rid)){
+				$actreport = new ActivityReport();
+				$actreport->populate($request->rid); // debugMessage($actreport->toArray());
+				$invoice->setReportID($request->rid);
+				$invoice->setClientID($actreport->getClientID());
+				$invoice->setVoucherID($actreport->getVoucherID());
+				$invoice->setHourstaken($actreport->getBillableHours());
 			}
 		}
 		
@@ -98,13 +107,38 @@ $(document).ready(function() {
 		});
 	<?php } ?>
 	
-	
+	<?php if($request->print == 1 || $request->pdf == 1){ ?>
+		$("body").addClass('print');
+		$("body.print #headercontainer, body.print #sidebar, body.print .breadcrumbs, body.print .pageheader, body.print #tabs #left, body.print .hideonprint").html('').remove();
+		$("body.print .showonprint").show().removeClass('hidden');
+		$('body.print div.controls, body.print .nullifempty').each(function() {
+			var html = $(this).html();
+			if(isEmptyString(html)){
+				$(this).html('');
+			}
+		});
+	<?php } ?>
 }); 
 </script>
 
 <?php if($request->section == 'invoice'){ ?>	        
 <form id="form-invoice" class="form-horizontal invoice" role="form" action="<?php echo $this->baseUrl("invoice/create"); ?>" method="post">
-	<div class="btn-group pull-right" style="margin-top:-10px;">
+	<div class="showonprint hidden">
+        <div class="divider15"></div>
+        <span id="reportactions">			
+            <div id="print_page_action_buttons">
+                <a title="Close Window" onClick="window.close()" class="btn btn-default btn-xs"><i class="glyphicon glyphicon-remove"></i> Close</a>
+                <?php if($request->print == '1'){ ?>
+                    <a title="Print" onClick="window.print()" class="btn btn-primary btn-xs print" ><i class="glyphicon glyphicon-print"></i> Print</a>&nbsp;
+                <?php } ?>
+                <?php if($request->pdf == '1'){ ?>
+                    <a class="btn btn-primary btn-xs exportpdf blockanchor" href="<?php echo rtrim($this->viewurl,'/').'/generate/1'; ?>"><i class="glyphicon glyphicon-save"></i> Print to PDF</a>&nbsp;
+                <?php } ?>
+            </div>
+        </span>
+        <div class="divider15"></div>
+    </div>
+	<div class="btn-group pull-right hideonprint" style="margin-top:-10px;">
         <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
             Invoice Actions <span class="caret"></span>
         </button>
@@ -116,6 +150,8 @@ $(document).ready(function() {
                 <?php if($acl->checkPermission('Invoice', ACTION_EDIT) && !isEmptyString($request->invid)){ ?>	
                 	<li><a class="<?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'update_trigger'; ?>" message="This Account is closed and updates are disabled!" href="<?php echo $baseview_inv.'/step/edit/invid/'.encode($invoice->getID()); ?>" title="Update"><i class="glyphicon glyphicon-pencil"></i> Update Voucher</a></li>
                 <?php } ?>
+                <li><a title="Print" href="<?php echo rtrim($this->viewurl, "/").'/print/1'; ?>" target="_blank"><i class="glyphicon glyphicon-print"></i> Print Invoice</a></li>
+                <li><a title="Print to PDF" href="<?php echo rtrim($this->viewurl, "/").'/pdf/1/'; ?>" target="_blank"><i class="glyphicon glyphicon-list-alt"></i> Print to PDF</a></li>
             <?php } ?>
             <?php if($acl->checkPermission('Invoice', ACTION_DELETE) && !isEmptyString($request->invid)){ ?>
 				<?php 
@@ -161,7 +197,7 @@ $(document).ready(function() {
             <div class="col-md-12 padding0 pull-right rightalign">
                 <?php if($step == 'edit' || $step == 'new'){ ?>
                     <p class="margin0 lineblocked">
-                        <button type="submit" class="btn btn-success btn-sm button-submit save_trigger save" name="save"><i class="glyphicon glyphicon-ok"></i> <?php echo $step == 'new' ? $this->translate('global_button_save') : $this->translate('global_button_save_changes'); ?></button>
+                        <button type="submit" class="btn btn-success btn-sm button-submit save_trigger save" name="save"><i class="glyphicon glyphicon-ok"></i> <?php echo $step == 'new' ? 'Generate Invoice' : $this->translate('global_button_save_changes'); ?></button>
                     </p>
                     <p class="margin0 lineblocked">
                         <a class="btn btn-default btn-sm cancel cancel_trigger"><i class="glyphicon glyphicon-remove"></i> <?php echo $this->translate('global_button_cancel'); ?></a>
@@ -188,6 +224,7 @@ $(document).ready(function() {
 						voucherid: "required",
 						invoiceno: "required",
 						invoicedate: "required",
+						reportid: "required",
 						hourstaken: {
 							required: true
 						},
@@ -198,6 +235,7 @@ $(document).ready(function() {
 						voucherid: "<?php echo $this->translate("invoice_voucherid_error"); ?>",
 						invoiceno: "<?php echo $this->translate("invoice_invoiceno_error"); ?>",
 						invoicedate: "<?php echo $this->translate("invoice_invoicedate_error"); ?>",
+						reportid: "<?php echo $this->translate("invoice_invoiceperiod_error"); ?>",
 						hourstaken: {
 							required: "<?php echo $this->translate("invoice_hourstaken_error"); ?>"
 						},
@@ -226,6 +264,15 @@ $(document).ready(function() {
 					}
 				});
 				
+				$("#reportid").change(function(){
+					var rid = $(this).val();
+					if(!isEmptyString(rid)){
+						var url = '<?php echo $baseview_inv.'/step/new/rid/'; ?>'+rid;
+						$.blockUI({ message: uiblockcontent}); 
+						window.location.href = url;	
+					}
+				});
+				
 				$(".computeamount").keyup(function(){
 					var rate = $("#rate").val();
 					var hours = $("#hourstaken").val();
@@ -242,102 +289,288 @@ $(document).ready(function() {
 				$(".computeamount").trigger("keyup");
 			}); 
 			</script>
-            <fieldset class="fieldsetcontainer">
-                <legend>Invoice Details</legend>
-                <div class="panel-body well-sm makerelative">
-                    <div class="col-md-8">
-                        <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("invoice_voucherid_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-8">
-                                <p class="form-control-static nullifempty view"><?php echo $invoice->getVoucher()->isFollowAlong() ? $invoice->getVoucher()->getfavoucherno() :  $invoice->getVoucher()->getVoucherNo(); ?></p>
-                                <div class="edit">
-                                    <?php
-										$vouchers = getVouchersForClient($client->getID());
-                                        $dropdown = new Zend_Form_Element_Select('voucherid',
-                                                            array(
-                                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $vouchers),
-                                                                'view' => new Zend_View(),
-                                                                'decorators' => array('ViewHelper'),
-                                                                'class' => array('form-control','input-sm','width150')
-                                                            )
-                                        );  
-                                        $dropdown->setValue($invoice->getvoucherid()); 
-                                        echo $dropdown->render();
-                                    ?>
-                                    <div id="voucherid_error"></div>
+            <?php if($step == 'edit' || $step == 'new'){ ?>
+                <fieldset class="fieldsetcontainer">
+                    <legend>Invoice Details</legend>
+                    <div class="panel-body well-sm makerelative">
+                        <div class="col-md-10">
+                            <div class="form-group">
+                                <label class="col-md-4 control-label"><?php echo $this->translate("invoice_voucherid_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                <div class="col-md-8">
+                                    <p class="form-control-static nullifempty view"><?php echo $invoice->getVoucher()->getVoucherNumber(); ?></p>
+                                    <div class="edit">
+                                        <?php
+                                            $vouchers = getVouchersForClient($client->getID());
+                                            $dropdown = new Zend_Form_Element_Select('voucherid',
+                                                                array(
+                                                                    'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $vouchers),
+                                                                    'view' => new Zend_View(),
+                                                                    'decorators' => array('ViewHelper'),
+                                                                    'class' => array('form-control','input-sm','width150')
+                                                                )
+                                            );  
+                                            $dropdown->setValue($invoice->getvoucherid()); 
+                                            echo $dropdown->render();
+                                        ?>
+                                        <div id="voucherid_error"></div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("invoice_invoiceno_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-8">
-                                <p class="form-control-static nullifempty view"><?php echo $invoice->getinvoiceno(); ?></p>
-                                <div class="edit">
-                                    <input type="text" class="form-control input-sm width125" id="invoiceno" name="invoiceno" value="<?php echo $invoice->getinvoiceno(); ?>" />
-                                    <div id="invoiceno_error"></div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label"><?php echo $this->translate("invoice_invoiceno_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                <div class="col-md-8">
+                                    <p class="form-control-static nullifempty view"><?php echo $invoice->getinvoiceno(); ?></p>
+                                    <div class="edit">
+                                        <input type="text" class="form-control input-sm width125" id="invoiceno" name="invoiceno" value="<?php echo $invoice->getinvoiceno(); ?>" />
+                                        <div id="invoiceno_error"></div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("invoice_invoicedate_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-8">
-                                <p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($invoice->getInvoiceDate()); ?></p>
-                                <div class="edit">
-                                    <input type="text" class="form-control input-sm datefield readonly width100" name="invoicedate" id="invoicedate" value="<?php echo changeMySQLDateToPageFormat($invoice->getInvoiceDate()); ?>" />
-                                    <div id="invoicedate_error"></div>
-                                </div>      
-                            </div>
-                        </div>
-                         <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("invoice_rate_label"); ?>:</label>
-                            <div class="col-md-8">
-                                <p class="form-control-static nullifempty view"><?php echo formatNumber($invoice->getVoucher()->getRate()); ?></p> 
-                                <div class="edit">
-                                    <?php echo formatNumber($invoice->getVoucher()->getRate()); ?>
-                                    <input type="hidden" name="rate" id="rate" class="computeamount" value="<?php echo $invoice->getVoucher()->getRate(); ?>" />
+                            <div class="form-group">
+                                <label class="col-md-4 control-label"><?php echo $this->translate("invoice_invoicedate_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                <div class="col-md-8">
+                                    <p class="form-control-static nullifempty view"><?php echo formatDateAndTime($invoice->getInvoiceDate(), false); ?></p>
+                                    <div class="edit">
+                                        <input type="text" class="form-control input-sm datefield readonly width100" name="invoicedate" id="invoicedate" value="<?php echo changeMySQLDateToPageFormat($invoice->getInvoiceDate()); ?>" />
+                                        <div id="invoicedate_error"></div>
+                                    </div>      
                                 </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("invoice_hourstaken_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-8">
-                                <p class="form-control-static nullifempty view"><?php echo formatNumber($invoice->getHourstaken()); ?></p> 
-                                <div class="edit">
-                                    <input type="text" class="form-control input-sm width100 isdecimal computeamount" id="hourstaken" name="hourstaken" value="<?php echo $invoice->getHourstaken(); ?>" /><div id="hourstaken_error"></div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Invoice Period: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                <div class="col-md-8">
+                                    <p class="form-control-static nullifempty view"><a href="<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/report/section/billablehours/step/view/rid/'.$invoice->getReportID()); ?>"><?php echo $invoice->getReport()->getTitle(); ?><?php echo formatDateAndTime($invoice->getReport()->getStartDate(), false); ?> - <?php echo formatDateAndTime($invoice->getReport()->getEndDate(), false); ?></a></p>
+                                    <div class="edit">
+                                        <?php
+                                            $reports = getBillableHoursReportsForClient($client->getID());
+                                            $dropdown = new Zend_Form_Element_Select('reportid',
+                                                                array(
+                                                                    'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $reports),
+                                                                    'view' => new Zend_View(),
+                                                                    'decorators' => array('ViewHelper'),
+                                                                    'class' => array('form-control','input-sm')
+                                                                )
+                                            );  
+                                            $dropdown->setValue($invoice->getreportid()); 
+                                            echo $dropdown->render();
+                                        ?>
+                                        <?php if(isEmptyString($invoice->getHourstaken()) || $invoice->getHourstaken() == '0' || $invoice->getHourstaken() == '0.00'){ ?>
+                                            
+                                            <div style="clear:both;" class="alert alert-warning margin5">No hours specified for this report. Please complete the Billable Hours Report to continue</div>
+                                            <a class="btn btn-primary btn-sm" href="<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/report/section/billablehours/step/new'); ?>"><i class="glyphicon glyphicon-plus"></i> Generate Billable Hours Report</a>
+                                        <?php } ?>
+                                        <div id="reportid_error"></div>
+                                    </div>      
                                 </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("invoice_amount_label"); ?> <?php echo '<small>($)</small>'; ?>:</label>
-                            <div class="col-md-8">
-                                <p class="form-control-static nullifempty view"><?php echo $invoice->getInvoiceAmount(); ?></p>
-                                <div class="edit">
-                                    <span id="amount_computed"><?php echo $invoice->getInvoiceAmount(); ?></span>
-                                    <input type="hidden" name="invoiceamount" id="invoiceamount" value="<?php echo $invoice->getInvoiceAmount(); ?>" />
+                             <div class="form-group">
+                                <label class="col-md-4 control-label"><?php echo $this->translate("invoice_rate_label"); ?>:</label>
+                                <div class="col-md-8">
+                                    <p class="form-control-static nullifempty view"><?php echo formatNumber($invoice->getVoucher()->getRate()); ?></p> 
+                                    <div class="edit">
+                                        <?php echo formatNumber($invoice->getVoucher()->getRate()); ?>
+                                        <input type="hidden" name="rate" id="rate" class="computeamount" value="<?php echo $invoice->getVoucher()->getRate(); ?>" />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("invoice_description_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-8">
-                                <p class="form-control-static nullifempty view"><?php echo $invoice->getdescription(); ?></p> 
-                                <div class="edit">
-                                    <textarea class="form-control expanding" id="description" name="description"><?php echo $invoice->getdescription(); ?></textarea><div id="description_error"></div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label"><?php echo $this->translate("invoice_hourstaken_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                <div class="col-md-8">
+                                    <p class="form-control-static nullifempty view"><?php echo formatNumber($invoice->getHourstaken()); ?></p> 
+                                    <div class="edit">
+                                        <span id="hourstaken_computed"><?php echo  formatNumber($invoice->getHourstaken()); ?></span>
+                                        <input type="hidden" name="hourstaken" id="hourstaken" value="<?php echo $invoice->getHourstaken(); ?>" />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("invoice_verifiedby_label"); ?>: </label>
-                            <div class="col-md-8">
-                                <p class="form-control-static nullifempty view"><?php echo $invoice->getverifiedby(); ?></p> 
-                                <div class="edit">
-                                    <input type="text" class="form-control input-sm" id="verifiedby" name="verifiedby" value="<?php echo $invoice->getverifiedby(); ?>" /><div id="verifiedby_error"></div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label"><?php echo $this->translate("invoice_amount_label"); ?> <?php echo '<small>($)</small>'; ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                <div class="col-md-8">
+                                    <p class="form-control-static nullifempty view"><?php echo $invoice->getInvoiceAmount(); ?></p>
+                                    <div class="edit">
+                                        <span id="amount_computed"><?php echo $invoice->getInvoiceAmount(); ?></span>
+                                        <input type="hidden" name="invoiceamount" id="invoiceamount" value="<?php echo $invoice->getInvoiceAmount(); ?>" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label"><?php echo $this->translate("invoice_description_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                <div class="col-md-8">
+                                    <p class="form-control-static nullifempty view"><?php echo $invoice->getdescription(); ?></p> 
+                                    <div class="edit">
+                                        <textarea class="form-control expanding" id="description" name="description"><?php echo $invoice->getdescription(); ?></textarea><div id="description_error"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label"><?php echo $this->translate("invoice_verifiedby_label"); ?>: </label>
+                                <div class="col-md-8">
+                                    <p class="form-control-static nullifempty view"><?php echo is_numeric($invoice->getverifiedby()) ? $invoice->getVerifier()->getName(): $invoice->getverifiedby(); ?></p> 
+                                    <div class="edit">
+                                        <input type="text" class="form-control input-sm" id="verifiedby" name="verifiedby" value="<?php echo $invoice->getverifiedby(); ?>" /><div id="verifiedby_error"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </fieldset>
+                </fieldset>
+          	<?php } ?>
+            <?php if($step == 'view'){ ?>
+            	<?php  ob_start();  ?>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="widget invoice">
+                        	<div class="separator"></div>
+							<div class="widget-header" style="vertical-align:top;">
+                            	<table class="table noborder margin0">
+                                	<tr>
+                                    	<td style="vertical-align:top; padding:0;">
+                                        	<div class="pull-left">
+                                                <h3>Employment Network Team of NJ (ENT)</h3>
+                                            </div>
+                                        </td>
+                                        <td style="width:50px;"></td>
+                                        <td style="vertical-align:top; text-align:right; float:right; padding:0; width:250px;">
+                                        	<div style="margin-right:5px; float:right; text-align:right;">
+                                                <div class="divider10"></div>
+                                                <h1 class="rightalign bolded margin0 padding0" style="text-decoration:underline; font-weight:bold; font-size:24px; padding-top:0; margin-top:0;">INVOICE</h1> 
+                                                <div class="divider10"></div>
+                                                <p class="bolded rightalign margin0 padding0" style="font-size:16px;">#<?php echo $invoice->getInvoiceNo(); ?></p>
+                                                <div class="divider5"></div>
+                                                <p class="invoice-date rightalign margin0 padding0"><?php echo formatDateAndTime($invoice->getInvoiceDate(), false); ?></p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+							</div>
+							<div class="widget-content">
+								<div class="row margin0">
+                                	<table class="table noborder margin0">
+                                		<tr>
+                                    		<td style="vertical-align:top; padding:0;">
+                                                <div class="col-md-12" style="float:left; text-align:left;">
+                                                    <h4>Bill To:</h4>
+                                                    <address style="font-style:normal;">
+                                                        <strong>DVRS - Mercer County.</strong><br>
+                                                        28 Yard Ave<br>
+                                                        P.O Box 959<br>
+                                                        Trenton, NJ 086250959
+                                                    </address>
+                                                </div>
+                                      		</td>
+                                            <td style="width:280px;"></td>
+                                            <td style="vertical-align:top; text-align:right; float:right; padding:0;">
+                                            	<div class="col-md-12 pull-right" style="float:right; text-align:right;">
+                                                    <!--<h4>Agent</h4>-->
+                                                    <address class="rightalign" style="font-style:normal; text-align:right;">
+                                                        <strong>ENT</strong><br>
+                                                        213 Carnegie Center #2367<br>
+                                                        P.O Box 2367 <br>
+                                                        Princeton, NJ 08453 <br>
+                                                        Tel #: (609) 386-3322<br>
+                                                        Fax #: (609) 589-3345<br>
+                                                        Tax ID#: 68-0645186
+                                                    </address>
+                                                </div>
+                                            </td>
+                                     	</tr>
+                                    </table>    
+									<?php if($request->generate == '1'){ ?>
+                                    	<div class="divider30"></div>
+                                    <?php } ?>
+									<div class="col-md-12 padding0">
+										<table class="table list table-bordered nohover viewtable margin0" style="width:100%; font-size:14px; <?php echo $request->generate == 1 ? 'border: 1px thin black;  font-size:12px;' : ''; ?>">
+											<thead>
+												<tr>
+													<th style="width:150px;">Period of Time</th>
+													<th>Description</th>
+													<th style="width:85px; text-align:center;">Units (Hrs)</th>
+													<th style="width:85px; text-align:center;">Rate ($)</th>
+													<th style="width:85px; text-align:center;">Amount ($)</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td style="padding:0 5px;">
+                                                    	<table class="table margin0 noborder table-condensed" style="font-size:13px;">
+                                                        	<tr>
+                                                            	<td style="width:40%; padding:0 6px;">From</td>
+                                                                <td style="width:60%; padding:0 6px;">To</td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+													<td style="padding:0 5px;">
+                                                    	<table class="table margin0 noborder table-condensed" style="font-size:13px;">
+                                                        	<tr>
+                                                            	<td style="width:25%; padding:0 6px;">Name /</td>
+                                                                <td style="width:50%; padding:0 6px;">Service Type /</td>
+                                                                <td style="width:25%; padding:0 6px;">Voucher#</td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+													<td></td>
+													<td></td>
+													<td></td>
+												</tr>
+												<tr>
+													<td><p><?php echo formatDateAndTime($invoice->getReport()->getStartDate(), false); ?> </p> 
+                                                        <p> to </p>
+                                                        <p><?php echo formatDateAndTime($invoice->getReport()->getEndDate(), false); ?> </p>
+                                                        <?php if(isEmptyString($request->print) && isEmptyString($request->pdf)){ ?>
+                                                        	<div><a class="btn btn-default btn-xs" href="<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/report/section/billablehours/step/view/rid/'.$invoice->getReportID()); ?>">View Period Report</a></div>
+                                                      	<?php } ?>      
+                                                    </td>
+													<td>
+                                                    	<?php $services = getServiceTypes(); ?>
+                                                    	<p class="bolded"><?php echo $client->getName(); ?> </p>
+                                                        <p><?php echo isArrayKeyAnEmptyString($invoice->getVoucher()->getServiceTypeID(), $services) ? '': $services[$invoice->getVoucher()->getServiceTypeID()]; ?>  </p>
+                                                        <p><?php echo $invoice->getVoucher()->getVoucherNumber(); ?> </p>
+                                                    </td>
+													<td style="text-align:right;"><?php echo formatNumber($invoice->getHourstaken()); ?></td>
+													<td style="text-align:right;"><?php echo formatNumber($invoice->getVoucher()->getRate()); ?></td>
+													<td style="text-align:right;"><?php echo $invoice->getInvoiceAmount(); ?></td>
+												</tr>												
+											</tbody>
+										</table>
+									</div>
+								</div>
+								<div class="row padding-top-10px">
+									<div class="col-md-8">
+                                    	<div class="divider10"></div>
+										<div class="well margin0 padding10">
+											<p><strong>Terms and Notes: </strong></p>
+                                            <p><?php echo $invoice->getTerms(); ?></p>
+                                            <p><?php echo $invoice->getDescription(); ?></p>
+										</div>
+									</div>
+									<div class="col-md-4 rightalign pull-right">
+                                    	<div class="divider10"></div>
+										<table class="table table-bordered nohover">
+                                        	<tr>
+                                            	<td class="bolded">AMOUNT DUE:</td>
+                                                <td class="bolded rightalign" style="width:85px;">$ <?php echo formatNumber($invoice->getInvoiceAmount()); ?></td>
+                                            </tr>
+                                        </table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+                <?php
+					$html = ob_get_clean(); 
+					echo $html;
+				?>
+                <?php if($request->pdf == 1 && $request->generate == 1){ ?>
+					<?php require_once APPLICATION_PATH."/views/scripts/index/pdfview.phtml"; ?>
+                    <script type="text/javascript">
+                        $(document).ready(function() {
+                            var pdfurl = '<?php echo $relativepathtodocument; ?>';
+                            window.location.href = pdfurl;
+                        });
+                    </script>
+                <?php } ?>
+            <?php } ?>
         <?php } ?>
         <?php if(isEmptyString($request->invid) && $step == 'view') { ?>
             <div class="divider5"></div>
@@ -358,15 +591,11 @@ $(document).ready(function() {
                            <?php 
                                 $counter = 1;
                                 foreach($invoices as $invoice){ 
-									$voucherno = $invoice->getVoucher()->getVoucherNo();
-									if($invoice->getVoucher()->isFollowAlong()){
-										$voucherno = $invoice->getVoucher()->getfavoucherno();
-									}
                             ?>
                                 <tr>
                                     <td class="centeralign"><a href="<?php echo $baseview_inv.'/step/view/invid/'.encode($invoice->getID()); ?>" class="btn btn-default btn-xs">View</a></td>
                                     <td><?php echo $invoice->getInvoiceNo(); ?></td>
-                                    <td><?php echo $voucherno; ?></td>
+                                    <td><?php echo $invoice->getVoucher()->getVoucherNumber(); ?></td>
                                     <td><?php echo formatDateAndTime($invoice->getInvoiceDate(), false); ?></td>
                                     <td><?php echo $invoice->getHoursTaken(); ?></td>
                                     <td><?php echo $invoice->getInvoiceAmount(); ?></td>

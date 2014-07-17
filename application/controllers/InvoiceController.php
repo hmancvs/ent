@@ -49,12 +49,18 @@ class InvoiceController extends IndexController  {
     	try {
     		// save the invoice and return to success page (client view)
     		$invoice->save(); // debugMessage('ssaved perfect');
+    		if(!isEmptyString($invoice->getReportID())){
+    			$invoice->getReport()->setInvoiceID($invoice->getID());
+    			$invoice->getReport()->setReportDate($invoice->getInvoiceDate());
+    			$invoice->getReport()->setCompletedBy($invoice->getVerifiedBy());
+    			$invoice->getReport()->save();
+    		}
     		if(isEmptyString($id)){
     			$session->setVar(SUCCESS_MESSAGE, $this->_translate->translate('global_save_success'));
     		} else {
     			$session->setVar(SUCCESS_MESSAGE, $this->_translate->translate('global_update_success'));
     		}
-    		$this->_helper->redirector->gotoUrl(decode($this->_getParam(URL_SUCCESS)));
+    		$this->_helper->redirector->gotoUrl(decode($this->_getParam(URL_SUCCESS)).'/invid/'.encode($invoice->getID()));
     	} catch (Exception $e) { debugMessage($e->getMessage());
     		// failed to save invoice, return to failure page (client view)
     		$session->setVar(ERROR_MESSAGE, $e->getMessage());

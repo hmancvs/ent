@@ -1,0 +1,561 @@
+<?php 
+	$actreport = new ActivityReport();
+	$baseview_rep = $reportsdash.'/section/activity';
+	
+	$report_count = 0;
+	if($step == 'view' && isEmptyString($request->rid)){
+		$reports = $client->getClientBillableHoursReport(2);
+		$report_count = $reports->count();
+	}
+	
+	if(!isEmptyString($request->rid)){
+		$report_count = '';
+		$actreport->populate(decode($request->rid)); //debugMessage($actreport->toArray());
+		$disabilitycodes = getDisabilityDiagnosisCodes(''); $disabilitycodes_notaliased = getDisabilityDiagnosisCodes('', false);
+		$causecodes = getDisabilityCauseCodes(); $causecodes_notaliased = getDisabilityCauseCodes('', false);
+		$goals = getAllEmploymentGoalOptions();
+	}
+	if($step == 'new'){
+		$report_count = '';
+		$actreport->setClientID($client->getID());
+		$actreport->setType('2');
+		$actreport->setTitle('DVRS SE/TJLC Activity Report');
+		$actreport->setnewservicetypeid('Additional Pre-Placement');
+		if(!isEmptyString($request->vid)){
+			$actreport->setVoucherID(decode($request->vid));
+		}
+	}
+	
+	if(!isEmptyString($session->getVar(ERROR_MESSAGE))){ 
+		$formvalues = $session->getVar(FORM_VALUES);
+		$actreport->processPost($formvalues);
+	}
+?>
+<script>
+$(document).ready(function() {
+	var dateofbirthOpts = datepickerOpts;
+	dateofbirthOpts.yearRange = "-<?php echo date('Y')-2010; ?>:-0"; 
+	var startfrom = '<?php echo date('Y'); ?>';
+	datepickerOpts.maxDate = new Date("Dec 31, "+startfrom);
+	$(".datefield").datepicker(dateofbirthOpts);
+	$('#tabtitle').html('<?php echo $tabtitle; ?>');
+	
+	<?php if($step == 'edit' || $step == 'new'){ ?>
+		$('.edit, .requiredmark, .save_trigger, .cancel_trigger').removeClass('hidden');
+		$('.form-control-static.view, .update_trigger').addClass('hidden');
+		
+		$(".save_trigger, .save").click(function(e){
+			e.preventDefault();
+			if ($("#form-report").valid()) {
+				$.blockUI({ message: '<?php echo $blockcontent; ?>' }); 
+				$("#form-report").submit();
+			}
+		});
+	<?php } ?>
+	
+	<?php if($step == 'edit' || $step == 'new'){ ?>
+		// validation 
+		$("#form-report").validate({		
+			// define the validation rules one field at a time
+			rules: {
+				voucherid: "required",
+				startdate: "required",
+				enddate: "required",
+				issues: "required",
+				strategies: "required",
+				title: "required",
+				appropriate: "required"
+			}, 
+			// the messages for each of the fields being validated
+			messages: {		
+				voucherid: "Please select a Voucher",
+				startdate: "Please select Report Start",
+				enddate: "Please select Report End",
+				issues: "Please specify details",
+				strategies: "Please specify details",
+				title: "Please enter Report Title",
+				appropriate: "Please enter details"
+			},
+			// custom error positions
+			errorPlacement: function(error, element) {
+				switch(element.attr("name")){					
+					default:
+					if(element.hasClass("useid_error")){
+						error.appendTo("#"+element.attr("id")+"_error");
+					} else {
+						error.appendTo("#"+element.attr("name")+"_error");
+					}
+					break;
+				}			
+			}
+		});
+	<?php } ?>
+	
+	<?php if($request->print == 1 || $request->pdf == 1){ ?>
+		$("body").addClass('print');
+		$("body.print #headercontainer, body.print #sidebar, body.print .breadcrumbs, body.print .pageheader, body.print #tabs #left, body.print .hideonprint").html('').remove();
+		$("body.print .showonprint").show().removeClass('hidden');
+		$('body.print div.controls, body.print .nullifempty').each(function() {
+			var html = $(this).html();
+			if(isEmptyString(html)){
+				$(this).html('');
+			}
+		});
+	<?php } ?>
+}); 
+</script>
+<form id="form-report" class="form-horizontal report margin0" role="form" action="<?php echo $this->baseUrl("report/processactivitylog"); ?>" method="post">
+    <div class="showonprint hidden">
+        <div class="divider15"></div>
+        <span id="reportactions">			
+            <div id="print_page_action_buttons">
+                <a title="Close Window" onClick="window.close()" class="btn btn-default btn-xs"><i class="glyphicon glyphicon-remove"></i> Close</a>
+                <?php if($request->print == '1'){ ?>
+                    <a title="Print" onClick="window.print()" class="btn btn-primary btn-xs print" ><i class="glyphicon glyphicon-print"></i> Print</a>&nbsp;
+                <?php } ?>
+                <?php if($request->pdf == '1'){ ?>
+                    <a class="btn btn-primary btn-xs exportpdf blockanchor" href="<?php echo rtrim($this->viewurl,'/').'/generate/1'; ?>"><i class="glyphicon glyphicon-save"></i> Print to PDF</a>&nbsp;
+                <?php } ?>
+            </div>
+        </span>
+        <div class="divider15"></div>
+    </div>
+    <div class="panel-body padding0">
+        <!-- Page actions -->
+        <div class="btn-group pull-right hideonprint" style="margin-top:-20px;">
+        	<?php if($acl->checkPermission('Activity Report', ACTION_CREATE) && $step == 'view' && isEmptyString($request->rid)){ ?>
+                <a href="<?php echo $baseview_rep.'/step/new'; ?>" title="Generate New Report" class="btn btn-primary btn-sm" style="margin-right:10px;"><i class="glyphicon glyphicon-plus"></i> Generate New Report</a>
+            <?php } ?>
+            <?php if($acl->checkPermission('Activity Report', ACTION_VIEW) && $step == 'view' && !isEmptyString($request->rid)){ ?>
+            	<a title="Print" class="btn btn-default btn-sm print" href="<?php echo rtrim($this->viewurl, "/").'/print/1'; ?>" target="_blank"><i class="glyphicon glyphicon-print"></i> Print</a>
+         		<a title="Print to PDF" class="btn btn-default btn-sm pdf" href="<?php echo rtrim($this->viewurl, "/").'/pdf/1/'; ?>" target="_blank"><i class="glyphicon glyphicon-list-alt"></i> PDF</a>
+            <?php } ?>
+            <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                Report Actions <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+            	<?php if($acl->checkPermission('Activity Report', ACTION_CREATE) && $step == 'view' && isEmptyString($request->rid)){ ?>
+                	<li><a href="<?php echo $baseview_rep.'/step/new'; ?>" title="Generate New Report"><i class="glyphicon glyphicon-plus"></i> Generate New Report</a></li>
+                <?php } ?>
+				<?php if($acl->checkPermission('Activity Report', ACTION_EDIT) && $step == 'view' && !isEmptyString($request->rid)){ ?>	
+                    <li><a href="<?php echo $baseview_rep.'/step/edit/rid/'.encode($actreport->getID()); ?>" title="Update Report"><i class="glyphicon glyphicon-pencil"></i> Update Report</a></li>
+                <?php } ?>
+				<?php if($acl->checkPermission('Activity Report', ACTION_VIEW) && $step == 'view' && !isEmptyString($request->rid)){ ?>
+                	<li><a title="Print" href="<?php echo rtrim($this->viewurl, "/").'/print/1'; ?>" target="_blank"><i class="glyphicon glyphicon-print"></i> Print Report</a></li>
+                    <li><a title="Print to PDF" href="<?php echo rtrim($this->viewurl, "/").'/pdf/1/'; ?>" target="_blank"><i class="glyphicon glyphicon-list-alt"></i> Print to PDF</a></li>
+                <?php } ?>
+                <?php if($acl->checkPermission('Activity Report', ACTION_LIST)){ ?>
+                    <li><a href="<?php echo $baseview_rep.'/step/view'; ?>"><i class="glyphicon glyphicon-list"></i> Activity Log History</a></li>
+                <?php } ?>
+                <?php if($acl->checkPermission('Activity Report', ACTION_LIST) && $step == 'view' && isEmptyString($request->rid)){ ?>
+                    <li><a href="<?php echo $reportsdash; ?>" title="Other Reports"><i class="glyphicon glyphicon-list"></i> Reports Dashboard</a></li>
+                <?php } ?>
+            </ul>
+       	</div>
+        <div class="divider2"></div>
+        
+        <!-- Create and edit interface -->
+        <?php if($step == 'edit' || $step == 'new'){ ?>
+        	<div class="divider10"></div>
+         	<div class="panel-body padding0">
+                <div class="row-fluid margin0">
+                    <div class="col-md-12 padding0 pull-right rightalign">
+                        <p class="margin0 lineblocked"><button type="submit" class="btn btn-success btn-sm button-submit save_trigger save" name="save"><i class="glyphicon glyphicon-ok"></i> <?php echo $step == 'new' ? 'Generate Report' : $this->translate('global_button_save_changes'); ?></button></p>
+                        <p class="margin0 lineblocked"><a class="cancel cancel_trigger"><?php echo $this->translate('global_button_cancel'); ?></a></p>
+                        <input type="hidden" id="entityname" name="entityname" value="ActivityReport" />
+                        <input type="hidden" id="id" name="id" value="<?php echo encode($actreport->getID()); ?>" />
+                        <input type="hidden" id="clientid" name="clientid" value="<?php echo $actreport->getClientID(); ?>" />
+                        <input type="hidden" id="type" name="type" value="<?php echo $actreport->getType(); ?>" />
+                        <input type="hidden" class="successurl" id="<?php echo URL_SUCCESS; ?>" name="<?php echo URL_SUCCESS; ?>" value="<?php echo encode($baseview_rep); ?>" />
+                        <input type="hidden" class="failureurl" id="<?php echo URL_FAILURE; ?>" name="<?php echo URL_FAILURE; ?>" value="<?php echo encode($this->viewurl); ?>" />
+                    </div>
+                </div>
+            </div>
+        	<fieldset class="fieldsetcontainer">
+                <legend><?php echo $step == 'new' ? 'Generate New Activity Report' : 'Update Report'; ?></legend>
+                <div class="panel-body well-sm makerelative">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label"><?php echo $this->translate("invoice_voucherid_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-9">
+                                <p class="form-control-static nullifempty view"><?php echo $actreport->getVoucher()->getVoucherNumber(); ?></p>
+                                <div class="edit">
+                                    <?php
+                                        $vouchers = getVouchersForClient($client->getID());
+                                        $dropdown = new Zend_Form_Element_Select('voucherid',
+                                                            array(
+                                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $vouchers),
+                                                                'view' => new Zend_View(),
+                                                                'decorators' => array('ViewHelper'),
+                                                                'class' => array('form-control','input-sm','width150')
+                                                            )
+                                        );  
+                                        $dropdown->setValue($actreport->getvoucherid()); 
+                                        echo $dropdown->render();
+                                    ?>
+                                    <div id="voucherid_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Report Start: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-9">
+                                <p class="form-control-static nullifempty view"><?php echo formatDateAndTime($actreport->getstartdate(), false); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm datefield readonly width100" name="startdate" id="startdate" value="<?php echo changeMySQLDateToPageFormat($actreport->getstartdate()); ?>" />
+                                    <div id="startdate_error"></div>
+                                </div>      
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Report End: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-9">
+                                <p class="form-control-static nullifempty view"><?php echo formatDateAndTime($actreport->getenddate(), false); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm datefield readonly width100" name="enddate" id="enddate" value="<?php echo changeMySQLDateToPageFormat($actreport->getenddate()); ?>" />
+                                    <div id="enddate_error"></div>
+                                </div>      
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Report Title: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-9">
+                                <p class="form-control-static nullifempty view"><?php echo $actreport->getTitle(); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm" name="title" id="title" value="<?php echo $actreport->gettitle(); ?>" />
+                                    <div id="title_error"></div>
+                                </div>      
+                            </div>
+                        </div>
+                	</div>
+                    <div class="divider10"></div>
+                    <h4 class="col-md-12">Assessment Details</h4>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-md-12 control-label">1. <?php echo $this->translate("report_activitylog_issues"); ?> <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-12">
+                                <p class="form-control-static nullifempty view"><?php echo $actreport->getissues(); ?></p>
+                                <div class="edit">
+                                    <textarea class="form-control expanding" id="issues" name="issues"><?php echo $actreport->getissues(); ?></textarea>
+                                    <div id="issues_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-12 control-label">2. <?php echo $this->translate("report_activitylog_strategies"); ?> <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-12">
+                                <p class="form-control-static nullifempty view"><?php echo $actreport->getstrategies(); ?></p>
+                                <div class="edit">
+                                    <textarea class="form-control expanding" id="strategies" name="strategies"><?php echo $actreport->getstrategies(); ?></textarea>
+                                    <div id="strategies_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-12 control-label">3. <?php echo $this->translate("report_activitylog_appropriate"); ?>:</label>
+                            <div class="col-md-12">
+                                <p class="form-control-static nullifempty view"><?php echo $actreport->getappropriate(); ?></p>
+                                <div class="edit">
+                                    <textarea class="form-control expanding" id="appropriate" name="appropriate"><?php echo $actreport->getappropriate(); ?></textarea>
+                                    <div id="appropriate_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-12 control-label">4. <?php echo $this->translate("report_activitylog_comments"); ?>:</label>
+                            <div class="col-md-12">
+                                <p class="form-control-static nullifempty view"><?php echo $actreport->getcomments(); ?></p>
+                                <div class="edit">
+                                    <textarea class="form-control expanding" id="comments" name="comments"><?php echo $actreport->getcomments(); ?></textarea>
+                                    <div id="comments_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">5. <?php echo $this->translate("report_activitylog_meetingrequested"); ?></label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo $actreport->getmeetingrequested() == 1 ? 'Yes' : 'No'; ?></p>
+                                <div class="edit">
+                                	<label class="radio-inline">
+                                      <input type="radio" id="meetingrequested_1" name="meetingrequested" value="1" <?php echo $actreport->getmeetingrequested() == 1 ? 'checked' : ''; ?>>Yes
+                                    </label>
+                                    <label class="radio-inline">
+                                      <input type="radio" id="meetingrequested_0" name="meetingrequested" value="0" <?php echo $actreport->getmeetingrequested() == 0 ? 'checked' : ''; ?>>No
+                                    </label> 
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">6. <?php echo $this->translate("report_activitylog_hoursrequested"); ?>:</label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo formatNumber($actreport->gethoursrequested()); ?></p>
+                                <div class="edit">
+                                	<input type="text" class="form-control input-sm width100 isdecimal" id="hoursrequested" name="hoursrequested" value="<?php echo $actreport->gethoursrequested(); ?>" />
+                       				<div id="hoursrequested_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">7. <?php echo $this->translate("report_activitylog_newservicetypeid"); ?>:</label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo $actreport->getnewservicetypeid(); ?></p>
+                                <div class="edit">
+                                	<input type="text" class="form-control input-sm" id="newservicetypeid" name="newservicetypeid" value="<?php echo $actreport->getnewservicetypeid(); ?>" />
+                       				<div id="newservicetypeid_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">8. <?php echo $this->translate("report_activitylog_hasjob"); ?></label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo $actreport->gethasjob() == 1 ? 'Yes' : 'No'; ?></p>
+                                <div class="edit">
+                                	<label class="radio-inline">
+                                    	<input type="radio" id="hasjob_1" name="hasjob" value="1" <?php echo $actreport->gethasjob() == 1 ? 'checked' : ''; ?>>Yes
+                                    </label>
+                                    <label class="radio-inline">
+                                      <input type="radio" id="hasjob_0" name="hasjob" value="0" <?php echo $actreport->gethasjob() == 0 ? 'checked' : ''; ?>>No
+                                    </label> 
+                                </div>
+                            </div>
+                        </div>
+					</div>
+				</div>
+			</fieldset>
+        <?php } ?>
+        
+        <!-- Report view formatted for printing -->
+        <?php if(!isEmptyString($request->rid) && $step == 'view'){ ?>
+        	<?php 
+                ob_start(); 
+            ?>
+        	<div class="divider20"></div>
+			<h5 class="inline margin0 bolded"><?php echo $actreport->getTitle(); ?> <span class="notbolded normaltext"><?php echo formatDateAndTime($actreport->getStartDate(), false); ?> - <?php echo formatDateAndTime($actreport->getEndDate(), false); ?></span></h5>
+            <div class="divider20"></div>
+            <div class="panel-body padding0">
+                <div class="statbox widget box">
+                    <div class="widget-content">
+                    	<?php if($request->generate == 1){ ?>
+                            <div class="divider20"></div>
+                        <?php } ?>
+                         <table class="table margin0 noborder printtable" style=" <?php echo $request->generate == 1 ? 'border-collapse: collapse; font-size:11px;' : ''; ?>">
+                            <tr>
+                                <td style="width:50%; padding-top:0;">
+                                    <table class="table margin0 noborder">
+                                        <tr>
+                                            <td style="width:115px;"><label class="control-label paddingleft0 floatleft">Client:</label></td>
+                                            <td><p class="form-control-static nullifempty view"><?php echo $client->getName(); ?></p>
+                                            <input type="hidden" id="clientid" name="clientid" value="<?php echo $client->getID(); ?>" /></td>
+                                        </tr>
+                                        <?php if($request->generate == 1){ ?>
+                                            <tr><td colspan="2">&nbsp;</td></tr>
+                                        <?php } ?>
+                                        <tr>
+                                            <td><label class="control-label">Voucher No#:</label></td>
+                                            <td><p class="form-control-static nullifempty view"><?php echo $actreport->getVoucher()->getVoucherNumber(); ?></p></td>
+                                        </tr>
+                                        <?php if($request->generate == 1){ ?>
+                                            <tr><td colspan="2">&nbsp;</td></tr>
+                                        <?php } ?>
+                                        <tr>
+                                            <td><label class="control-label">Reporting Period:</label></td>
+                                            <td><p class="form-control-static nullifempty view"><?php echo formatDateAndTime($actreport->getStartDate(), false); ?> - <?php echo formatDateAndTime($actreport->getEndDate(), false); ?></p></td>
+                                        </tr>
+                                        <?php if($request->generate == 1){ ?>
+                                            <tr><td colspan="2">&nbsp;</td></tr>
+                                        <?php } ?>
+                                        <tr>
+                                            <td><label class="control-label">Report Date:</label></td>
+                                            <td><p class="form-control-static nullifempty view"><?php echo formatDateAndTime($actreport->getReportDate(), false); ?></p></td>
+                                        </tr>
+                                        <?php if($request->generate == 1){ ?>
+                                            <tr><td colspan="2">&nbsp;</td></tr>
+                                        <?php } ?>
+                                        <tr>
+                                            <td><label class="control-label">Completed By:</label></td>
+                                            <td><p class="form-control-static nullifempty view"><?php echo is_numeric($actreport->getcompletedby()) ? $actreport->getUser()->getName(): $actreport->getcompletedby(); ?></p></td>
+                                        </tr>
+                                        <?php if($request->generate == 1){ ?>
+                                            <tr><td colspan="2">&nbsp;</td></tr>
+                                        <?php } ?>
+                                    </table>
+                                </td>
+                                <td style="padding-top:0;">
+                                    <table class="table margin0 noborder">
+                                        <tr>
+                                            <td style="width:115px;"><label class="control-label">Provider Agency:</label></td>
+                                            <td><p class="form-control-static nullifempty view"><?php echo $this->translate('appfullname'); ?></p></td>
+                                        </tr>
+                                        <?php if($request->generate == 1){ ?>
+                                            <tr><td colspan="2">&nbsp;</td></tr>
+                                        <?php } ?>
+                                        <tr>
+                                            <td><label class="control-label">DVRS Counsellor:</label></td>
+                                            <td><p class="form-control-static nullifempty view"><?php echo $client->getDVRSCounselor(); ?></p></td>
+                                        </tr>
+                                        <?php if($request->generate == 1){ ?>
+                                            <tr><td colspan="2">&nbsp;</td></tr>
+                                        <?php } ?>
+                                        <tr>
+                                            <td><label class="control-label">DVRS Office:</label></td>
+                                            <td><p class="form-control-static nullifempty view">Trenton / Mercer</p></td>
+                                        </tr>
+                                        <?php if($request->generate == 1){ ?>
+                                            <tr><td colspan="2">&nbsp;</td></tr>
+                                        <?php } ?>
+                                        <tr>
+                                            <td><label class="control-label">Contact Phone:</label></td>
+                                            <td><p class="form-control-static nullifempty view">(609) 386-332</p></td>
+                                        </tr>
+                                        <?php if($request->generate == 1){ ?>
+                                            <tr><td colspan="2">&nbsp;</td></tr>
+                                        <?php } ?>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+               	</div>
+          	</div>
+            <div class="panel-body padding0">
+                <div class="statbox widget box">
+                    <div class="widget-content">
+                    	<table class="table margin0 noborder printtable" style=" <?php echo $request->generate == 1 ? 'border-collapse: collapse; font-size:11px;' : ''; ?>">
+                            <tr>
+                                <td style="width:140px; vertical-align:top;"><label class="control-label">Disability Code(s):</label></td>
+                                <td style="vertical-align:top;">
+                                	<p class="form-control-static nullifempty view inline">
+										<?php if($actreport->getClient()->getPrimaryDiagnosis() && $actreport->getClient()->getPrimaryCause()){ ?>
+                                            <?php echo getDisabilityCodeForClient($actreport->getClient()->getPrimaryDiagnosis(), $actreport->getClient()->getPrimaryCause()); ?>
+                                        <?php } ?>
+                                        <?php if($actreport->getClient()->getSecondaryDiagnosis() && $actreport->getClient()->getSecondaryCause()){ ?>
+                                            , <?php echo getDisabilityCodeForClient($actreport->getClient()->getSecondaryDiagnosis(), $actreport->getClient()->getSecondaryCause()); ?>
+                                        <?php } ?>
+                                    </p>
+                                </td>
+                           	</tr>
+                            <?php if($request->generate == 1){ ?>
+                                <tr><td colspan="2">&nbsp;</td></tr>
+                            <?php } ?>
+                            <tr>
+                                <td style="vertical-align:top;"><label class="control-label">Employment Goal(s):</label></td>
+                                <td style="min-height:50px; height:auto; vertical-align:top;">
+                                	<p class="form-control-static nullifempty view inline" style="display:inline;">
+									<?php if(!isEmptyString($actreport->getClient()->getjobpreferred())){ ?>
+                                		<?php echo $goals[$client->getjobpreferred()]; ?>
+                                    <?php } ?>
+                                    <?php if(!isEmptyString($actreport->getClient()->getjobpreferred1())){ ?>
+                                    	, <?php echo $goals[$client->getjobpreferred1()]; ?>
+                                    <?php } ?>
+                                    </p>
+                                    <?php if(!isEmptyString($actreport->getClient()->getemploymentgoal())){ ?>
+                                		<p class="form-control-static nullifempty view blocked" style="display:block;"><?php echo $actreport->getClient()->getemploymentgoal(); ?></p>
+                                    <?php } ?>    
+                                </td>
+                           	</tr>
+                            <?php if($request->generate == 1){ ?>
+                                <tr><td colspan="2">&nbsp;</td></tr>
+                            <?php } ?>
+                            <tr>
+                                <td style="vertical-align:top;"><label class="control-label">Voucher Units Provided:</label></td>
+                                <td style="vertical-align:top;"><p class="form-control-static nullifempty view"><?php echo formatNumber($actreport->getVoucher()->getHours()); ?></p></td>
+                           	</tr>
+                      	</table> 
+                    </div>
+               	</div>
+           	</div>
+            <div class="panel-body padding0">
+                <div class="statbox widget box">
+                    <div class="widget-content">
+                        <h5 class="col-md-12 bolded">Assessment Details</h5>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="col-md-12 control-label bolded">1. <?php echo $this->translate("report_activitylog_issues"); ?></label>
+                                <div class="col-md-12"><p class="form-control-static nullifempty view"><?php echo $actreport->getissues(); ?></p></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-12 control-label bolded">2. <?php echo $this->translate("report_activitylog_strategies"); ?> <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                <div class="col-md-12"><p class="form-control-static nullifempty view"><?php echo $actreport->getstrategies(); ?></p></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-12 control-label">3. <?php echo $this->translate("report_activitylog_appropriate"); ?>:</label>
+                                <div class="col-md-12"><p class="form-control-static nullifempty view"><?php echo $actreport->getappropriate(); ?></p></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-12 control-label">4. <?php echo $this->translate("report_activitylog_comments"); ?>:</label>
+                                <div class="col-md-12"><p class="form-control-static nullifempty view"><?php echo $actreport->getcomments(); ?></p></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">5. <?php echo $this->translate("report_activitylog_meetingrequested"); ?></label>
+                                <div class="col-md-8"><p class="form-control-static nullifempty view"><?php echo $actreport->getmeetingrequested() == 1 ? 'Yes' : 'No'; ?></p></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">6. <?php echo $this->translate("report_activitylog_hoursrequested"); ?>:</label>
+                                <div class="col-md-8"><p class="form-control-static nullifempty view"><?php echo formatNumber($actreport->gethoursrequested()); ?></p></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">7. <?php echo $this->translate("report_activitylog_newservicetypeid"); ?>:</label>
+                                <div class="col-md-8"><p class="form-control-static nullifempty view"><?php echo $actreport->getnewservicetypeid(); ?></p></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">8. <?php echo $this->translate("report_activitylog_hasjob"); ?></label>
+                                <div class="col-md-8"><p class="form-control-static nullifempty view"><?php echo $actreport->gethasjob() == 1 ? 'Yes' : 'No'; ?></p></div>
+                            </div>
+                        </div>
+                    </div>
+               	</div>
+           	</div>
+            <?php
+                $html = ob_get_clean(); 
+                echo $html;
+            ?>
+        <?php } ?>
+        
+        <!--List of activity reports-->
+        <?php if($step == 'view' && isEmptyString($request->rid) && isEmptyString($request->voucherid)) { ?>
+            <h5 class="inline margin0 bolded">Activity Assessment Reports</h5>
+            <div class="divider10"></div>
+            <?php if($report_count == 0){ ?>
+                <div class="col-md-12 padding0">
+                    <div class="statbox widget box box-shadow">
+                        <div class="widget-content">
+                            <div style="clear:both;" class="alert alert-warning margin5">There are currently no previous reports in history</div>
+                        </div>
+                    </div>
+                </div>
+            <?php } else { ?>
+                <?php 
+                    foreach($reports as $report){ 
+                        $reportview = $baseview_rep.'/step/view/rid/'.encode($report->getID());
+                ?>
+                    <div class="col-md-12 padding0">
+                        <div class="statbox widget box box-shadow">
+                            <div class="widget-content">
+                                <a href="<?php echo $reportview; ?>" class="nodecoration">
+                                    <div class="visual yellow"><i class="glyphicon glyphicon-signal" style="font-size:32px;"></i></div>
+                                    <div class="title">
+                                        <div class="blocked"><?php echo $report->getTitle(); ?> </div>
+                                        <span class="blocked"></span>
+                                        <span class="notbolded normaltext"><?php echo formatDateAndTime($report->getStartDate(), false); ?> - <?php echo formatDateAndTime($report->getEndDate(), false); ?></span>
+                                    </div>
+                                    <div class="value"></div>
+                                </a>
+                                <div class="divider2"></div>
+                                <a href="<?php echo $reportview; ?>" class="more">View Report <i class="pull-right icon-angle-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                <?php } ?>
+            <?php } ?>    
+        <?php } ?>                
+    </div>
+</form>  
+<?php if($request->pdf == 1 && $request->generate == 1){ ?>
+	<?php require_once APPLICATION_PATH."/views/scripts/index/pdfview.phtml"; ?>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			var pdfurl = '<?php echo $relativepathtodocument; ?>';
+			window.location.href = pdfurl;
+		});
+	</script>
+<?php } ?>

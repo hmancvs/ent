@@ -22,7 +22,7 @@ class Voucher extends BaseEntity {
 		$this->hasColumn('status', 'integer', null, array('default' => 0));
 		$this->hasColumn('hours', 'decimal', 11, array('scale' => 2, 'notblank' => true));
 		$this->hasColumn('days', 'integer', null);
-		$this->hasColumn('rate', 'decimal', 11);
+		$this->hasColumn('rate', 'decimal', 11, array('scale' => 2, 'default' => '0.00'));
 		$this->hasColumn('employmentgoal', 'string', 2000);
 		$this->hasColumn('notes', 'string', 1000);
 		$this->hasColumn('isrenewable', 'integer', null, array('default' => 0));
@@ -128,6 +128,10 @@ class Voucher extends BaseEntity {
 			$result = true;
 		}
 		return $result;
+	}
+	# determine the voucher number depending on voucher type
+	function getVoucherNumber(){
+		return $this->isFollowAlong() ? $this->getfavoucherno() : $this->getVoucherNo();
 	}
 }
 ?>

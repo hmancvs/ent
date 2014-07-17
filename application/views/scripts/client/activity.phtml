@@ -190,8 +190,8 @@
                 <?php if($acl->checkPermission('Activity', ACTION_EDIT) && !isEmptyString($request->aid)){ ?>	
                 	<li><a class="<?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'update_trigger'; ?>" message="This Account is closed and updates are disabled." href="<?php echo $baseview.'/step/edit/aid/'.$request->aid; ?>" title="Update"><i class="glyphicon glyphicon-pencil"></i> Update Intervention</a></li>
                 <?php } ?>
-                <?php if(!isEmptyString($request->aid)){ ?>	
-                    <!--<li><a class="gonowhere" title="Print Intervention"><i class="glyphicon glyphicon-print"></i> Print Intervention</a></li>-->
+                <?php if($acl->checkPermission('Billable Hours Report', ACTION_CREATE) && $step == 'view'){ ?>
+                    <li><a href="<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/report/section/billablehours/step/new'); ?>" title="Generate New Report"><i class="glyphicon glyphicon-plus"></i> Generate Billable Hours Report</a></li>
                 <?php } ?>
             <?php } ?>
             <?php if($acl->checkPermission('Activity', ACTION_DELETE) && !isEmptyString($request->aid)){ ?>
@@ -363,10 +363,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                    	
-                        
                     </div>
                 </div>
             </fieldset>          

@@ -145,6 +145,9 @@
 .middlealign, .table td.middlealign {
 	vertical-align:middle;	
 }
+.topalign, .table td.topalign {
+	vertical-align:middle;	
+}
 .centeralign, .table td.centeralign {
 	text-align:center;	
 }
@@ -273,6 +276,15 @@ select.auto, .auto, td.auto, table.auto {
 	font-style:italic;
 	font-weight:normal;
 	color:#999999;	
+}
+.nodecoration {
+	text-decoration:none;
+}
+.nodecoration:hover {
+	text-decoration:none;
+}
+.normaltext {
+	font-style:normal;
 }
 .pagedescription {
 	color:#666666;

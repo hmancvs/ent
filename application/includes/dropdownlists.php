@@ -1339,6 +1339,13 @@
 		$array = getOptionValuesFromDatabaseQuery($query);
 		return $array;
 	}
+	# determine the billable hours reports for the client
+	function getBillableHoursReportsForClient($clientid){
+		$query = "SELECT a.id as optionvalue, concat(a.title,' ', date_format(a.startdate, '%m/%d/%Y'),' to ',date_format(a.enddate, '%m/%d/%Y')) as optiontext FROM activityreport AS a WHERE a.clientid = '".$clientid."' order by a.reportdate ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		return $array;
+	} 
 	# fetch all the activity codes for billable interventions
 	function getAllActivityCodes($value = '', $aliased=true){
 		if($aliased){

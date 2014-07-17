@@ -60,7 +60,12 @@ $(document).ready(function() {
 		$.blockUI({ message: uiblockcontent}); 
         return false;
     });
-
+	
+	// show block ui when transfering to another page
+	$('a.blockanchor').click(function(){
+		$.blockUI({ message: uiblockcontent}); 
+        return true;
+    });
 	// reset tab index
     var tabindex = 1;
     $('input,select,textarea').each(function() {
@@ -797,7 +802,7 @@ $(document).ready(function() {
 			});		
 			$('#dialog').on('hidden', function () {
 				enableContainerByID('indexform');
-				$("#"+fieldid).val('');
+				// $("#"+fieldid).val('');
 			});
 			return false;
 		}
@@ -878,6 +883,7 @@ $(document).ready(function() {
 		});
 		return false;
 	});
+	
 });
 
 //Use window.load and not document.ready for effective equal heights
@@ -888,3 +894,17 @@ $(window).load(function() {
 });
 
 </script>
+<?php if($request->print == 1 || $request->pdf == 1){ ?>
+<style>
+#centercolumn {
+	width:840px;
+}
+#contentcontainer {
+	margin-left:0;
+}
+#center {
+	float:left;
+	width:100%;
+}
+</style>
+<?php } ?>

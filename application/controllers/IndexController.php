@@ -217,34 +217,45 @@ class IndexController extends Zend_Controller_Action  {
     	$this->createAction();
     }
     
-    public function deleteAction() {
-    	$this->_setParam("action", ACTION_DELETE); 
-		
-    	$session = SessionWrapper::getInstance(); 
+public function deleteAction() {
+    	$this->_setParam("action", ACTION_DELETE);
+    
+    	$session = SessionWrapper::getInstance();
     	$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender(TRUE);
-		
-		$formvalues = $this->_getAllParams();
-		$successurl = decode($formvalues[URL_SUCCESS]);
-		if(!isArrayKeyAnEmptyString(SUCCESS_MESSAGE, $formvalues)){
-			$successmessage = decode($formvalues[SUCCESS_MESSAGE]);
-		}
-		$classname = $formvalues['entityname'];
-		// debugMessage($successurl);
-		
+    	$this->_helper->viewRenderer->setNoRender(TRUE);
+    
+    	$formvalues = $this->_getAllParams();
+    	$successurl = decode($formvalues[URL_SUCCESS]);
+    	if(!isArrayKeyAnEmptyString(SUCCESS_MESSAGE, $formvalues)){
+    		$successmessage = decode($formvalues[SUCCESS_MESSAGE]);
+    	}
+    	$classname = $formvalues['entityname'];
+    	$altclassname = '';
+    	if(!isArrayKeyAnEmptyString('altdeleteentity', $formvalues)){
+    		$altclassname = $formvalues['altdeleteentity'];
+    	}
+    	// debugMessage($successurl);
+    
     	$obj = new $classname;
     	$id = is_numeric($formvalues['id']) ? $formvalues['id'] : decode($formvalues['id']);
     	$obj->populate($id);
     	/* debugMessage($obj->toArray());
-    	exit(); */
+    	 exit(); */
     	if($obj->delete()) {
+    		if(!isArrayKeyAnEmptyString('altdeleteid', $formvalues)){
+    			$altobj = new $altclassname;
+    			$altobj->populate($formvalues['altdeleteid']);
+    			if(!isEmptyString($altobj->getID())){
+    				$altobj->delete();
+    			}
+    		}
     		$session->setVar(SUCCESS_MESSAGE, $this->_translate->translate("global_delete_success"));
     		if(!isEmptyString($successmessage)){
     			$session->setVar(SUCCESS_MESSAGE, $successmessage);
     		}
     		if($formvalues['entityname'] == 'Podcast'){
     			// erase any physical files on the file system
-    			
+    			 
     		}
     	}
     	$this->_helper->redirector->gotoUrl($successurl);

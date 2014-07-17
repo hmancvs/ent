@@ -1,0 +1,479 @@
+<?php 
+	
+	$actreport = new ActivityReport();
+	$startdate = $request->startdate;
+	$enddate = $request->enddate;
+	$voucherid = $request->voucherid;
+	
+	$baseview = $reportsdash.'/section/billablehours';
+	$act_count = 0;
+	if(!isEmptyString($request->rid)){
+		$report_count = '';
+		$actreport->populate($request->rid); // debugMessage($voucher->toArray());
+		$voucherid = $actreport->getVoucherID();
+		$startdate = $actreport->getStartDate();
+		$enddate = $actreport->getEndDate();
+	}
+	if($step == 'new' ){
+		$report_count = '';
+		$actreport->setType(1);
+		$actreport->setClientID($client->getID());
+		if(!isEmptyString($request->vid)){
+			$actreport->setVoucherID(decode($request->vid));
+		}
+	}
+	
+	if(!isEmptyString($request->startdate)){
+		$startdate = changeDateFromPageToMySQLFormat($request->startdate);
+	}
+	if(!isEmptyString($request->enddate)){
+		$enddate = changeDateFromPageToMySQLFormat($request->enddate);
+	}
+	if(!isEmptyString($request->voucherid)){
+		$voucherid = $request->voucherid;
+	}
+	
+	if($step == 'view' && isEmptyString($request->rid)){
+		$reports = $client->getClientBillableHoursReport();
+		$report_count = $reports->count();
+	}
+	
+	if(!isEmptyString($startdate) && !isEmptyString($enddate) && !isEmptyString($voucherid)){
+		$actcodes = getAllActivityCodes('', false);
+		$interventions = $client->getAllInterventionsForReport($startdate, $enddate, $voucherid);
+		$act_count = $interventions->count();
+	}
+	
+	if(!isEmptyString($session->getVar(ERROR_MESSAGE))){ 
+		$formvalues = $session->getVar(FORM_VALUES);
+		$actreport->processPost($formvalues);
+	}
+?>
+<script>
+$(document).ready(function() {
+	var dateofbirthOpts = datepickerOpts;
+	dateofbirthOpts.yearRange = "-<?php echo date('Y')-2010; ?>:-0"; 
+	var startfrom = '<?php echo date('Y'); ?>';
+	datepickerOpts.maxDate = new Date("Dec 31, "+startfrom);
+	$(".datefield").datepicker(dateofbirthOpts);
+	$('#tabtitle').html('<?php echo $tabtitle; ?>');
+	
+	<?php if($step == 'edit' || $step == 'new'){ ?>
+		$('.edit, .requiredmark, .save_trigger, .cancel_trigger').removeClass('hidden');
+		$('.form-control-static.view, .update_trigger').addClass('hidden');
+		
+	<?php } ?>
+	
+	// fetch activities for report 
+	$("#generate").click(function(){
+		var voucherid = $("#voucherid").val();
+		var startdate = $("#startdate").val();
+		var enddate = $("#enddate").val();
+		var generate = true;
+		
+		if(isEmptyString(voucherid)){
+			generate = false;
+			bootbox.alert('<label class="blockcontainer notbolded">Please select Voucher to continue</label>'); 
+			return false;
+		}
+		if(isEmptyString(startdate)){
+			generate = false;
+			bootbox.alert('<label class="blockcontainer notbolded">Please select Report Start to continue</label>'); 
+			return false;
+		}
+		if(isEmptyString(enddate)){
+			generate = false;
+			bootbox.alert('<label class="blockcontainer notbolded">Please select Report End to continue</label>'); 
+			return false;
+		}
+		// if all parameters are specified, generate the activities for the report
+		if(generate){
+			var url = '<?php echo $baseview.'/step/'.$step; ?>';
+			<?php if(!isEmptyString($request->rid)){ ?>
+				url += '<?php echo '/rid/'.$request->rid; ?>';
+			<?php } ?>
+			if(!isEmptyString(voucherid)){
+				url += '/voucherid/'+voucherid;
+			}
+			if(!isEmptyString(startdate)){
+				url += '/startdate/'+startdate;
+			}
+			if(!isEmptyString(enddate)){
+				url += '/enddate/'+enddate;
+			}
+			// alert(url);
+			$.blockUI({ message: '<?php echo $blockcontent; ?>' }); 
+			$(location).attr('href',url);
+		}
+	});
+	
+	$(".save").click(function(e){
+		e.preventDefault();
+		var fname = $(this).attr('name');
+		$("#reportaction").val(fname);
+		$("#form-report").submit();
+		$.blockUI({ message: '<?php echo $blockcontent; ?>' }); 
+	});
+	
+	<?php if($request->print == 1 || $request->pdf == 1){ ?>
+		$("body").addClass('print');
+		$("body.print #headercontainer, body.print #sidebar, body.print .breadcrumbs, body.print .pageheader, body.print #tabs #left, body.print .hideonprint").html('').remove();
+		$("body.print .showonprint").show().removeClass('hidden');
+		$('body.print div.controls, body.print .nullifempty').each(function() {
+			var html = $(this).html();
+			if(isEmptyString(html)){
+				$(this).html('');
+			}
+		});
+	<?php } ?>
+	
+}); 
+</script>
+<form id="form-report" class="form-horizontal report margin0" role="form" action="<?php echo $this->baseUrl("report/processbillablehours"); ?>" method="post">
+    <div class="showonprint hidden">
+        <div class="divider15"></div>
+        <span id="reportactions">			
+            <div id="print_page_action_buttons">
+                <a title="Close Window" onClick="window.close()" class="btn btn-default btn-xs"><i class="glyphicon glyphicon-remove"></i> Close</a>
+                <?php if($request->print == '1'){ ?>
+                    <a title="Print" onClick="window.print()" class="btn btn-primary btn-xs print" ><i class="glyphicon glyphicon-print"></i> Print</a>&nbsp;
+                <?php } ?>
+                <?php if($request->pdf == '1'){ ?>
+                    <a class="btn btn-primary btn-xs exportpdf blockanchor" href="<?php echo rtrim($this->viewurl,'/').'/generate/1'; ?>"><i class="glyphicon glyphicon-save"></i> Print to PDF</a>&nbsp;
+                <?php } ?>
+            </div>
+        </span>
+        <div class="divider15"></div>
+    </div>
+    <div class="panel-body padding0">
+        <div class="pull-right hideonprint" style="margin-top:-20px;">
+            <?php if($acl->checkPermission('Billable Hours Report', ACTION_CREATE) && $step == 'view'){ ?>
+                <a href="<?php echo $baseview.'/step/new'; ?>" title="Generate New Report" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-plus"></i> Generate New Report</a>
+            <?php } ?>
+            <?php if($acl->checkPermission('Billable Hours Report', ACTION_LIST) && (($step == 'view' && !isEmptyString($request->rid)) || $step == 'new' )){ ?>
+                <a href="<?php echo $baseview.'/step/view'; ?>" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-list"></i> Billable Hours History</a>
+            <?php } ?>
+            <?php if($acl->checkPermission('Billable Hours Report', ACTION_LIST) && $step == 'view' && isEmptyString($request->rid)){ ?>
+                <a href="<?php echo $reportsdash; ?>" title="Other Reports" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-list"></i> Other Reports</a>
+            <?php } ?>
+        </div>
+        <div class="divider2"></div>
+        <?php if(($step == 'view' && !isEmptyString($request->rid)) || $step == 'new') { ?>
+			<?php if($step == 'new'){ ?>
+                <h5 class="inline margin0 bolded">Generate New Billable Hours Report</h5>
+                <div class="divider2"></div>
+                <div class="separator"></div>
+            <?php } ?>
+            <div class="col-md-12 padding0 hideonprint">
+                <div class="statbox widget box" style="margin-top:15px;">
+                    <div class="widget-content" style="margin-bottom:0; padding-bottom:0; padding-right:0;">
+                        <ul class="listfilter">
+                            <li><label class="control-label">Voucher:</label>
+                                <?php
+                                    $vouchers = getVouchersForClient($client->getID());
+                                    $dropdown = new Zend_Form_Element_Select('voucherid',
+                                                        array(
+                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $vouchers),
+                                                            'view' => new Zend_View(),
+                                                            'decorators' => array('ViewHelper'),
+                                                            'class' => array('form-control','input-sm','width125')
+                                                        )
+                                    );  
+                                    $dropdown->setValue($voucherid); 
+                                    echo $dropdown->render();
+                                ?></li>
+                            <li><label class="control-label blocked">Report Start:</label>
+                                <input type="text" name="startdate" id="startdate" class="form-control input-sm datefield readonly width100" value="<?php echo changeMySQLDateToPageFormat($startdate); ?>" placeholder="From:" />
+                            </li>
+                            <li><label class="control-label blocked">Report End:</label>
+                                <input name="enddate" id="enddate" type="text" class="form-control input-sm datefield readonly width100" placeholder="To:" value="<?php echo changeMySQLDateToPageFormat($enddate); ?>" />
+                            </li>
+                            <li><label class="control-label blocked">&nbsp;</label>
+                                <a class="btn btn-info btn-sm gonowhere" id="generate"><i class="glyphicon glyphicon-filter"></i> Filter Activities</a>
+                                <input type="hidden" id="id" name="id" value="<?php echo $request->rid; ?>" />
+                                <input type="hidden" id="step" name="step" value="<?php echo $step; ?>" />
+                                <input type="hidden" id="reportaction" name="reportaction" value="" />
+                                <input type="hidden" id="invoiceurl" name="invoiceurl" value="<?php echo encode($this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/finance/section/invoice/step/new')); ?>" />
+                            </li>
+                            <li><label class="control-label blocked">&nbsp;</label>
+                                <?php if($acl->checkPermission('Billable Hours Report', ACTION_DELETE) && !isEmptyString($request->rid)){ ?>
+                                    <?php if($actreport->isInvoiced()){ ?>
+                                        <a class="confirm-dialog gonowhere" message="Are you sure you want to Delete this Report? <br>Please note that erasing this entry will also delete the corresponding invoice!" action="<?php echo $this->baseUrl('index/delete/id/'.encode($request->rid).'/entityname/ActivityReport/altdeleteid/'.$actreport->getInvoiceID().'/altdeleteentity/Invoice/successurl/'.encode($baseview)); ?>">Delete</a>&nbsp;
+                                    <?php } else { ?>
+                                        <a class="confirm-dialog gonowhere" message="Are you sure you want to Delete this Report?" action="<?php echo $this->baseUrl('index/delete/id/'.encode($request->rid)."/entityname/ActivityReport/successurl/".encode($baseview)); ?>">Delete</a>&nbsp; 
+                                    <?php } ?>
+                                <?php } ?>   
+                                <?php if($act_count > 0){ ?> 
+                                    <a title="Print" class="btn btn-default btn-sm print" href="<?php echo rtrim($this->viewurl, "/").'/print/1'; ?>" target="_blank"><i class="glyphicon glyphicon-print"></i></a> &nbsp;
+                                    <a title="Print to PDF" class="btn btn-default btn-xs pdf" href="<?php echo rtrim($this->viewurl, "/").'/pdf/1/'; ?>" target="_blank" style="padding:2px 6px;"><i class="glyphicon glyphicon-list-alt"></i> PDF</a>
+                                <?php } ?>
+                            </li>
+                        </ul> 
+                        <div class="divider2"></div>
+                        <ul class="listfilter blocked">
+                            <?php 
+                                $showsave = false; $showregenerate = false; 
+                                if($act_count > 0 && !isEmptyString($request->voucherid) && $actreport->getVoucherID() != $request->voucherid){
+                                    $showsave = true;
+                                }
+                                if($act_count > 0 && !isEmptyString($request->startdate) && $actreport->getStartDate() != changeDateFromPageToMySQLFormat($request->startdate)){
+                                    $showsave = true;
+                                }
+                                if($act_count > 0 && !isEmptyString($request->enddate) && $actreport->getEndDate() != changeDateFromPageToMySQLFormat($request->enddate)){
+                                    $showsave = true;
+                                }
+                            ?>
+                            <?php if($step == 'view'){ ?>
+                                <li>
+                                    <?php if($showsave){ ?>
+                                        <button type="submit" class="btn btn-success btn-sm gonowhere save" name="savethenview" id="savethenview"><i class="glyphicon glyphicon-ok"></i> Save Changes <?php echo !$actreport->isInvoiced() ? '' : ' and Update Invoice'; ?></button>
+                                        <?php if(!$actreport->isInvoiced()){ ?>
+                                            <button type="submit" class="btn btn-success btn-sm gonowhere save" name="savetheninvoice" id="savetheninvoice"><i class="glyphicon glyphicon-ok"></i> Save Changes and Generate Invoice</button>
+                                        <?php } ?>
+                                        <input type="hidden" class="successurl" id="<?php echo URL_SUCCESS; ?>" name="<?php echo URL_SUCCESS; ?>" value="<?php echo encode($baseview.'/step/view'); ?>" />
+                                        <input type="hidden" class="failureurl" id="<?php echo URL_FAILURE; ?>" name="<?php echo URL_FAILURE; ?>" value="<?php echo encode($this->viewurl); ?>" />
+                                    <?php } else { ?>
+                                        <?php if(!$actreport->isInvoiced()){ ?>
+                                            <a class="btn btn-primary btn-sm blockanchor" href="<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/finance/section/invoice/step/new/rid/'.$request->rid); ?>">Generate Invoice From Report <i class="glyphicon glyphicon-arrow-right"></i></a>
+                                        <?php } else { ?>
+                                            <a class="btn btn-primary btn-sm blockanchor" href="<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/finance/section/invoice/step/view/invid/'.encode($actreport->getInvoiceID())); ?>">View Report Invoice <i class="glyphicon glyphicon-arrow-right"></i></a>
+                                        <?php } ?>
+                                    <?php } ?>
+                                </li>
+                            <?php } ?>
+                            <?php if($step == 'new'){ ?>
+                                <li>
+                                    <?php if($showsave){ ?>
+                                        <button type="submit" class="btn btn-success btn-sm gonowhere save" name="savethenview" id="savethenview"><i class="glyphicon glyphicon-ok"></i> Save Report</button>
+                                        <button type="submit" class="btn btn-success btn-sm gonowhere save" name="savetheninvoice" id="savetheninvoice"><i class="glyphicon glyphicon-ok"></i> Save and Generate Invoice</button>
+                                        <input type="hidden" class="successurl" id="<?php echo URL_SUCCESS; ?>" name="<?php echo URL_SUCCESS; ?>" value="<?php echo encode($baseview.'/step/view'); ?>" />
+                                        <input type="hidden" class="failureurl" id="<?php echo URL_FAILURE; ?>" name="<?php echo URL_FAILURE; ?>" value="<?php echo encode($this->viewurl); ?>" />
+                                    <?php } ?>
+                                </li>
+                            <?php } ?>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <?php 
+                ob_start(); 
+            ?>
+            <?php if(!isEmptyString($request->rid)) { ?>
+                <h5 class="inline margin0 bolded"><?php echo $actreport->getTitle(); ?> <span class="notbolded normaltext"><?php echo formatDateAndTime($startdate, false); ?> - <?php echo formatDateAndTime($enddate, false); ?></span></h5>
+            <?php } ?>
+            <div class="divider10"></div>
+            <div class="col-md-12 padding0" style="width:100%;">
+                <div class="statbox widget box">
+                    <div class="widget-content">
+                        <?php if($act_count == 0){ ?>
+                            <div class="divider15"></div>
+                            <?php if($step == 'new' && isEmptyString($request->voucherid)){ ?>
+                                <div style="clear:both;" class="alert alert-info margin5">Select reporting period above and click 'Filter' to generate billable hours</div>
+                            <?php } else { ?>
+                                <div style="clear:both;" class="alert alert-warning margin5">There are currently no activities in this period</div>
+                            <?php } ?>
+                        <?php } else { ?>
+                       		<?php if($request->generate == 1){ ?>
+                                <div class="divider20"></div>
+                            <?php } ?>
+                            <?php if(!isEmptyString($request->rid)) { ?>
+                                <table class="table margin0 noborder printtable" style=" <?php echo $request->generate == 1 ? 'border-collapse: collapse; font-size:11px;' : ''; ?>">
+                                    <tr>
+                                        <td style="width:50%; padding-top:0;">
+                                            <table class="table margin0 noborder">
+                                                <tr>
+                                                    <td style="width:115px;"><label class="control-label paddingleft0 floatleft">Client:</label></td>
+                                                    <td><p class="form-control-static nullifempty view"><?php echo $client->getName(); ?></p>
+                                                    <input type="hidden" id="clientid" name="clientid" value="<?php echo $client->getID(); ?>" /></td>
+                                                </tr>
+												<?php if($request->generate == 1){ ?>
+                                                	<tr><td colspan="2">&nbsp;</td></tr>
+                                                <?php } ?>
+                                                <tr>
+                                                    <td><label class="control-label">Voucher No#:</label></td>
+                                                    <td><p class="form-control-static nullifempty view"><?php echo $actreport->getVoucher()->getVoucherNumber(); ?></p></td>
+                                                </tr>
+                                                <?php if($request->generate == 1){ ?>
+                                                	<tr><td colspan="2">&nbsp;</td></tr>
+                                                <?php } ?>
+                                                <tr>
+                                                    <td><label class="control-label">Reporting Period:</label></td>
+                                                    <td><p class="form-control-static nullifempty view"><?php echo formatDateAndTime($actreport->getStartDate(), false); ?> - <?php echo formatDateAndTime($actreport->getEndDate(), false); ?></p></td>
+                                                </tr>
+                                                <?php if($request->generate == 1){ ?>
+                                                	<tr><td colspan="2">&nbsp;</td></tr>
+                                                <?php } ?>
+                                                <tr>
+                                                    <td><label class="control-label">Report Date:</label></td>
+                                                    <td><p class="form-control-static nullifempty view"><?php echo formatDateAndTime($actreport->getReportDate(), false); ?></p>
+                                                        <input type="hidden" id="reportdate" name="reportdate" value="<?php echo $actreport->getReportDate(); ?>" /></td>
+                                                </tr>
+                                                <?php if($request->generate == 1){ ?>
+                                                	<tr><td colspan="2">&nbsp;</td></tr>
+                                                <?php } ?>
+                                                <tr>
+                                                    <td><label class="control-label">Completed By:</label></td>
+                                                    <td><p class="form-control-static nullifempty view"><?php echo is_numeric($actreport->getcompletedby()) ? $actreport->getUser()->getName(): $actreport->getcompletedby(); ?></p></td>
+                                                </tr>
+                                                <?php if($request->generate == 1){ ?>
+                                                	<tr><td colspan="2">&nbsp;</td></tr>
+                                                <?php } ?>
+                                            </table>
+                                        </td>
+                                        <td style="padding-top:0;">
+                                            <table class="table margin0 noborder">
+                                                <tr>
+                                                    <td style="width:115px;"><label class="control-label">Provider Agency:</label></td>
+                                                    <td><p class="form-control-static nullifempty view"><?php echo $this->translate('appfullname'); ?></p></td>
+                                                </tr>
+                                                <?php if($request->generate == 1){ ?>
+                                                	<tr><td colspan="2">&nbsp;</td></tr>
+                                                <?php } ?>
+                                                <tr>
+                                                    <td><label class="control-label">DVRS Counsellor:</label></td>
+                                                    <td><p class="form-control-static nullifempty view"><?php echo $client->getDVRSCounselor(); ?></p></td>
+                                                </tr>
+                                                <?php if($request->generate == 1){ ?>
+                                                	<tr><td colspan="2">&nbsp;</td></tr>
+                                                <?php } ?>
+                                                <tr>
+                                                    <td><label class="control-label">DVRS Office:</label></td>
+                                                    <td><p class="form-control-static nullifempty view">Trenton / Mercer</p></td>
+                                                </tr>
+                                                <?php if($request->generate == 1){ ?>
+                                                	<tr><td colspan="2">&nbsp;</td></tr>
+                                                <?php } ?>
+                                                <tr>
+                                                    <td><label class="control-label">Contact Phone:</label></td>
+                                                    <td><p class="form-control-static nullifempty view">(609) 386-332</p></td>
+                                                </tr>
+                                                <?php if($request->generate == 1){ ?>
+                                                	<tr><td colspan="2">&nbsp;</td></tr>
+                                                <?php } ?>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            <?php } ?>
+                            <?php if($request->print == 1 || $request->pdf == 1){ ?>
+                                <div class="divider30"></div>
+                            <?php } ?>
+                            <table class="table list table-striped table-bordered viewtable" style="width:100%; <?php echo $request->generate == 1 ? 'border-collapse: collapse; border: 1px thin black;  font-size:11px;' : ''; ?>">
+                                <thead>
+                                    <tr>
+                                        <th style="width:120px; <?php echo $request->generate == 1 ? 'padding:10px; vertical-align:top;' : ''; ?>">Date / Employee</th>
+                                        <th class="nowrapping" style=" <?php echo $request->generate == 1 ? 'padding:10px; vertical-align:top; ' : ''; ?>">Start <img src="<?php echo $this->baseUrl('images/spacer.gif'); ?>" style="width:30px; height:2px;" /></th>
+                                        <th class="nowrapping" style=" <?php echo $request->generate == 1 ? 'padding:10px; vertical-align:top;' : ''; ?>">End <img src="<?php echo $this->baseUrl('images/spacer.gif'); ?>" style="width:30px; height:2px;" /></th>
+                                        <th class="nowrapping" style=" <?php echo $request->generate == 1 ? 'padding:10px; vertical-align:top;' : ''; ?>">Description of Billable Activity</th>
+                                        <?php foreach($actcodes as $key => $code){ ?>
+                                            <th style="width:30px; <?php echo $request->generate == 1 ? 'padding:10px; vertical-align:top;' : ''; ?>"><?php echo $code?></th>
+                                        <?php } ?>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php 
+                                        $counter = 1;
+                                        $totalcodes = count($actcodes);
+                                        $subtot_1 = $subtot_2 = $subtot_3 = $subtot_4 = 0;
+                                        foreach($interventions as $activity){
+                                            
+                                    ?>
+                                        <tr>
+                                            <td style=" <?php echo $request->generate == 1 ? 'padding:10px; vertical-align:top;' : ''; ?>"><span class="blocked"><?php echo changeMySQLDateToPageFormat($activity->getActivityDate()); ?></span>
+                                            	<div class="divider10"></div>
+                                                <span class="blocked"><?php echo $activity->getCoach()->getName(); ?></span>
+                                            </td>
+                                            <td style=" <?php echo $request->generate == 1 ? 'padding:10px; vertical-align:top;' : ''; ?>"><?php echo formatTime($activity->getStartTime()); ?></td>
+                                            <td style=" <?php echo $request->generate == 1 ? 'padding:10px; vertical-align:top;' : ''; ?>"><?php echo formatTime($activity->getEndTime()); ?></td>
+                                            <td style=" <?php echo $request->generate == 1 ? 'padding:10px; vertical-align:top;' : ''; ?>"><?php echo $activity->getprogressofintervention(); ?></td>
+                                            <?php
+                                                foreach($actcodes as $key => $code){
+                                                    if($activity->getActCode() == $key){
+                                                        ${'subtot_'.$key} += $activity->getBillableHours();
+                                                    } 
+                                                    
+                                            ?>
+                                                <td style=" <?php echo $request->generate == 1 ? 'padding:10px; vertical-align:top;' : ''; ?>"><?php echo $key == $activity->getActCode() ? formatNumber($activity->getBillableHours()) : '--'; ?></td>
+                                            <?php } ?>
+                                        </tr>
+                                    <?php } ?>
+                                    <tr>
+                                        <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+                                        <td class="righalign bolded" style=" <?php echo $request->generate == 1 ? 'padding:10px; vertical-align:top;' : ''; ?>">Total Hours Used (By Activity)</td>
+                                        <?php
+                                            $total = 0;
+                                            foreach($actcodes as $key => $code){
+                                                $total += ${'subtot_'.$key};
+                                        ?>
+                                            <td style=" <?php echo $request->generate == 1 ? 'padding:10px; vertical-align:top;' : ''; ?>"><?php echo ${'subtot_'.$key} == 0 ? '--' : formatNumber(${'subtot_'.$key}); ?></td>
+                                        <?php } ?>
+                                    </tr>
+                                    <tr>
+                                        <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+                                        <td class="righalign bolded" style=" <?php echo $request->generate == 1 ? 'padding:10px; vertical-align:top;' : ''; ?>">Total Hours Used on Log</td>
+                                        <?php foreach($actcodes as $key => $code){ ?>
+                                            <td class="leftalign bolded" style=" <?php echo $request->generate == 1 ? 'padding:10px; vertical-align:top' : ''; ?>"><?php echo $key == 2 ? formatNumber($total) : ''; ?></td>
+                                        <?php } ?>
+                                        <input type="hidden" name="billablehours" id="billablehours" value="<?php echo $total; ?>" />
+                                        <input type="hidden" name="type" id="type" value="1" />
+                                        <input type="hidden" name="coachid" id="coachid" value="<?php echo $client->getCoachID(); ?>" />
+                                    </tr>
+                                </tbody>
+                            </table>
+                        <?php } ?>
+                    </div>
+                </div>
+            </div>
+            <?php
+                $html = ob_get_clean(); 
+                echo $html;
+            ?>
+        <?php } ?>
+        
+        <?php if($step == 'view' && isEmptyString($request->rid) && isEmptyString($request->voucherid)) { ?>
+            <h5 class="inline margin0 bolded">Billable Hours Report History</h5>
+            <div class="divider10"></div>
+            <?php if($report_count == 0){ ?>
+                <div class="col-md-12 padding0">
+                    <div class="statbox widget box box-shadow">
+                        <div class="widget-content">
+                            <div style="clear:both;" class="alert alert-warning margin5">There are currently no previous reports in history</div>
+                        </div>
+                    </div>
+                </div>
+            <?php } else { ?>
+                <?php 
+                    foreach($reports as $report){ 
+                        $reportview = $baseview.'/step/view/rid/'.$report->getID();
+                ?>
+                    <div class="col-md-12 padding0">
+                        <div class="statbox widget box box-shadow">
+                            <div class="widget-content">
+                                <a href="<?php echo $reportview; ?>" class="nodecoration">
+                                    <div class="visual yellow"><i class="glyphicon glyphicon-signal" style="font-size:32px;"></i></div>
+                                    <div class="title">
+                                        <div class="blocked"><?php echo $report->getTitle(); ?> <span class="notbolded normaltext"><?php echo formatDateAndTime($report->getStartDate(), false); ?> - <?php echo formatDateAndTime($report->getEndDate(), false); ?></span> </div>
+                                        <span class="blocked"></span>
+                                        <span class="blocked"><small><?php echo formatNumber($report->getBillableHours()); ?> Hours</small></span>
+                                    </div>
+                                    <div class="value"></div>
+                                </a>
+                                <div class="divider2"></div>
+                                <a href="<?php echo $reportview; ?>" class="more">View Report <i class="pull-right icon-angle-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                <?php } ?>
+            <?php } ?>    
+        <?php } ?>                
+    </div>
+</form>  
+<?php if($request->pdf == 1 && $request->generate == 1){ ?>
+	<?php require_once APPLICATION_PATH."/views/scripts/index/pdfview.phtml"; ?>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			var pdfurl = '<?php echo $relativepathtodocument; ?>';
+			window.location.href = pdfurl;
+		});
+	</script>
+<?php } ?>
