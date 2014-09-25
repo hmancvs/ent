@@ -60,7 +60,7 @@ class UserController extends IndexController  {
 	    		$audit_values['transactiontype'] = USER_LOGIN;
 	    		$audit_values['success'] = "N";
 	    		$audit_values['transactiondetails'] = "Login for user with email '".$this->_getParam("email")."' failed. Invalid username or password";
-				// $this->notify(new sfEvent($this, USER_LOGIN, $audit_values));
+				$this->notify(new sfEvent($this, USER_LOGIN, $audit_values));
 				
 				// return to the home page
 				if(!isArrayKeyAnEmptyString(URL_FAILURE, $formvalues)){
@@ -93,7 +93,7 @@ class UserController extends IndexController  {
 		$audit_values['userid'] = $useraccount->getID();
 		$audit_values['executedby'] = $useraccount->getID();
    		$audit_values['transactiondetails'] = "Login for user with id '".$this->_getParam("email")."' successful";
-		// $this->notify(new sfEvent($this, USER_LOGIN, $audit_values));
+		$this->notify(new sfEvent($this, USER_LOGIN, $audit_values));
 		
 		if (isEmptyString($this->_getParam("redirecturl"))) {
 			# forward to the dashboard

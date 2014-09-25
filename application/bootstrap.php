@@ -59,4 +59,42 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 		$request = $this->getResource('frontController');
 		
 	}
+	
+	/**
+	 * Sets up a register_shutdown_function hook to give a nice error page when a
+	 * PHP fatal error is encountered.
+	 */
+	protected function _initFatalErrorCatcher()
+	{
+		register_shutdown_function(array($this, 'onApplicationShutdown'));
+	}
+	
+	public function onApplicationShutdown()
+	{
+		$error = error_get_last();
+		$wasFatal = ($error && ($error['type'] === E_ERROR) || ($error['type'] === E_USER_ERROR));
+		if ($wasFatal)
+		{
+			$frontController = Zend_Controller_Front::getInstance();
+			$errorHandler = $frontController->getPlugin('Zend_Controller_Plugin_ErrorHandler');
+			$request = $frontController->getRequest();
+			$response = $frontController->getResponse();
+	
+			// Add the fatal exception to the response in a format that ErrorHandler will understand
+			$response->setException(new Exception(
+					"Fatal error: $error[message] at $error[file]:$error[line]",
+					$error['type']));
+	
+			// Call ErrorHandler->_handleError which will forward to the Error controller
+			$handleErrorMethod = new ReflectionMethod('Zend_Controller_Plugin_ErrorHandler', '_handleError');
+			$handleErrorMethod->setAccessible(true);
+			$handleErrorMethod->invoke($errorHandler, $request);
+	
+			// Discard any view output from before the fatal
+			ob_end_clean();
+	
+			// Now display the error controller:
+			$frontController->dispatch($request, $response);
+		}
+	}
 }

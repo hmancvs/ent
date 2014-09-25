@@ -48,14 +48,14 @@ class ClientController extends SecureController {
 	    	$upload->addValidator('Size', false, $config->uploads->docmaximumfilesize);
 	    	
 	    	// base path for uploaded
-	    	$destination_path = APPLICATION_PATH.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.PUBLICFOLDER.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'clients'.DIRECTORY_SEPARATOR;
+	    	$destination_path = BASE_PATH.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'clients'.DIRECTORY_SEPARATOR;
 	    	// add client folder if missing and add it to destination path
 	    	$clientfolder = "temp";
 	    	if(!isEmptyString($client->getID())){
 	    		$clientfolder = "client_".$client->getID();
 	    	}
 	    	if(!is_dir($destination_path.$clientfolder)){
-	    		mkdir($destination_path.$clientfolder, 0777);
+	    		mkdir($destination_path.$clientfolder, 0775);
 	    	}
 			
 	    	// set the destination for 
@@ -159,9 +159,9 @@ class ClientController extends SecureController {
     	// type is resume
     	 if($formvalues['type'] == 'resume' && $client->hasResume()){
     		// create archive folder for each client
-    		$path = APPLICATION_PATH.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR.PUBLICFOLDER.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR."client_".$client->getID().DIRECTORY_SEPARATOR."resume".DIRECTORY_SEPARATOR;
+    		$path = BASE_PATH.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR."client_".$client->getID().DIRECTORY_SEPARATOR."resume".DIRECTORY_SEPARATOR;
     		if(!is_dir($path."archive")){
-    			mkdir($path."archive", 0777);
+    			mkdir($path."archive", 0775);
     		}
     		
     		try {
@@ -175,9 +175,9 @@ class ClientController extends SecureController {
     	} 
     	if($formvalues['type'] == 'cover' && $client->hasCoverletter()){
     		// create archive folder for each client
-    		$path = APPLICATION_PATH.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR.PUBLICFOLDER.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR."client_".$client->getID().DIRECTORY_SEPARATOR."cover".DIRECTORY_SEPARATOR;
+    		$path = BASE_PATH.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR."client_".$client->getID().DIRECTORY_SEPARATOR."cover".DIRECTORY_SEPARATOR;
     		if(!is_dir($path."archive")){
-    			mkdir($path."archive", 0777);
+    			mkdir($path."archive", 0775);
     		}
     	
     		try {
@@ -200,19 +200,19 @@ class ClientController extends SecureController {
     	$this->_helper->viewRenderer->setNoRender(TRUE);
     	$session = SessionWrapper::getInstance();
     	$formvalues = $this->_getAllParams();
-    	debugMessage($formvalues); // exit;
+    	// debugMessage($formvalues); // exit;
     	
     	$client = new Client();
     	$client->populate($formvalues['id']);
     	
-    	$history = $client->getClientHistory(true); debugMessage($history->toArray());
+    	$history = $client->getClientHistory(true); // debugMessage($history->toArray());
     	if($history){
 	    	$history->getClient()->setStatus(0);
 	    	$history->setStatus(0);
 	    	$history->setEndDate(date('Y-m-d'));
 	    	$history->setDateClosed(date('Y-m-d H:i:s'));
 	    	$history->setClosedByID($session->getVar('userid'));
-	    	debugMessage($history->toArray());
+	    	// debugMessage($history->toArray());
 	    	
 	    	try {
 	    		$history->save();
@@ -227,7 +227,7 @@ class ClientController extends SecureController {
 	    			$historynew->setStatus(1);
 	    			$historynew->setCreatedby($session->getVar('userid'));
 	    			$historynew->setDateCreated(date('Y-m-d H:i:s'));
-	    			$historynew->setClientID($client->getID()); debugMessage($historynew->toArray());
+	    			$historynew->setClientID($client->getID()); // debugMessage($historynew->toArray());
 	    			try {
 	    				$historynew->save();
 	    				$history->getClient()->setStatus(1);
@@ -259,7 +259,7 @@ class ClientController extends SecureController {
     
     	$formvalues = $this->_getAllParams();
     	 
-    	debugMessage($this->_getAllParams());
+    	//debugMessage($this->_getAllParams());
     	$client = new Client();
     	$client->populate(decode($this->_getParam('id')));
     
@@ -273,12 +273,12 @@ class ClientController extends SecureController {
     	$upload->addValidator('Size', false, $config->uploads->photomaximumfilesize);
     
     	// base path for profile pictures
-    	$destination_path = APPLICATION_PATH.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR."client_";
+    	$destination_path = BASE_PATH.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR."client_";
     
     	// determine if client has destination avatar folder. Else client is editing there picture
     	if(!is_dir($destination_path.$client->getID())){
     		// no folder exits. Create the folder
-    		mkdir($destination_path.$client->getID(), 0777);
+    		mkdir($destination_path.$client->getID(), 0775);
     	}
     
     	// set the destination path for the image
@@ -286,12 +286,12 @@ class ClientController extends SecureController {
     	$destination_path = $destination_path.$profilefolder.DIRECTORY_SEPARATOR."avatar";
     
     	if(!is_dir($destination_path)){
-    		mkdir($destination_path, 0777);
+    		mkdir($destination_path, 0775);
     	}
     	// create archive folder for each client
     	$archivefolder = $destination_path.DIRECTORY_SEPARATOR."archive";
     	if(!is_dir($archivefolder)){
-    		mkdir($archivefolder, 0777);
+    		mkdir($archivefolder, 0775);
     	}
     
     	$oldfilename = $client->getProfilePhoto();
@@ -304,13 +304,12 @@ class ClientController extends SecureController {
     	$uploadedext = findExtension($file['profileimage']['name']);
     	$currenttime = mktime();
     	$currenttime_file = $currenttime.'.'.$uploadedext;
-    	// debugMessage($file);
     
     	$thefilename = $destination_path.DIRECTORY_SEPARATOR.'base_'.$currenttime_file;
     	$thelargefilename = $destination_path.DIRECTORY_SEPARATOR.'large_'.$currenttime_file;
     	$updateablefile = $destination_path.DIRECTORY_SEPARATOR.'base_'.$currenttime;
     	$updateablelarge = $destination_path.DIRECTORY_SEPARATOR.'large_'.$currenttime;
-    	// exit();
+    	//debugMessage($thefilename);
     	// rename the base image file
     	$upload->addFilter('Rename',  array('target' => $thefilename, 'overwrite' => true));
     	// exit();
@@ -410,7 +409,7 @@ class ClientController extends SecureController {
     	//debugMessage($client->toArray());
     
     	$oldfile = "large_".$client->getProfilePhoto();
-    	$base = APPLICATION_PATH.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.PUBLICFOLDER.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR.'client_'.$clientfolder.''.DIRECTORY_SEPARATOR.'avatar'.DIRECTORY_SEPARATOR;
+    	$base = BASE_PATH.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR.'client_'.$clientfolder.''.DIRECTORY_SEPARATOR.'avatar'.DIRECTORY_SEPARATOR;
     
     	// debugMessage($client->toArray());
     	$src = $base.$oldfile;

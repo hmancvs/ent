@@ -88,10 +88,42 @@ $(document).ready(function() {
 		$(".computeamount").trigger("keyup");
 	<?php } ?>
 	
+	<?php if($request->print == 1 || $request->pdf == 1){ ?>
+		$("body").addClass('print');
+		$("body.print #headercontainer, body.print #sidebar, body.print .breadcrumbs, body.print .pageheader, body.print #tabs #left, body.print .hideonprint").html('').remove();
+		$("body.print .showonprint").show().removeClass('hidden');
+		$('body.print div.controls, body.print .nullifempty').each(function() {
+			var html = $(this).html();
+			if(isEmptyString(html)){
+				$(this).html('');
+			}
+		});
+	<?php } ?>
 }); 
 </script>	        
 <form id="form-voucher" class="form-horizontal voucher" role="form" action="<?php echo $this->baseUrl("voucher/create"); ?>" method="post">
-	<div class="btn-group pull-right" style="margin-top:-10px;">
+	<div class="showonprint hidden">
+        <div class="divider15"></div>
+        <span id="reportactions">			
+            <div id="print_page_action_buttons">
+                <a title="Close Window" onClick="window.close()" class="btn btn-default btn-xs"><i class="glyphicon glyphicon-remove"></i> Close</a>
+                <?php if($request->print == '1'){ ?>
+                    <a title="Print" onClick="window.print()" class="btn btn-primary btn-xs print" ><i class="glyphicon glyphicon-print"></i> Print</a>&nbsp;
+                <?php } ?>
+                <?php if($request->pdf == '1'){ ?>
+                    <a class="btn btn-primary btn-xs exportpdf blockanchor" href="<?php echo rtrim($this->viewurl,'/').'/generate/1'; ?>"><i class="glyphicon glyphicon-save"></i> Print to PDF</a>&nbsp;
+                <?php } ?>
+            </div>
+        </span>
+        <div class="divider15"></div>
+    </div>
+    <?php
+			$invoiceid = $voucher->getInvoiceForVoucher()->getID();
+			 if(!isEmptyString($invoiceid)){ ?>
+			<a href="<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/finance/section/invoice/step/view/invid/'.encode($invoiceid)); ?>" class="btn btn-default xpull-right hideonprint"><i class="glyphicon glyphicon-list"></i> View Invoice</a> &nbsp;
+		<?php } ?>
+    <div class="btn-group pull-right hideonprint" style="margin-top:-10px;">
+        
         <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
             Voucher Actions <span class="caret"></span>
         </button>
@@ -111,9 +143,7 @@ $(document).ready(function() {
                 <?php if($acl->checkPermission('Activity', ACTION_CREATE) && !isEmptyString($request->vid)){ ?>	
                     <li><a href="<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/activity/step/new/vid/'.encode($voucher->getID())); ?>" title="New Intervention"><i class="glyphicon glyphicon-plus"></i> Log New Intervention</a></li>
                     <li><a href="<?php echo $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/activity/step/view/voucherid/'.$voucher->getID()); ?>" title=" Intervention History"><i class="glyphicon glyphicon-list"></i> Intervention History</a></li>
-                    <!--<li><a class="gonowhere" title="Print Voucher"><i class="glyphicon glyphicon-print"></i> Print Voucher</a></li>
-                    <li><a class="gonowhere" title="Print Voucher"><i class="glyphicon glyphicon-signal"></i> Billable Hours Report</a></li>
-                    <li><a class="gonowhere" title="Print Voucher"><i class="glyphicon glyphicon-signal"></i> Activity Log Report</a></li>-->
+                    <li><a title="Print" href="<?php echo rtrim($this->viewurl, "/").'/print/1'; ?>" target="_blank"><i class="glyphicon glyphicon-print"></i> Print Voucher</a></li>
                 <?php } ?>
             <?php } ?>
             <?php if($acl->checkPermission('Voucher', ACTION_DELETE) && !isEmptyString($request->vid)){ ?>
@@ -131,7 +161,9 @@ $(document).ready(function() {
                 ?>
                 <li><a class="gonowhere <?php echo !$isdeletable ? 'alert-dialog' : 'confirm-dialog'; ?>" title="Delete" message="<?php echo $message; ?> " action="<?php echo $this->baseUrl('voucher/delete/id/'.encode($voucher->getID())."/entityname/Voucher/successurl/".encode($baseview)); ?>"><i class="glyphicon glyphicon-remove"></i> Delete Voucher</a></li>
             <?php } ?>
-            <li><a href="<?php echo $baseview.'/step/view'; ?>" title="All Vouchers"><i class="glyphicon glyphicon-list"></i> Voucher History</a></li>
+            <?php if(($step == 'view' && !isEmptyString($request->vid)) || $step == 'new'){ ?>
+	            <li><a href="<?php echo $baseview.'/step/view'; ?>" title="All Vouchers"><i class="glyphicon glyphicon-list"></i> Return to Voucher History</a></li>
+            <?php } ?>  
         </ul>
     </div>
     <?php if($step == 'edit' || $step == 'new'){ ?>
@@ -195,9 +227,6 @@ $(document).ready(function() {
 						faprefix: {
 							required: "#type:checked"
 						},	
-						days: {
-							required: true
-						},
 						<?php if(!$isfollowalong){ ?>			
 							dateapproved: "required",
 						<?php } ?>
@@ -224,9 +253,6 @@ $(document).ready(function() {
 						faprefix: {
 							required: "<?php echo $this->translate("voucher_faprefix_error"); ?>"
 						},
-						days: {
-							required: "<?php echo $this->translate("voucher_days_error"); ?>"
-						},	
 						<?php if(!$isfollowalong){ ?>					
 						dateapproved: "<?php echo $this->translate("voucher_dateapproved_error"); ?>",
 						<?php } ?>
@@ -430,7 +456,7 @@ $(document).ready(function() {
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("voucher_days_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <label class="col-md-4 control-label"><?php echo $this->translate("voucher_days_label"); ?>:</label>
                             <div class="col-md-8">
                                 <p class="form-control-static nullifempty view"><?php echo $voucher->getDays(); ?></p> 
                                 <div class="edit">
@@ -440,7 +466,7 @@ $(document).ready(function() {
                                 </div>
                             </div>
                         </div>
-                        <?php if(!$isfollowalong){ ?>		
+                        <?php if(!$isfollowalong && false){ ?>		
                             <div class="form-group">
                                 <label class="col-md-4 control-label"><?php echo $this->translate("voucher_invoicedate_label"); ?>:</label>
                                 <div class="col-md-8">
@@ -473,17 +499,18 @@ $(document).ready(function() {
                     <div class="panel-body well-sm makerelative">
                         <div class="col-md-9">
                             <div class="form-group">
-                                <label class="col-md-4 control-label">Hours Available To-date:</label>
-                                <div class="col-md-8">
-                                    <p class="form-control-static nullifempty view"><?php echo $voucher->getHoursRemaining(); ?></p>
-                                </div>
-                            </div>
-                            <div class="form-group">
                                 <label class="col-md-4 control-label">Hours Utilised To-date:</label>
                                 <div class="col-md-8">
                                     <p class="form-control-static nullifempty view"><?php echo $voucher->getHoursUsed(); ?></p>
                                 </div>
                             </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Hours Available:</label>
+                                <div class="col-md-8">
+                                    <p class="form-control-static nullifempty view"><?php echo $voucher->getHoursRemaining(); ?></p>
+                                </div>
+                            </div>
+                            
                             <div class="form-group">
                                 <label class="col-md-4 control-label">Executed By:</label>
                                 <div class="col-md-8">
@@ -538,7 +565,7 @@ $(document).ready(function() {
             <div class="divider5"></div>
             <div class="col-md-12 padding0">
             	<div class="listcontainer">
-                    <table class="table list table-striped table-responsive viewtable">
+                    <table class="table list table-striped table-responsive viewtable" style="max-width:800px;">
                         <thead>
                             <tr>
                                 <th class="centeralign" style="width:15px;">#</th>

@@ -11,7 +11,7 @@ rules: {
     addressline1: "required",
     phonecount: {
         phonecount_validate: true
-    },
+    },   
     
     // referral
     programid: "required",
@@ -30,7 +30,7 @@ rules: {
     referraldate: "required",
     
     // attachment
-    resumefilename: "required",
+    // resumefilename: "required",
     
     // medical
     primarydiagnosis: "required",
@@ -38,8 +38,14 @@ rules: {
     
     // assignment
     userid: "required",
+    usertextfirstname: "required",
+	usertextlastname: "required",
     role: "required",
-    assignstartdate: "required"		
+    assignstartdate: "required",
+    emailpassword: {
+    	required: false,
+        minlength: 6
+    }
 }, 
 // the messages for each of the fields being validated
 messages: {
@@ -70,7 +76,7 @@ messages: {
     startdate: "<?php echo $this->translate("client_datereceived_error"); ?>",
     
     // attachment
-    resumefilename: "<?php echo $this->translate("client_resumefilename_error"); ?>",
+    // resumefilename: "<?php //echo $this->translate("client_resumefilename_error"); ?>",
     
     // medical
     primarydiagnosis: "<?php echo $this->translate("client_primarydiagnosis_error"); ?>",
@@ -78,8 +84,13 @@ messages: {
     
     // assignment
     userid: "<?php echo $this->translate("client_userid_error"); ?>",
+    usertextfirstname: "Please enter first name",
+	usertextlastname: "Please enter last name",
     role: "<?php echo $this->translate("client_assign_role_error"); ?>",
-    assignstartdate: "<?php echo $this->translate("client_assign_startdate_error"); ?>"
+    assignstartdate: "<?php echo $this->translate("client_assign_startdate_error"); ?>",
+    emailpassword: {
+        minlength: "Password should be atleast 6 Characters"
+    }
 },
 // custom error positions
 errorPlacement: function(error, element) {

@@ -2,6 +2,35 @@
     <div class="col-md-12 padding0">
         <div class="form-group">
             <div class="col-md-6">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_hascriminalrecord_label'); ?>:</label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getiscriminal() == 1 ? 'Yes' : 'No'; ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <label class="radio-inline">
+                          <input type="radio" id="iscriminal_1" name="iscriminal" class="disableoutsidesection" value="1" <?php echo $client->getiscriminal() == 1 ? 'checked' : ''; ?>>Yes
+                        </label>
+                        <label class="radio-inline">
+                          <input type="radio" id="iscriminal_0" name="iscriminal" class="disableoutsidesection" value="0" <?php echo $client->getiscriminal() == 0 ? 'checked' : ''; ?>>No
+                        </label>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_criminaldetails_label'); ?>:</label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getcriminalhistory(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <textarea class="form-control expanding" id="criminalhistory" name="criminalhistory"><?php echo $client->getcriminalhistory(); ?></textarea>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-6">
                 <label class="col-md-12 control-label"><?php echo $this->translate('client_onprobation_label'); ?>:</label>
                 <div class="col-md-12">
                     <p class="form-control-static nullifempty view"><?php echo $client->getonprobation() == 1 ? 'Yes' : 'No'; ?></p>

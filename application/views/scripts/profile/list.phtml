@@ -172,14 +172,14 @@
                 <ul class="listfilter">
                     <li><input type="text" name="startdate" id="startdate" class="form-control input-sm datefield readonly width100" value="<?php echo $request->startdate; ?>" placeholder="From:" /></li>
                     <li><input name="enddate" id="enddate" type="text" class="form-control input-sm datefield readonly width100" placeholder="To:" value="<?php echo $request->enddate; ?>" /></li>
-                    <li><button type="submit" class="btn btn-default btn-sm" style=""><i class="glyphicon glyphicon-filter"></i> Filter</button></li>
+                    <li><button type="submit" class="btn btn-default btn-sm blockanchor"><i class="glyphicon glyphicon-filter"></i> Filter</button></li>
                	</ul>
 			</div>
             <div class="col-md-3 padding0">
-            	<div class="col-md-12 padding0"><input name="searchterm" id="searchterm" class="form-control form-search" value="<?php echo $request->searchterm; ?>" type="text" placeholder="Search <?php echo $listitems; ?>..." /><span class="glyphicon glyphicon-search glyphicon-list-search"></span></div>
+            	<div class="col-md-12 padding0"><input name="searchterm" id="searchterm" class="form-control form-search" value="<?php echo $request->searchterm; ?>" type="text" placeholder="Search..." /><button type="submit" class="btn btn-default blockanchor searchbtn"><i class="glyphicon glyphicon-search"></i></button></div>
             	<input type="hidden" name="letter" id="letter" value="<?php echo $request->getParam('letter'); ?>" />
                 <?php if($allowclear){ ?>
-                    <a href="<?php echo $listurl; ?>" title="Clear Search and Filters" id="" class="reset removeline close button btn">&times;</a>
+                    <a href="<?php echo $listurl; ?>" title="Clear Search and Filters" class="reset close button btn resetlink blockanchor">&times;</a>
                 <?php } ?>
             </div>
 		</div>

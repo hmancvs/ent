@@ -1,5 +1,5 @@
 <div class="col-md-12">
-    <div class="form-group">
+	<div class="form-group" style="margin-left:-30px; margin-right:-30px;">
         <div class="col-md-6 padding0">
             <label class="col-md-12 control-label"><?php echo $this->translate('client_education_label'); ?>:</label>
             <div class="col-md-12">
@@ -27,19 +27,20 @@
         </div>
     </div>
     <div class="divider15"></div>
-    <div class="form-group">
+    <div class="form-group" style="margin-left:-30px; margin-right:-30px;">
         <div class="col-md-12 padding0">
             <label class="col-md-12 control-label"><?php echo $this->translate('client_educ_background_label'); ?>:</label>
-            <div class="col-md-12">
+            <div class="col-md-12 padding0">
                 <p class="form-control-static nullifempty view">
                     <table class="table table-condensed table-striped table-responsive viewtable" style="margin-bottom:10px;">
                         <thead>
                             <tr>
                                 <th class="centeralign" style="width:15px;">#</th>
                                 <th><?php echo $this->translate('client_educ_school_label'); ?></th>
-                                <th style="width:20%;"><?php echo $this->translate('client_educ_location_label'); ?></th>
-                                <th style="width:25%;"><?php echo $this->translate('client_educ_award_label'); ?></th>
-                                <th style="width:20%;"><?php echo $this->translate('client_educ_duration_label'); ?></th>
+                                <th style="width:18%;"><?php echo $this->translate('client_educ_location_label'); ?></th>
+                                <th style="width:20%;">Level</th>
+                                <th style="width:20%;"><?php echo $this->translate('client_educ_award_label'); ?></th>
+                                <th style="width:15%;"><?php echo $this->translate('client_educ_duration_label'); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -54,6 +55,7 @@
                                     <td>--</td>
                                     <td>--</td>
                                     <td>--</td>
+                                    <td>--</td>
                                 </tr>
                             <?php } else { ?>
                                 <?php 
@@ -64,6 +66,7 @@
                                     <td class="centeralign"><?php echo $counter; ?></td>
                                     <td><?php echo $award->getValue1(); ?></td>
                                     <td><?php echo $award->getValue2(); ?></td>
+                                    <td><?php echo isArrayKeyAnEmptyString($award->getValue3(), $educationlevels) ? '' : $educationlevels[$award->getValue3()]; ?></td>
                                     <td><?php echo $award->getValue4(); ?></td>
                                     <td><?php echo $award->getValue5(); ?></td>
                                 </tr>
@@ -79,9 +82,10 @@
                             <tr>
                                 <th class="centeralign" style="width:15px;">#</th>
                                 <th><?php echo $this->translate('client_educ_school_label'); ?></th>
-                                <th style="width:20%;"><?php echo $this->translate('client_educ_location_label'); ?></th>
-                                <th style="width:25%;"><?php echo $this->translate('client_educ_award_label'); ?></th>
-                                <th style="width:20%;"><?php echo $this->translate('client_educ_duration_label'); ?></th>
+                                <th style="width:18%;"><?php echo $this->translate('client_educ_location_label'); ?></th>
+                                <th style="width:20%;">Level</th>
+                                <th style="width:20%;"><?php echo $this->translate('client_educ_award_label'); ?></th>
+                                <th style="width:15%;"><?php echo $this->translate('client_educ_duration_label'); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -96,10 +100,24 @@
                                 <td class="centeralign"><a heduc="javascript: doNothing();" title="<?php echo $this->translate("global_button_remove"); ?>" id="row_educ_<?php echo $e; ?>" class="removeline btn btn-xs btn-default" rel="educ">&times;</a>
                                     <input type="hidden" id="educdetails_id_<?php echo $e; ?>" class="form-control" name="educdetails[<?php echo md5($e); ?>][id]" value="<?php echo $education->getID(); ?>" />
                                 </td>
-                                <td><input type="text" class="form-control input-sm" name="educdetails[<?php echo md5($e); ?>][value1]" id="educdetails_value1_<?php echo $e; ?>" value="<?php echo $education->getValue1(); ?>" /></td>
-                                <td><input type="text" class="form-control input-sm" name="educdetails[<?php echo md5($e); ?>][value2]" id="educdetails_value2_<?php echo $e; ?>" value="<?php echo $education->getValue2(); ?>" /></td>
-                                <td><input type="text" class="form-control input-sm" name="educdetails[<?php echo md5($e); ?>][value4]" id="educdetails_value4_<?php echo $e; ?>" value="<?php echo $education->getValue4(); ?>" /></td>
-                                <td><input type="text" class="form-control input-sm" name="educdetails[<?php echo md5($e); ?>][value5]" id="educdetails_value5_<?php echo $e; ?>" value="<?php echo $education->getValue5(); ?>" /></td>
+                                <td><textarea class="form-control input-sm expanding educdetail" name="educdetails[<?php echo md5($e); ?>][value1]" id="educdetails_value1_<?php echo $e; ?>"><?php echo $education->getValue1(); ?></textarea>
+                                	</td>
+                                <td><textarea class="form-control input-sm expanding educdetail" name="educdetails[<?php echo md5($e); ?>][value2]" id="educdetails_value2_<?php echo $e; ?>"><?php echo $education->getValue2(); ?></textarea></td>
+                               	<td><?php
+										$dropdown = new Zend_Form_Element_Select('value3_'.md5($e),
+															array(
+																'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $educationlevels),
+																'view' => new Zend_View(),
+																'decorators' => array('ViewHelper'),
+																'class' => array('form-control','input-sm')
+															)
+										);  
+										$dropdown->setValue($education->getValue3()); 
+										echo $dropdown->render();
+									?>
+                                </td>
+                                <td><textarea class="form-control input-sm expanding educdetail" name="educdetails[<?php echo md5($e); ?>][value4]" id="educdetails_value4_<?php echo $e; ?>"><?php echo $education->getValue4(); ?></textarea></td>
+                                <td><textarea class="form-control input-sm expanding educdetail" name="educdetails[<?php echo md5($e); ?>][value5]" id="educdetails_value5_<?php echo $e; ?>"><?php echo $education->getValue5(); ?></textarea></td>
                             </tr>
                             <?php $e++; $x++; $counter++; } ?>
                             <?php 
@@ -118,10 +136,24 @@
                                 <tr class="<?php echo $class; ?> row_educ_<?php echo $i; ?>" id="row_educ_<?php echo $i; ?>">
                                     <td class="centeralign"><a heduc="javascript: doNothing();" title="<?php echo $this->translate("global_button_remove"); ?>" id="row_educ_<?php echo $i; ?>" class="removeline btn btn-xs btn-default" rel="educ">&times;</a>
                                     </td>
-                                    <td><input type="text" class="form-control input-sm" name="educdetails[<?php echo md5($i); ?>][value1]" id="educdetails_value1_<?php echo $i; ?>" value="" /></td>
-                                    <td><input type="text" class="form-control input-sm" name="educdetails[<?php echo md5($i); ?>][value2]" id="educdetails_value2_<?php echo $i; ?>" value="" /></td>
-                                    <td><input type="text" class="form-control input-sm" name="educdetails[<?php echo md5($i); ?>][value4]" id="educdetails_value4_<?php echo $i; ?>" value="" /></td>
-                                    <td><input type="text" class="form-control input-sm" name="educdetails[<?php echo md5($i); ?>][value5]" id="educdetails_value5_<?php echo $i; ?>" value="" /></td>
+                                    <td><textarea class="form-control input-sm expanding educdetail" name="educdetails[<?php echo md5($i); ?>][value1]" id="educdetails_value1_<?php echo $i; ?>"></textarea></td>
+                                    <td><textarea class="form-control input-sm expanding educdetail" name="educdetails[<?php echo md5($i); ?>][value2]" id="educdetails_value2_<?php echo $i; ?>"></textarea></td>
+                                    <td>
+                                    	<?php
+											$dropdown = new Zend_Form_Element_Select('value3_'.$i,
+																array(
+																	'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $educationlevels),
+																	'view' => new Zend_View(),
+																	'decorators' => array('ViewHelper'),
+																	'class' => array('form-control','input-sm')
+																)
+											);  
+											$dropdown->setValue(''); 
+											echo $dropdown->render();
+										?>
+                                    </td>
+                                    <td><textarea class="form-control input-sm expanding educdetail" name="educdetails[<?php echo md5($i); ?>][value4]" id="educdetails_value4_<?php echo $i; ?>"></textarea></td>
+                                    <td><textarea class="form-control input-sm expanding educdetail" name="educdetails[<?php echo md5($i); ?>][value5]" id="educdetails_value5_<?php echo $i; ?>"></textarea></td>
                                 </tr>
                             <?php $x++; } ?>
                             <tr>
@@ -134,6 +166,7 @@
             </div>
         </div>
     </div>
+    <div class="divider15"></div>
     <div class="form-group">
         <div class="col-md-12 padding0">
             <label class="col-md-12 control-label"><?php echo $this->translate('client_disableoutsidesection_label'); ?>:</label>

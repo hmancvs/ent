@@ -1,76 +1,6 @@
 <div class="panel-body well-sm">
     <div class="col-md-12">
         <div class="form-group">
-            <label class="col-md-12 control-label"><?php echo $this->translate("client_incomesources_label"); ?>:</label>
-            <div class="col-md-12">
-                <p class="form-control-static nullifempty view"><?php echo count($client->getIncomeSourcesArray())  == 0 ? '': $client->getListofIncomeSources(); ?></p>
-                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
-                <div class="edit">
-                    <div id="container_incomesourcesids">
-						<?php 
-                            $existing_values = $client->getIncomeSourcesArray();
-                            foreach($incomesources as $key => $value){
-                        ?>
-                            <label class="checkbox notbolded col-md-3">
-                              <input type="checkbox" id="incomesources_<?php echo $key; ?>" name="incomesourcesids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked' : ''; ?>><?php echo $value; ?>
-                            </label>
-                        <?php } ?>
-                  	 </div>
-                    <div class="divider5"></div>
-                    <a class="gonowhere checkothertrigger" fieldid="incomesourcesids" lookupid="26" fieldlabel="Client Employment Income Sources" fieldtype="checkbox" checkclasses="checkbox notbolded col-md-3" checkname="incomesourcesids[]" checkid="incomesources_"><?php echo $this->translate("global_addoption_label"); ?></a>
-                </div>
-                <?php } ?>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="col-md-6 padding0">
-                <label class="col-md-8 control-label"><?php echo $this->translate("client_totalmonthlyincome_label"); ?>:</label>
-                <div class="col-md-4">
-                    <p class="form-control-static nullifempty view"><?php echo $client->gettotalmonthlyincome(); ?></p>
-                    <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
-                    <div class="edit">
-                        <input type="text" class="form-control input-sm" id="totalmonthlyincome" name="totalmonthlyincome" value="<?php echo $client->gettotalmonthlyincome(); ?>" />
-                    </div>
-                    <?php } ?>
-                </div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-md-12 control-label"><?php echo $this->translate("client_reduceincomebenefit_label"); ?>:</label>
-            <div class="col-md-12">
-                <p class="form-control-static nullifempty view"><?php echo $client->getreduceincomebenefit() == 1 ? 'Yes' : 'No'; ?></p>
-                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
-                <div class="edit">
-                    <label class="radio-inline">
-                      <input type="radio" id="reduceincomebenefit_1" name="reduceincomebenefit" class="disableoutsidesection" value="1" <?php echo $client->getreduceincomebenefit() == 1 ? 'checked' : ''; ?>>Yes
-                    </label>
-                    <label class="radio-inline">
-                      <input type="radio" id="reduceincomebenefit_0" name="reduceincomebenefit" class="disableoutsidesection" value="0" <?php echo $client->getreduceincomebenefit() == 0 ? 'checked' : ''; ?>>No
-                    </label>
-                </div>
-                <?php } ?>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-md-12 control-label"><?php echo $this->translate("client_providedwithbenefitinfo_label"); ?>:</label>
-            <div class="col-md-12">
-                <p class="form-control-static nullifempty view"><?php echo $client->getprovidedwithbenefitinfotext(); ?></p>
-                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
-                <div class="edit">
-                    <label class="radio-inline">
-                      <input type="radio" id="providedwithbenefitinfo_1" name="providedwithbenefitinfo" class="disableoutsidesection" value="1" <?php echo $client->getprovidedwithbenefitinfo() == 1 ? 'checked' : ''; ?>>Yes
-                    </label>
-                    <label class="radio-inline">
-                      <input type="radio" id="providedwithbenefitinfo_0" name="providedwithbenefitinfo" class="disableoutsidesection" value="0" <?php echo $client->getprovidedwithbenefitinfo() == 0 ? 'checked' : ''; ?>>No
-                    </label>
-                    <label class="radio-inline">
-                      <input type="radio" id="providedwithbenefitinfo_2" name="providedwithbenefitinfo" class="disableoutsidesection" value="2" <?php echo $client->getprovidedwithbenefitinfo() == 2 ? 'checked' : ''; ?>>Consumer declined offer of information
-                    </label>
-                </div>
-                <?php } ?>
-            </div>
-        </div>
-        <div class="form-group">
             <label class="col-md-12 control-label">Details of Work History</label>
             <div class="col-md-12">
                 <p class="form-control-static nullifempty view">
@@ -130,9 +60,9 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6 padding0">
-                                                    <label class="col-md-12 control-label"><?php echo $this->translate('job_contactphone_label'); ?>:</label>
+                                                    <label class="col-md-12 control-label"><?php echo $this->translate('client_addressline1_label'); ?>:</label>
                                                     <div class="col-md-12">
-                                                        <p class="form-control-static nullifempty view"><?php echo $employment->getEmployer()->getPhone(); ?></p>
+                                                        <p class="form-control-static nullifempty view"><?php echo $employment->getEmployer()->getAddressline1(); ?></p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -144,9 +74,9 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6 padding0">
-                                                    <label class="col-md-12 control-label"><?php echo $this->translate('client_state_label'); ?>:</label>
+                                                    <label class="col-md-12 control-label"><?php echo $this->translate('client_city_label'); ?>:</label>
                                                     <div class="col-md-12">
-                                                        <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($employment->getEmployer()->getState(), $states) ? '': $states[$employment->getEmployer()->getState()]; ?></p>
+                                                        <p class="form-control-static nullifempty view"><?php echo $employment->getEmployer()->getCity(); ?></p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -158,9 +88,9 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6 padding0">
-                                                    <label class="col-md-12 control-label"><?php echo $this->translate('client_city_label'); ?>:</label>
+                                                    <label class="col-md-12 control-label"><?php echo $this->translate('client_state_label'); ?>:</label>
                                                     <div class="col-md-12">
-                                                        <p class="form-control-static nullifempty view"><?php echo $employment->getEmployer()->getCity(); ?></p>
+                                                        <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($employment->getEmployer()->getState(), $states) ? '': $states[$employment->getEmployer()->getState()]; ?></p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -172,9 +102,20 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6 padding0">
-                                                    <label class="col-md-12 control-label"><?php echo $this->translate('client_addressline1_label'); ?>:</label>
+                                                	<label class="col-md-12 control-label">Zip Code:</label>
                                                     <div class="col-md-12">
-                                                        <p class="form-control-static nullifempty view"><?php echo $employment->getEmployer()->getAddressline1(); ?></p>
+                                                        <p class="form-control-static nullifempty view"><?php echo $employment->getEmployer()->getZipCode(); ?></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-md-6 padding0">
+                                                    
+                                                </div>
+                                                <div class="col-md-6 padding0">
+                                                	<label class="col-md-12 control-label"><?php echo $this->translate('job_contactphone_label'); ?>:</label>
+                                                    <div class="col-md-12">
+                                                        <p class="form-control-static nullifempty view"><?php echo $employment->getEmployer()->getPhone(); ?></p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -242,9 +183,9 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('job_contactphone_label'); ?>:</label>
+                                                <label class="col-md-12 control-label"><?php echo $this->translate('client_address_label'); ?>:</label>
                                                 <div class="col-md-12">
-                                                    <input type="text" class="form-control input-sm" name="employmentdetails[<?php echo $key; ?>][phone]" id="employmentdetails_phone_<?php echo $key; ?>" value="<?php echo $employment->getEmployer()->getPhone(); ?>" />
+                                                    <input type="text" class="form-control input-sm" name="employmentdetails[<?php echo $key; ?>][addressline1]" id="employmentdetails_addressline1_<?php echo $key; ?>" value="<?php echo $employment->getEmployer()->getAddressline1(); ?>" />
                                                 </div>
                                             </div>
                                         </div>
@@ -256,20 +197,9 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('client_state_label'); ?>:</label>
+                                                <label class="col-md-12 control-label"><?php echo $this->translate('client_city_label'); ?>:</label>
                                                 <div class="col-md-12">
-                                                    <?php
-                                                        $dropdown = new Zend_Form_Element_Select('state_'.$key,
-                                                                            array(
-                                                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $states),
-                                                                                'view' => new Zend_View(),
-                                                                                'decorators' => array('ViewHelper'),
-                                                                                'class' => array('form-control','input-sm')
-                                                                            )
-                                                        );  
-                                                        $dropdown->setValue($employment->getEmployer()->getState()); 
-                                                        echo $dropdown->render();
-                                                    ?>
+                                                	<input type="text" class="form-control input-sm" name="employmentdetails[<?php echo $key; ?>][city]" id="employmentdetails_city_<?php echo $key; ?>" value="<?php echo $employment->getEmployer()->getCity(); ?>" />
                                                 </div>
                                             </div>
                                         </div>
@@ -293,9 +223,20 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('client_city_label'); ?>:</label>
+                                                <label class="col-md-12 control-label"><?php echo $this->translate('client_state_label'); ?>:</label>
                                                 <div class="col-md-12">
-                                                    <input type="text" class="form-control input-sm" name="employmentdetails[<?php echo $key; ?>][city]" id="employmentdetails_city_<?php echo $key; ?>" value="<?php echo $employment->getEmployer()->getCity(); ?>" />
+                                                     <?php
+                                                        $dropdown = new Zend_Form_Element_Select('state_'.$key,
+                                                                            array(
+                                                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $states),
+                                                                                'view' => new Zend_View(),
+                                                                                'decorators' => array('ViewHelper'),
+                                                                                'class' => array('form-control','input-sm')
+                                                                            )
+                                                        );  
+                                                        $dropdown->setValue($employment->getEmployer()->getState()); 
+                                                        echo $dropdown->render();
+                                                    ?>
                                                 </div>
                                             </div>
                                         </div>
@@ -307,9 +248,20 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('client_address_label'); ?>:</label>
+                                                <label class="col-md-12 control-label">Zip Code:</label>
                                                 <div class="col-md-12">
-                                                    <input type="text" class="form-control input-sm" name="employmentdetails[<?php echo $key; ?>][addressline1]" id="employmentdetails_addressline1_<?php echo $key; ?>" value="<?php echo $employment->getEmployer()->getAddressline1(); ?>" />
+                                                    <input type="text" class="form-control input-sm width100" id="employmentdetails_zipcode_<?php echo $key; ?>" name="employmentdetails[<?php echo $key; ?>][zipcode]" value="<?php echo $employment->getEmployer()->getZipCode(); ?>" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-6 padding0">
+                                               
+                                            </div>
+                                            <div class="col-md-6 padding0">
+                                                <label class="col-md-12 control-label"><?php echo $this->translate('job_contactphone_label'); ?>:</label>
+                                                <div class="col-md-12">
+                                                    <input type="text" class="form-control input-sm" name="employmentdetails[<?php echo $key; ?>][phone]" id="employmentdetails_phone_<?php echo $key; ?>" value="<?php echo $employment->getEmployer()->getPhone(); ?>" />
                                                 </div>
                                             </div>
                                         </div>
@@ -372,10 +324,9 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('job_contactphone_label'); ?>:</label>
+                                                <label class="col-md-12 control-label"><?php echo $this->translate('client_address_label'); ?>:</label>
                                                 <div class="col-md-12">
-    
-                                                    <input type="text" class="form-control input-sm" name="employmentdetails[<?php echo md5($i); ?>][phone]" id="employmentdetails_phone_<?php echo $i; ?>" value="" />
+                                                    <input type="text" class="form-control input-sm" name="employmentdetails[<?php echo md5($i); ?>][addressline1]" id="employmentdetails_addressline1_<?php echo $i; ?>" value="" />
                                                 </div>
                                             </div>
                                         </div>
@@ -387,20 +338,9 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('client_state_label'); ?>:</label>
+                                                <label class="col-md-12 control-label"><?php echo $this->translate('client_city_label'); ?>:</label>
                                                 <div class="col-md-12">
-                                                    <?php
-                                                        $dropdown = new Zend_Form_Element_Select('state_'.$i,
-                                                                            array(
-                                                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $states),
-                                                                                'view' => new Zend_View(),
-                                                                                'decorators' => array('ViewHelper'),
-                                                                                'class' => array('form-control','input-sm')
-                                                                            )
-                                                        );  
-                                                        $dropdown->setValue(''); 
-                                                        echo $dropdown->render();
-                                                    ?>
+                                                    <input type="text" class="form-control input-sm" name="employmentdetails[<?php echo md5($i); ?>][city]" id="employmentdetails_city_<?php echo $i; ?>" value="" />
                                                 </div>
                                             </div>
                                         </div>
@@ -424,9 +364,20 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('client_city_label'); ?>:</label>
+                                                <label class="col-md-12 control-label"><?php echo $this->translate('client_state_label'); ?>:</label>
                                                 <div class="col-md-12">
-                                                    <input type="text" class="form-control input-sm" name="employmentdetails[<?php echo md5($i); ?>][city]" id="employmentdetails_city_<?php echo $i; ?>" value="" />
+                                                    <?php
+                                                        $dropdown = new Zend_Form_Element_Select('state_'.$i,
+                                                                            array(
+                                                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $states),
+                                                                                'view' => new Zend_View(),
+                                                                                'decorators' => array('ViewHelper'),
+                                                                                'class' => array('form-control','input-sm')
+                                                                            )
+                                                        );  
+                                                        $dropdown->setValue(''); 
+                                                        echo $dropdown->render();
+                                                    ?>
                                                 </div>
                                             </div>
                                         </div>
@@ -438,9 +389,22 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('client_address_label'); ?>:</label>
+                                                <label class="col-md-12 control-label">Zip Code:</label>
                                                 <div class="col-md-12">
-                                                    <input type="text" class="form-control input-sm" name="employmentdetails[<?php echo md5($i); ?>][addressline1]" id="employmentdetails_addressline1_<?php echo $i; ?>" value="" />
+    
+                                                    <input type="text" class="form-control input-sm width100" name="employmentdetails[<?php echo md5($i); ?>][zipdode]" id="employmentdetails_zipdode_<?php echo $i; ?>" value="" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-6 padding0">
+                                               
+                                            </div>
+                                            <div class="col-md-6 padding0">
+                                                <label class="col-md-12 control-label"><?php echo $this->translate('job_contactphone_label'); ?>:</label>
+                                                <div class="col-md-12">
+    
+                                                    <input type="text" class="form-control input-sm" name="employmentdetails[<?php echo md5($i); ?>][phone]" id="employmentdetails_phone_<?php echo $i; ?>" value="" />
                                                 </div>
                                             </div>
                                         </div>
@@ -493,6 +457,40 @@
         </div>
         <div class="form-group">
             <div class="col-md-6 padding0">
+                <label class="col-md-12 control-label"><?php echo $this->translate("client_photoid_label"); ?>:</label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->gethasphotoid() == 1 ? 'Yes' : 'No'; ?></p>
+					<?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                        <div class="edit">
+                            <label class="radio-inline">
+                              <input type="radio" id="hasphotoid_1" name="hasphotoid" class="disableoutsidesection" value="1" <?php echo $client->gethasphotoid() == 1 ? 'checked' : ''; ?>>Yes
+                            </label>
+                            <label class="radio-inline">
+                              <input type="radio" id="hasphotoid_0" name="hasphotoid" class="disableoutsidesection" value="0" <?php echo $client->gethasphotoid() == 0 ? 'checked' : ''; ?>>No
+                            </label>
+                        </div>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="col-md-6 padding0">
+                <label class="col-md-12 control-label"><?php echo $this->translate("client_socialsecuritycard_label"); ?>:</label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->gethasssncard() == 1 ? 'Yes' : 'No'; ?></p>
+					<?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                        <div class="edit">
+                            <label class="radio-inline">
+                              <input type="radio" id="hasssncard_1" name="hasssncard" class="disableoutsidesection" value="1" <?php echo $client->gethasssncard() == 1 ? 'checked' : ''; ?>>Yes
+                            </label>
+                            <label class="radio-inline">
+                              <input type="radio" id="hasssncard_0" name="hasssncard" class="disableoutsidesection" value="0" <?php echo $client->gethasssncard() == 0 ? 'checked' : ''; ?>>No
+                            </label>
+                        </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-6 padding0">
                 <label class="col-md-12 control-label"><?php echo $this->translate("client_typingspeed_label"); ?>:</label>
                 <div class="col-md-12">
                     <p class="form-control-static nullifempty view"><?php echo $client->gettypingspeed(); ?></p>
@@ -515,5 +513,6 @@
                 </div>
             </div>
         </div>
+        
     </div>
 </div>

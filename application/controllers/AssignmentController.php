@@ -20,8 +20,6 @@ class AssignmentController extends IndexController  {
     		$formvalues['datedeassigned'] = date('Y-m-d');
     		$assignment->populate($id);
     		$assignment->processPost($formvalues);
-    		/* debugMessage($assignment->toArray());
-    		debugMessage('error is '.$assignment->getErrorStackAsString()); */
     		
     		if($assignment->hasError()){
     			$this->_helper->redirector->gotoUrl();

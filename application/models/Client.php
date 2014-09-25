@@ -44,6 +44,7 @@ class Client extends BaseEntity {
 		$this->hasColumn('coverletterfilename', 'string', 255);
 		
 		$this->hasColumn('coachid', 'integer', null); # main coach
+		$this->hasColumn('coachname', 'string', 50); # coach text
 		$this->hasColumn('programid', 'integer', null);
 		$this->hasColumn('funderid', 'integer', null);
 		$this->hasColumn('servicetypeid', 'integer', null);
@@ -56,9 +57,9 @@ class Client extends BaseEntity {
 		$this->hasColumn('dddref', 'string', 15);
 		$this->hasColumn('dvrscounselor', 'string', 255);
 		$this->hasColumn('employmentgoal', 'string', 255);
-		/*$this->hasColumn('allergies', 'string', 500);
+		$this->hasColumn('allergies', 'string', 500);
 		$this->hasColumn('iscriminal', 'integer', null);
-		$this->hasColumn('criminalhistory', 'string', 1000);*/
+		$this->hasColumn('criminalhistory', 'string', 1000);
 		
 		$this->hasColumn('contactperson', 'string', 255);
 		$this->hasColumn('relationship', 'string', 255);
@@ -103,6 +104,8 @@ class Client extends BaseEntity {
 		$this->hasColumn('learningstyles', 'string', 500);
 		$this->hasColumn('driverslicenseno', 'string', 15);
 		$this->hasColumn('typingspeed', 'string', 15);
+		$this->hasColumn('hasphotoid', 'integer', null);
+		$this->hasColumn('hasssncard', 'integer', null);
 		$this->hasColumn('specialinfoforjobapplied', 'string', 1000);
 		$this->hasColumn('cancontactreferences', 'integer', null);
 		$this->hasColumn('whynotcontact', 'string', 255);
@@ -145,6 +148,8 @@ class Client extends BaseEntity {
 		$this->hasColumn('livingenvironment', 'string', 500);
 		$this->hasColumn('transportationsafety', 'string', 500);
 		$this->hasColumn('socialrships', 'string', 500);
+		$this->hasColumn('language', 'integer', null, array("default"=>1));
+		$this->hasColumn('emailpassword', 'string', 50);
 	}
 	
 	# Contructor method for custom initialization
@@ -419,25 +424,31 @@ class Client extends BaseEntity {
 		}
 		
 		// if adding new client
-		if(isArrayKeyAnEmptyString('id', $formvalues) && !isArrayKeyAnEmptyString('userid', $formvalues)){
+		if(isArrayKeyAnEmptyString('id', $formvalues)){
 			// check if adding new client so as to set coach assignment
-			$formvalues['coachid'] = $formvalues['userid'];
 			$assignments = array(
 					1 => array(
-						'userid'=> $formvalues['userid'], 
 						'status'=> $formvalues['status'], 
 						'startdate' => changeDateFromPageToMySQLFormat($formvalues['assignstartdate']), 
 						'createdby'=> $formvalues['createdby'],
 						'role'=> 2						
 					)
 			);
+			if(!isArrayKeyAnEmptyString('userid', $formvalues)){
+				$formvalues['coachid'] = $formvalues['userid'];
+				$assignments[1]['userid'] = $formvalues['userid'];
+			}
+			if(!isArrayKeyAnEmptyString('usertextfirstname', $formvalues) && !isArrayKeyAnEmptyString('usertextlastname', $formvalues)){
+				$formvalues['coachname'] = $formvalues['usertextfirstname'].' '.$formvalues['usertextlastname'];
+			}
+			
 			$formvalues['assignments'] = $assignments;
 			
 			// check if adding new client so as to set initial entry to client history
 			$clienthistory = array(
 					1 => array(
 						'status'=> $formvalues['status'],
-						'startdate' => changeDateFromPageToMySQLFormat($formvalues['startdate']),
+						'startdate' => changeDateFromPageToMySQLFormat($formvalues['assignstartdate']),
 						'createdby'=> $formvalues['createdby'],
 					)
 			);
@@ -453,6 +464,18 @@ class Client extends BaseEntity {
 				}
 			} else {
 				unset($formvalues['incomesources']);
+			}
+		}
+		
+		if(!isArrayKeyAnEmptyString('therapytreatmentids', $formvalues)) {
+			$formvalues['therapytreatment'] = implode(',', $formvalues['therapytreatmentids']);
+		} else {
+			if(!isArrayKeyAnEmptyString('therapytreatmentids_old', $formvalues)){
+				if(isArrayKeyAnEmptyString('therapytreatmentids', $formvalues)) {
+					$formvalues['therapytreatment'] = NULL;
+				}
+			} else {
+				unset($formvalues['therapytreatment']);
 			}
 		}
 		
@@ -499,13 +522,6 @@ class Client extends BaseEntity {
 			unset($formvalues['desiredhourlyrate']);
 		}
 		
-		if(isArrayKeyAnEmptyString('therapytreatment', $formvalues)){
-			if(isArrayKeyAnEmptyString('therapytreatment_old', $formvalues)){
-				unset($formvalues['therapytreatment']);
-			} else {
-				$formvalues['therapytreatment'] = NULL;
-			}
-		}
 		if(!isArrayKeyAnEmptyString('formaleducinterestsids', $formvalues)) {
 			$formvalues['formaleducinterests'] = implode(',', $formvalues['formaleducinterestsids']);
 		} else {
@@ -708,8 +724,8 @@ class Client extends BaseEntity {
 					if(!isArrayKeyAnEmptyString('value2', $value)){
 						$detailsarray[$mds]['value2'] = $value['value2'];
 					}
-					if(!isArrayKeyAnEmptyString('value3', $value)){
-						$detailsarray[$mds]['value3'] = $value['value3'];
+					if(!isArrayKeyAnEmptyString('value3_'.$key, $formvalues)){
+						$detailsarray[$mds]['value3'] = $formvalues['value3_'.$key];
 					}
 					if(!isArrayKeyAnEmptyString('value4', $value)){
 						$detailsarray[$mds]['value4'] = $value['value4'];
@@ -732,6 +748,7 @@ class Client extends BaseEntity {
 				$restoredata[4] = $typeformattedarray[4];
 			}
 		}
+		// debugMessage($detailsarray); exit();
 		
 		# process the reference contacts
 		if (!isArrayKeyAnEmptyString('references', $formvalues)) {
@@ -1012,7 +1029,7 @@ class Client extends BaseEntity {
 			}
 		}
 		
-		debugMessage($formvalues); // exit(); 
+		// debugMessage($formvalues); // exit(); 
 		parent::processPost($formvalues);
 	}
 	
@@ -1033,7 +1050,7 @@ class Client extends BaseEntity {
 		$session = SessionWrapper::getInstance();
 		
 		// base path for uploaded
-		$path = APPLICATION_PATH.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR.PUBLICFOLDER.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR;
+		$path = BASE_PATH.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR;
 		$clientfolder = "client_".$this->getID();
 		
 		// check if file was uploaded to client temp area and move it to the right folder (resume). If creating, file will be at root of clients while edit it will be at client_folderid
@@ -1083,6 +1100,45 @@ class Client extends BaseEntity {
 				$this->getInitialVoucher()->save();
 			}
 		}
+		
+		if(!isEmptyString($this->getCoachName()) && isEmptyString($this->getCoachID())){
+			$name = $this->getCoachName();
+			$namesarray = explode(" ", $name);
+				
+			$firstname = isArrayKeyAnEmptyString(0, $namesarray) ? '' : $namesarray[0];
+			$lastname = isArrayKeyAnEmptyString(1, $namesarray) ? '' : $namesarray[1];
+			// $othername = isArrayKeyAnEmptyString(2, $namesarray) ? '' : $namesarray[2];
+			$groupids = array(2);
+			$usergroups = array();
+			foreach ($groupids as $id) {
+				$usergroups[]['groupid'] = $id;
+			}
+				
+			$userdata = array(
+					'firstname' => $firstname,
+					'lastname' => $lastname,
+					'type' => 2,
+					'createdby' => $session->getVar('userid'),
+					'gender' => 1,
+					'usergroups' => $usergroups
+			);
+			// save new user
+			$user = new UserAccount();
+			$user->processPost($userdata);
+			$user->save();
+			
+			// set assignmentid to this user
+			$assignment = $this->getCurrentAssignedCoach();
+			if(!isEmptyString($assignment->getID())){
+				$assignment->setUserID($user->getID());
+				$assignment->save();
+			}
+			
+			// blank out coachname [optional]
+			$this->setCoachID($user->getID());
+			$this->save();
+		}
+		
 		return true;
 	}
 	
@@ -1091,7 +1147,7 @@ class Client extends BaseEntity {
 	}
 	# relative path to profile image
 	function hasProfileImage(){
-		$real_path = APPLICATION_PATH.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR."client_";
+		$real_path = BASE_PATH.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR."client_";
 		$real_path = $real_path.$this->getID().DIRECTORY_SEPARATOR."avatar".DIRECTORY_SEPARATOR."medium_".$this->getProfilePhoto();
 		// debugMessage($real_path);
 		if(file_exists($real_path) && !isEmptyString($this->getProfilePhoto())){
@@ -1101,14 +1157,14 @@ class Client extends BaseEntity {
 	}
 	# determine if person has profile image
 	function getRelativeProfilePicturePath(){
-		$real_path = APPLICATION_PATH.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR."client_";
+		$real_path = BASE_PATH.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR."client_";
 		$real_path = $real_path.$this->getID().DIRECTORY_SEPARATOR."avatar".DIRECTORY_SEPARATOR."medium_".$this->getProfilePhoto();
 		if(file_exists($real_path) && !isEmptyString($this->getProfilePhoto())){
 			return $real_path;
 		}
-		$real_path = APPLICATION_PATH.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."default".DIRECTORY_SEPARATOR."default_medium_male.jpg";
+		$real_path = BASE_PATH.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."default".DIRECTORY_SEPARATOR."default_medium_male.jpg";
 		if($this->isFemale()){
-			$real_path = APPLICATION_PATH.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."default".DIRECTORY_SEPARATOR."default_medium_female.jpg";
+			$real_path = BASE_PATH.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."default".DIRECTORY_SEPARATOR."default_medium_female.jpg";
 		}
 		return $real_path;
 	}
@@ -1200,7 +1256,7 @@ class Client extends BaseEntity {
 	}
 	# path to resume absolute path
 	function getResumePath(){
-		$path = APPLICATION_PATH.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR.PUBLICFOLDER.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR."client_".$this->getID().DIRECTORY_SEPARATOR."resume".DIRECTORY_SEPARATOR.$this->getResumeFilename();
+		$path = BASE_PATH.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR."client_".$this->getID().DIRECTORY_SEPARATOR."resume".DIRECTORY_SEPARATOR.$this->getResumeFilename();
 		return $path;
 	}
 	# check if client has a resume
@@ -1230,7 +1286,7 @@ class Client extends BaseEntity {
 	
 	# path to cover absolute path
 	function getCoverletterPath(){
-		$path = APPLICATION_PATH.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR.PUBLICFOLDER.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR."client_".$this->getID().DIRECTORY_SEPARATOR."cover".DIRECTORY_SEPARATOR.$this->getCoverletterFilename();
+		$path = BASE_PATH.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR."client_".$this->getID().DIRECTORY_SEPARATOR."cover".DIRECTORY_SEPARATOR.$this->getCoverletterFilename();
 		return $path;
 	}
 	# check if client has a cover
@@ -1435,7 +1491,7 @@ class Client extends BaseEntity {
 	}
 	# return an array of client therapy treatments
 	function getTherapyTreatmentArray(){
-		return isEmptyString($this->getTherapyTreatment()) ? '' : explode(',',preg_replace('!\s+!', '', trim($this->getTherapyTreatment())));
+		return isEmptyString($this->getTherapyTreatment()) ? array() : explode(',',preg_replace('!\s+!', '', trim($this->getTherapyTreatment())));
 	}
 	# return list of income sources for client
 	function getListofTherapyTreatment(){
@@ -1705,6 +1761,14 @@ class Client extends BaseEntity {
 			return $result;
 		}
 		return new Activity();
+	}
+	# determine the age of a client
+	function getAge(){
+		$age = '';
+		if(!isEmptyString($this->getDateofBirth())){
+			$age = date('Y') - date('Y', strtotime($this->getDateofBirth()));
+		}
+		return $age;
 	}
 }
 ?>

@@ -19,6 +19,7 @@
 		$maritalstatuses = getAllMaritalStatuses();
 		$educationlevels = getEducationLevels();
 		$races = getAllRaces();
+		$languages = getAllLanguages();
 		$programs = getPrograms();
 		$funders = getFunders();
 		$services = getServiceTypes();
@@ -33,6 +34,17 @@
 		$ratetypes = getRateTypes();
 		$incomesources = getAllIncomeSources();
 		$rships = getAllRelationshipOptions();
+		$therapytreatments = getAllTherapyTreatments();
+		
+		$dob = $client->getDateofBirth();
+		$birthday = ''; $birthmonth = ''; $birthyear = ''; $dateofbirth = '';
+		if(!isEmptyString($dob)){
+			$dateofbirth = date('M d, Y', strtotime($dob)); 
+			$birthday = date('d', strtotime($dob)); 
+			$birthmonth = date('m', strtotime($dob)); 
+			$birthyear = date('Y', strtotime($dob)); 
+		}
+		// debugMessage($birthday.' - '.$birthmonth.' - '.$birthyear.' - '.$birthyear);
 	}
 	
 	#in case of errors in session, populate the fields from session
@@ -41,7 +53,7 @@
 	}
 	
 	$title = 'New Client';
-	$description = 'Complete the 5 Steps below to Setup a New Client. Fields marked with '.$this->translate("global_required_field_marker").' are mandatory.';	
+	$description = 'Complete the steps below to setup a new Client. Fields marked with '.$this->translate("global_required_field_marker").' are mandatory.';	
 	$this->headTitle($title.$browserappend);
 ?>
 <script type="text/javascript" src="<?php echo $this->serverUrl($this->baseUrl('javascript/plugins/jquery.stepy.js')); ?>"></script>
@@ -58,7 +70,7 @@
 		$('.view, .update_trigger').addClass('hidden').hide();
 		
 		// form wizard
-		/**/
+		/*
 		$('#indexform').stepy({
 			block: true,
 			validate: true,
@@ -71,10 +83,10 @@
 			},
 			finish: function() {
 				if ($("#indexform").valid()) {
-					$.blockUI({ message: '<?php echo $blockcontent; ?>' }); 
+					$.blockUI({ message: '<?php //echo $blockcontent; ?>' }); 
 				}
 			}
-		});
+		});*/
 		
 		$(".button-back").addClass('btn btn-default btn-lg');
 		$(".button-next").addClass('btn btn-primary btn-lg'); 
@@ -88,13 +100,7 @@
 		
 		// custom date picker options
 		var dateofbirthOpts = datepickerOpts;
-		var startfrom = '<?php echo date('Y'); ?>';
-		dateofbirthOpts.yearRange = "-<?php echo date('Y')-1900; ?>:-0"; 
-		dateofbirthOpts.minDate = "-<?php echo date('Y'); ?>Y";
-		datepickerOpts.maxDate = new Date("Dec 31, "+startfrom);	
-		$("#dateofbirth").datepicker(dateofbirthOpts);
-		
-		dateofbirthOpts.yearRange = "-<?php echo date('Y')-2010; ?>:-0"; 
+		// dateofbirthOpts.yearRange = "-<?php // echo date('Y')-2010; ?>:-0"; 
 		// datepickerOpts.maxDate = new Date();
 		// $("#dateapproved, #referraldate, #assessmentdate, #startdate, #enddate, #invoicedate, #medicalstartdate, #activitydate, #dateavailable").datepicker(dateofbirthOpts);
 		$(".datefield").datepicker(dateofbirthOpts);
@@ -120,6 +126,29 @@
 		$(".computeamount").trigger("keyup");
 		
 		$(".chosen-container.chosen-container-single").css({'width':'100%'});
+		
+		multipleDisableContainerByClass('user_text');
+		multipleEnableContainerByClass('user_select');
+		$("#usertrigger").click(function(){
+			if($(this).is(':checked')){
+				disableContainerByClass('user_select');
+				enableContainerByClass('user_text');
+				$(".user_select select").val('');
+			} else {
+				disableContainerByClass('user_text');
+				enableContainerByClass('user_select');
+				$(".user_text input").val('');
+			}
+		});
+		
+		// dynamically add new configurable values to dropdowns
+		$(".switchuser").change(function(){
+			var value = $(this).val(); 
+			if(!isEmptyString(value) && value == '0'){
+				$("#usertrigger").click();
+			}
+		});
+		
 	});
 	
 </script>
@@ -136,7 +165,6 @@
         <div class="alert alert-success alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> <?php echo $session->getVar(SUCCESS_MESSAGE); ?></div>
     <?php } ?>
     <div id="tabs" class="clearfix" style="min-height:500px;">
-        <?php // require APPLICATION_PATH."/views/scripts/client/leftcolumn.phtml"; ?>
         <div class="col-md-12 tab-content clearfix" id="center" style="width:100%;">
         	<h4 id="tabtitle"></h4>
         	<div id="profile">
@@ -183,7 +211,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <?php // } ?>
+                                    
                                     <div class="panel panel-default" id="assess3">
                                         <div class="panel-heading">
                                             <h4 class="panel-title"><a class="accordion-toggle dark collapsed" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col3"> Family and Living</a> </h4>
@@ -195,7 +223,6 @@
                                         </div>
                                     </div>
                                     
-                                    <?php // if(false){ ?>
                                     <div class="panel panel-default" id="assess4">
                                         <div class="panel-heading">
                                             <h4 class="panel-title"><a class="accordion-toggle dark collapsed" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col4"> Employment Preferrences</a> </h4>
@@ -285,7 +312,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <?php // } ?>
+                                    <?php //} ?>
                                 </div>
                             </div>
                         </fieldset>
@@ -312,26 +339,41 @@
                                     <div class="form-group">
                                         <label class="col-sm-5 control-label"><?php echo $this->translate("client_userid_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                                         <div class="col-sm-7">
-                                        	<?php
-												$allvalues = getUsers(2, '', 1);
-												$dropdown = new Zend_Form_Element_Select('userid',
-																	array(
-																		'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $allvalues),
-																		'view' => new Zend_View(),
-																		'decorators' => array('ViewHelper'),
-																		'class' => array('form-control','input-sm'),
-																	)
-												);  
-												$dropdown->setValue(''); 
-												echo $dropdown->render();
-											?>
-                                            <div id="userid_error"></div>
+                                        	<div class="user_text">
+                                                <i class="blocked">Enter details of new user</i>
+                                                <div class="inline">
+                                                    <label style="font-weight:bold; font-size:10px; display:inline-block; width:180px;">First Name:</label>
+                                                    <input type="text" name="usertextfirstname" id="usertextfirstname" class="form-control input-sm " value="" style="width:180px; display:inline;"  />
+                                                </div>
+                                                <div class="inline">
+                                                    <label style="font-weight:bold; font-size:10px; display:inline-block; width:180px;">Last Name:</label>
+                                                    <input type="text" name="usertextlastname" id="usertextlastname" class="form-control input-sm " value="" style="width:180px; display:inline;"  />
+                                                </div>
+                                            </div>
+                                            <div class="user_select">
+                                                <?php
+                                                    $allvalues = getUsers(2, '', 1);
+                                                    $dropdown = new Zend_Form_Element_Select('userid',
+                                                                        array(
+                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $allvalues, array('0'=>'Other')),
+                                                                            'view' => new Zend_View(),
+                                                                            'decorators' => array('ViewHelper'),
+                                                                            'class' => array('form-control','input-sm','switchuser'),
+                                                                            'style' => 'width:180px; display:inline;'
+                                                                        )
+                                                    );  
+                                                    $dropdown->setValue(''); 
+                                                    echo $dropdown->render();
+                                                ?>
+                                            </div>
+                                            &nbsp;<input type="checkbox" name="usertrigger" id="usertrigger" class="lineblocked" value="1" title="Switch entry mode" placeholder="enter free text" /> Other
+                                        	<div id="usertextfirstname_error"></div><div id="usertextlastname_error"></div><div id="usertext_error"></div><div id="userid_error"></div> 
                                         </div>
                                     </div>
                                     <div class="form-group">
                                          <label class="col-sm-5 control-label"><?php echo $this->translate("client_assign_startdate_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                                         <div class="col-sm-7">
-                                            <input type="text" class="form-control input-sm datefield readonly width100" name="assignstartdate" id="assignstartdate" value="" /><div id="assignstartdate_error"></div>
+                                            <input type="text" class="form-control input-sm datefield readonly width100" name="assignstartdate" id="assignstartdate" value="<?php echo changeMySQLDateToPageFormat(date('Y-m-d')); ?>" /><div id="assignstartdate_error"></div>
                                         </div>
                                     </div>
                                 </div>

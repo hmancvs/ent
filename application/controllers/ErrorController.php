@@ -7,18 +7,19 @@ class ErrorController extends Zend_Controller_Action
     	// $this->_helper->layout->disableLayout();
     	
     	// debugMessage($this->toArray());
-        $errors = $this->_getParam('error_handler'); 
+        $errors = $this->_getParam('error_handler');
+        if (!$errors) {
+        	$this->view->message = 'You have reached the error page';
+        	debugMessage('$this->view->message. No Error detected');
+        	return;
+        }
+         
         $exception = $errors->exception; // debugMessage($exception);
         $vars = get_object_vars($exception );
-        $error_list = createHTMLCommaListFromArray($vars);
-        
+        $error_list = createHTMLCommaListFromArray($vars); // debugMessage($error_list);
+        // debugMessage(get_class($errors->exception));  debugMessage($errors->type);
+       
         // exit();
-        
-        if (!$errors) {
-            $this->view->message = 'You have reached the error page';
-            return;
-        }
-        
         switch ($errors->type) {
             case Zend_Controller_Plugin_ErrorHandler::EXCEPTION_NO_ROUTE:
             case Zend_Controller_Plugin_ErrorHandler::EXCEPTION_NO_CONTROLLER:

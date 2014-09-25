@@ -471,7 +471,36 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                         <div class="form-group">
+                        <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("client_addressline1_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo $job->getEmployer()->getAddressline1(); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm" id="addressline1" name="addressline1" value="<?php echo $job->getEmployer()->getAddressline1(); ?>" />
+                                    <div id="addressline1_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("client_addressline2_label"); ?>:</label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo $job->getEmployer()->getAddressline2(); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm" id="addressline2" name="addressline2" value="<?php echo $job->getEmployer()->getAddressline2(); ?>" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("client_city_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo $job->getEmployer()->getCity(); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm" id="city" name="city" value="<?php echo $job->getEmployer()->getCity(); ?>" />
+                                    <div id="city_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label class="col-md-4 control-label"><?php echo $this->translate("client_state_label"); ?>:</label>
                             <div class="col-md-8">
                                 <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($job->getEmployer()->getState(), $states) ? '': $states[$job->getEmployer()->getState()]; ?></p>  
@@ -493,6 +522,16 @@
                             </div>
                         </div>
                         <div class="form-group">
+                            <label class="col-md-4 control-label"><?php echo $this->translate("client_zipcode_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-md-8">
+                                <p class="form-control-static nullifempty view"><?php echo $job->getEmployer()->getZipCode(); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm width100" id="zipcode" name="zipcode" value="<?php echo $job->getEmployer()->getZipCode(); ?>" />
+                                    <div id="zipcode_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label class="col-md-4 control-label"><?php echo $this->translate("client_county_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                             <div class="col-md-8">
                                 <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($job->getEmployer()->getCounty(), $counties) ? '': $counties[$job->getEmployer()->getCounty()]; ?></p>  
@@ -510,45 +549,6 @@
                                         echo $dropdown->render();
                                     ?><input type="hidden" class="form-control" name="county_old" id="county_old" value="<?php echo $job->getEmployer()->getCounty(); ?>" />
                                     <div id="county_error"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("client_city_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-8">
-                                <p class="form-control-static nullifempty view"><?php echo $job->getEmployer()->getCity(); ?></p>
-                                <div class="edit">
-                                    <input type="text" class="form-control input-sm" id="city" name="city" value="<?php echo $job->getEmployer()->getCity(); ?>" />
-                                    <div id="city_error"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("client_zipcode_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-8">
-                                <p class="form-control-static nullifempty view"><?php echo $job->getEmployer()->getZipCode(); ?></p>
-                                <div class="edit">
-                                    <input type="text" class="form-control input-sm width100" id="zipcode" name="zipcode" value="<?php echo $job->getEmployer()->getZipCode(); ?>" />
-                                    <div id="zipcode_error"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("client_addressline1_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-8">
-                                <p class="form-control-static nullifempty view"><?php echo $job->getEmployer()->getAddressline1(); ?></p>
-                                <div class="edit">
-                                    <input type="text" class="form-control input-sm" id="addressline1" name="addressline1" value="<?php echo $job->getEmployer()->getAddressline1(); ?>" />
-                                    <div id="addressline1_error"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("client_addressline2_label"); ?>:</label>
-                            <div class="col-md-8">
-                                <p class="form-control-static nullifempty view"><?php echo $job->getEmployer()->getAddressline2(); ?></p>
-                                <div class="edit">
-                                    <input type="text" class="form-control input-sm" id="addressline2" name="addressline2" value="<?php echo $job->getEmployer()->getAddressline2(); ?>" />
                                 </div>
                             </div>
                         </div>

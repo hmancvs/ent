@@ -1,13 +1,11 @@
 <?php
 	require_once APPLICATION_PATH.'/includes/header.php';
-	require_once APPLICATION_PATH.'/../'.PUBLICFOLDER.'/mpdf/mpdf.php';
 	
 	$reportsdash = $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/report');
 	if(isEmptyString($request->section)){
 		$request->setParam('section', 'dashboard');
 		$section = 'dashboard';
 	}
-	
 ?>
 <div class="row-fluid">
 	<?php if($section == 'dashboard'){ ?>

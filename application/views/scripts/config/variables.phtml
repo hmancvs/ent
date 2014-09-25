@@ -72,7 +72,10 @@
 			# set the search columns to be used on this list
 			$paginate->setSearchColumns(array("c.name"));
 			$paginate->setFilterColumns(array());
-			$paginate->setItemCountPerPage("10");
+			$paginate->setItemCountPerPage("ALL");
+			if($lookupid == 45){
+				$paginate->setItemCountPerPage("25");
+			}
 			
 			# define the letter to be clicked to ease navigation 
 			$order_query = " ORDER BY c.datecreated DESC ";
@@ -322,7 +325,7 @@ $(document).ready(function(){
                 <tr>
                     <th style="width:20px;" class="centeralign">#</th>
                     <?php if(in_array($lookuptype->getID(), $aliasedtypes)){ ?>
-                    	<th style="width:100px;" class="centeralign">Code</th>
+                    	<th style="width:130px;">Code</th>
                     <?php } ?>
                     <th>Variable Name</th>
                     <!--<th style="width:125px;">System Value</th>-->
@@ -342,7 +345,7 @@ $(document).ready(function(){
                     <tr id="lookup_<?php echo $value['id']; ?>" class="editable">
                         <td class="centeralign"><?php echo $x; ?></td>
                         <?php if(in_array($lookuptype->getID(), $aliasedtypes)){ ?>
-                            <td class="centeralign">
+                            <td>
                             	<div style="position:relative;">
                                     <span class="display" id="text_alias_<?php echo $value['id']; ?>"><?php echo $value['alias']; ?></span>
                                     <span class="edit" id="html_alias_<?php echo $value['id']; ?>">
@@ -553,6 +556,41 @@ $(document).ready(function(){
                                             </div>
                                             <div class="col-md-6">
                                                  <div class="form-group">
+                                                    <label class="col-md-4 control-label"><?php echo $this->translate("global_addressline1_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                                    <div class="col-md-8">
+                                                        <p class="form-control-static nullifempty view"><?php echo $company->getAddressline1(); ?></p>
+                                                        <?php if(($step == 'edit' || $step == 'new')){ ?>
+                                                        <div class="edit">
+                                                            <input type="text" class="form-control input-sm" id="addressline1" name="addressline1" value="<?php echo $company->getAddressline1(); ?>" />
+                                                            <div id="addressline1_error"></div>
+                                                        </div>
+                                                        <?php } ?>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-4 control-label"><?php echo $this->translate("global_addressline2_label"); ?>:</label>
+                                                    <div class="col-md-8">
+                                                        <p class="form-control-static nullifempty view"><?php echo $company->getAddressline2(); ?></p>
+                                                        <?php if(($step == 'edit' || $step == 'new')){ ?>
+                                                        <div class="edit">
+                                                            <input type="text" class="form-control input-sm" id="addressline2" name="addressline2" value="<?php echo $company->getAddressline2(); ?>" />
+                                                        </div>
+                                                        <?php } ?>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-4 control-label"><?php echo $this->translate("global_city_label"); ?>/<?php echo $this->translate("global_town_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                                    <div class="col-md-8">
+                                                        <p class="form-control-static nullifempty view"><?php echo $company->getCity(); ?></p>
+                                                        <?php if(($step == 'edit' || $step == 'new')){ ?>
+                                                        <div class="edit">
+                                                            <input type="text" class="form-control input-sm" id="city" name="city" value="<?php echo $company->getCity(); ?>" />
+                                                            <div id="city_error"></div>
+                                                        </div>
+                                                        <?php } ?>
+                                                    </div>
+                                                </div>
+                                                 <div class="form-group">
                                                     <label class="col-md-4 control-label"><?php echo $this->translate("global_state_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                                                     <div class="col-md-8">
                                                         <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($company->getState(), $states) ? '': $states[$company->getState()]; ?></p>  
@@ -576,6 +614,18 @@ $(document).ready(function(){
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
+                                                    <label class="col-md-4 control-label"><?php echo $this->translate("global_zipcode_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                                    <div class="col-md-8">
+                                                        <p class="form-control-static nullifempty view"><?php echo $company->getZipCode(); ?></p>
+                                                        <?php if(($step == 'edit' || $step == 'new')){ ?>
+                                                        <div class="edit">
+                                                            <input type="text" class="form-control input-sm width100" id="zipcode" name="zipcode" value="<?php echo $company->getZipCode(); ?>" />
+                                                            <div id="zipcode_error"></div>
+                                                        </div>
+                                                        <?php } ?>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
                                                     <label class="col-md-4 control-label"><?php echo $this->translate("global_county_label"); ?>:</label>
                                                     <div class="col-md-8">
                                                         <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($company->getCounty(), $counties) ? '': $counties[$company->getCounty()]; ?></p>  
@@ -594,53 +644,6 @@ $(document).ready(function(){
                                                                 echo $dropdown->render();
                                                             ?><input type="hidden" class="form-control" name="county_old" id="county_old" value="<?php echo $company->getCounty(); ?>" />
                                                             <div id="county_error"></div>
-                                                        </div>
-                                                        <?php } ?>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="col-md-4 control-label"><?php echo $this->translate("global_city_label"); ?>/<?php echo $this->translate("global_town_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                                    <div class="col-md-8">
-                                                        <p class="form-control-static nullifempty view"><?php echo $company->getCity(); ?></p>
-                                                        <?php if(($step == 'edit' || $step == 'new')){ ?>
-                                                        <div class="edit">
-                                                            <input type="text" class="form-control input-sm" id="city" name="city" value="<?php echo $company->getCity(); ?>" />
-                                                            <div id="city_error"></div>
-                                                        </div>
-                                                        <?php } ?>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="col-md-4 control-label"><?php echo $this->translate("global_zipcode_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                                    <div class="col-md-8">
-                                                        <p class="form-control-static nullifempty view"><?php echo $company->getZipCode(); ?></p>
-                                                        <?php if(($step == 'edit' || $step == 'new')){ ?>
-                                                        <div class="edit">
-                                                            <input type="text" class="form-control input-sm width100" id="zipcode" name="zipcode" value="<?php echo $company->getZipCode(); ?>" />
-                                                            <div id="zipcode_error"></div>
-                                                        </div>
-                                                        <?php } ?>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="col-md-4 control-label"><?php echo $this->translate("global_addressline1_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                                    <div class="col-md-8">
-                                                        <p class="form-control-static nullifempty view"><?php echo $company->getAddressline1(); ?></p>
-                                                        <?php if(($step == 'edit' || $step == 'new')){ ?>
-                                                        <div class="edit">
-                                                            <input type="text" class="form-control input-sm" id="addressline1" name="addressline1" value="<?php echo $company->getAddressline1(); ?>" />
-                                                            <div id="addressline1_error"></div>
-                                                        </div>
-                                                        <?php } ?>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="col-md-4 control-label"><?php echo $this->translate("global_addressline2_label"); ?>:</label>
-                                                    <div class="col-md-8">
-                                                        <p class="form-control-static nullifempty view"><?php echo $company->getAddressline2(); ?></p>
-                                                        <?php if(($step == 'edit' || $step == 'new')){ ?>
-                                                        <div class="edit">
-                                                            <input type="text" class="form-control input-sm" id="addressline2" name="addressline2" value="<?php echo $company->getAddressline2(); ?>" />
                                                         </div>
                                                         <?php } ?>
                                                     </div>

@@ -4,7 +4,7 @@
 	$client = new Client();
     $client->populate(decode($request->id));
 	$id = $client->getID();
-	// debugMessage($client->toArray());
+	// debugMessage($client->getMediumPicturePath());
 	
 	$posturl = $this->baseUrl("client/edit"); 
 	$successmessage = $this->translate('profile_update_success');
@@ -26,9 +26,10 @@
 	
 	$title = $client->getName();
 	$description = 'Profile Details';	
-	$this->headTitle($title.$browserappend);
+	$this->headTitle($title.$browserappend);/**/
 ?>
 <script>
+
 $(document).ready(function() {
 	$('.titlebreadcrumb').html('<?php echo $homedir.'Clients / '.$client->getName(); ?>');
 	$('.titlelabel').html('<?php echo $title; ?>');
@@ -43,6 +44,9 @@ $(document).ready(function() {
 	
 });
 </script>
+<?php if(false){ ?>
+<?php } ?>
+<?php //if(false){ ?>
 <div class="row-fluid margin0 view">
     <div class="col-md-12 padding0">
     	<div class="headerbox">
@@ -65,47 +69,47 @@ $(document).ready(function() {
     <?php } ?>
     <div id="tabs">
         <?php require APPLICATION_PATH."/views/scripts/client/leftcolumn.phtml"; ?>
-        <div class="col-md-9 tab-content makerelative padding0 xtestborder clearfix" id="center">
-        	
+        <div class="col-md-9 tab-content makerelative padding0 clearfix" id="center">
         	<div id="profile">
             	<?php if($tab == 'profile'){ ?>
-                	<h4 id="xtabtitle">Profile</h4>
+                	<h4 class="hideonprint">Profile</h4>
                     <?php require APPLICATION_PATH."/views/scripts/client/profile.phtml"; ?>
 				<?php } ?>
 			</div> 
             <div id="employment">
             	<?php if($tab == 'employment'){ ?>
-                	<h4 id="xtabtitle">Employment</h4>
+                	<h4 class="hideonprint">Employment</h4>
                 	<?php require APPLICATION_PATH."/views/scripts/client/employment.phtml"; ?>
                 <?php } ?>
 			</div>
             <div id="voucher">
 				<?php if($request->tab == 'voucher'){ ?>
-                	<h4 id="xtabtitle">Voucher History</h4>
+                	<h4 class="hideonprint">Vouchers</h4>
 					<?php require APPLICATION_PATH."/views/scripts/client/voucher.phtml"; ?>
                 <?php } ?>
 			</div>
             <div id="activity">
 				<?php if($request->tab == 'activity'){ ?>
-                	<h4 id="xtabtitle">Interventions</h4>
+                	<h4 class="hideonprint">Interventions</h4>
                 	<?php require APPLICATION_PATH."/views/scripts/client/activity.phtml"; ?>
                 <?php } ?>
 			</div>
             <div id="finance">
                 <?php if($request->tab == 'finance'){ ?>
-                	<h4 id="xtabtitle" class="hideonprint">Invoices and Payments</h4>
+                	
                 	<?php require APPLICATION_PATH."/views/scripts/client/finance.phtml"; ?>
                 <?php } ?>
 			</div>
             <div id="report">
                 <?php if($request->tab == 'report'){ ?>
-                	<h4 id="xtabtitle" class="hideonprint">Reports</h4>
+                	<h4 class="hideonprint">Reports</h4>
                 	<?php require APPLICATION_PATH."/views/scripts/report/dashboard.phtml"; ?>
                 <?php } ?>
 			</div>
      	</div> 
     </div>
-</div>    
+</div> 
+<?php //} ?>   
 <?php
 	require_once APPLICATION_PATH.'/includes/footer.php';
 ?>

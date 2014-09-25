@@ -7,7 +7,7 @@ class Assignment extends BaseRecord  {
 		$this->setTableName('assignment');
 		$this->hasColumn('id', 'integer', null, array('primary' => true, 'autoincrement' => true));
 		$this->hasColumn('clientid', 'integer', null);
-		$this->hasColumn('userid', 'integer', null, array('notblank' => true));
+		$this->hasColumn('userid', 'integer', null);
 		$this->hasColumn('startdate', 'date', null, array('notblank' => true));
 		$this->hasColumn('enddate', 'date', null);
 		$this->hasColumn('role', 'integer', null, array('default' => 2));
@@ -74,7 +74,6 @@ class Assignment extends BaseRecord  {
 		
 		// set the custom error messages
        	$this->addCustomErrorMessages(array(
-       									"userid.notblank" => $this->translate->_("client_assignment_userid_error"),
        									"startdate.notblank" => $this->translate->_("client_assignment_userid_error"),
        									"role.notblank" => $this->translate->_("client_assignment_role_error")
        	       						));
@@ -83,6 +82,7 @@ class Assignment extends BaseRecord  {
 	 * Pre process model data
 	 */
 	function processPost($formvalues){
+		$session = SessionWrapper::getInstance();
 		# force setting of default none string column values. enum, int and date 	
 		if(isArrayKeyAnEmptyString('datedeassigned', $formvalues)){
 			unset($formvalues['datedeassigned']); 
@@ -106,7 +106,30 @@ class Assignment extends BaseRecord  {
 			unset($formvalues['datedeassignedbyid']);
 		}
 		
-		// debugMessage($formvalues); // exit();
+		if(!isArrayKeyAnEmptyString('usertextfirstname', $formvalues) && !isArrayKeyAnEmptyString('usertextlastname', $formvalues)){
+			// unset($formvalues['userid']);
+			//$name = $formvalues['usertext']; 
+			// $namesarray = explode(" ", $name); 
+			
+			$firstname = $formvalues['usertextfirstname'];
+			$lastname = $formvalues['usertextlastname'];
+			$groupids = array(2);
+			$usergroups = array();
+			foreach ($groupids as $id) {
+				$usergroups[]['groupid'] = $id;
+			}
+			
+			$userdata = array(
+						'firstname' => $firstname,
+						'lastname' => $lastname,
+						'type' => 2,
+						'createdby' => $session->getVar('userid'),
+						'gender' => 1,
+						'usergroups' => $usergroups
+					);
+			$formvalues['user'] = $userdata;
+		}
+		// debugMessage($formvalues); 
 		parent::processPost($formvalues);
 	}
 }

@@ -140,7 +140,7 @@
         	<div class="col-md-9 paddingleft0">
             	<ul class="listfilter">
 					<?php if ($acl->checkPermission('Client', ACTION_CREATE)) { ?>
-                        <li><a title="New <?php echo $moduleitem; ?>" class="btn btn-primary btn-sm" href="<?php echo $addurl; ?>"><i class="glyphicon glyphicon-plus"></i> New <?php echo $moduleitem; ?></a></li>
+                        <li><a title="New <?php echo $moduleitem; ?>" class="btn btn-primary btn-sm blockanchor" href="<?php echo $addurl; ?>"><i class="glyphicon glyphicon-plus"></i> New <?php echo $moduleitem; ?></a></li>
                     <?php } ?>
                     <li>
                         <?php
@@ -189,14 +189,14 @@
                 <ul class="listfilter">
                     <li><input type="text" name="startdate" id="startdate" class="form-control input-sm datefield readonly width100" value="<?php echo $request->startdate; ?>" placeholder="From:" /></li>
                     <li><input name="enddate" id="enddate" type="text" class="form-control input-sm datefield readonly width100" placeholder="To:" value="<?php echo $request->enddate; ?>" /></li>
-                    <li><button type="submit" class="btn btn-default btn-sm" style=""><i class="glyphicon glyphicon-filter"></i> Filter</button></li>
+                    <li><button type="submit" class="btn btn-default btn-sm blockanchor"><i class="glyphicon glyphicon-filter"></i> Filter</button></li>
                	</ul>
             </div>
             <div class="col-md-3 padding0">
-            	<div class="col-md-12 padding0"><input name="searchterm" id="searchterm" class="form-control form-search" value="<?php echo $request->searchterm; ?>" type="text" placeholder="Search <?php echo $listitems; ?>..." /><span class="glyphicon glyphicon-search glyphicon-list-search"></span></div>
+            	<div class="col-md-12 padding0"><input name="searchterm" id="searchterm" class="form-control form-search" value="<?php echo $request->searchterm; ?>" type="text" placeholder="Search..." /><button type="submit" class="btn btn-default blockanchor searchbtn"><i class="glyphicon glyphicon-search"></i></button></div>
             	<input type="hidden" name="letter" id="letter" value="<?php echo $request->getParam('letter'); ?>" />
                 <?php if($allowclear){ ?>
-                    <a href="<?php echo $listurl; ?>" title="Clear Search and Filters" id="" class="reset removeline close button btn">&times;</a>
+                    <a href="<?php echo $listurl; ?>" title="Clear Search and Filters" class="reset close button btn resetlink blockanchor">&times;</a>
                 <?php } ?>
             </div>
         </div>
@@ -216,8 +216,7 @@
 						$addressline1 = $line['addressline2'];
 						
 						$hasprofileimage = false;
-						$real_path = APPLICATION_PATH.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR."client_";
-						$real_path = $real_path.$id.DIRECTORY_SEPARATOR."avatar".DIRECTORY_SEPARATOR."medium_".$line['profilephoto'];
+						$real_path = BASE_PATH.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."clients".DIRECTORY_SEPARATOR."client_".$id.DIRECTORY_SEPARATOR."avatar".DIRECTORY_SEPARATOR."medium_".$line['profilephoto'];
 						if(file_exists($real_path) && !isEmptyString($line['profilephoto'])){
 							$hasprofileimage = true;
 						}
@@ -256,16 +255,16 @@
                                 <div class="peopleinfo">
                                     <h4><a href="<?php echo $viewurl; ?>"><?php echo $line['client']; ?></a></h4>
                                     <div class="row-fluid margin0">
-                                    	<div class="col-md-6 padding0">
+                                    	<div class="col-md-7 padding0">
                                         	<ul>
                                                 <li><span class="bolded">SSN:</span> <?php echo $line['ssn']; ?></li>
-                                                <li><span class="bolded">Funder:</span> <?php echo isArrayKeyAnEmptyString($line['funderid'], $funders) ? '--' : $funders[$line['funderid']]; ?></li>
-                                                <li><span class="bolded">Program:</span> <?php echo isArrayKeyAnEmptyString($line['programid'], $programs) ? '--' : $programs[$line['programid']]; ?></li>                                                
+                                                <li><span class="bolded">Program:</span> <?php echo isArrayKeyAnEmptyString($line['programid'], $programs) ? '--' : $programs[$line['programid']]; ?></li> 
+                                                <li><span class="bolded">Funder:</span> <?php echo isArrayKeyAnEmptyString($line['funderid'], $funders) ? '--' : snippet($funders[$line['funderid']], 50, '...'); ?></li>
                                                 <li><span class="bolded">Coach:</span> <?php echo $coachlink; ?></li>
                                                 <li><span class="bolded">Start Date:</span> <?php echo formatDateAndTime($line['startdate'], false); ?></li>
                                             </ul>
                                         </div>
-                                        <div class="col-md-6 padding0">
+                                        <div class="col-md-5 padding0">
                                             <ul>
                                             	<li><span class="bolded">Contact</span></li>
                                                 <li><?php echo $line['cell']; ?></li>

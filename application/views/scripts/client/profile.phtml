@@ -9,6 +9,7 @@
 	$maritalstatuses = getAllMaritalStatuses();
 	$educationlevels = getEducationLevels();
 	$races = getAllRaces();
+	$languages = getAllLanguages();
 	$programs = getPrograms();
 	$funders = getFunders();
 	$services = getServiceTypes();
@@ -23,6 +24,17 @@
 	$ratetypes = getRateTypes();
 	$incomesources = getAllIncomeSources();
 	$rships = getAllRelationshipOptions();
+	$therapytreatments = getAllTherapyTreatments();
+	
+	$dob = $client->getDateofBirth();
+	$birthday = ''; $birthmonth = ''; $birthyear = ''; $dateofbirth = '';
+	if(!isEmptyString($dob)){
+		$dateofbirth = date('M d, Y', strtotime($dob)); 
+		$birthday = date('d', strtotime($dob)); 
+		$birthmonth = date('m', strtotime($dob)); 
+		$birthyear = date('Y', strtotime($dob)); 
+	}
+	// debugMessage($birthday.' - '.$birthmonth.' - '.$birthyear.' - '.$dateofbirth);
 ?>
 <script>
 $(document).ready(function() {
@@ -43,6 +55,16 @@ $(document).ready(function() {
 		<?php require APPLICATION_PATH."/views/scripts/client/validation.phtml"; ?>
 	});
 	
+	$.validator.addMethod("validbirth", function(value, element, params) { 
+		var day = $("#birthday").val();
+		var month = $("#birthmonth").val();
+		var year = value;
+		if (!isEmptyString(day) && !isEmptyString(month) && !isEmptyString(year)) {
+			return true; 
+		}
+		return false;        
+	}, "Please select full Date of Birth");
+		
 	// maintain settings disable and readonly settings for dateofbirth, state, dateapproved
 	$(".datefield, #state").attr('readonly', true);
 	$(".chosen-container.chosen-container-single").css({'width':'100%'});
@@ -191,7 +213,6 @@ $(document).ready(function() {
                     <div class="divider5"></div>
                     
                     <div class="panel-group" id="inneraccordion">
-                    	
                         <div class="panel panel-default" id="assess1">
                             <div class="panel-heading">
                                 <h4 class="panel-title"><a class="accordion-toggle dark" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col1"> Resume and Attachments</a> </h4>
@@ -266,7 +287,6 @@ $(document).ready(function() {
                                 </div>
                            	</div>
                       	</div>
-                        
                         <div class="panel panel-default" id="assess8">
                             <div class="panel-heading">
                                 <h4 class="panel-title"><a class="accordion-toggle dark collapsed" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col8"> Legal Information</a> </h4>
@@ -287,6 +307,7 @@ $(document).ready(function() {
                                 </div>
                            	</div>
                       	</div>
+                        
                         <div class="panel panel-default" id="assess10">
                             <div class="panel-heading">
                                 <h4 class="panel-title"><a class="accordion-toggle dark collapsed" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col10"> Cultural and Social Information</a> </h4>

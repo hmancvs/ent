@@ -3,11 +3,55 @@
 $(document).ready(function() {
 	// custom date picker options
 	var dateofbirthOpts = datepickerOpts;
-	var startfrom = '<?php echo date('Y'); ?>';
-	dateofbirthOpts.yearRange = "-<?php echo date('Y')-1900; ?>:-0"; 
-	dateofbirthOpts.minDate = "-<?php echo date('Y'); ?>Y";
-	datepickerOpts.maxDate = new Date("Dec 31, "+startfrom);	
+	dateofbirthOpts.yearRange = "-<?php echo date('Y')-1800; ?>:-0"; 
+	dateofbirthOpts.minDate = "-<?php echo '1800'; ?>Y";
+	datepickerOpts.maxDate = new Date("Dec 31, <?php echo date('Y'); ?>");
 	$("#dateofbirth").datepicker(dateofbirthOpts);
+	
+	$(".birth").change(function(){
+		var day = $("#birthday").val();
+		var month = trim($("#birthmonth option:selected").text());
+		var year = $("#birthyear").val();
+		var thedate = '';
+		if(!isEmptyString(day) && !isEmptyString(month) && !isEmptyString(year)){
+			thedate = month+' '+day+', '+year; // alert(thedate);
+			$("#dateofbirth").val(thedate).change();
+		}
+	});
+	
+	$("#dateofbirth").change(function(){
+		var birth = $(this).val(); // alert(birth);				
+		var birthobj = new Date(birth); //alert(birthobj.getFullYear());		
+		var now = new Date(); // alert(now.getFullYear());
+		var yeardiff = now.getFullYear() - birthobj.getFullYear();
+		// alert(yeardiff);
+		if(isEmptyString(yeardiff) || isNaN(yeardiff)){
+			$("#agediff").html('--');
+		} else {
+			$("#agediff").html(yeardiff);
+		}
+	});
+	
+	<?php if($request->getActionName() == 'view' && $step == 'view'){ ?>
+		$("#agediff").html('<?php echo $client->getAge(); ?>');		
+	<?php } ?>
+	
+	$("#dateofbirth").change();
+	$("#datecontainer img.ui-datepicker-trigger").hide();
+	
+	$.validator.addMethod("validbirth", function(value, element, params) { 
+		var day = $("#birthday").val();
+		var month = $("#birthmonth").val();
+		var year = value;
+		if (
+			(!isEmptyString(year) && (isEmptyString(day) || !isEmptyString(month))) ||
+			(!isEmptyString(day) && (isEmptyString(year) || !isEmptyString(month))) ||
+			(!isEmptyString(month) && (isEmptyString(year) || !isEmptyString(day)))  
+		) {
+			return false; 
+		}
+		return true;        
+	}, "Please select full Date of Birth");
 	
 	$.validator.addMethod("phonecount_validate", function(value, element) {	
 		k=0;
@@ -23,8 +67,26 @@ $(document).ready(function() {
 		return false;
 	}, "<?php echo $this->translate("client_phone_count_error"); ?>");
 	
+	// show message for invalid emails but allow user to save the form
+	$(".reminderfield").change(function(){
+		var fieldid = $(this).attr('id');
+		var value = $(this).val();
+		if(!isEmptyString(value) && !isValidEmailAddress(value)){
+			$('#'+fieldid+'_error').html('<div class="divider5"></div><div class="alert alert-danger" style="margin-bottom:0;">Please enter a valid email</div>');
+		} else {
+			$('#'+fieldid+'_error').html('');
+		}
+	});
+	$(".reminderfield").change();
+	
 });
 </script>
+<style>
+.birth {
+	padding-left:2px;
+	font-size:10px;
+}
+</style>
 <fieldset class="fieldsetcontainer">
     <legend>About</legend>
     <div class="panel-body well-sm">
@@ -37,6 +99,16 @@ $(document).ready(function() {
                     <div class="edit">
                         <input type="text" class="form-control input-sm" id="firstname" name="firstname" value="<?php echo $client->getFirstName(); ?>" />
                         <div id="firstname_error"></div>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label"><?php echo $this->translate("client_initial_label"); ?>: </label>
+                <div class="col-md-8">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getInitial(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
+                    <div class="edit"><input type="text" class="form-control input-sm width75" id="initial" name="initial" value="<?php echo $client->getInitial(); ?>" />
                     </div>
                     <?php } ?>
                 </div>
@@ -65,16 +137,6 @@ $(document).ready(function() {
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-4 control-label"><?php echo $this->translate("client_initial_label"); ?>: </label>
-                <div class="col-md-8">
-                    <p class="form-control-static nullifempty view"><?php echo $client->getInitial(); ?></p>
-                    <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
-                    <div class="edit"><input type="text" class="form-control input-sm width75" id="initial" name="initial" value="<?php echo $client->getInitial(); ?>" />
-                    </div>
-                    <?php } ?>
-                </div>
-            </div>
-            <div class="form-group">
                 <label class="col-md-4 control-label"><?php echo $this->translate("client_nickname_label"); ?>:</label>
                 <div class="col-md-8">
                     <p class="form-control-static nullifempty view"><?php echo $client->getnickname(); ?></p>
@@ -85,21 +147,22 @@ $(document).ready(function() {
                     <?php } ?>
                 </div>
             </div>
-        </div>
-        <div class="col-md-6">
             <div class="form-group">
                 <label class="col-md-4 control-label"><?php echo $this->translate("client_gender_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                <div class="col-md-8">
+                <div class="col-md-8" style="padding-right:0;">
                     <p class="form-control-static nullifempty view"><?php echo $client->getGenderText(); ?></p>
                     <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
-                    <div class="edit">
+                    <div class="edit" style="font-size:10px;">
                       <label class="radio-inline"><input type="radio" name="gender" id="male" value="1" class="xform-control <?php echo $client->getGender() == '1'? 1 : 0; ?>"> Male</label>
                       <label class="radio-inline"><input type="radio" name="gender" id="female" value="2" class="xform-control <?php echo $client->getGender() == '2'? 1 : 0; ?>"> Female</label>
+                      <label class="radio-inline"><input type="radio" name="gender" id="transgender" value="3" class="xform-control <?php echo $client->getGender() == '3'? 1 : 0; ?>"> Transgender</label>
                       <div id="gender_error"></div>
                     </div>
                     <?php } ?>
                 </div>
             </div>
+        </div>
+        <div class="col-md-6">
             <div class="form-group">
                 <label class="col-md-4 control-label"><?php echo $this->translate("client_ssn_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                 <div class="col-md-8">
@@ -114,38 +177,99 @@ $(document).ready(function() {
             </div>
             <div class="form-group">
                 <label class="col-md-4 control-label"><?php echo $this->translate("client_dob_label"); ?>:</label>
-                <div class="col-md-8">
-                    <p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($client->getDateofBirth()); ?></p>
+                <div class="col-md-8" style="padding-right:0;">
+                	<?php 
+						$yeardiff = '';
+						if(!isEmptyString($client->getDateofBirth())){
+							$now = date('Y');
+							$birthyr = date('Y', strtotime($client->getDateofBirth()));
+							$yeardiff = intval($now) - intval($birthyr);
+						}
+						$datestyle = 'width:65px; display:inline; font-size:10px; padding-left:2px;';
+						if(isEmptyString($client->getID())){
+							$datestyle = 'width:85px; display:inline; font-size:12px; padding-left:4px;';
+						}
+						
+					?>
+                    <p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($client->getDateofBirth()); ?><!-- <b style="margin-left:20px;">Age:</b> &nbsp;<span id="phpyeardiff" class="lineblocked"><?php //echo $yeardiff; ?></span>--></p>
                     <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
-                    <div class="edit"><div class="divider5"></div>
-                        <input type="text" class="form-control input-sm datefield readonly width100" name="dateofbirth" id="dateofbirth" value="<?php echo changeMySQLDateToPageFormat($client->getDateofBirth()); ?>" />
-                    </div>
+                        <div class="edit" id="datecontainer"><div class="divider5"></div>
+                            <?php
+								$daydp = new Zend_Form_Element_Select('birthday',
+													array(
+														'multiOptions' => array_merge_maintain_keys(array('' => 'Day'), getMonthDays()),	
+														'view' => new Zend_View(),
+														'decorators' => array('ViewHelper'),
+														'class' => array('birth form-control input-sm'),
+														'style' => $datestyle		
+													)
+												);
+								$daydp->setValue($birthday); 
+								echo $daydp->render(); 
+							?> 
+							<?php
+								$monthdp = new Zend_Form_Element_Select('birthmonth',
+													array(
+														'multiOptions' => array_merge_maintain_keys(array('' => 'Month'), getAllMonthsAsShortNames()),	
+														'view' => new Zend_View(),
+														'decorators' => array('ViewHelper'),
+														'class' => array('birth form-control input-sm'),
+														'style' => $datestyle		
+													)
+												);
+								$monthdp->setValue($birthmonth); 
+								echo $monthdp->render(); 
+							?> 
+							<?php
+								$years = getSubscribeBirthYears();
+								$yeardp = new Zend_Form_Element_Select('birthyear',
+													array(
+														'multiOptions' => array_merge_maintain_keys(array('' => 'Year'), $years),	
+														'view' => new Zend_View(),
+														'decorators' => array('ViewHelper'),
+														'class' => array('birth'),
+														'class' => array('birth form-control input-sm'),
+														'style' => $datestyle		
+													)
+												);
+								$yeardp->setValue($birthyear); 
+								echo $yeardp->render(); 
+							?>
+                            <input type="hidden" class="form-control input-sm xdatefield readonly width100" name="dateofbirth" id="dateofbirth" value="<?php echo changeMySQLDateToPageFormat($client->getDateofBirth()); ?>" />
+                            <div id="birthyear_error"></div>
+                        </div>
                     <?php } ?>                                                           
                 </div>
-            </div>                                                    
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label">Age:</label>       
+                <div class="col-md-8" style="padding-left:8px;">&nbsp; 
+                    <span id="agediff" class="lineblocked">--</span>
+                </div>
+            </div>                                 
             <div class="form-group">
                 <label class="col-md-4 control-label"><?php echo $this->translate("client_maritalstatus_label"); ?>:</label>
                 <div class="col-md-8">
                     <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getMaritalStatus(), $maritalstatuses) ? '': $maritalstatuses[$client->getMaritalStatus()]; ?></p>
                     <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
-                    <div class="edit">
-                        <?php
-                            $dropdown = new Zend_Form_Element_Select('maritalstatus',
-                                                array(
-                                                    'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $maritalstatuses, array('0'=>$this->translate("global_addvariable_label"))),
-                                                    'view' => new Zend_View(),
-                                                    'decorators' => array('ViewHelper'),
-                                                    'class' => array('form-control','input-sm','configvariable'),
-													'lookupid' => 11,
-													'fieldid' => 'maritalstatus',
-													'fieldlabel' => $this->translate("client_maritalstatus_label")
-                                                )
-                            );  
-                            $dropdown->setValue($client->getMaritalStatus()); 
-                            echo $dropdown->render();
-                        ?>
-                        <input type="hidden" class="form-control" name="maritalstatus_old" id="maritalstatus_old" value="<?php echo $client->getMaritalStatus(); ?>" />
-                    </div>
+                        <div class="edit">
+                            <?php
+                                $dropdown = new Zend_Form_Element_Select('maritalstatus',
+                                                    array(
+                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $maritalstatuses, array('0'=>$this->translate("global_addvariable_label"))),
+                                                        'view' => new Zend_View(),
+                                                        'decorators' => array('ViewHelper'),
+                                                        'class' => array('form-control','input-sm','configvariable'),
+                                                        'lookupid' => 11,
+                                                        'fieldid' => 'maritalstatus',
+                                                        'fieldlabel' => $this->translate("client_maritalstatus_label")
+                                                    )
+                                );  
+                                $dropdown->setValue($client->getMaritalStatus()); 
+                                echo $dropdown->render();
+                            ?>
+                            <input type="hidden" class="form-control" name="maritalstatus_old" id="maritalstatus_old" value="<?php echo $client->getMaritalStatus(); ?>" />
+                        </div>
                     <?php } ?>
                 </div>
             </div>
@@ -171,8 +295,34 @@ $(document).ready(function() {
                             echo $dropdown->render();
                         ?>
                         <input type="hidden" class="form-control" name="race_old" id="race_old" value="<?php echo $client->getRace(); ?>" />
-                    </div>
                     <?php } ?>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label"><?php echo $this->translate("client_language_label"); ?>:</label>
+                <div class="col-md-8">
+                    <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getLanguage(), $languages) ? '': $languages[$client->getLanguage()]; ?></p>
+                    <div class="edit">
+						<?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
+                            <?php
+                                $dropdown = new Zend_Form_Element_Select('language',
+                                                    array(
+                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $languages, array('0'=>$this->translate("global_addvariable_label"))),
+                                                        'view' => new Zend_View(),
+                                                        'decorators' => array('ViewHelper'),
+                                                        'class' => array('form-control','input-sm','configvariable'),
+                                                        'lookupid' => 47,
+                                                        'fieldid' => 'language',
+                                                        'fieldlabel' => $this->translate("client_language_label")
+                                                    )
+                                );  
+                                $dropdown->setValue($client->getLanguage()); 
+                                echo $dropdown->render();
+                            ?>
+                            <input type="hidden" class="form-control" name="language_old" id="languagee_old" value="<?php echo $client->getLanguage(); ?>" />
+                        <?php } ?>
+                    </div>
                 </div>
             </div>
         </div>
@@ -187,6 +337,41 @@ $(document).ready(function() {
                 <div class="col-md-12">
                     <div id="xxx"></div>
                     <input type="text" class="form-control" name="xxx" id="xxx" value="" style="border:none; border:#fff hidden; height:2px; box-shadow:none;" />
+                    <div class="form-group">
+                        <label class="col-md-4 control-label"><?php echo $this->translate("global_addressline1_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                        <div class="col-md-8">
+                            <p class="form-control-static nullifempty view"><?php echo $client->getAddressline1(); ?></p>
+                            <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
+                            <div class="edit">
+                                <input type="text" class="form-control input-sm" id="addressline1" name="addressline1" value="<?php echo $client->getAddressline1(); ?>" />
+                                <div id="addressline1_error"></div>
+                            </div>
+                            <?php } ?>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label"><?php echo $this->translate("global_addressline2_label"); ?>:</label>
+                        <div class="col-md-8">
+                            <p class="form-control-static nullifempty view"><?php echo $client->getAddressline2(); ?></p>
+                            <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
+                            <div class="edit">
+                                <input type="text" class="form-control input-sm" id="addressline2" name="addressline2" value="<?php echo $client->getAddressline2(); ?>" />
+                            </div>
+                            <?php } ?>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label"><?php echo $this->translate("global_city_label"); ?>/<?php echo $this->translate("global_town_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                        <div class="col-md-8">
+                            <p class="form-control-static nullifempty view"><?php echo $client->getCity(); ?></p>
+                            <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
+                            <div class="edit">
+                                <input type="text" class="form-control input-sm" id="city" name="city" value="<?php echo $client->getCity(); ?>" />
+                                <div id="city_error"></div>
+                            </div>
+                            <?php } ?>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label"><?php echo $this->translate("global_state_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                         <div class="col-md-8">
@@ -207,6 +392,18 @@ $(document).ready(function() {
                                 ?>
                                 <div id="state_error"></div>
                                 <!--<input type="hidden" class="form-control" name="state" id="state" value="<?php //echo $client->getState(); ?>" />-->
+                            </div>
+                            <?php } ?>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label"><?php echo $this->translate("global_zipcode_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                        <div class="col-md-8">
+                            <p class="form-control-static nullifempty view"><?php echo $client->getZipCode(); ?></p>
+                            <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
+                            <div class="edit">
+                                <input type="text" class="form-control input-sm width100" id="zipcode" name="zipcode" value="<?php echo $client->getZipCode(); ?>" />
+                                <div id="zipcode_error"></div>
                             </div>
                             <?php } ?>
                         </div>
@@ -237,51 +434,8 @@ $(document).ready(function() {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("global_city_label"); ?>/<?php echo $this->translate("global_town_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                        <div class="col-md-8">
-                            <p class="form-control-static nullifempty view"><?php echo $client->getCity(); ?></p>
-                            <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
-                            <div class="edit">
-                                <input type="text" class="form-control input-sm" id="city" name="city" value="<?php echo $client->getCity(); ?>" />
-                                <div id="city_error"></div>
-                            </div>
-                            <?php } ?>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("global_zipcode_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                        <div class="col-md-8">
-                            <p class="form-control-static nullifempty view"><?php echo $client->getZipCode(); ?></p>
-                            <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
-                            <div class="edit">
-                                <input type="text" class="form-control input-sm width100" id="zipcode" name="zipcode" value="<?php echo $client->getZipCode(); ?>" />
-                                <div id="zipcode_error"></div>
-                            </div>
-                            <?php } ?>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("global_addressline1_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                        <div class="col-md-8">
-                            <p class="form-control-static nullifempty view"><?php echo $client->getAddressline1(); ?></p>
-                            <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
-                            <div class="edit">
-                                <input type="text" class="form-control input-sm" id="addressline1" name="addressline1" value="<?php echo $client->getAddressline1(); ?>" />
-                                <div id="addressline1_error"></div>
-                            </div>
-                            <?php } ?>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("global_addressline2_label"); ?>:</label>
-                        <div class="col-md-8">
-                            <p class="form-control-static nullifempty view"><?php echo $client->getAddressline2(); ?></p>
-                            <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
-                            <div class="edit">
-                                <input type="text" class="form-control input-sm" id="addressline2" name="addressline2" value="<?php echo $client->getAddressline2(); ?>" />
-                            </div>
-                            <?php } ?>
-                        </div>
+                        <label class="col-md-4 control-label">&nbsp;</label>
+                        <div class="col-md-8" style="height:42px;">&nbsp;</div>
                     </div>
                 </div>
             </div>
@@ -344,7 +498,7 @@ $(document).ready(function() {
                             <p class="form-control-static nullifempty view"><?php echo $client->getEmail(); ?></p> 
                             <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                             <div class="edit">
-                                <input type="text" class="form-control input-sm isvalidemail" id="email" name="email" value="<?php echo $client->getEmail(); ?>" />
+                                <input type="text" class="form-control input-sm reminderfield" id="email" name="email" value="<?php echo $client->getEmail(); ?>" />
                                 <div id="email_error"></div>
                             </div>
                             <?php } ?>
@@ -356,8 +510,20 @@ $(document).ready(function() {
                             <p class="form-control-static nullifempty view"><?php echo $client->getEmail2(); ?></p> 
                             <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                             <div class="edit">
-                                <input type="text" class="form-control input-sm isvalidemail" id="email2" name="email2" value="<?php echo $client->getEmail2(); ?>" />
+                                <input type="text" class="form-control input-sm reminderfield" id="email2" name="email2" value="<?php echo $client->getEmail2(); ?>" />
                                 <div id="email2_error"></div>
+                            </div>
+                            <?php } ?>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label"><?php echo $this->translate("client_emailpassword_label"); ?>:</label>
+                        <div class="col-md-8">
+                            <p class="form-control-static nullifempty view"><?php echo $client->getEmailPassword(); ?></p> 
+                            <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
+                            <div class="edit">
+                                <input type="text" class="form-control input-sm" id="emailpassword" name="emailpassword" value="<?php echo $client->getEmailPassword(); ?>" />
+                                <div id="emailpassword_error"></div>
                             </div>
                             <?php } ?>
                         </div>
@@ -367,3 +533,89 @@ $(document).ready(function() {
         </fieldset>
     </div>
 </div>
+<div class="divider10"></div>
+<fieldset class="fieldsetcontainer">
+    <legend>Income Sources</legend>
+    <div class="panel-body well-sm">
+        <div class="col-md-12">
+            <div class="form-group">
+            	<?php if(isEmptyString($client->getID())){ ?>
+	            	<label class="col-md-4 control-label">Current Income Sources:</label>
+                <?php } ?>
+            	<div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo count($client->getIncomeSourcesArray())  == 0 ? '': $client->getListofIncomeSources(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
+                        <div class="edit">
+                            <div id="container_incomesourcesids">
+                                <?php 
+                                    $existing_values = $client->getIncomeSourcesArray();
+                                    foreach($incomesources as $key => $value){
+                                ?>
+                                    <label class="checkbox notbolded col-md-3">
+                                      <input type="checkbox" id="incomesources_<?php echo $key; ?>" name="incomesourcesids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked' : ''; ?>><?php echo $value; ?>
+                                    </label>
+                                <?php } ?>
+                             </div>
+                            <div class="divider5"></div>
+                            <a class="gonowhere checkothertrigger" fieldid="incomesourcesids" lookupid="26" fieldlabel="Client Employment Income Sources" fieldtype="checkbox" checkclasses="checkbox notbolded col-md-3" checkname="incomesourcesids[]" checkid="incomesources_"><?php echo $this->translate("global_addoption_label"); ?></a>
+                        </div>
+                    <?php } ?>
+                </div>
+            </div>
+     	</div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <div class="col-md-6 padding0">
+                    <label class="col-md-8 control-label"><?php echo $this->translate("client_totalmonthlyincome_label"); ?>:</label>
+                    <div class="col-md-4">
+                        <p class="form-control-static nullifempty view"><?php echo $client->gettotalmonthlyincome(); ?></p>
+                        <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
+                        <div class="edit">
+                            <input type="text" class="form-control input-sm" id="totalmonthlyincome" name="totalmonthlyincome" value="<?php echo $client->gettotalmonthlyincome(); ?>" />
+                        </div>
+                        <?php } ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="col-md-12 control-label"><?php echo $this->translate("client_reduceincomebenefit_label"); ?>:</label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getreduceincomebenefit() == 1 ? 'Yes' : 'No'; ?></p>
+                    <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
+                    <div class="edit">
+                        <label class="radio-inline">
+                          <input type="radio" id="reduceincomebenefit_1" name="reduceincomebenefit" class="disableoutsidesection" value="1" <?php echo $client->getreduceincomebenefit() == 1 ? 'checked' : ''; ?>>Yes
+                        </label>
+                        <label class="radio-inline">
+                          <input type="radio" id="reduceincomebenefit_0" name="reduceincomebenefit" class="disableoutsidesection" value="0" <?php echo $client->getreduceincomebenefit() == 0 ? 'checked' : ''; ?>>No
+                        </label>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="col-md-12 control-label"><?php echo $this->translate("client_providedwithbenefitinfo_label"); ?>:</label>
+                <div class="col-md-12">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getprovidedwithbenefitinfotext(); ?></p>
+                    <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
+                    <div class="edit">
+                        <label class="radio-inline">
+                          <input type="radio" id="providedwithbenefitinfo_1" name="providedwithbenefitinfo" class="disableoutsidesection" value="1" <?php echo $client->getprovidedwithbenefitinfo() == 1 ? 'checked' : ''; ?>>Yes
+                        </label>
+                        <label class="radio-inline">
+                          <input type="radio" id="providedwithbenefitinfo_0" name="providedwithbenefitinfo" class="disableoutsidesection" value="0" <?php echo $client->getprovidedwithbenefitinfo() == 0 ? 'checked' : ''; ?>>No
+                        </label>
+                        <label class="radio-inline">
+                          <input type="radio" id="providedwithbenefitinfo_2" name="providedwithbenefitinfo" class="disableoutsidesection" value="2" <?php echo $client->getprovidedwithbenefitinfo() == 2 ? 'checked' : ''; ?>>Consumer declined offer of information
+                        </label>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+  	</div>
+</fieldset>

@@ -96,8 +96,8 @@ class IndexController extends Zend_Controller_Action  {
     	// populate the object with data from the post and validate the object
     	// to ensure that its wellformed 
     	$new_object->processPost($this->_getAllParams());
-		debugMessage($new_object->toArray());
-		debugMessage('errors are '.$new_object->getErrorStackAsString());
+		/* debugMessage($new_object->toArray());
+		debugMessage('errors are '.$new_object->getErrorStackAsString()); */
 		// exit();
     	if ($new_object->hasError()) {
     		// there were errors - add them to the session

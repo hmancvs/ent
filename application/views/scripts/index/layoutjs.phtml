@@ -62,7 +62,7 @@ $(document).ready(function() {
     });
 	
 	// show block ui when transfering to another page
-	$('a.blockanchor').click(function(){
+	$('a.blockanchor, .blockanchor').click(function(){
 		$.blockUI({ message: uiblockcontent}); 
         return true;
     });
@@ -704,6 +704,108 @@ $(document).ready(function() {
 	$(".computeamount").trigger("keyup");
 	
 	// dynamically add new configurable values to dropdowns
+	$(".configfunder").change(function(){
+		var fieldid = $(this).attr('fieldid');
+		var value = $("#"+fieldid).val(); 
+		var lookupid = $("#"+fieldid).attr('lookupid'); // alert(fieldid+'-'+value+'-'+lookupid);
+		
+		var fieldlabel = $("#"+fieldid).attr('fieldlabel'); // alert(fieldlabel);
+		var hasalias = $("#"+fieldid).attr('hasalias');
+		if(hasalias == '1'){
+			var hasalias = '1';
+		} else {
+			var hasalias = '0';
+		}
+		var doubleappendid = $("#"+fieldid).attr('doubleappendid');
+		var appendclass = $("#"+fieldid).attr('appendclass');
+		if(isEmptyString(doubleappendid) || doubleappendid == 'undefined'){
+			doubleappendid = '';
+		}
+		if(isEmptyString(appendclass) || appendclass == 'undefined'){
+			appendclass = '';
+		}
+		
+		if(!isEmptyString(value) && value == '0'){
+			var title = fieldlabel+' - New Value';
+			var href = '<?php echo $this->baseUrl('config/add/pgc/true/hasalias/'); ?>'+hasalias+'/lookupid/'+lookupid+'/fieldid/'+fieldid+'/doubleappendid/'+doubleappendid+'/appendclass/'+appendclass;
+			var formid = 'configform';
+			var posturl = '<?php echo $this->baseUrl("config/processvariables"); ?>';
+			var submittext = 'Save'; 
+			
+			// popup title
+			$(".modal-title").html(title);
+			// load content
+			$("#dialogcontent").html($("#dialogbody #loading").html());
+			$("#dialogcontent").load(href);  	
+			// then show it after the changes have been made
+			$('#dialog').modal('toggle');
+			$(".modelcancel").show();
+			$("#save").show();
+			
+			// check for default submit button text
+			if(!isEmptyString(submittext)){
+				$("#new #save").html('<i class="icon-ok icon-white"></i> '+submittext);
+			}
+			
+			// save dialog
+			$('#dialog #save').on('click', function(e){
+				var fieldid = $(".popupwindow #fieldid").val();
+				var lookupid = $(".popupwindow #lookupid").val(); 
+				var formid = 'configform';
+				// $('#dialog').modal('hide');	
+				if($(".popupwindow #"+formid).valid() == true) {
+					// alert('>'+fieldid+'>'+doubleappendid+'>'+lookupid+'>'+hasalias);
+					// disable buttons
+					$(".modelcancel").hide();
+					$('#dialog #save').hide();
+					// post form
+					$.post(  
+						posturl,  
+						$("#"+formid).serialize(),  
+						function(data){
+							// alert(data); return false;
+							data = jQuery.parseJSON(data);
+							var labelname = data.name;
+							if(hasalias == '1'){
+								var labelname = data.name;
+							}
+							var newselectoption = '<option label="'+labelname+'" value="'+data.id+'" selected="selected">'+labelname+'</option>';
+							// append the option to the defined fieldid
+							
+							$("#"+fieldid).append(newselectoption);
+							// also append the option to another select if specified
+							if(!isEmptyString(doubleappendid) && doubleappendid != 'undefined'){
+								var altselectoption = '<option label="'+labelname+'" value="'+data.id+'">'+labelname+'</option>';
+								$("#"+doubleappendid).append(altselectoption);
+							}
+							if(!isEmptyString(appendclass) && appendclass != 'undefined'){
+								var altselectoption = '<option label="'+labelname+'" value="'+data.id+'">'+labelname+'</option>';
+								$("."+appendclass).append(altselectoption);
+							}
+							
+							$("#dialog").modal('hide');
+							enableContainerByID('form-profile');
+						}  
+					); // close the $.post					
+					$("#dialogcontent").html($("#dialogbody #loading").html());
+				}
+			});
+			
+			// cancel model
+			$(".modelcancel, .close").on('click', function(e){
+				$("#dialog").modal('hide');
+				enableContainerByID('indexform');
+				$("#"+fieldid).val('');
+			});		
+			$('#dialog').on('hidden', function () {
+				enableContainerByID('indexform');
+				// $("#"+fieldid).val('');
+			});
+			return false;
+		}
+	});
+	
+	// dynamically add new configurable values to dropdowns
 	$(".configvariable").change(function(){
 		var fieldid = $(this).attr('fieldid');
 		var value = $("#"+fieldid).val(); 
@@ -765,7 +867,6 @@ $(document).ready(function() {
 						posturl,  
 						$("#"+formid).serialize(),  
 						function(data){
-							
 							// alert(data); return false;
 							data = jQuery.parseJSON(data);
 							var labelname = data.name;
@@ -884,13 +985,105 @@ $(document).ready(function() {
 		return false;
 	});
 	
+	$(function(){
+		$(".search").keyup(function(e){
+			var keyCode = e.keyCode || e.which; //alert('code '+keyCode);
+			if(keyCode !== 38 && keyCode !== 40 && keyCode !== 13){
+				var inputSearch = $(this).val();
+				// var dataString = 'searchword='+ inputSearch;
+				var searchurl = '<?php echo $this->baseUrl('search/index'); ?>/searchword/'+inputSearch;
+				if(!isEmptyString(inputSearch) && inputSearch.length > 2){
+					$.ajax({
+						type: "POST",
+						url: searchurl,
+						cache: false,
+						success: function(data) {
+							// alert(data);
+							$("#divResult").html(data).show().css({'display':'block','padding':'0'});
+							$('li.display_box:first').addClass('selected');
+							
+							$("li.display_box").on("mouseover mouseout", function(e) {
+							  if(e.type == "mouseover") {
+								$(this).addClass("selected");
+							  } else {
+								$(this).removeClass("selected");
+							  }
+							});
+						}
+					});
+				}
+				var imageurl = '<?php echo $this->baseUrl('images/loader.gif'); ?>';
+				if(!isEmptyString(inputSearch)){
+					$("#divResult").html("<a id='loading' class='xhidden' style='text-align:center; display:block;'><img style='width:22px;' src='<?php echo $this->baseUrl('images/loader.gif'); ?>' /></a>").css({'display':'block','padding':'10px 0'});
+				} else {
+					$("#divResult").html("");
+				}
+				
+			} else {
+				// if( $('li.display_box').length > 0) {
+				var li = $('li.display_box');
+				var liSelected = $("li.display_box").eq(0);
+				
+				if(keyCode === 40){
+					liSelected = $('li.display_box.selected');
+					liSelected.removeClass('selected');
+					var curentindex = parseInt(liSelected.index());					
+					next = li.eq(curentindex);					
+					if(next.length > 0){
+						liSelected = next.addClass('selected');
+					} else {
+						liSelected = $("li.display_box").eq(0).addClass('selected');
+					}
+				} 
+				if(keyCode === 38) {
+					liSelected = $('li.display_box.selected');
+					liSelected.removeClass('selected');
+					var curentindex = parseInt(liSelected.index());
+					next = li.eq(curentindex-1);
+					var lastindex = parseInt($("li.display_box").length);
+					// alert(lastindex);
+					if(next.length > 0){
+						liSelected = next.addClass('selected');
+					} else {
+						liSelected = li.last().addClass('selected');
+						// liSelected = $("li.display_box").eq(lastindex-1).addClass('selected');
+					}
+				}
+				if(keyCode === 13) {
+					var liSelected = $("li.display_box.selected");
+					if(liSelected){
+						var url = $("li.display_box.selected").attr('url'); // alert(url);
+						if(!isEmptyString(url)){
+							window.location.href = url;
+						}
+					}
+				}
+			}
+			return false;    
+		});
+		$("#divResult").on("click",function(e){ 
+			  var $clicked = $(e.target);
+			  var $name = $clicked.find('.name').html();
+			  var decoded = $("<div/>").html($name).text();
+			  $('#inputSearch').val(decoded);
+		});
+		$(document).on("click", function(e) { 
+			  var $clicked = $(e.target);
+			  if (!$clicked.hasClass("search")){
+			  	$("#divResult").fadeOut(); 
+			  }
+		});
+		$('#inputSearch').click(function(){
+			  $("#divResult").fadeIn();
+		});
+	});
 });
 
 //Use window.load and not document.ready for effective equal heights
 $(window).load(function() {
 	//Make columns equal
 	equalHeight($("#sidebar, #contentcontainer"));
-	
+	equalHeight($("#location, #contact"));
 });
 
 </script>

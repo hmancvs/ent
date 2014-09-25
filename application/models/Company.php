@@ -10,7 +10,7 @@ class Company extends BaseEntity {
 		$this->hasColumn('type', 'integer', null, array('notblank' => true));
 		$this->hasColumn('name', 'string', 500, array('notblank' => true));
 		$this->hasColumn('alias', 'string', 50);
-		$this->hasColumn('contactperson', 'string', 500, array('notblank' => true));
+		$this->hasColumn('contactperson', 'string', 500);
 		$this->hasColumn('email', 'string', 50);
 		$this->hasColumn('phone', 'string', 15);
 		$this->hasColumn('fax', 'string', 15);
@@ -49,7 +49,7 @@ class Company extends BaseEntity {
 		if(isArrayKeyAnEmptyString('defaultrate', $formvalues)){
 			unset($formvalues['defaultrate']);
 		}
-		debugMessage($formvalues); // exit(); 
+		// debugMessage($formvalues); // exit(); 
 		parent::processPost($formvalues);
 	}
 }

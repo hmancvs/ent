@@ -226,6 +226,32 @@
     </div>
     <div class="form-group">
         <div class="col-md-12">
+            <label class="col-md-12 control-label">Important Medical, Behavior or Special needs Information, which may relate to Employment:</label>
+            <div class="col-md-12">
+                <p class="form-control-static nullifempty view"><?php echo $client->getneedsassessment(); ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <textarea class="form-control expanding" id="needsassessment" name="needsassessment"><?php echo $client->getneedsassessment(); ?></textarea>
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-12">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_allergy_label'); ?>:</label>
+            <div class="col-md-12">
+                <p class="form-control-static nullifempty view"><?php echo $client->getallergies(); ?></p>
+                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                <div class="edit">
+                    <textarea class="form-control expanding" id="allergies" name="allergies"><?php echo $client->getallergies(); ?></textarea>
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-12">
             <label class="col-md-12 control-label"><?php echo $this->translate('client_jobaccomodations_label'); ?>:</label>
             <div class="col-md-12">
                 <p class="form-control-static nullifempty view"><?php echo $client->getrequiresmedicalaccomodation() == 1 ? 'Yes' : 'No'; ?></p>
@@ -297,31 +323,31 @@
         </div>
     </div>
     <div class="form-group">
-        <div class="col-md-6">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_therapy_label'); ?>:</label>
+        <div class="col-md-12">
+            <label class="col-md-12 control-label"><?php echo $this->translate('client_therapy_label'); ?>: 
+            <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+            <i class="pagedescription">(Check all that apply) </i></label>
+            <?php } ?>
             <div class="col-md-12">
-                <?php $therapytreatments = getAllTherapyTreatments();
-                ?>
-                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->gettherapytreatment(), $therapytreatments) ? '': $therapytreatments[$client->gettherapytreatment()]; ?></p>
-                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
-                <div class="edit">
-                    <?php
-                        $dropdown = new Zend_Form_Element_Select('therapytreatment',
-                                            array(
-                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $therapytreatments, array('0'=>$this->translate("global_addvariable_label"))),
-                                                'view' => new Zend_View(),
-                                                'decorators' => array('ViewHelper'),
-                                                'class' => array('form-control','input-sm','configvariable'),
-												'lookupid' => 32,
-												'fieldid' => 'therapytreatment',
-												'fieldlabel' => $this->translate("client_therapy_label")
-                                            )
-                        );  
-                        $dropdown->setValue($client->gettherapytreatment()); 
-                        echo $dropdown->render();
-                    ?><input type="hidden" name="therapytreatment_old" class="form-control" id="therapytreatment_old" value="<?php echo $client->gettherapytreatment(); ?>" />
-                </div>
+                <p class="form-control-static nullifempty view"><?php echo count($client->getTherapyTreatmentArray())  == 0 ? '': $client->getListofTherapyTreatment(); ?></p>
+				<?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
+                    <div class="edit">
+                        <div id="container_therapytreatmentids">
+                            <?php 
+                                $existing_values = $client->getTherapyTreatmentArray(); // debugMessage('>>'.$existing_values);
+                                foreach($therapytreatments as $key => $value){
+                            ?>
+                                <label class="checkbox notbolded col-md-3">
+                                  <input type="checkbox" id="therapytreatment_<?php echo $key; ?>" name="therapytreatmentids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked' : ''; ?>><?php echo $value; ?>
+                                </label>
+                            <?php } ?>
+                         </div>
+                        <div class="divider5"></div>
+                        <a class="gonowhere checkothertrigger" fieldid="therapytreatmentids" lookupid="32" fieldlabel="Therapy Administered" fieldtype="checkbox" checkclasses="checkbox notbolded col-md-3" checkname="therapytreatmentids[]" checkid="therapytreatment_"><?php echo $this->translate("global_addoption_label"); ?></a>
+                    </div>
                 <?php } ?>
+                    
+				
             </div>
         </div>
     </div>

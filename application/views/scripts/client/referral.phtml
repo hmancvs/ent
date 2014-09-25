@@ -38,8 +38,7 @@ $(document).ready(function() {
                                                     'class' => array('form-control','input-sm','configvariable'),
 													'lookupid' => 41,
 													'fieldid' => 'programid',
-													'fieldlabel' => $this->translate("client_program_label"),
-													'hasalias' => '1'
+													'fieldlabel' => $this->translate("client_program_label")
                                                 )
                             );  
                             $dropdown->setValue($client->getProgramID()); 
@@ -61,10 +60,14 @@ $(document).ready(function() {
                         <?php
                             $dropdown = new Zend_Form_Element_Select('funderid',
                                                 array(
-                                                    'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $funders),
+                                                    'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $funders, array('0'=>$this->translate("global_addvariable_label"))),
                                                     'view' => new Zend_View(),
                                                     'decorators' => array('ViewHelper'),
-                                                    'class' => array('form-control','input-sm',)
+                                                    'class' => array('form-control','input-sm','configfunder'),
+													'lookupid' => 43,
+													'fieldid' => 'funderid',
+													'fieldlabel' => $this->translate("client_funder_label"),
+													'hasalias' => '1'
                                                 )
                             );  
                             $dropdown->setValue($client->getFunderID()); 
@@ -177,7 +180,18 @@ $(document).ready(function() {
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-4 control-label"><?php echo $this->translate("client_authorizedby_label"); ?> <small class="blocked">(DVRS Counsellor):</small></label>
+                <label class="col-md-4 control-label"><?php echo $this->translate("client_dddref_label"); ?>:</label>
+                <div class="col-md-8">
+                    <p class="form-control-static nullifempty view"><?php echo $client->getDDDRef(); ?></p> 
+                    <?php if(($step == 'edit' && $section == 'referral' || $step == 'new')){ ?>
+                    <div class="edit">
+                        <input type="text" class="form-control input-sm width150" id="dddref" name="dddref" value="<?php echo $client->getDDDRef(); ?>" />
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label"><?php echo $this->translate("client_authorizedby_label"); ?> <small class="blocked">(Counsellor):</small></label>
                 <div class="col-md-8">
                     <p class="form-control-static nullifempty view"><?php echo $client->getDvrsCounselor(); ?></p> 
                     <?php if(($step == 'edit' && $section == 'referral' || $step == 'new')){ ?>

@@ -2,14 +2,15 @@
  	$baseview = $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/finance');
 	$baseview_pay = $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/finance/section/payment');
 	$baseview_inv = $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/finance/section/invoice');
-	require_once APPLICATION_PATH.'/../'.PUBLICFOLDER.'/mpdf/mpdf.php';
 	
 	$tabtitle = '';
 	if(isEmptyString($request->section)){
 		$request->setParam('section', 'invoice');
 		$section = 'invoice';
 	}
-	
+	$isinvoicelist = false; $isinvoice = true;
+	$ispaymentlist = false; $ispayment = false;
+	  
 	if($request->section == 'invoice'){
 		$tabtitle = 'Invoices';
 		$invoice = new Invoice();
@@ -17,6 +18,9 @@
 		if($step == 'view'){
 			$invoices = $client->getClientInvoices(); // debugMessage($invoices->toArray());
 			$invoice_count = $invoices->count();
+			if(isEmptyString($request->invid)){
+				$isinvoicelist = true;
+			}
 		}
 		if(!isEmptyString($request->invid)){
 			$invoice_count = '';
@@ -48,9 +52,13 @@
 		$tabtitle = 'Payments';
 		$payment = new Payment();
 		
+		$isinvoice = false; $ispayment = true;
 		if($step == 'view'){
 			$payments = $client->getClientPayments(); // debugMessage($invoices->toArray());
 			$payment_count = $payments->count();
+			if(isEmptyString($request->pid)){
+				$ispaymentlist = true;
+			}
 		}
 		if(!isEmptyString($request->pid)){
 			$payment_count = '';
@@ -121,7 +129,8 @@ $(document).ready(function() {
 }); 
 </script>
 
-<?php if($request->section == 'invoice'){ ?>	        
+<?php if($request->section == 'invoice'){ ?>	 
+<h4 class="hideonprint">Invoices</h4>       
 <form id="form-invoice" class="form-horizontal invoice" role="form" action="<?php echo $this->baseUrl("invoice/create"); ?>" method="post">
 	<div class="showonprint hidden">
         <div class="divider15"></div>
@@ -138,6 +147,11 @@ $(document).ready(function() {
         </span>
         <div class="divider15"></div>
     </div>
+	<?php if($section == 'invoice' && $step == 'view' && !isEmptyString($request->invid)){ ?>
+    	<!--<div class="makeabsolute hideonprint" style="right:12px; top:7px;">
+        	
+       	</div>-->
+    <?php } ?>
 	<div class="btn-group pull-right hideonprint" style="margin-top:-10px;">
         <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
             Invoice Actions <span class="caret"></span>
@@ -148,11 +162,11 @@ $(document).ready(function() {
                     <li><a href="<?php echo $baseview_inv.'/step/new'; ?>" title="New Invoice"><i class="glyphicon glyphicon-plus"></i> New Invoice</a></li>
                 <?php } ?>
                 <?php if($acl->checkPermission('Invoice', ACTION_EDIT) && !isEmptyString($request->invid)){ ?>	
-                	<li><a class="<?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'update_trigger'; ?>" message="This Account is closed and updates are disabled!" href="<?php echo $baseview_inv.'/step/edit/invid/'.encode($invoice->getID()); ?>" title="Update"><i class="glyphicon glyphicon-pencil"></i> Update Voucher</a></li>
+                	<li><a class="<?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'update_trigger'; ?>" message="This Account is closed and updates are disabled!" href="<?php echo $baseview_inv.'/step/edit/invid/'.encode($invoice->getID()); ?>" title="Update"><i class="glyphicon glyphicon-pencil"></i> Update Invoice</a></li>
                 <?php } ?>
-                <li><a title="Print" href="<?php echo rtrim($this->viewurl, "/").'/print/1'; ?>" target="_blank"><i class="glyphicon glyphicon-print"></i> Print Invoice</a></li>
-                <li><a title="Print to PDF" href="<?php echo rtrim($this->viewurl, "/").'/pdf/1/'; ?>" target="_blank"><i class="glyphicon glyphicon-list-alt"></i> Print to PDF</a></li>
             <?php } ?>
+            <li><a title="Print" href="<?php echo rtrim($this->viewurl, "/").'/print/1'; ?>" target="_blank"><i class="glyphicon glyphicon-print"></i> Print Invoice</a></li>
+        	<li><a title="Print to PDF" href="<?php echo rtrim($this->viewurl, "/").'/pdf/1/'; ?>" target="_blank"><i class="glyphicon glyphicon-list-alt"></i> PDF</a></li>
             <?php if($acl->checkPermission('Invoice', ACTION_DELETE) && !isEmptyString($request->invid)){ ?>
 				<?php 
                     $isdeletable = true;
@@ -164,10 +178,10 @@ $(document).ready(function() {
                 ?>
                 <li><a class="gonowhere <?php echo !$isdeletable ? 'alert-dialog' : 'confirm-dialog'; ?>" title="Delete" <?php echo $message; ?> action="<?php echo $this->baseUrl('client/delete/id/'.encode($invoice->getID())."/entityname/Invoice/successurl/".encode($baseview_inv)); ?>"><i class="glyphicon glyphicon-remove"></i> Delete Invoice</a></li>
             <?php } ?>
-            <?php if($acl->checkPermission('Invoice', ACTION_LIST)){ ?>
+            <?php if($acl->checkPermission('Invoice', ACTION_LIST) && ($ispayment || ($isinvoice && !$isinvoicelist))){ ?>
 	            <li><a href="<?php echo $baseview_inv.'/step/view'; ?>" title="Invoice History"><i class="glyphicon glyphicon-list"></i> Invoice History</a></li>
             <?php } ?>
-            <?php if($acl->checkPermission('Payment', ACTION_LIST)){ ?>
+            <?php if($acl->checkPermission('Payment', ACTION_LIST) && ($isinvoice || ($ispayment && !$ispaymentlist))){ ?>
 	            <li><a href="<?php echo $baseview_pay; ?>" title="Payment History"><i class="glyphicon glyphicon-list"></i> Payment History</a></li>
             <?php } ?>
         </ul>
@@ -182,13 +196,14 @@ $(document).ready(function() {
         <input type="hidden" id="nosuccessid" name="nosuccessid" value="1" />
     <?php } ?>
     <div class="panel-body padding0">
-    	<div class="divider10"></div>
 		<?php if($step == 'new'){ ?>
+        	<div class="divider10"></div>
             <h5 class="inline margin0 bolded">New Invoice</h5>
             <div class="separator"></div>
             <div class="divider10"></div>
         <?php } ?>
         <?php if($step == 'edit'){ ?>
+        	<div class="divider10"></div>
             <h5 class="inline margin0 bolded">Update Invoice</h5>
             <div class="separator"></div>
             <div class="divider10"></div>
@@ -206,11 +221,10 @@ $(document).ready(function() {
             </div>
         </div>
        	<?php if($invoice_count == 0 && $step == 'view' && isEmptyString($request->invid)){ ?>
-        	<div class="divider15"></div>
             <div style="clear:both;" class="alert alert-warning margin5">There are currently no invoices for <strong><?php echo $client->getName(); ?></strong></div>
         <?php } ?>
-       
 		<?php if($invoice_count > 0 && $step == 'view' && isEmptyString($request->invid)) { ?>
+        	<div class="divider15"></div>
             <div class="pagedescription">Viewing details for <strong><?php echo $invoice_count == 1 ? '1 Invoice' : $invoice_count.' Invoices'; ?></strong></div>
         <?php } ?>
        	<?php if(!isEmptyString($request->invid) || $step == 'edit' || $step == 'new'){ ?>
@@ -416,6 +430,7 @@ $(document).ready(function() {
                 </fieldset>
           	<?php } ?>
             <?php if($step == 'view'){ ?>
+            	<div class="divider10"></div>
             	<?php  ob_start();  ?>
 				<div class="row">
 					<div class="col-md-12">
@@ -609,7 +624,8 @@ $(document).ready(function() {
     </div>
 </form>
 <?php } ?>
-<?php if($request->section == 'payment'){ ?>	        
+<?php if($request->section == 'payment'){ ?>
+<h4 class="hideonprint">Payments</h4>	        
 <form id="form-payment" class="form-horizontal payment" role="form" action="<?php echo $this->baseUrl("payment/create"); ?>" method="post">
 	<div class="btn-group pull-right" style="margin-top:-10px;">
         <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
@@ -635,10 +651,10 @@ $(document).ready(function() {
                 ?>
                 <li><a class="gonowhere <?php echo !$isdeletable ? 'alert-dialog' : 'confirm-dialog'; ?>" title="Delete"<?php echo $message; ?> action="<?php echo $this->baseUrl('client/delete/id/'.encode($payment->getID())."/entityname/Payment/successurl/".encode($baseview_pay)); ?>"><i class="glyphicon glyphicon-remove"></i> Delete Payment</a></li>
             <?php } ?>
-            <?php if($acl->checkPermission('Payment', ACTION_LIST)){ ?>
-	            <li><a href="<?php echo $baseview_pay.'/step/view'; ?>" title="Payment History"><i class="glyphicon glyphicon-list"></i> Payment History</a></li>
+            <?php if($acl->checkPermission('Payment', ACTION_LIST) && ($isinvoice || ($ispayment && !$ispaymentlist))){ ?>
+	            <li><a href="<?php echo $baseview_pay; ?>" title="Payment History"><i class="glyphicon glyphicon-list"></i> Payment History</a></li>
             <?php } ?>
-            <?php if($acl->checkPermission('Invoice', ACTION_LIST)){ ?>
+            <?php if($acl->checkPermission('Invoice', ACTION_LIST) && ($ispayment || ($isinvoice && !$isinvoicelist))){ ?>
 	            <li><a href="<?php echo $baseview_inv.'/step/view'; ?>" title="Invoice History"><i class="glyphicon glyphicon-list"></i> Invoice History</a></li>
             <?php } ?>
         </ul>
@@ -678,15 +694,12 @@ $(document).ready(function() {
             </div>
         </div>
        	<?php if($payment_count == 0 && $step == 'view' && isEmptyString($request->pid)){ ?>
-        	<div class="divider15"></div>
             <div style="clear:both;" class="alert alert-warning margin5">There are currently no payments for <strong><?php echo $client->getName(); ?></strong></div>
         <?php } ?>
-       
 		<?php if($payment_count > 0 && $step == 'view' && isEmptyString($request->pid)) { ?>
             <div class="pagedescription">Viewing details for <strong><?php echo $payment_count == 1 ? '1 Payment' : $payment_count.' Payments'; ?></strong></div>
         <?php } ?>
        	<?php if(!isEmptyString($request->pid) || $step == 'edit' || $step == 'new'){ ?>
-        
         <script>
 			$(document).ready(function() {
 				// validation 

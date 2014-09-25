@@ -36,7 +36,7 @@ class UserAccount extends BaseEntity {
 		$this->hasColumn('profilephoto', 'string', 50);
 		
 		$this->hasColumn('country', 'string', 2, array('default' => 'US'));
-		$this->hasColumn('state', 'string', 2);
+		$this->hasColumn('state', 'string', 2, array('default' => 'NJ'));
 		$this->hasColumn('city', 'string', 50);
 		$this->hasColumn('county', 'integer', null);
 		$this->hasColumn('zipcode', 'string', 15);
@@ -1039,6 +1039,9 @@ class UserAccount extends BaseEntity {
 		if($this->isFemale()){		
 			return 'Female';
 		}
+		if($this->getGender() == 3){
+			return 'Transgender';
+		}
 		return '';
 	}
 	# Determine if user profile has been activated
@@ -1097,7 +1100,7 @@ class UserAccount extends BaseEntity {
     }
     # determine if user has pending activation
     function hasPendingActivation() {
-   		return $this->isUserInActive() ? true : false;
+   		return $this->isUserInActive() && !isEmptyString($this->getInvitedByID()) ? true : false;
     }
 	/**
 	 * Return the date of birth 

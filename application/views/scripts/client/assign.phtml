@@ -39,6 +39,8 @@
 			// define the validation rules one field at a time
 			rules: {
 				userid: "required",
+				usertextfirstname: "required",
+				usertextlastname: "required",
 				role: "required",
 				startdate: "required",
 				reason: "required"
@@ -46,6 +48,8 @@
 			// the messages for each of the fields being validated
 			messages: {		
 				userid: "<?php echo $this->translate("client_userid_error"); ?>",
+				usertextfirstname: "Please enter first name",
+				usertextlastname: "Please enter last name",
 				role: "<?php echo $this->translate("client_assign_role_error"); ?>",
 				startdate: "<?php echo $this->translate("client_assign_startdate_error"); ?>",
 				reason: "<?php echo $this->translate("client_assign_reason_error"); ?>"
@@ -83,6 +87,28 @@
 		$(".disabledfield").each(function(){
 			$(this).attr('readonly', true).attr('disabled', true);
 		});
+		
+		multipleDisableContainerByClass('user_text');
+		multipleEnableContainerByClass('user_select');
+		$("#usertrigger").click(function(){
+			if($(this).is(':checked')){
+				disableContainerByClass('user_select');
+				enableContainerByClass('user_text');
+				$(".user_select select").val('');
+			} else {
+				disableContainerByClass('user_text');
+				enableContainerByClass('user_select');
+				$(".user_text input").val('');
+			}
+		});
+		
+		// dynamically add new configurable values to dropdowns
+		$(".switchuser").change(function(){
+			var value = $(this).val(); 
+			if(!isEmptyString(value) && value == '0'){
+				$("#usertrigger").click();
+			}
+		});
 	}); 
 </script>
 <form class="form-horizontal well" id="indexform" method="post" action="<?php echo $this->baseUrl("assignment/create"); ?>" >
@@ -98,21 +124,37 @@
                 <div class="form-group">
                     <label class="col-md-3 control-label" for="userid"><?php echo $this->translate("client_userid_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
                     <div class="col-md-4 padding0">
-                        <?php
-                            $allvalues = getUsers(2, '', 1);
-                            $dropdown = new Zend_Form_Element_Select('userid',
-                                                array(
-                                                    'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $allvalues),
-                                                    'view' => new Zend_View(),
-                                                    'decorators' => array('ViewHelper'),
-                                                    'class' => array('form-control','input-sm'),
-                                                )
-                            );  
-                            $dropdown->setValue($assignment->getUserID()); 
-                            echo $dropdown->render();
-                        ?>
+                        <div class="user_text">
+                        	<i class="blocked">Enter details of new user</i>
+                        	<div class="inline">
+                            	<label style="font-weight:bold; font-size:10px; display:inline-block; width:180px;">First Name:</label>
+                                <input type="text" name="usertextfirstname" id="usertextfirstname" class="form-control input-sm " value="" style="width:180px; display:inline;"  />
+                            </div>
+                            <div class="inline">
+                            	<label style="font-weight:bold; font-size:10px; display:inline-block; width:180px;">Last Name:</label>
+                                <input type="text" name="usertextlastname" id="usertextlastname" class="form-control input-sm " value="" style="width:180px; display:inline;"  />
+                            </div>
+                        </div>
+                        <div class="user_select">
+                            <?php
+								$allvalues = getUsers(2, '', 1);
+								$dropdown = new Zend_Form_Element_Select('userid',
+													array(
+														'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $allvalues, array('0'=>'Other')),
+														'view' => new Zend_View(),
+														'decorators' => array('ViewHelper'),
+														'class' => array('form-control','input-sm','switchuser'),
+														'style' => 'width:180px; display:inline;'
+													)
+								);  
+								$dropdown->setValue($assignment->getUserID()); 
+								echo $dropdown->render();
+							?>
+                        </div>
+                        &nbsp;<input type="checkbox" name="usertrigger" id="usertrigger" class="lineblocked" value="1" title="Switch entry mode" placeholder="enter free text" /> Other
                     </div>
-                    <div id="userid_error" class="col-md-offset-3"></div>
+                    <div id="usertextfirstname_error" class="col-md-offset-3"></div><div id="usertextlastname_error" class="col-md-offset-3"></div> 
+                    <div id="usertext_error" class="col-md-offset-3"></div><div id="userid_error" class="col-md-offset-3"></div> 
                 </div>
                 <div class="form-group">
                     <label class="col-md-3 control-label" for="role"><?php echo $this->translate("client_assign_role_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>

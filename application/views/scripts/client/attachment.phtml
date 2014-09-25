@@ -1,7 +1,7 @@
 <div class="panel-body" style="min-height:0; height:auto;">
-    <div class="form-group">
+    <div class="form-group" style="margin-bottom:0;">
         <div class="col-md-6">
-            <label class="col-md-12 control-label"><?php echo $this->translate("client_resume_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+            <label class="col-md-12 control-label"><?php echo $this->translate("client_resume_label"); ?>:</label>
             <div class="col-md-6">
                 <p class="form-control-static nullifempty view"><?php echo $client->getResumeLink(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
@@ -19,7 +19,11 @@
                     </div>
                     <div id="aftersave_resume">
                         <input type="text" name="resumefilename_old" id="resumefilename_old" class="form-control hidden" value="<?php echo $client->getResumeFilename(); ?>" />
-                        <p class="form-control-static nullifempty"><?php echo $client->getResumeFilename(); ?></p> 
+                        <p class="form-control-static nullifempty">
+							<?php if($client->hasResume()){ ?>
+								<?php echo $client->getResumeFilename(); ?>
+                        	<?php } ?>
+                        </p> 
                     </div>
                     <?php if($client->hasResume()){ ?>
                         <div class="divider5"></div>
@@ -29,6 +33,10 @@
                 </div>
                 <?php } ?>
             </div>
+            <?php if((($step == 'edit' && $section == 'assessment') || $step == 'new') && !$client->hasResume()){ ?>
+                <div class="divider10"></div>
+                <div class="alert alert-danger col-sm-12"><?php echo $this->translate("client_resumefilename_error"); ?></div>
+            <?php } ?>
         </div>
         <div class="col-md-6">
             <label class="col-md-12 control-label"><?php echo $this->translate("client_cover_label"); ?>:</label>
@@ -49,9 +57,13 @@
                     </div>
                     <div id="aftersave_cover">
                         <input type="text" name="coverletterfilename_old" class="form-control hidden" id="coverletterfilename_old" value="<?php echo $client->getCoverLetterFilename(); ?>" />
-                        <p class="form-control-static nullifempty"><?php echo $client->getCoverLetterFilename(); ?></p> 
+                        <p class="form-control-static nullifempty">
+							<?php if($client->hasCoverletter()){ ?>
+								<?php echo $client->getCoverLetterFilename(); ?>
+                          	<?php } ?>
+                      	</p> 
                     </div>
-                    <?php if($client->getCoverletterLink()){ ?>
+                    <?php if($client->hasCoverletter()){ ?>
                         <div class="divider5"></div>
                         <a class="gonowhere btn btn-default btn-xs reupload" id="reupload_cover" rel="cover"><span class="glyphicon glyphicon-refresh"></span> Re-upload</a> <img src="<?php echo $this->baseUrl('images/loader.gif'); ?>" class="hidden" id="loading_cover" />
                     <?php } ?>

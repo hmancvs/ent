@@ -51,7 +51,6 @@ class Voucher extends BaseEntity {
 						'foreign' => 'id',
 				)
 		);
-		
 	}
 	/**
 	 * Preprocess model data
@@ -132,6 +131,16 @@ class Voucher extends BaseEntity {
 	# determine the voucher number depending on voucher type
 	function getVoucherNumber(){
 		return $this->isFollowAlong() ? $this->getfavoucherno() : $this->getVoucherNo();
+	}
+	# get the invoices on a voucher
+	function getInvoiceForVoucher(){
+		$query = Doctrine_Query::create()->from('Invoice i')
+		->where("i.voucherid = '".$this->getID()."'")->orderby('i.invoicedate desc')->limit('1');
+		$result = $query->execute();
+		if($result){
+			return $result->get(0);
+		}
+		return new Invoice();
 	}
 }
 ?>

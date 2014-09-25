@@ -185,9 +185,10 @@
 	function getSubscribeBirthYears() {				
 		$aconfig = Zend_Registry::get("config"); 
 		$years = array(); 
-		$start_year = (date("Y")) - 100;
+		// $start_year = (date("Y")) - 100;
+		$start_year = 1900;
 		
-		$end_year = (date("Y") - 18);
+		$end_year = (date("Y"));
 		for($i = $start_year; $i <= $end_year; $i++) {
 			$years[$i] = $i; 
 		}		
@@ -745,7 +746,7 @@
 	# return programs
 	function getPrograms($value = '', $aliased = true){
 		if($aliased){
-			$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.alias,' - ',l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_PROGRAMS' ";
+			$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_PROGRAMS' ";
 		} else {
 			$query = "SELECT l.lookuptypevalue as optionvalue, l.alias as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_PROGRAMS' ";
 		}
@@ -764,7 +765,7 @@
 	# return service types
 	function getServiceTypes($value = '', $aliased = true){
 		if($aliased){
-			$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.alias,' - ',l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'VOUCHER_SERVICE_TYPES' ";
+			$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'VOUCHER_SERVICE_TYPES' ";
 		} else {
 			$query = "SELECT l.lookuptypevalue as optionvalue, l.alias as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'VOUCHER_SERVICE_TYPES' ";
 		}
@@ -783,7 +784,7 @@
 	# return the follow along types
 	function getFAServiceTypes($value = '', $aliased = true){
 		if($aliased){
-			$query = "SELECT l.lookuptypevalue as optionvalue, concat(l.alias,' - ',l.lookupvaluedescription) as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'FA_SERVICE_TYPES' ";
+			$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'FA_SERVICE_TYPES' ";
 		} else {
 			$query = "SELECT l.lookuptypevalue as optionvalue, l.alias as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'FA_SERVICE_TYPES' ";
 		}
@@ -801,7 +802,7 @@
 	}
 	# check for funders
 	function getFunders($value = ''){
-		$query = "SELECT c.id as optionvalue, c.alias as optiontext FROM company c where c.type = 1 order by optiontext ";
+		$query = "SELECT c.id as optionvalue, c.name as optiontext FROM company c where c.type = 1 order by optiontext ";
 		// debugMessage($query); exit();
 		$array = getOptionValuesFromDatabaseQuery($query);
 		if(!isEmptyString($value)){
@@ -830,6 +831,20 @@
 	# determine the client races
 	function getAllRaces($value = ''){
 		$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'RACES' order by optiontext ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			if(!isArrayKeyAnEmptyString($value, $array)){
+				return $array[$value];
+			} else {
+				return '';
+			}
+		}
+		return $array;
+	}
+	# determine the client languages
+	function getAllLanguages($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'CLIENT_LANGUAGES' order by optiontext ";
 		// debugMessage($query); exit();
 		$array = getOptionValuesFromDatabaseQuery($query);
 		if(!isEmptyString($value)){
@@ -907,7 +922,7 @@
 	}
 	# determine the education levels
 	function getEducationLevels($value = ''){
-		$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'EDUCATION_LEVELS' order by optionvalue ";
+		$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'EDUCATION_LEVELS' order by l.code ";
 		// debugMessage($query); exit();
 		$array = getOptionValuesFromDatabaseQuery($query);
 		if(!isEmptyString($value)){
