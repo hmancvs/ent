@@ -45,6 +45,8 @@ class Client extends BaseEntity {
 		
 		$this->hasColumn('coachid', 'integer', null); # main coach
 		$this->hasColumn('coachname', 'string', 50); # coach text
+		$this->hasColumn('completedbyid', 'integer', null); # main coach
+		$this->hasColumn('completedby', 'string', 50); # coach text
 		$this->hasColumn('programid', 'integer', null);
 		$this->hasColumn('funderid', 'integer', null);
 		$this->hasColumn('servicetypeid', 'integer', null);
@@ -76,7 +78,7 @@ class Client extends BaseEntity {
 		$this->hasColumn('secondarycause', 'integer', null);
 		$this->hasColumn('needsassessment', 'string', 255);
 		$this->hasColumn('incomesources', 'string', 255);
-		$this->hasColumn('totalmonthlyincome', 'decimal', 11, array('default'=>'0.00'));
+		$this->hasColumn('totalmonthlyincome', 'decimal', 11, array('default'=>null));
 		$this->hasColumn('reduceincomebenefit', 'integer', null);
 		$this->hasColumn('providedwithbenefitinfo', 'integer', null);
 		$this->hasColumn('requiresmedicalaccomodation', 'integer', null);
@@ -234,7 +236,11 @@ class Client extends BaseEntity {
 		$session = SessionWrapper::getInstance();
 		// about 
 		if(isArrayKeyAnEmptyString('gender', $formvalues)){
-			unset($formvalues['gender']);
+			if(isArrayKeyAnEmptyString('gender_old', $formvalues)){
+				unset($formvalues['gender']);
+			} else {
+				$formvalues['gender'] = NULL;
+			}
 		}
 		if(isArrayKeyAnEmptyString('dateofbirth', $formvalues)){
 			unset($formvalues['dateofbirth']);
@@ -278,6 +284,9 @@ class Client extends BaseEntity {
 		if(isArrayKeyAnEmptyString('coachid', $formvalues)){
 			unset($formvalues['coachid']);
 		}
+		if(isArrayKeyAnEmptyString('completedbyid', $formvalues)){
+			unset($formvalues['completedbyid']);
+		}
 		if(isArrayKeyAnEmptyString('funderid', $formvalues)){
 			unset($formvalues['funderid']);
 		}
@@ -301,7 +310,11 @@ class Client extends BaseEntity {
 			unset($formvalues['referraldate']);
 		}
 		if(isArrayKeyAnEmptyString('iscriminal', $formvalues)){
-			unset($formvalues['iscriminal']);
+			if(isArrayKeyAnEmptyString('iscriminal_old', $formvalues)){
+				unset($formvalues['iscriminal']);
+			} else {
+				$formvalues['iscriminal'] = NULL;
+			}
 		}
 		
 		if(isArrayKeyAnEmptyString('communication', $formvalues)){
@@ -436,10 +449,18 @@ class Client extends BaseEntity {
 			);
 			if(!isArrayKeyAnEmptyString('userid', $formvalues)){
 				$formvalues['coachid'] = $formvalues['userid'];
+				$formvalues['coachid'] = $formvalues['userid'];
 				$assignments[1]['userid'] = $formvalues['userid'];
+			}
+			if(!isArrayKeyAnEmptyString('completedbyid', $formvalues)){
+				
 			}
 			if(!isArrayKeyAnEmptyString('usertextfirstname', $formvalues) && !isArrayKeyAnEmptyString('usertextlastname', $formvalues)){
 				$formvalues['coachname'] = $formvalues['usertextfirstname'].' '.$formvalues['usertextlastname'];
+			}
+
+			if(!isArrayKeyAnEmptyString('usertext2firstname', $formvalues) && !isArrayKeyAnEmptyString('usertext2lastname', $formvalues)){
+				$formvalues['completedby'] = $formvalues['usertext2firstname'].' '.$formvalues['usertext2lastname'];
 			}
 			
 			$formvalues['assignments'] = $assignments;
@@ -481,45 +502,162 @@ class Client extends BaseEntity {
 		
 		if(isArrayKeyAnEmptyString('reduceincomebenefit', $formvalues)){
 			unset($formvalues['reduceincomebenefit']);
+			if(isArrayKeyAnEmptyString('reduceincomebenefit_old', $formvalues)){
+				unset($formvalues['reduceincomebenefit']);
+			} else {
+				$formvalues['reduceincomebenefit'] = NULL;
+			}
 		}
 		if(isArrayKeyAnEmptyString('totalmonthlyincome', $formvalues)){
 			unset($formvalues['totalmonthlyincome']);
 		}
 		if(isArrayKeyAnEmptyString('providedwithbenefitinfo', $formvalues)){
-			unset($formvalues['providedwithbenefitinfo']);
+			if(isArrayKeyAnEmptyString('providedwithbenefitinfo_old', $formvalues)){
+				unset($formvalues['providedwithbenefitinfo']);
+			} else {
+				$formvalues['providedwithbenefitinfo'] = NULL;
+			}
 		}
 		if(isArrayKeyAnEmptyString('requiresmedicalaccomodation', $formvalues)){
-			unset($formvalues['requiresmedicalaccomodation']);
+			if(isArrayKeyAnEmptyString('requiresmedicalaccomodation_old', $formvalues)){
+				unset($formvalues['requiresmedicalaccomodation']);
+			} else {
+				$formvalues['requiresmedicalaccomodation'] = NULL;
+			}
 		}
 		if(isArrayKeyAnEmptyString('oncallhousesupport', $formvalues)){
-			unset($formvalues['oncallhousesupport']);
+			if(isArrayKeyAnEmptyString('oncallhousesupport_old', $formvalues)){
+				unset($formvalues['oncallhousesupport']);
+			} else {
+				$formvalues['oncallhousesupport'] = NULL;
+			}
 		}
+		if(isArrayKeyAnEmptyString('workshift', $formvalues)){
+			if(isArrayKeyAnEmptyString('workshift_old', $formvalues)){
+				unset($formvalues['workshift']);
+			} else {
+				$formvalues['workshift'] = NULL;
+			}
+		}
+		if(isArrayKeyAnEmptyString('jobtype', $formvalues)){
+			if(isArrayKeyAnEmptyString('jobtype_old', $formvalues)){
+				unset($formvalues['jobtype']);
+			} else {
+				$formvalues['jobtype'] = NULL;
+			}
+		}
+		
 		if(isArrayKeyAnEmptyString('qualityoflife', $formvalues)){
-			unset($formvalues['qualityoflife']);
+			if(isArrayKeyAnEmptyString('qualityoflife_old', $formvalues)){
+				unset($formvalues['qualityoflife']);
+			} else {
+				$formvalues['qualityoflife'] = NULL;
+			}
 		}
 		if(isArrayKeyAnEmptyString('contactschooltoverify', $formvalues)){
-			unset($formvalues['contactschooltoverify']);
+			if(isArrayKeyAnEmptyString('contactschooltoverify_old', $formvalues)){
+				unset($formvalues['contactschooltoverify']);
+			} else {
+				$formvalues['contactschooltoverify'] = NULL;
+			}
 		}
 		if(isArrayKeyAnEmptyString('experiencedlearningproblems', $formvalues)){
-			unset($formvalues['experiencedlearningproblems']);
+			if(isArrayKeyAnEmptyString('experiencedlearningproblems_old', $formvalues)){
+				unset($formvalues['experiencedlearningproblems']);
+			} else {
+				$formvalues['experiencedlearningproblems'] = NULL;
+			}
 		}
 		if(isArrayKeyAnEmptyString('cancontactreferences', $formvalues)){
-			unset($formvalues['cancontactreferences']);
+			if(isArrayKeyAnEmptyString('cancontactreferences_old', $formvalues)){
+				unset($formvalues['cancontactreferences']);
+			} else {
+				$formvalues['cancontactreferences'] = NULL;
+			}
 		}
 		if(isArrayKeyAnEmptyString('onprobation', $formvalues)){
-			unset($formvalues['onprobation']);
+			if(isArrayKeyAnEmptyString('onprobation_old', $formvalues)){
+				unset($formvalues['onprobation']);
+			} else {
+				$formvalues['onprobation'] = NULL;
+			}
 		}
 		if(isArrayKeyAnEmptyString('convictedoffelony', $formvalues)){
-			unset($formvalues['convictedoffelony']);
+			if(isArrayKeyAnEmptyString('convictedoffelony_old', $formvalues)){
+				unset($formvalues['convictedoffelony']);
+			} else {
+				$formvalues['convictedoffelony'] = NULL;
+			}
 		}
 		if(isArrayKeyAnEmptyString('convictedofmisdemeanor', $formvalues)){
-			unset($formvalues['convictedofmisdemeanor']);
+			if(isArrayKeyAnEmptyString('convictedofmisdemeanor_old', $formvalues)){
+				unset($formvalues['convictedofmisdemeanor']);
+			} else {
+				$formvalues['convictedofmisdemeanor'] = NULL;
+			}
+		}
+		if(isArrayKeyAnEmptyString('employertheftcase', $formvalues)){
+			if(isArrayKeyAnEmptyString('employertheftcase_old', $formvalues)){
+				unset($formvalues['employertheftcase']);
+			} else {
+				$formvalues['employertheftcase'] = NULL;
+			}
 		}
 		if(isArrayKeyAnEmptyString('traveldistance', $formvalues)){
-			unset($formvalues['traveldistance']);
+			if(isArrayKeyAnEmptyString('traveldistance_old', $formvalues)){
+				unset($formvalues['traveldistance']);
+			} else {
+				$formvalues['traveldistance'] = NULL;
+			}
 		}
 		if(isArrayKeyAnEmptyString('desiredhourlyrate', $formvalues)){
-			unset($formvalues['desiredhourlyrate']);
+			if(isArrayKeyAnEmptyString('desiredhourlyrate_old', $formvalues)){
+				unset($formvalues['desiredhourlyrate']);
+			} else {
+				$formvalues['desiredhourlyrate'] = NULL;
+			}
+		}
+		if(isArrayKeyAnEmptyString('hasphotoid', $formvalues)){
+			if(isArrayKeyAnEmptyString('hasphotoid_old', $formvalues)){
+				unset($formvalues['hasphotoid']);
+			} else {
+				$formvalues['hasphotoid'] = NULL;
+			}
+		}
+		if(isArrayKeyAnEmptyString('hasssncard', $formvalues)){
+			if(isArrayKeyAnEmptyString('hasssncard_old', $formvalues)){
+				unset($formvalues['hasssncard']);
+			} else {
+				$formvalues['hasssncard'] = NULL;
+			}
+		}
+		if(isArrayKeyAnEmptyString('cancontactreferences', $formvalues)){
+			if(isArrayKeyAnEmptyString('cancontactreferences_old', $formvalues)){
+				unset($formvalues['cancontactreferences']);
+			} else {
+				$formvalues['cancontactreferences'] = NULL;
+			}
+		}
+		if(isArrayKeyAnEmptyString('isveteran', $formvalues)){
+			if(isArrayKeyAnEmptyString('isveteran_old', $formvalues)){
+				unset($formvalues['isveteran']);
+			} else {
+				$formvalues['isveteran'] = NULL;
+			}
+		}
+		if(isArrayKeyAnEmptyString('dischargetype', $formvalues)){
+			if(isArrayKeyAnEmptyString('dischargetype_old', $formvalues)){
+				unset($formvalues['dischargetype']);
+			} else {
+				$formvalues['dischargetype'] = NULL;
+			}
+		}
+		if(isArrayKeyAnEmptyString('iscombat', $formvalues)){
+			if(isArrayKeyAnEmptyString('iscombat_old', $formvalues)){
+				unset($formvalues['iscombat']);
+			} else {
+				$formvalues['iscombat'] = NULL;
+			}
 		}
 		
 		if(!isArrayKeyAnEmptyString('formaleducinterestsids', $formvalues)) {
@@ -1139,6 +1277,36 @@ class Client extends BaseEntity {
 			$this->save();
 		}
 		
+		if(!isEmptyString($this->getCompletedBy()) && isEmptyString($this->getCompletedByID())){
+			$name = $this->getCompletedBy();
+			$namesarray = explode(" ", $name);
+		
+			$firstname = isArrayKeyAnEmptyString(0, $namesarray) ? '' : $namesarray[0];
+			$lastname = isArrayKeyAnEmptyString(1, $namesarray) ? '' : $namesarray[1];
+			// $othername = isArrayKeyAnEmptyString(2, $namesarray) ? '' : $namesarray[2];
+			$groupids = array(3);
+			$usergroups = array();
+			foreach ($groupids as $id) {
+				$usergroups[]['groupid'] = $id;
+			}
+		
+			$userdata = array(
+					'firstname' => $firstname,
+					'lastname' => $lastname,
+					'type' => 3,
+					'createdby' => $session->getVar('userid'),
+					'gender' => 1,
+					'usergroups' => $usergroups
+			);
+			// save new user
+			$user = new UserAccount();
+			$user->processPost($userdata);
+			$user->save();
+				
+			// blank out coachname [optional]
+			$this->setCompletedByID($user->getID());
+			$this->save();
+		}
 		return true;
 	}
 	
@@ -1769,6 +1937,132 @@ class Client extends BaseEntity {
 			$age = date('Y') - date('Y', strtotime($this->getDateofBirth()));
 		}
 		return $age;
+	}
+	function getreduceincomebenefit_text(){
+		if(!isEmptyString($this->getreduceincomebenefit()) && $this->getreduceincomebenefit() == '1'){
+			return 'Yes';			
+		}
+		if(!isEmptyString($this->getreduceincomebenefit()) && $this->getreduceincomebenefit() == '0'){
+			return 'No';
+		}
+		return '';
+	}
+	function getrequiresmedicalaccomodation_text(){
+		if(!isEmptyString($this->getrequiresmedicalaccomodation()) && $this->getrequiresmedicalaccomodation() == '1'){
+			return 'Yes';
+		}
+		if(!isEmptyString($this->getrequiresmedicalaccomodation()) && $this->getrequiresmedicalaccomodation() == '0'){
+			return 'No';
+		}
+		return '';
+	}
+	function getoncallhousesupport_text(){
+		if(!isEmptyString($this->getoncallhousesupport()) && $this->getoncallhousesupport() == '1'){
+			return 'Yes';
+		}
+		if(!isEmptyString($this->getoncallhousesupport()) && $this->getoncallhousesupport() == '0'){
+			return 'No';
+		}
+		return '';
+	}
+	function gethasphotoid_text(){
+		if(!isEmptyString($this->gethasphotoid()) && $this->gethasphotoid() == '1'){
+			return 'Yes';
+		}
+		if(!isEmptyString($this->gethasphotoid()) && $this->gethasphotoid() == '0'){
+			return 'No';
+		}
+		return '';
+	}
+	function getcontactschooltoverify_text(){
+		if(!isEmptyString($this->getcontactschooltoverify()) && $this->getcontactschooltoverify() == '1'){
+			return 'Yes';
+		}
+		if(!isEmptyString($this->getcontactschooltoverify()) && $this->getcontactschooltoverify() == '0'){
+			return 'No';
+		}
+		return '';
+	}
+	function getexperiencedlearningproblems_text(){
+		if(!isEmptyString($this->getexperiencedlearningproblems()) && $this->getexperiencedlearningproblems() == '1'){
+			return 'Yes';
+		}
+		if(!isEmptyString($this->getexperiencedlearningproblems()) && $this->getexperiencedlearningproblems() == '0'){
+			return 'No';
+		}
+		return '';
+	}
+	function getcancontactreferences_text(){
+		if(!isEmptyString($this->getcancontactreferences()) && $this->getcancontactreferences() == '1'){
+			return 'Yes';
+		}
+		if(!isEmptyString($this->getcancontactreferences()) && $this->getcancontactreferences() == '0'){
+			return 'No';
+		}
+		return '';
+	}
+	function getiscriminal_text(){
+		if(!isEmptyString($this->getiscriminal()) && $this->getiscriminal() == '1'){
+			return 'Yes';
+		}
+		if(!isEmptyString($this->getiscriminal()) && $this->getiscriminal() == '0'){
+			return 'No';
+		}
+		return '';
+	}
+	function getonprobation_text(){
+		if(!isEmptyString($this->getonprobation()) && $this->getonprobation() == '1'){
+			return 'Yes';
+		}
+		if(!isEmptyString($this->getonprobation()) && $this->getonprobation() == '0'){
+			return 'No';
+		}
+		return '';
+	}
+	function getconvictedoffelony_text(){
+		if(!isEmptyString($this->getconvictedoffelony()) && $this->getconvictedoffelony() == '1'){
+			return 'Yes';
+		}
+		if(!isEmptyString($this->getconvictedoffelony()) && $this->getconvictedoffelony() == '0'){
+			return 'No';
+		}
+		return '';
+	}
+	function getconvictedofmisdemeanor_text(){
+		if(!isEmptyString($this->getconvictedofmisdemeanor()) && $this->getconvictedofmisdemeanor() == '1'){
+			return 'Yes';
+		}
+		if(!isEmptyString($this->getconvictedofmisdemeanor()) && $this->getconvictedofmisdemeanor() == '0'){
+			return 'No';
+		}
+		return '';
+	}
+	function getemployertheftcase_text(){
+		if(!isEmptyString($this->getemployertheftcase()) && $this->getemployertheftcase() == '1'){
+			return 'Yes';
+		}
+		if(!isEmptyString($this->getemployertheftcase()) && $this->getemployertheftcase() == '0'){
+			return 'No';
+		}
+		return '';
+	}
+	function getisveteran_text(){
+		if(!isEmptyString($this->getisveteran()) && $this->getisveteran() == '1'){
+			return 'Yes';
+		}
+		if(!isEmptyString($this->getisveteran()) && $this->getisveteran() == '0'){
+			return 'No';
+		}
+		return '';
+	}
+	function getiscombat_text(){
+		if(!isEmptyString($this->getiscombat()) && $this->getiscombat() == '1'){
+			return 'Yes';
+		}
+		if(!isEmptyString($this->getiscombat()) && $this->getiscombat() == '0'){
+			return 'No';
+		}
+		return '';
 	}
 }
 ?>

@@ -254,14 +254,14 @@
         <div class="col-md-12">
             <label class="col-md-12 control-label"><?php echo $this->translate('client_jobaccomodations_label'); ?>:</label>
             <div class="col-md-12">
-                <p class="form-control-static nullifempty view"><?php echo $client->getrequiresmedicalaccomodation() == 1 ? 'Yes' : 'No'; ?></p>
+                <p class="form-control-static nullifempty view"><?php echo $client->getrequiresmedicalaccomodation_text(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
                     <label class="radio-inline">
-                      <input type="radio" id="requiresmedicalaccomodation_1" class="disableoutsidesection" name="requiresmedicalaccomodation" value="1" <?php echo $client->getrequiresmedicalaccomodation() == 1 ? 'checked' : ''; ?>>Yes
+                      <input type="radio" id="requiresmedicalaccomodation_1" class="radiobutton disableoutsidesection" name="requiresmedicalaccomodation" value="1" <?php echo $client->getrequiresmedicalaccomodation() == 1 && !isEmptyString($client->getrequiresmedicalaccomodation()) ? 'checked data-waschecked="true"' : ''; ?>>Yes
                     </label>
                     <label class="radio-inline">
-                      <input type="radio" id="requiresmedicalaccomodation_0" class="disableoutsidesection" name="requiresmedicalaccomodation" value="0" <?php echo $client->getrequiresmedicalaccomodation() == 0 ? 'checked' : ''; ?>>No
+                      <input type="radio" id="requiresmedicalaccomodation_0" class="radiobutton disableoutsidesection" name="requiresmedicalaccomodation" value="0" <?php echo $client->getrequiresmedicalaccomodation() == 0 && !isEmptyString($client->getrequiresmedicalaccomodation()) ? 'checked data-waschecked="true"' : ''; ?>>No
                     </label>
                 </div>
                 <?php } ?>
@@ -326,7 +326,7 @@
         <div class="col-md-12">
             <label class="col-md-12 control-label"><?php echo $this->translate('client_therapy_label'); ?>: 
             <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
-            <i class="pagedescription">(Check all that apply) </i></label>
+            <?php echo $this->translate('global_checkall_label'); ?></label>
             <?php } ?>
             <div class="col-md-12">
                 <p class="form-control-static nullifempty view"><?php echo count($client->getTherapyTreatmentArray())  == 0 ? '': $client->getListofTherapyTreatment(); ?></p>
@@ -338,7 +338,7 @@
                                 foreach($therapytreatments as $key => $value){
                             ?>
                                 <label class="checkbox notbolded col-md-3">
-                                  <input type="checkbox" id="therapytreatment_<?php echo $key; ?>" name="therapytreatmentids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked' : ''; ?>><?php echo $value; ?>
+                                  <input type="checkbox" id="therapytreatment_<?php echo $key; ?>" name="therapytreatmentids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked data-waschecked="true"' : ''; ?>><?php echo $value; ?>
                                 </label>
                             <?php } ?>
                          </div>

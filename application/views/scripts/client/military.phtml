@@ -4,15 +4,16 @@
             <div class="col-md-6">
                 <label class="col-md-12 control-label"><?php echo $this->translate('client_isveteran_label'); ?></label>
                 <div class="col-md-12">
-                    <p class="form-control-static nullifempty view"><?php echo $client->getisveteran() == 1 ? 'Yes' : 'No'; ?></p>
+                    <p class="form-control-static nullifempty view"><?php echo $client->getisveteran_text(); ?></p>
                     <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                     <div class="edit">
                         <label class="radio-inline">
-                          <input type="radio" id="isveteran_1" name="isveteran" value="1" class="disableoutsidesection" <?php echo $client->getisveteran() == 1 ? 'checked' : ''; ?>>Yes
+                          <input type="radio" id="isveteran_1" name="isveteran" value="1" class="radiobutton disableoutsidesection" <?php echo $client->getisveteran() == 1 && !isEmptyString($client->getisveteran()) ? 'checked data-waschecked="true"' : ''; ?>>Yes
                         </label>
                         <label class="radio-inline">
-                          <input type="radio" id="isveteran_0" name="isveteran" value="0" class="disableoutsidesection" <?php echo $client->getisveteran() == 0 ? 'checked' : ''; ?>>No
+                          <input type="radio" id="isveteran_0" name="isveteran" value="0" class="radiobutton disableoutsidesection" <?php echo $client->getisveteran() == 0 && !isEmptyString($client->getisveteran()) ? 'checked data-waschecked="true"' : ''; ?>>No
                         </label>
+                        <input type="hidden" name="isveteran_old" id="isveteran_old" value="<?php echo $client->getisveteran(); ?>" />
                     </div>
                     <?php } ?>
                 </div>
@@ -65,9 +66,10 @@
                             foreach($dischargeoptions as $key => $value){
                         ?>
                             <label class="radio-inline">
-                              <input type="radio" id="dischargetype_<?php echo $key; ?>" name="dischargetype" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo $key == $client->getdischargetype() ? 'checked' : ''; ?>> <?php echo $value; ?>
+                              <input type="radio" id="dischargetype_<?php echo $key; ?>" name="dischargetype" class="radiobutton disableoutsidesection" value="<?php echo $key; ?>" <?php echo $key == $client->getdischargetype() && !isEmptyString($client->getdischargetype()) ? 'checked data-waschecked="true"' : ''; ?>> <?php echo $value; ?>
                             </label>
                         <?php } ?>
+                        <input type="hidden" name="dischargetype_old" id="dischargetype_old" value="<?php echo $client->getdischargetype(); ?>" />
                     </div>
                     <?php } ?>
                 </div> 
@@ -77,15 +79,16 @@
             <div class="col-md-6">
                 <label class="col-md-12 control-label"><?php echo $this->translate('client_iscombat_label'); ?>:</label>
                 <div class="col-md-12">
-                    <p class="form-control-static nullifempty view"><?php echo $client->getiscombat() == 1 ? 'Yes' : 'No'; ?></p>
+                    <p class="form-control-static nullifempty view"><?php echo $client->getiscombat_text(); ?></p>
                     <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                     <div class="edit">
                         <label class="radio-inline">
-                          <input type="radio" id="iscombat_1" name="iscombat" class="disableoutsidesection" value="1" <?php echo $client->getiscombat() == 1 ? 'checked' : ''; ?>>Yes
+                          <input type="radio" id="iscombat_1" name="iscombat" class="radiobutton disableoutsidesection" value="1" <?php echo $client->getiscombat() == 1 && !isEmptyString($client->getiscombat()) ? 'checked data-waschecked="true"' : ''; ?>>Yes
                         </label>
                         <label class="radio-inline">
-                          <input type="radio" id="iscombat_0" name="iscombat" class="disableoutsidesection" value="0" <?php echo $client->getiscombat() == 0 ? 'checked' : ''; ?>>No
+                          <input type="radio" id="iscombat_0" name="iscombat" class="radiobutton disableoutsidesection" value="0" <?php echo $client->getiscombat() == 0 && !isEmptyString($client->getiscombat()) ? 'checked data-waschecked="true"' : ''; ?>>No
                         </label>
+                        <input type="hidden" name="iscombat_old" id="iscombat_old" value="<?php echo $client->getiscombat(); ?>" />
                     </div>
                     <?php } ?>
                 </div>
@@ -105,7 +108,7 @@
                                 foreach($combatproblems as $key => $value){
                             ?>
                                 <label class="checkbox notbolded">
-                                  <input type="checkbox" id="combatproblems_<?php echo $key; ?>" name="combatproblemsids[]" value="<?php echo $key; ?>"  <?php echo in_array($key, $existing_values) ? 'checked' : ''; ?>><?php echo $value; ?>
+                                  <input type="checkbox" id="combatproblems_<?php echo $key; ?>" name="combatproblemsids[]" value="<?php echo $key; ?>"  <?php echo in_array($key, $existing_values) ? 'checked data-waschecked="true"' : ''; ?>><?php echo $value; ?>
                                 </label>
                             <?php } ?>
                         </div>

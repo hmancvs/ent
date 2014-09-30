@@ -38,8 +38,11 @@ rules: {
     
     // assignment
     userid: "required",
+    completedbyid: "required",
     usertextfirstname: "required",
 	usertextlastname: "required",
+    usertext2firstname: "required",
+	usertext2lastname: "required",
     role: "required",
     assignstartdate: "required",
     emailpassword: {
@@ -84,8 +87,11 @@ messages: {
     
     // assignment
     userid: "<?php echo $this->translate("client_userid_error"); ?>",
+    completedbyid: "<?php echo $this->translate("client_userid_error"); ?>",
     usertextfirstname: "Please enter first name",
 	usertextlastname: "Please enter last name",
+    usertext2firstname: "Please enter first name",
+	usertext2lastname: "Please enter last name",
     role: "<?php echo $this->translate("client_assign_role_error"); ?>",
     assignstartdate: "<?php echo $this->translate("client_assign_startdate_error"); ?>",
     emailpassword: {

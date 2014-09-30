@@ -3,8 +3,8 @@
 $(document).ready(function() {
 	// custom date picker options
 	var dateofbirthOpts = datepickerOpts;
-	dateofbirthOpts.yearRange = "-<?php echo date('Y')-1800; ?>:-0"; 
-	dateofbirthOpts.minDate = "-<?php echo '1800'; ?>Y";
+	dateofbirthOpts.yearRange = "-<?php echo date('Y')-1900; ?>:-0"; 
+	dateofbirthOpts.minDate = "-<?php echo '1900'; ?>Y";
 	datepickerOpts.maxDate = new Date("Dec 31, <?php echo date('Y'); ?>");
 	$("#dateofbirth").datepicker(dateofbirthOpts);
 	
@@ -153,9 +153,10 @@ $(document).ready(function() {
                     <p class="form-control-static nullifempty view"><?php echo $client->getGenderText(); ?></p>
                     <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                     <div class="edit" style="font-size:10px;">
-                      <label class="radio-inline"><input type="radio" name="gender" id="male" value="1" class="xform-control <?php echo $client->getGender() == '1'? 1 : 0; ?>"> Male</label>
-                      <label class="radio-inline"><input type="radio" name="gender" id="female" value="2" class="xform-control <?php echo $client->getGender() == '2'? 1 : 0; ?>"> Female</label>
-                      <label class="radio-inline"><input type="radio" name="gender" id="transgender" value="3" class="xform-control <?php echo $client->getGender() == '3'? 1 : 0; ?>"> Transgender</label>
+                      <label class="radio-inline"><input type="radio" name="gender" id="male" value="1" class="xform-control radiobutton <?php echo $client->getGender() == '1'? 1 : 0; ?>"> Male</label>
+                      <label class="radio-inline"><input type="radio" name="gender" id="female" value="2" class="xform-control radiobutton <?php echo $client->getGender() == '2'? 1 : 0; ?>"> Female</label>
+                      <label class="radio-inline"><input type="radio" name="gender" id="transgender" value="3" class="xform-control radiobutton <?php echo $client->getGender() == '3'? 1 : 0; ?>"> Transgender</label>
+                      <input type="hidden" name="gender_old" id="gender_old" value="<?php echo $client->getGender(); ?>" />
                       <div id="gender_error"></div>
                     </div>
                     <?php } ?>
@@ -546,13 +547,14 @@ $(document).ready(function() {
                     <p class="form-control-static nullifempty view"><?php echo count($client->getIncomeSourcesArray())  == 0 ? '': $client->getListofIncomeSources(); ?></p>
                     <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                         <div class="edit">
+                        	<?php echo $this->translate('global_checkall_label'); ?>
                             <div id="container_incomesourcesids">
                                 <?php 
                                     $existing_values = $client->getIncomeSourcesArray();
                                     foreach($incomesources as $key => $value){
                                 ?>
                                     <label class="checkbox notbolded col-md-3">
-                                      <input type="checkbox" id="incomesources_<?php echo $key; ?>" name="incomesourcesids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked' : ''; ?>><?php echo $value; ?>
+                                      <input type="checkbox" id="incomesources_<?php echo $key; ?>" name="incomesourcesids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked data-waschecked="true"' : ''; ?>><?php echo $value; ?>
                                     </label>
                                 <?php } ?>
                              </div>
@@ -572,6 +574,7 @@ $(document).ready(function() {
                         <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                         <div class="edit">
                             <input type="text" class="form-control input-sm" id="totalmonthlyincome" name="totalmonthlyincome" value="<?php echo $client->gettotalmonthlyincome(); ?>" />
+                            <input type="hidden" name="providedwithbenefitinfo_old" id="providedwithbenefitinfo_old" value="<?php echo $client->gettotalmonthlyincome(); ?>" />
                         </div>
                         <?php } ?>
                     </div>
@@ -582,15 +585,16 @@ $(document).ready(function() {
             <div class="form-group">
                 <label class="col-md-12 control-label"><?php echo $this->translate("client_reduceincomebenefit_label"); ?>:</label>
                 <div class="col-md-12">
-                    <p class="form-control-static nullifempty view"><?php echo $client->getreduceincomebenefit() == 1 ? 'Yes' : 'No'; ?></p>
+                    <p class="form-control-static nullifempty view"><?php echo $client->getreduceincomebenefit_text(); ?></p>
                     <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                     <div class="edit">
                         <label class="radio-inline">
-                          <input type="radio" id="reduceincomebenefit_1" name="reduceincomebenefit" class="disableoutsidesection" value="1" <?php echo $client->getreduceincomebenefit() == 1 ? 'checked' : ''; ?>>Yes
+                          <input type="radio" id="reduceincomebenefit_1" name="reduceincomebenefit" class="radiobutton disableoutsidesection" value="1" <?php echo $client->getreduceincomebenefit() == 1 && !isEmptyString($client->getreduceincomebenefit()) ? 'checked data-waschecked="true"' : ''; ?>>Yes
                         </label>
                         <label class="radio-inline">
-                          <input type="radio" id="reduceincomebenefit_0" name="reduceincomebenefit" class="disableoutsidesection" value="0" <?php echo $client->getreduceincomebenefit() == 0 ? 'checked' : ''; ?>>No
+                          <input type="radio" id="reduceincomebenefit_0" name="reduceincomebenefit" class="radiobutton disableoutsidesection" value="0" <?php echo $client->getreduceincomebenefit() == 0 && !isEmptyString($client->getreduceincomebenefit()) ? 'checked data-waschecked="true"' : ''; ?>>No
                         </label>
+                        <input type="hidden" name="reduceincomebenefit_old" id="reduceincomebenefit_old" value="<?php echo $client->getreduceincomebenefit(); ?>" />
                     </div>
                     <?php } ?>
                 </div>
@@ -604,14 +608,15 @@ $(document).ready(function() {
                     <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                     <div class="edit">
                         <label class="radio-inline">
-                          <input type="radio" id="providedwithbenefitinfo_1" name="providedwithbenefitinfo" class="disableoutsidesection" value="1" <?php echo $client->getprovidedwithbenefitinfo() == 1 ? 'checked' : ''; ?>>Yes
+                          <input type="radio" id="providedwithbenefitinfo_1" name="providedwithbenefitinfo" class="radiobutton disableoutsidesection" value="1" <?php echo $client->getprovidedwithbenefitinfo() == 1 && !isEmptyString($client->getprovidedwithbenefitinfo()) ? 'checked data-waschecked="true"' : ''; ?>>Yes
                         </label>
                         <label class="radio-inline">
-                          <input type="radio" id="providedwithbenefitinfo_0" name="providedwithbenefitinfo" class="disableoutsidesection" value="0" <?php echo $client->getprovidedwithbenefitinfo() == 0 ? 'checked' : ''; ?>>No
+                          <input type="radio" id="providedwithbenefitinfo_0" name="providedwithbenefitinfo" class="radiobutton disableoutsidesection" value="0" <?php echo $client->getprovidedwithbenefitinfo() == 0 && !isEmptyString($client->getprovidedwithbenefitinfo()) ? 'checked data-waschecked="true"' : ''; ?>>No
                         </label>
                         <label class="radio-inline">
-                          <input type="radio" id="providedwithbenefitinfo_2" name="providedwithbenefitinfo" class="disableoutsidesection" value="2" <?php echo $client->getprovidedwithbenefitinfo() == 2 ? 'checked' : ''; ?>>Consumer declined offer of information
+                          <input type="radio" id="providedwithbenefitinfo_2" name="providedwithbenefitinfo" class="radiobutton disableoutsidesection" value="2" <?php echo $client->getprovidedwithbenefitinfo() == 2 && !isEmptyString($client->getprovidedwithbenefitinfo()) ? 'checked data-waschecked="true"' : ''; ?>>Consumer declined offer of information
                         </label>
+                        <input type="hidden" name="providedwithbenefitinfo_old" id="providedwithbenefitinfo_old" value="<?php echo $client->getprovidedwithbenefitinfo(); ?>" />
                     </div>
                     <?php } ?>
                 </div>

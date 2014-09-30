@@ -78,11 +78,12 @@ class ConfigController extends IndexController   {
 				$company = new Company();
 				$company->processPost($formvalues);
 				
-				$result = array('id'=>'', 'name'=>'');
+				$result = array('id'=>'', 'name'=>'', 'error'=>'');
 				if($company->hasError()){
 					$session->setVar(ERROR_MESSAGE, $company->getErrorStackAsString());
 					$session->setVar(FORM_VALUES, $formvalues);
 					// debugMessage('error is '.$company->getErrorStackAsString()); exit;
+					$result['error'] = $company->getErrorStackAsString();
 				} else {
 					try {
 						$company->save();
@@ -90,6 +91,7 @@ class ConfigController extends IndexController   {
 					} catch (Exception $e) {
 						$session->setVar(ERROR_MESSAGE, $e->getMessage()."<br />".$company->getErrorStackAsString());
 						$session->setVar(FORM_VALUES, $formvalues);
+						$result['error'] = $company->getErrorStackAsString();
 					}
 				}
 				break;
@@ -127,11 +129,12 @@ class ConfigController extends IndexController   {
 				// debugMessage($lookupvalue->toArray());
 		    	// debugMessage('errors are '.$lookupvalue->getErrorStackAsString()); // exit();
 				
-		    	$result = array('id'=>'', 'name'=>'');
+		    	$result = array('id'=>'', 'name'=>'', 'error' => '');
 				if($lookupvalue->hasError()){
 					$haserror = true;
 					$session->setVar(ERROR_MESSAGE, $lookupvalue->getErrorStackAsString());
 					$session->setVar(FORM_VALUES, $formvalues);
+					$result['error'] = $lookupvalue->getErrorStackAsString();
 				} else {
 					try {
 						$lookupvalue->save();
@@ -142,10 +145,11 @@ class ConfigController extends IndexController   {
 								$session->setVar(SUCCESS_MESSAGE, "Successfully updated");
 							}
 						}
-						$result = array('id'=>$lookupvalue->getlookuptypevalue(), 'name'=>$lookupvalue->getlookupvaluedescription(), 'alias'=>$lookupvalue->getalias());
+						$result = array('id'=>$lookupvalue->getlookuptypevalue(), 'name'=>$lookupvalue->getlookupvaluedescription(), 'alias'=>$lookupvalue->getalias(), 'error'=>'');
 					} catch (Exception $e) {
 						$session->setVar(ERROR_MESSAGE, $e->getMessage()."<br />".$lookupvalue->getErrorStackAsString());
 						$session->setVar(FORM_VALUES, $formvalues);
+						$result['error'] = $lookupvalue->getErrorStackAsString();
 					}
 				}
 				break;

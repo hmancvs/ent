@@ -25,6 +25,14 @@ var uiblockcontent = '<h4><img src="<?php echo $this->baseUrl('images/loader.gif
 
 $(document).ready(function() {
 	
+	// custom date picker options
+	var dateOpts = datepickerOpts;
+	dateOpts.yearRange = "-<?php echo date('Y')-2000; ?>:-0"; 
+	$(".datefield").datepicker(dateOpts);
+	
+	dateOpts.yearRange = "-<?php echo date('Y')-1990; ?>:-0"; 
+	$(".datefield#enddate, .datefield#startdate, .datefield#medicalstartdate, .datefield#medicalenddate").datepicker(dateOpts);
+	
 	// make the datefields readonly
 	// $(".datefield").attr('readOnly', 'true');
 	$(".readonly").each(function(){
@@ -780,7 +788,7 @@ $(document).ready(function() {
 							}
 							if(!isEmptyString(appendclass) && appendclass != 'undefined'){
 								var altselectoption = '<option label="'+labelname+'" value="'+data.id+'">'+labelname+'</option>';
-								$("."+appendclass).append(altselectoption);
+								$("."+appendclass+":not(#"+fieldid+")").append(altselectoption);
 							}
 							
 							$("#dialog").modal('hide');
@@ -869,26 +877,32 @@ $(document).ready(function() {
 						function(data){
 							// alert(data); return false;
 							data = jQuery.parseJSON(data);
-							var labelname = data.name;
-							if(hasalias == '1'){
-								var labelname = data.alias+' - '+data.name;
+							if(data.error == ''){
+								var labelname = data.name;
+								if(hasalias == '1'){
+									var labelname = data.alias+' - '+data.name;
+								}
+								var newselectoption = '<option label="'+labelname+'" value="'+data.id+'" selected="selected">'+labelname+'</option>';
+								// append the option to the defined fieldid
+								
+								$("#"+fieldid).append(newselectoption);
+								// also append the option to another select if specified
+								if(!isEmptyString(doubleappendid) && doubleappendid != 'undefined'){
+									var altselectoption = '<option label="'+labelname+'" value="'+data.id+'">'+labelname+'</option>';
+									$("#"+doubleappendid).append(altselectoption);
+								}
+								if(!isEmptyString(appendclass) && appendclass != 'undefined'){
+									var altselectoption = '<option label="'+labelname+'" value="'+data.id+'">'+labelname+'</option>';
+									$("."+appendclass+":not(#"+fieldid+")").append(altselectoption);
+								}
+								enableContainerByID('indexform');
+								$("#dialog").modal('hide');
+							} else {
+								enableContainerByID('indexform');
+								$("#dialog").modal('hide');
+								bootbox.alert(data.error); 
 							}
-							var newselectoption = '<option label="'+labelname+'" value="'+data.id+'" selected="selected">'+labelname+'</option>';
-							// append the option to the defined fieldid
 							
-							$("#"+fieldid).append(newselectoption);
-							// also append the option to another select if specified
-							if(!isEmptyString(doubleappendid) && doubleappendid != 'undefined'){
-								var altselectoption = '<option label="'+labelname+'" value="'+data.id+'">'+labelname+'</option>';
-								$("#"+doubleappendid).append(altselectoption);
-							}
-							if(!isEmptyString(appendclass) && appendclass != 'undefined'){
-								var altselectoption = '<option label="'+labelname+'" value="'+data.id+'">'+labelname+'</option>';
-								$("."+appendclass).append(altselectoption);
-							}
-							
-							$("#dialog").modal('hide');
-							enableContainerByID('indexform');
 						}  
 					); // close the $.post					
 					$("#dialogcontent").html($("#dialogbody #loading").html());
@@ -1076,6 +1090,22 @@ $(document).ready(function() {
 		$('#inputSearch').click(function(){
 			  $("#divResult").fadeIn();
 		});
+	});
+	
+	$(".radiobutton").click(function(){
+		var id = $(this).attr('id');
+		var name = $(this).attr('name');
+		var $radio = $(this);
+        
+        // if this was previously checked
+        if ($radio.data('waschecked') == true) {
+            $radio.prop('checked', false);
+            $radio.data('waschecked', false);
+        } else {
+            $radio.data('waschecked', true);
+		}
+        // remove was checked from other radios
+        $radio.siblings('input[name="'+name+'"]').data('waschecked', false);
 	});
 });
 

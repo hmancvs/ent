@@ -4,7 +4,7 @@
 	$client = new Client();
     $client->populate(decode($request->id));
 	$id = $client->getID();
-	// debugMessage($client->toArray());
+	// debugMessage($client->toArray()); exit();
 	
 	$posturl = $this->baseUrl("client/create"); 
 	$successmessage = $this->translate('profile_add_success');
@@ -98,17 +98,11 @@
 			<?php require APPLICATION_PATH."/views/scripts/client/validation.phtml"; ?>
 		});
 		
-		// custom date picker options
-		var dateofbirthOpts = datepickerOpts;
-		// dateofbirthOpts.yearRange = "-<?php // echo date('Y')-2010; ?>:-0"; 
-		// datepickerOpts.maxDate = new Date();
-		// $("#dateapproved, #referraldate, #assessmentdate, #startdate, #enddate, #invoicedate, #medicalstartdate, #activitydate, #dateavailable").datepicker(dateofbirthOpts);
-		$(".datefield").datepicker(dateofbirthOpts);
-		
 		// add filename of selected file in background of input to indicate that a file has been selected.
 		$("#resumefilename").change(function(){
 			if(!isEmptyString($(this).val())){
 				$("#beforesave_resume .fileinput-preview").html($(this).val());
+				$("#missingresume").html('').remove();
 			}
 		});
 		$("#coverletterfilename").change(function(){
@@ -146,6 +140,28 @@
 			var value = $(this).val(); 
 			if(!isEmptyString(value) && value == '0'){
 				$("#usertrigger").click();
+			}
+		});
+		
+		multipleDisableContainerByClass('user2_text');
+		multipleEnableContainerByClass('user2_select');
+		$("#user2trigger").click(function(){
+			if($(this).is(':checked')){
+				disableContainerByClass('user2_select');
+				enableContainerByClass('user2_text');
+				$(".user2_select select").val('');
+			} else {
+				disableContainerByClass('user2_text');
+				enableContainerByClass('user2_select');
+				$(".user2_text input").val('');
+			}
+		});
+		
+		// dynamically add new configurable values to dropdowns
+		$(".switchuser2").change(function(){
+			var value = $(this).val(); 
+			if(!isEmptyString(value) && value == '0'){
+				$("#user2trigger").click();
 			}
 		});
 		
@@ -327,17 +343,49 @@
                         </fieldset>
                         <div class="divider10"></div>
                     </fieldset>
-                    <fieldset title="Assign to User">
+                    <fieldset title="Intake Record Summary">
                         <legend>Step 5</legend>
-                        <?php //if(false){ ?>
                     	<fieldset class="fieldsetcontainer">
-                            <legend>Job Coach</legend>
+                            <legend>Intake Record Summary</legend>
                             <div class="panel-body well-sm">
-                            	<div class="col-md-6"><small><em>Select the Coach assigned to this Client.</em></small></div>
                                 <div class="divider10"></div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="col-sm-5 control-label"><?php echo $this->translate("client_userid_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                        <label class="col-sm-5 control-label">Completed By: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                        <div class="col-sm-7">
+                                        	<div class="user2_text">
+                                                <i class="blocked">Enter details of new user</i>
+                                                <div class="inline">
+                                                    <label style="font-weight:bold; font-size:10px; display:inline-block; width:180px;">First Name:</label>
+                                                    <input type="text" name="usertext2firstname" id="usertext2firstname" class="form-control input-sm " value="" style="width:180px; display:inline;"  />
+                                                </div>
+                                                <div class="inline">
+                                                    <label style="font-weight:bold; font-size:10px; display:inline-block; width:180px;">Last Name:</label>
+                                                    <input type="text" name="usertext2lastname" id="usertext2lastname" class="form-control input-sm " value="" style="width:180px; display:inline;"  />
+                                                </div>
+                                            </div>
+                                            <div class="user2_select">
+                                                <?php
+                                                    $allvalues = getUsers();
+                                                    $dropdown = new Zend_Form_Element_Select('completedbyid',
+                                                                        array(
+                                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $allvalues, array('0'=>'Other')),
+                                                                            'view' => new Zend_View(),
+                                                                            'decorators' => array('ViewHelper'),
+                                                                            'class' => array('form-control','input-sm','switchuser2'),
+                                                                            'style' => 'width:180px; display:inline;'
+                                                                        )
+                                                    );  
+                                                    $dropdown->setValue($session->getVar('userid')); 
+                                                    echo $dropdown->render();
+                                                ?>
+                                            </div>
+                                            &nbsp;<input type="checkbox" name="user2trigger" id="user2trigger" class="lineblocked" value="1" title="Switch entry mode" placeholder="enter free text" /> Other
+                                        	<div id="usertext2firstname_error"></div><div id="usertext2lastname_error"></div><div id="user2text_error"></div><div id="completedbyid_error"></div> 
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-5 control-label">Coach assigned to Client: <?php echo $this->translate("global_required_field_marker"); ?></label>
                                         <div class="col-sm-7">
                                         	<div class="user_text">
                                                 <i class="blocked">Enter details of new user</i>

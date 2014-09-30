@@ -11,9 +11,10 @@
                         foreach($lifequalities as $key => $value){
                     ?>
                         <label class="radio-inline notbolded">
-                          <input type="radio" id="qualityoflife_<?php echo $key; ?>" name="qualityoflife" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo $client->getqualityoflife() == $key ? 'checked' : ''; ?>> <?php echo $value; ?>
+                          <input type="radio" id="qualityoflife_<?php echo $key; ?>" name="qualityoflife" class="radiobutton disableoutsidesection" value="<?php echo $key; ?>" <?php echo $client->getqualityoflife() == $key && !isEmptyString($client->getqualityoflife()) ? 'checked data-waschecked="true"' : ''; ?>> <?php echo $value; ?>
                         </label>
                     <?php } ?>
+                    <input type="hidden" name="qualityoflife_old" id="qualityoflife_old" value="<?php echo $client->getqualityoflife(); ?>" />
                 </div>
                 <?php } ?>
             </div> 
@@ -23,15 +24,16 @@
         <div class="col-md-12">
             <label class="col-md-12 control-label"><?php echo $this->translate('client_oncallhousesupport_label'); ?>:</label>
             <div class="col-md-12">
-                <p class="form-control-static nullifempty view"><?php echo $client->getoncallhousesupport() == 1 ? 'Yes' : 'No'; ?></p>
+                <p class="form-control-static nullifempty view"><?php echo $client->getoncallhousesupport_text(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
                     <label class="radio-inline">
-                      <input type="radio" id="oncallhousesupport_1" name="oncallhousesupport" class="disableoutsidesection" value="1" <?php echo $client->getoncallhousesupport() == 1 ? 'checked' : ''; ?>>Yes
+                      <input type="radio" id="oncallhousesupport_1" name="oncallhousesupport" class="radiobutton disableoutsidesection" value="1" <?php echo $client->getoncallhousesupport() == 1 && !isEmptyString($client->getoncallhousesupport()) ? 'checked data-waschecked="true"' : ''; ?>>Yes
                     </label>
                     <label class="radio-inline">
-                      <input type="radio" id="oncallhousesupport_0" name="oncallhousesupport" class="disableoutsidesection" value="0" <?php echo $client->getoncallhousesupport() == 0 ? 'checked' : ''; ?>>No
+                      <input type="radio" id="oncallhousesupport_0" name="oncallhousesupport" class="radiobutton disableoutsidesection" value="0" <?php echo $client->getoncallhousesupport() == 0 && !isEmptyString($client->getoncallhousesupport()) ? 'checked data-waschecked="true"' : ''; ?>>No
                     </label>
+                    <input type="hidden" name="oncallhousesupport_old" id="oncallhousesupport_old" value="<?php echo $client->getoncallhousesupport(); ?>" />
                 </div>
                 <?php } ?>
             </div> 
@@ -217,6 +219,8 @@
 											);  
 											$dropdown->setValue(''); 
 											echo $dropdown->render();
+											
+											// debugMessage($datavalues);
 										?>
 								</tr>
 							<?php $x++; } ?>

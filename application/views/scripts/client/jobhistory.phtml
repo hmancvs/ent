@@ -459,15 +459,16 @@
             <div class="col-md-6 padding0">
                 <label class="col-md-12 control-label"><?php echo $this->translate("client_photoid_label"); ?>:</label>
                 <div class="col-md-12">
-                    <p class="form-control-static nullifempty view"><?php echo $client->gethasphotoid() == 1 ? 'Yes' : 'No'; ?></p>
+                    <p class="form-control-static nullifempty view"><?php echo $client->gethasphotoid_text(); ?></p>
 					<?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                         <div class="edit">
                             <label class="radio-inline">
-                              <input type="radio" id="hasphotoid_1" name="hasphotoid" class="disableoutsidesection" value="1" <?php echo $client->gethasphotoid() == 1 ? 'checked' : ''; ?>>Yes
+                              <input type="radio" id="hasphotoid_1" name="hasphotoid" class="radiobutton disableoutsidesection" value="1" <?php echo $client->gethasphotoid() == 1 && !isEmptyString($client->gethasphotoid()) ? 'checked data-waschecked="true"' : ''; ?>>Yes
                             </label>
                             <label class="radio-inline">
-                              <input type="radio" id="hasphotoid_0" name="hasphotoid" class="disableoutsidesection" value="0" <?php echo $client->gethasphotoid() == 0 ? 'checked' : ''; ?>>No
+                              <input type="radio" id="hasphotoid_0" name="hasphotoid" class="radiobutton disableoutsidesection" value="0" <?php echo $client->gethasphotoid() == 0 && !isEmptyString($client->gethasphotoid()) ? 'checked data-waschecked="true"' : ''; ?>>No
                             </label>
+                            <input type="hidden" name="hasphotoid_old" id="hasphotoid_old" value="<?php echo $client->gethasphotoid(); ?>" />
                         </div>
                     <?php } ?>
                 </div>
@@ -479,11 +480,12 @@
 					<?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                         <div class="edit">
                             <label class="radio-inline">
-                              <input type="radio" id="hasssncard_1" name="hasssncard" class="disableoutsidesection" value="1" <?php echo $client->gethasssncard() == 1 ? 'checked' : ''; ?>>Yes
+                              <input type="radio" id="hasssncard_1" name="hasssncard" class="radiobutton disableoutsidesection" value="1" <?php echo $client->gethasssncard() == 1 && !isEmptyString($client->gethasssncard()) ? 'checked data-waschecked="true"' : ''; ?>>Yes
                             </label>
                             <label class="radio-inline">
-                              <input type="radio" id="hasssncard_0" name="hasssncard" class="disableoutsidesection" value="0" <?php echo $client->gethasssncard() == 0 ? 'checked' : ''; ?>>No
+                              <input type="radio" id="hasssncard_0" name="hasssncard" class="radiobutton disableoutsidesection" value="0" <?php echo $client->gethasssncard() == 0 && !isEmptyString($client->gethasssncard()) ? 'checked data-waschecked="true"' : ''; ?>>No
                             </label>
+                            <input type="hidden" name="hasssncard_old" id="hasssncard_old" value="<?php echo $client->gethasssncard(); ?>" />
                         </div>
                     <?php } ?>
                 </div>

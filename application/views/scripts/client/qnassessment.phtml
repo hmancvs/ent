@@ -76,11 +76,11 @@
                                         <div class="col-md-12">
                                             <div class="divider10"></div>
                                             <p class="bolded"><?php echo $this->translate('client_impactsorpotential_label'); ?>:</p>
-                                            <p><label class="checkbox-inline"><input type="checkbox" name="qn_<?php echo $key; ?>_0" id="qn_<?php echo $key; ?>_0" class="disableoutsidesection" value="1" <?php echo $data[0] == 1 ? 'checked' : ''; ?>/> <?php echo $this->translate('client_lifequality_label'); ?></label></p>
-                                            <p><label class="checkbox-inline"><input type="checkbox" name="qn_<?php echo $key; ?>_1" id="qn_<?php echo $key; ?>_1" class="disableoutsidesection" value="1" <?php echo $data[1] == 1 ? 'checked' : ''; ?>/> <?php echo $this->translate('client_empsuccess_label'); ?></label></p>
+                                            <p><label class="checkbox-inline"><input type="checkbox" name="qn_<?php echo $key; ?>_0" id="qn_<?php echo $key; ?>_0" class="disableoutsidesection" value="1" <?php echo $data[0] == 1 ? 'checked data-waschecked="true"' : ''; ?>/> <?php echo $this->translate('client_lifequality_label'); ?></label></p>
+                                            <p><label class="checkbox-inline"><input type="checkbox" name="qn_<?php echo $key; ?>_1" id="qn_<?php echo $key; ?>_1" class="disableoutsidesection" value="1" <?php echo $data[1] == 1 ? 'checked data-waschecked="true"' : ''; ?>/> <?php echo $this->translate('client_empsuccess_label'); ?></label></p>
                                             <div class="divider10"></div>
                                             <p class="bolded"><?php echo $this->translate('client_impactedby_label'); ?>:</p>
-                                            <p><label class="checkbox-inline"><input type="checkbox" name="qn_<?php echo $key; ?>_2" id="qn_<?php echo $key; ?>_2" class="disableoutsidesection" value="1" <?php echo $data[2] == 1 ? 'checked' : ''; ?> /> <?php echo $this->translate('client_empconditions_label'); ?></label></p>
+                                            <p><label class="checkbox-inline"><input type="checkbox" name="qn_<?php echo $key; ?>_2" id="qn_<?php echo $key; ?>_2" class="disableoutsidesection" value="1" <?php echo $data[2] == 1 ? 'checked data-waschecked="true"' : ''; ?> /> <?php echo $this->translate('client_empconditions_label'); ?></label></p>
                                             <div class="divider10"></div>
                                             <p class="bolded"><?php echo $this->translate('client_issuesneeded_label'); ?></p>
                                             <p class="blocked"><textarea id="qn_<?php echo $key; ?>_3" name="qn_<?php echo $key; ?>_3" class="form-control expanding"><?php echo decode($data[3]); ?></textarea></p>

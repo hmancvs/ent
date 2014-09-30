@@ -66,9 +66,10 @@
                         foreach($workshifts as $key => $value){
                     ?>
                         <label class="radio-inline">
-                          <input type="radio" id="workshift_<?php echo $key; ?>" name="workshift" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo $key == $client->getworkshift() ? 'checked' : ''; ?>> <?php echo $value; ?>
+                          <input type="radio" id="workshift_<?php echo $key; ?>" name="workshift" class="radiobutton disableoutsidesection" value="<?php echo $key; ?>" <?php echo $key == $client->getworkshift() && !isEmptyString($client->getworkshift()) ? 'checked data-waschecked="true"' : ''; ?>> <?php echo $value; ?>
                         </label>
                     <?php } ?>
+                    <input type="hidden" name="workshift_old" id="workshift_old" value="<?php echo $client->getworkshift(); ?>" />
                 </div>
                 <?php } ?>
             </div> 
@@ -86,9 +87,10 @@
                         foreach($jobtypes as $key => $value){
                     ?>
                         <label class="radio-inline">
-                          <input type="radio" id="jobtype_<?php echo $key; ?>" class="disableoutsidesection" name="jobtype" value="<?php echo $key; ?>" <?php echo $key == $client->getjobtype() ? 'checked' : ''; ?>><?php echo $value; ?>
+                          <input type="radio" id="jobtype_<?php echo $key; ?>" class="radiobutton disableoutsidesection" name="jobtype" value="<?php echo $key; ?>" <?php echo $key == $client->getjobtype() && !isEmptyString($client->getjobtype()) ? 'checked data-waschecked="true"' : ''; ?>><?php echo $value; ?>
                         </label>
                     <?php } ?>
+                    <input type="hidden" name="jobtype_old" id="jobtype_old" value="<?php echo $client->getworkshift(); ?>" />
                 </div>
                 <?php } ?>
             </div> 
@@ -289,17 +291,21 @@
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
                     <input type="text" name="traveldistance" id="traveldistance" class="form-control width100 isdecimal" value="<?php echo $client->gettraveldistance(); ?>" />
+                    <div id="traveldistance_error"></div>
                 </div>
                 <?php } ?>
             </div>
         </div>
         <div class="col-md-6">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_desiredhourlyrate_label'); ?>:</label>
+            <label class="col-md-12 control-label" for="desiredhourlyrate"><?php echo $this->translate('client_desiredhourlyrate_label'); ?>:</label>
             <div class="col-md-12">
                 <p class="form-control-static nullifempty view"><?php echo $client->getdesiredhourlyrate(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
                     <input type="text" name="desiredhourlyrate" id="desiredhourlyrate" class="form-control width100 isdecimal" value="<?php echo $client->getdesiredhourlyrate(); ?>" />
+                    <input type="hidden" class="form-control" name="desiredhourlyrate_old" id="desiredhourlyrate_old" value="<?php echo $client->getdesiredhourlyrate(); ?>" />
+                    <div id="desiredhourlyrate_error"></div>
+
                 </div>
                 <?php } ?>
             </div>
@@ -314,15 +320,15 @@
                 <div class="edit">
                     <?php
                         $dropdown = new Zend_Form_Element_Select('transportation',
-                                            array(
-                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $transportmodes, array('0'=>$this->translate("global_addvariable_label"))),
-                                                'view' => new Zend_View(),
-                                                'decorators' => array('ViewHelper'),
-												'class' => array('form-control','input-sm','configvariable'),
-												'lookupid' => 19,
-												'fieldid' => 'transportation',
-												'fieldlabel' => $this->translate("job_transport_label")
-                                            )
+								array(
+									'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $transportmodes, array('0'=>$this->translate("global_addvariable_label"))),
+									'view' => new Zend_View(),
+									'decorators' => array('ViewHelper'),
+									'class' => array('form-control','input-sm','configvariable'),
+									'lookupid' => 19,
+									'fieldid' => 'transportation',
+									'fieldlabel' => $this->translate("job_transport_label")
+								)
                         );  
                         $dropdown->setValue($client->gettransportation()); 
                         echo $dropdown->render();

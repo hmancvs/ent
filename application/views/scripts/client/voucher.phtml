@@ -44,11 +44,11 @@
 ?>
 <script>
 $(document).ready(function() {
-	var dateofbirthOpts = datepickerOpts;
-	dateofbirthOpts.yearRange = "-<?php echo date('Y')-2010; ?>:-0"; 
-	var startfrom = '<?php echo date('Y'); ?>';
+	/*var dateofbirthOpts = datepickerOpts;
+	dateofbirthOpts.yearRange = "-<?php //echo date('Y')-2010; ?>:-0"; 
+	var startfrom = '<?php //echo date('Y'); ?>';
 	datepickerOpts.maxDate = new Date("Dec 31, "+startfrom);
-	$(".datefield").datepicker(dateofbirthOpts);
+	$(".datefield").datepicker(dateofbirthOpts);*/
 	
 	<?php if($step == 'edit' || $step == 'new'){ ?>
 		$('.edit, .requiredmark, .save_trigger, .cancel_trigger').removeClass('hidden');

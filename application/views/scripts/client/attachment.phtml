@@ -35,7 +35,7 @@
             </div>
             <?php if((($step == 'edit' && $section == 'assessment') || $step == 'new') && !$client->hasResume()){ ?>
                 <div class="divider10"></div>
-                <div class="alert alert-danger col-sm-12"><?php echo $this->translate("client_resumefilename_error"); ?></div>
+                <div class="alert alert-danger col-sm-12" id="missingresume"><?php echo $this->translate("client_resumefilename_error"); ?></div>
             <?php } ?>
         </div>
         <div class="col-md-6">

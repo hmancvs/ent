@@ -1,31 +1,4 @@
 <div class="col-md-12">
-	<div class="form-group" style="margin-left:-30px; margin-right:-30px;">
-        <div class="col-md-6 padding0">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_education_label'); ?>:</label>
-            <div class="col-md-12">
-                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->geteducationlevel(), $educationlevels) ? '' : $educationlevels[$client->geteducationlevel()]; ?></p>
-                <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
-                <div class="edit">
-                    <?php
-                        $dropdown = new Zend_Form_Element_Select('educationlevel',
-                                            array(
-                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $educationlevels, array('0'=>$this->translate("global_addvariable_label"))),
-                                                'view' => new Zend_View(),
-                                                'decorators' => array('ViewHelper'),
-                                                'class' => array('form-control','input-sm','configvariable'),
-												'lookupid' => 12,
-												'fieldid' => 'educationlevel',
-												'fieldlabel' => $this->translate("client_education_label")
-                                            )
-                        );  
-                        $dropdown->setValue($client->geteducationlevel()); 
-                        echo $dropdown->render();
-                    ?><input type="hidden" class="form-control" name="educationlevel_old" id="educationlevel_old" value="<?php echo $client->geteducationlevel(); ?>" />
-                </div>
-                <?php } ?>
-            </div>
-        </div>
-    </div>
     <div class="divider15"></div>
     <div class="form-group" style="margin-left:-30px; margin-right:-30px;">
         <div class="col-md-12 padding0">
@@ -36,11 +9,11 @@
                         <thead>
                             <tr>
                                 <th class="centeralign" style="width:15px;">#</th>
-                                <th><?php echo $this->translate('client_educ_school_label'); ?></th>
-                                <th style="width:18%;"><?php echo $this->translate('client_educ_location_label'); ?></th>
-                                <th style="width:20%;">Level</th>
-                                <th style="width:20%;"><?php echo $this->translate('client_educ_award_label'); ?></th>
-                                <th style="width:15%;"><?php echo $this->translate('client_educ_duration_label'); ?></th>
+                                <th style="font-size:10px;"><?php echo $this->translate('client_educ_school_label'); ?></th>
+                                <th style="width:18%; font-size:10px;"><?php echo $this->translate('client_educ_location_label'); ?></th>
+                                <th style="width:20%; font-size:10px;"><?php echo $this->translate('client_education_label'); ?></th>
+                                <th style="width:20%; font-size:10px;"><?php echo $this->translate('client_educ_award_label'); ?></th>
+                                <th style="width:15%; font-size:10px;"><?php echo $this->translate('client_educ_duration_label'); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -81,11 +54,11 @@
                         <thead>
                             <tr>
                                 <th class="centeralign" style="width:15px;">#</th>
-                                <th><?php echo $this->translate('client_educ_school_label'); ?></th>
-                                <th style="width:18%;"><?php echo $this->translate('client_educ_location_label'); ?></th>
-                                <th style="width:20%;">Level</th>
-                                <th style="width:20%;"><?php echo $this->translate('client_educ_award_label'); ?></th>
-                                <th style="width:15%;"><?php echo $this->translate('client_educ_duration_label'); ?></th>
+                                <th style="font-size:10px;"><?php echo $this->translate('client_educ_school_label'); ?></th>
+                                <th style="width:18%; font-size:10px;"><?php echo $this->translate('client_educ_location_label'); ?></th>
+                                <th style="width:20%; font-size:10px;"><?php echo $this->translate('client_education_label'); ?></th>
+                                <th style="width:20%; font-size:10px;"><?php echo $this->translate('client_educ_award_label'); ?></th>
+                                <th style="width:15%; font-size:10px;"><?php echo $this->translate('client_educ_duration_label'); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -103,16 +76,21 @@
                                 <td><textarea class="form-control input-sm expanding educdetail" name="educdetails[<?php echo md5($e); ?>][value1]" id="educdetails_value1_<?php echo $e; ?>"><?php echo $education->getValue1(); ?></textarea>
                                 	</td>
                                 <td><textarea class="form-control input-sm expanding educdetail" name="educdetails[<?php echo md5($e); ?>][value2]" id="educdetails_value2_<?php echo $e; ?>"><?php echo $education->getValue2(); ?></textarea></td>
-                               	<td><?php
+                               	<td>
+									<?php
 										$dropdown = new Zend_Form_Element_Select('value3_'.md5($e),
 															array(
-																'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $educationlevels),
+																'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $educationlevels, array('0'=>$this->translate("global_addvariable_label"))),
 																'view' => new Zend_View(),
 																'decorators' => array('ViewHelper'),
-																'class' => array('form-control','input-sm')
+																'class' => array('form-control','input-sm','configvariable','educlevels'),
+																'lookupid' => 12,
+																'fieldid' => 'value3_'.md5($e),
+																'fieldlabel' => 'Education Levels',
+																'appendclass' => 'educlevels'
 															)
 										);  
-										$dropdown->setValue($education->getValue3()); 
+										$dropdown->setValue(''); 
 										echo $dropdown->render();
 									?>
                                 </td>
@@ -139,13 +117,17 @@
                                     <td><textarea class="form-control input-sm expanding educdetail" name="educdetails[<?php echo md5($i); ?>][value1]" id="educdetails_value1_<?php echo $i; ?>"></textarea></td>
                                     <td><textarea class="form-control input-sm expanding educdetail" name="educdetails[<?php echo md5($i); ?>][value2]" id="educdetails_value2_<?php echo $i; ?>"></textarea></td>
                                     <td>
-                                    	<?php
+                                        <?php
 											$dropdown = new Zend_Form_Element_Select('value3_'.$i,
 																array(
-																	'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $educationlevels),
+																	'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $educationlevels, array('0'=>$this->translate("global_addvariable_label"))),
 																	'view' => new Zend_View(),
 																	'decorators' => array('ViewHelper'),
-																	'class' => array('form-control','input-sm')
+																	'class' => array('form-control','input-sm','configvariable','educlevels'),
+																	'lookupid' => 12,
+																	'fieldid' => 'value3_'.$i,
+																	'fieldlabel' => 'Education Levels',
+																	'appendclass' => 'educlevels'
 																)
 											);  
 											$dropdown->setValue(''); 
@@ -171,15 +153,16 @@
         <div class="col-md-12 padding0">
             <label class="col-md-12 control-label"><?php echo $this->translate('client_disableoutsidesection_label'); ?>:</label>
             <div class="col-md-12">
-                <p class="form-control-static nullifempty view"><?php echo $client->getcontactschooltoverify() == 1 ? 'Yes' : 'No'; ?></p>
+                <p class="form-control-static nullifempty view"><?php echo $client->getcontactschooltoverify_text(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
                     <label class="radio-inline">
-                      <input type="radio" id="contactschooltoverify_1" name="contactschooltoverify" class="disableoutsidesection" value="1" <?php echo $client->getcontactschooltoverify() == 1 ? 'checked' : ''; ?>>Yes
+                      <input type="radio" id="contactschooltoverify_1" name="contactschooltoverify" class="radiobutton disableoutsidesection" value="1" <?php echo $client->getcontactschooltoverify() == 1 && !isEmptyString($client->getcontactschooltoverify()) ? 'checked data-waschecked="true"' : ''; ?>>Yes
                     </label>
                     <label class="radio-inline">
-                      <input type="radio" id="contactschooltoverify_0" name="contactschooltoverify" class="disableoutsidesection" value="0" <?php echo $client->getcontactschooltoverify() == 0 ? 'checked' : ''; ?>>No
+                      <input type="radio" id="contactschooltoverify_0" name="contactschooltoverify" class="radiobutton disableoutsidesection" value="0" <?php echo $client->getcontactschooltoverify() == 0 && !isEmptyString($client->getcontactschooltoverify()) ? 'checked data-waschecked="true"' : ''; ?>>No
                     </label>
+                    <input type="hidden" name="contactschooltoverify_old" id="contactschooltoverify_old" value="<?php echo $client->getcontactschooltoverify(); ?>" />
                 </div>
                 <?php } ?>
             </div>
@@ -189,15 +172,16 @@
         <div class="col-md-6 padding0">
             <label class="col-md-12 control-label"><?php echo $this->translate('client_experiencedlearningproblems_label'); ?>:</label>
             <div class="col-md-12">
-                <p class="form-control-static nullifempty view"><?php echo $client->getexperiencedlearningproblems() == 1 ? 'Yes' : 'No'; ?></p>
+                <p class="form-control-static nullifempty view"><?php echo $client->getexperiencedlearningproblems_text(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
                     <label class="radio-inline">
-                      <input type="radio" id="experiencedlearningproblems_1" name="experiencedlearningproblems" class="disableoutsidesection" value="1" <?php echo $client->getexperiencedlearningproblems() == 1 ? 'checked' : ''; ?>>Yes
+                      <input type="radio" id="experiencedlearningproblems_1" name="experiencedlearningproblems" class="radiobutton disableoutsidesection" value="1" <?php echo $client->getexperiencedlearningproblems() == 1 ? 'checked data-waschecked="true"' : ''; ?>>Yes
                     </label>
                     <label class="radio-inline">
-                      <input type="radio" id="experiencedlearningproblems_0" name="experiencedlearningproblems" class="disableoutsidesection" value="0" <?php echo $client->getexperiencedlearningproblems() == 0 ? 'checked' : ''; ?>>No
+                      <input type="radio" id="experiencedlearningproblems_0" name="experiencedlearningproblems" class="radiobutton disableoutsidesection" value="0" <?php echo $client->getexperiencedlearningproblems() == 0 ? 'checked data-waschecked="true"' : ''; ?>>No
                     </label>
+                    <input type="hidden" name="experiencedlearningproblems_old" id="experiencedlearningproblems_old" value="<?php echo $client->getexperiencedlearningproblems(); ?>" />
                 </div>
                 <?php } ?>
             </div>
@@ -241,9 +225,10 @@
                             foreach($interestoptions as $key => $value){
                         ?>
                             <label class="checkbox notbolded col-md-3">
-                              <input type="checkbox" id="formaleducinterests_<?php echo $key; ?>" name="formaleducinterestsids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked' : 1; ?>><?php echo $value; ?>
+                              <input type="checkbox" id="formaleducinterests_<?php echo $key; ?>" name="formaleducinterestsids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked data-waschecked="true"' : 1; ?>><?php echo $value; ?>
                             </label>
                         <?php } ?>
+                        <input type="hidden" name="formaleducinterests_old" id="formaleducinterests_old" value="<?php echo $client->getformaleducinterests(); ?>" />
                     </div>
                     <div class="divider5"></div>
                     <a class="gonowhere checkothertrigger" fieldid="formaleducinterestsids" lookupid="30" fieldlabel="Client Education Subjects of Interest" fieldtype="checkbox" checkclasses="checkbox notbolded col-md-3" checkname="formaleducinterestsids[]" checkid="formaleducinterests_"><?php echo $this->translate('global_addoption_label'); ?></a>
@@ -266,9 +251,10 @@
                         foreach($styles as $key => $value){
                     ?>
                         <label class="checkbox notbolded">
-                          <input type="checkbox" id="learningstyles_<?php echo $key; ?>" name="learningstylesids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked' : ''; ?>><?php echo $value; ?>
+                          <input type="checkbox" id="learningstyles_<?php echo $key; ?>" name="learningstylesids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked data-waschecked="true"' : ''; ?>><?php echo $value; ?>
                         </label>
                     <?php } ?>
+                    <input type="hidden" name="learningstyles_old" id="learningstyles_old" value="<?php echo $client->getlearningstyles(); ?>" />
                     </div>
                     <div class="divider5"></div>
                     <a class="gonowhere checkothertrigger" fieldid="learningstylesids" lookupid="31" fieldlabel="Client Education Preferred Learning Styles" fieldtype="checkbox" checkclasses="checkbox notbolded" checkname="learningstylesids[]" checkid="learningstyles_"><?php echo $this->translate('global_addoption_label'); ?></a>

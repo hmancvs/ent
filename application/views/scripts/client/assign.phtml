@@ -75,11 +75,8 @@
 		});
 		
 		var dateOpts = datepickerOpts;
-		var startfrom = '<?php echo date('Y', strtotime($client->getStartDate())); ?>';
-		dateOpts.yearRange = "-<?php echo date('Y')- date('Y', strtotime($client->getStartDate())); ?>:-0"; 
-		dateOpts.minDate = new Date("<?php echo $client->getStartDate(); ?>");
-		dateOpts.maxDate = new Date("Dec 31, "+startfrom);	
-		$("#startdate").datepicker(dateOpts);
+		dateOpts.yearRange = "-<?php echo date('Y')-2000; ?>:-0"; 
+		$(".datefield").datepicker(dateOpts);
 		
 		$(".readonly").each(function(){
 			$(this).attr('readonly','readonly');
@@ -111,6 +108,8 @@
 		});
 	}); 
 </script>
+<style>
+</style>
 <form class="form-horizontal well" id="indexform" method="post" action="<?php echo $this->baseUrl("assignment/create"); ?>" >
 	<input type="hidden" name="clientid" id="clientid" value="<?php echo $assignment->getClientID(); ?>" />
     <input type="hidden" name="status" id="status" value="<?php echo $assignment->getStatus(); ?>" />

@@ -44,7 +44,7 @@
                                 ?>
                                 <tr>
                                     <td><?php echo $value; ?></td>
-                                    <td class="centeralign"><input type="checkbox" id="employmentdifficulty_<?php echo $key; ?>" name="employmentdifficultyids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked' : ''; ?> /></td>
+                                    <td class="centeralign"><input type="checkbox" id="employmentdifficulty_<?php echo $key; ?>" name="employmentdifficultyids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked data-waschecked="true"' : ''; ?> /></td>
                                 </tr>
                                 <?php } ?>
                                 <input type="hidden" name="employmentdifficulty_old" class="form-control" value="<?php echo $client->getemploymentdifficulty(); ?>" />
@@ -116,12 +116,14 @@
                                 ?>
                                 <tr>
                                     <td><?php echo $value; ?></td>
-                                    <td class="centeralign"><input type="checkbox" id="currentevents_<?php echo $key; ?>" name="currenteventids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $current_values) ? 'checked' : ''; ?> /></td>
-                                    <td class="centeralign"><input type="checkbox" id="pastevents_<?php echo $key; ?>" name="pasteventids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $past_values) ? 'checked' : ''; ?> /></td>
+                                    <td class="centeralign"><input type="checkbox" id="currentevents_<?php echo $key; ?>" name="currenteventids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $current_values) ? 'checked data-waschecked="true"' : ''; ?> /></td>
+                                    <td class="centeralign"><input type="checkbox" id="pastevents_<?php echo $key; ?>" name="pasteventids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $past_values) ? 'checked data-waschecked="true"' : ''; ?> /></td>
                                 </tr>
                                 <?php } ?>
                             </tbody>
                         </table>
+                        <input type="hidden" name="currentevents_old" id="currentevents_old" value="<?php echo $client->getcurrentevents(); ?>" />
+                        <input type="hidden" name="pastevents_old" id="pastevents_old" value="<?php echo $client->getpastevents(); ?>" />
                     </div>
                     <?php } ?>
                 </div>
@@ -141,7 +143,7 @@
                                 foreach($supportservices as $key => $value){
                             ?>
                                 <label class="checkbox notbolded col-md-3">
-                                  <input type="checkbox" id="supportservices_<?php echo $key; ?>" name="supportservicesids[]" value="<?php echo $key; ?>" class="disableoutsidesection" <?php echo in_array($key, $existing_values) ? 'checked' : ''; ?>><?php echo $value; ?>
+                                  <input type="checkbox" id="supportservices_<?php echo $key; ?>" name="supportservicesids[]" value="<?php echo $key; ?>" class="disableoutsidesection" <?php echo in_array($key, $existing_values) ? 'checked data-waschecked="true"' : ''; ?>><?php echo $value; ?>
                                 </label>
                             <?php } ?>
                             <input type="hidden" name="supportservices_old" class="form-control" value="<?php echo $client->getsupportservices(); ?>" />
@@ -193,7 +195,7 @@
                                 foreach($supportservices as $key => $value){
                             ?>
                                 <label class="checkbox notbolded col-md-3">
-                                  <input type="checkbox" id="assistivedevice_<?php echo $key; ?>" name="assistivedeviceids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked' : ''; ?>><?php echo $value; ?>
+                                  <input type="checkbox" id="assistivedevice_<?php echo $key; ?>" name="assistivedeviceids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked data-waschecked="true"' : ''; ?>><?php echo $value; ?>
                                 </label>
                             <?php } ?>
                             <input type="hidden" name="assistivedevice_old" class="form-control" value="<?php echo $client->getassistivedevice(); ?>" />
@@ -247,8 +249,7 @@
         </div>
         <div class="form-group">
             <div class="col-md-12">
-                <label class="col-md-12 control-label">
-                <span class="blocked notbolded"><?php echo $this->translate('client_barriersolutions_label'); ?></label>
+                <label class="col-md-12 control-label"><?php echo $this->translate('client_barriersolutions_label'); ?></label>
                 <div class="col-md-12">
                     <p class="form-control-static nullifempty view"><?php echo $client->getpotentialbarriers(); ?></p>
                     <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>

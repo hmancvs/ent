@@ -100,6 +100,7 @@ $(document).ready(function() {
 	$("#resumefilename").change(function(){
 		if(!isEmptyString($(this).val())){
 			$("#beforesave_resume .fileinput-preview").html($(this).val());
+			$("#missingresume").html('').remove();
 		}
 	});
 	$("#coverletterfilename").change(function(){
