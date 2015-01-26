@@ -13,7 +13,7 @@ class ClientController extends SecureController {
 	 	$action = strtolower($this->getRequest()->getActionName()); 
 	 	if($action == "removeupload" || $action == "assign" || $action == "processassign" || 
 	 		$action == "changestatus" || $action == "picture" || $action == "processpicture" || 
-	 		$action == "uploadpicture" || $action == "croppicture"
+	 		$action == "uploadpicture" || $action == "croppicture" || $action == "terminate"
 		){
 	 		return ACTION_EDIT;
 	 	}
@@ -205,47 +205,136 @@ class ClientController extends SecureController {
     	$client = new Client();
     	$client->populate($formvalues['id']);
     	
-    	$history = $client->getClientHistory(true); // debugMessage($history->toArray());
+    	$history = $client->getClientHistory(true); // debugMessage($history->toArray()); exit;
     	if($history){
-	    	$history->getClient()->setStatus(0);
-	    	$history->setStatus(0);
-	    	$history->setEndDate(date('Y-m-d'));
-	    	$history->setDateClosed(date('Y-m-d H:i:s'));
-	    	$history->setClosedByID($session->getVar('userid'));
-	    	// debugMessage($history->toArray());
-	    	
-	    	try {
-	    		$history->save();
-	    		if($formvalues['status'] == 0){
-	    			// set success message to session if only closing
-	    			$session->setVar(SUCCESS_MESSAGE, "Account successfully closed.");
-	    		}
-	    		if($formvalues['status'] == 1){
-	    			// proceed to enter new record in history with status open
-	    			$historynew = new ClientHistory();
-	    			$historynew->setStartDate($history->getEnddate());
-	    			$historynew->setStatus(1);
-	    			$historynew->setCreatedby($session->getVar('userid'));
-	    			$historynew->setDateCreated(date('Y-m-d H:i:s'));
-	    			$historynew->setClientID($client->getID()); // debugMessage($historynew->toArray());
-	    			try {
-	    				$historynew->save();
-	    				$history->getClient()->setStatus(1);
-	    				$history->save();
-	    				// set success message to session if only closing
-	    				$session->setVar(SUCCESS_MESSAGE, "Account successfully Reopened.");
-	    			} catch (Exception $e) {
-	    				// set error message to session
-	    				$session->setVar(ERROR_MESSAGE, "An error occured in updating status. ".$e->getMessage());
-	    			}
-	    		}
-	    	} catch (Exception $e) {
-	    		// set error message to session
-	    		$session->setVar(ERROR_MESSAGE, "An error occured in updating status. ".$e->getMessage());
-	    	}
+    		if($formvalues['status'] == 1){
+    			// proceed to enter new record in history with status open
+    			$historynew = new ClientHistory();
+    			$historynew->setStartDate($history->getEnddate());
+    			$historynew->setStatus(1);
+    			$historynew->setAssessedByID($session->getVar('userid'));
+    			$historynew->setClientID($client->getID()); // debugMessage($historynew->toArray());
+    			try {
+    				$historynew->save();
+    				$history->getClient()->setStatus(1);
+    				$history->save();
+    				// set success message to session if only closing
+    				$session->setVar(SUCCESS_MESSAGE, "Account successfully Reopened.");
+    			} catch (Exception $e) {
+    				// set error message to session
+    				$session->setVar(ERROR_MESSAGE, "An error occured in updating status. ".$e->getMessage());
+    			}
+    		}
     	}
     	$this->_helper->redirector->gotoUrl(decode($this->_getParam('successurl')));
     }
+    
+    
+    function terminateAction() {
+    	$this->_helper->layout->disableLayout();
+    	$this->_helper->viewRenderer->setNoRender(TRUE);
+    	$session = SessionWrapper::getInstance();
+    	$formvalues = $this->_getAllParams();
+    	$formvalues['id'] = $formvalues['historyid'];
+    	if(!isArrayKeyAnEmptyString('program', $formvalues)){
+    		$formvalues['status'] = 0;
+    	}
+    	// debugMessage(decode($this->_getParam(URL_FAILURE)));exit;
+    	 
+    	$history = new ClientHistory();
+    	$history->populate($formvalues['id']);
+    	// debugMessage($history->toArray()); exit;
+    	
+    	// fetch all existing assessment details
+    	$restoredata = array();
+    	$allassessments = $history->getClient()->getAssessments()->toArray(); // debugMessage($allassessments);
+    	$idsarray = array(); $typeformattedarray = array();
+    	foreach ($allassessments as $key => $value){
+    		$idsarray[$value['id']] = $key;
+    		$typeformattedarray[$value['type']][$key] = $allassessments[$key];
+    	}
+    	
+    	$detailsarray = array(); $id = 0;
+    	if(!isArrayKeyAnEmptyString('referraldetails', $formvalues)){
+    		foreach ($formvalues['referraldetails'] as $key => $value){
+    			if(isEmptyString($value['value1'])){
+    				unset($formvalues['referraldetails'][$key]);
+    			} else {
+    				$id++; $mds = md5($id); // debugMessage($id.'>>'.$mds);
+    				if(!isArrayKeyAnEmptyString('id', $value)){
+    					$mds = $idsarray[$value['id']];
+    					$detailsarray[$mds]['id'] = $value['id'];
+    				}
+    				if(!isArrayKeyAnEmptyString('clientid', $formvalues)){
+    					$detailsarray[$mds]['clientid'] = $formvalues['clientid'];
+    				}
+    				if(!isArrayKeyAnEmptyString('historyid', $formvalues)){
+    					$detailsarray[$mds]['parentid'] = $formvalues['historyid'];
+    				}
+    				$detailsarray[$mds]['type'] = 7;
+    				if(!isArrayKeyAnEmptyString('value1', $value)){
+    					$detailsarray[$mds]['value1'] = $value['value1'];
+    				}
+    				if(!isArrayKeyAnEmptyString('value2', $value)){
+    					$detailsarray[$mds]['value2'] = $value['value2'];
+    				}
+    				if(!isArrayKeyAnEmptyString('value3', $value)){
+    					$detailsarray[$mds]['value3'] = $value['value3'];
+    				}
+    				if(!isArrayKeyAnEmptyString('value4', $value)){
+    					$detailsarray[$mds]['value4'] = $value['value4'];
+    				}
+    				if(!isArrayKeyAnEmptyString('value5', $value)){
+    					$detailsarray[$mds]['value5'] = $value['value4'];
+    				}
+    			}
+    		}
+    	}
+    	// debugMessage($detailsarray);
+    	// debugMessage($formvalues); exit;
+    	# process the job
+    	$history->processPost($formvalues); $history->clearRelated();
+    	/* debugMessage($history->toArray()); 
+    	debugMessage('error is '.$history->getErrorStackAsString()); exit(); */
+    	
+    	# check for processing errors
+    	if($history->hasError()){
+    		$session->setVar(ERROR_MESSAGE, $history->getErrorStackAsString());
+    		$session->setVar(FORM_VALUES, $formvalues);
+    		$this->_helper->redirector->gotoUrl(decode($this->_getParam('failureurl')));
+    	}
+    	
+    	# save changes
+    	try {
+    		if(!isArrayKeyAnEmptyString('program', $formvalues)){
+    			$history->getClient()->setStatus(0);
+    		}
+    		$history->save(); 
+    		if(count($detailsarray) > 0){
+    			foreach ($detailsarray as $key => $value){
+    				$detail = new AssessmentDetails();
+    				if(!isArrayKeyAnEmptyString('id', $value)){
+    					$detail->populate($value['id']);
+    				}
+    				$detail->processPost($value);
+    				if(!$detail->hasError()){
+    					$detail->save();
+    				}
+    			}
+    		}
+    		// exit;
+    		# process and save the exit refer
+    		$session->setVar(SUCCESS_MESSAGE, $this->_translate->translate('global_update_success'));
+    		$this->_helper->redirector->gotoUrl(decode($this->_getParam(URL_SUCCESS)));
+    	} catch (Exception $e) {
+    		debugMessage($e->getMessage()); exit;
+    		// failed to save job, return to failure page (client view)
+    		$session->setVar(ERROR_MESSAGE, $e->getMessage());
+    		$session->setVar(FORM_VALUES, $formvalues);
+    		$this->_helper->redirector->gotoUrl(decode($this->_getParam(URL_FAILURE)));
+    	}
+    }
+    
     public function pictureAction() {}
     
     public function processpictureAction() {

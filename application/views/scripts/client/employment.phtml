@@ -21,6 +21,7 @@
 	$states = getStates();
 	$counties = getAllCounties();
 ?>
+<?php if(isEmptyString($request->pgc)){ ?>
 <script>
 	$(document).ready(function() {
 		<?php if($step == 'edit' || $step == 'new'){ ?>
@@ -148,15 +149,21 @@
 		<?php } ?>
 	}); 
 </script>		
-		
+<?php } ?>		
 <form id="form-employment" class="form-horizontal employment" role="form" action="<?php echo $this->baseUrl("job/create"); ?>" method="post">
+	<?php if($step == 'view' && !isEmptyString($request->pgc)){ ?>
+    	<h3 style="margin-top:10px; font-size:20px;">Employment Details - <?php echo $client->getName(); ?></h3>
+    <?php } ?>
 	<?php if($step == 'view'){ ?>
-        <p class="margin0 lineblocked makeabsolute" style="right:30px; top:5px;">
-        	<?php if($acl->checkPermission('Job', ACTION_CREATE)){ ?>	
-            	<a class="btn btn-sm btn-primary" href="<?php echo $baseview.'/step/new'; ?>"><i class="glyphicon glyphicon-plus"></i> Add Job</a>
+        <p class="margin0 lineblocked makeabsolute hideonprint" style="right:15px; top:5px;">
+        	<?php if($acl->checkPermission('Job', ACTION_CREATE) && isEmptyString($request->jobid)){ ?>	
+            	<a class="btn btn-sm btn-primary block" href="<?php echo stripURL($baseview).'/step/new'; ?>"><i class="glyphicon glyphicon-plus"></i> New Placement</a>
+            <?php } ?>
+            <?php if((!isEmptyString($request->jobid) || $job_count == 1 || $step == 'view') && isEmptyString($request->pgc)){ ?>
+                <a title="Print" href="<?php echo stripURL($this->viewurl).'/print/1/pgc/true'; ?>" class="btn btn-default btn-sm" target="_blank"><i class="glyphicon glyphicon-print"></i> Print</a>
             <?php } ?>
             <?php if($job_count > 1 && !isEmptyString($request->jobid)){ ?>
-                <a class="btn btn-sm btn-default" href="<?php echo $baseview.'/step/view'; ?>"><i class="glyphicon glyphicon-list"></i> All Jobs</a>
+                <a class="btn btn-sm btn-default block" href="<?php echo stripURL($baseview).'/step/view'; ?>"><i class="glyphicon glyphicon-list"></i> Job History</a>
             <?php } ?>
         </p>
     <?php } ?>
@@ -173,13 +180,13 @@
     <div class="panel-body padding0">
     	<div class="divider10"></div>
 		<?php if($step == 'new'){ ?>
-            <h5 class="inline margin0 bolded">Add new Job</h5>
+            <h5 class="inline margin0 bolded">Add new Client Placement</h5>
         <?php } ?>
         <?php if($step == 'edit'){ ?>
             <h5 class="inline margin0 bolded">Update Job</h5>
         <?php } ?>
         <div class="row-fluid margin0">
-            <div class="col-md-12 padding0 pull-right rightalign">
+            <div class="col-sm-12 padding0 pull-right rightalign">
                 <?php if($step == 'edit' || $step == 'new'){ ?>
                     <p class="margin0 lineblocked">
                         <button type="submit" class="btn btn-success btn-sm button-submit save_trigger save" name="save"><i class="glyphicon glyphicon-ok"></i> <?php echo $step == 'new' ? $this->translate('global_button_save') : $this->translate('global_button_save_changes'); ?></button>
@@ -192,7 +199,7 @@
         </div>
        	<?php if($job_count == 0 && $step == 'view'){ ?>
         	<div class="divider15"></div>
-            <div style="clear:both;" class="alert alert-warning margin5">There are currently no Jobs for <strong><?php echo $client->getName(); ?></strong></div>
+            <div style="clear:both;" class="alert alert-warning margin5">There are currently no jobs for <strong><?php echo $client->getName(); ?></strong></div>
         <?php } ?>
        
 		<?php if($job_count > 1 && $step == 'view' && isEmptyString($request->jobid)) { ?>
@@ -215,205 +222,14 @@
 				}
             }
         ?>
-            <fieldset class="fieldsetcontainer">
-            <legend>Job Details</legend>
-            <div class="panel-body well-sm makerelative">
-                <?php if($step == 'view'){ ?>
-                    <p class="margin0 lineblocked makeabsolute" style="right:5px; top:-5px;">
-                        <?php if($acl->checkPermission('Job', ACTION_EDIT)){ ?>	
-                            <a class="btn btn-default btn-xs <?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'update_trigger'; ?>" message="This Account is closed and updates are disabled." href="<?php echo $baseview.'/step/edit/jobid/'.encode($job->getID()); ?>" title="Update"><i class="glyphicon glyphicon-pencil"></i> Update</a>
-                        <?php } ?>
-                        <?php if($acl->checkPermission('Job', ACTION_DELETE)){ ?>
-                            <button type="button" class="btn btn-default btn-xs confirm-dialog noimgbuttonsmall" title="Delete" message="Are you sure you want to delete this entry?" action="<?php echo $this->baseUrl('job/delete/id/'.encode($job->getID())."/entityname/Job/successurl/".encode($baseview)); ?>"><i class="glyphicon glyphicon-remove"></i></button>
-                        <?php } ?>
-                    </p>
-                <?php } ?>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("job_jobtitle_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                        <div class="col-md-8">
-                            <p class="form-control-static nullifempty view"><?php echo $job->getJobTitle(); ?></p>
-                            <div class="edit">
-                                <input type="text" class="form-control input-sm" id="jobtitle" name="jobtitle" value="<?php echo $job->getJobTitle(); ?>" />
-                                <div id="jobtitle_error"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("job_hoursperweek_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                        <div class="col-md-8">
-                            <p class="form-control-static nullifempty view"><?php echo $job->gethoursperweek(); ?></p>
-                            <div class="edit">
-                                <input type="text" class="form-control input-sm width100 isdecimal" id="hoursperweek" name="hoursperweek" value="<?php echo $job->gethoursperweek(); ?>" />
-                                <div id="hoursperweek_error"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("job_wage_label"); ?> <small>($)</small>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                        <div class="col-md-8">
-                            <p class="form-control-static nullifempty view"><?php echo '$'.$job->getRate().' '.getRateTypes($job->getRateType()); ?></p>
-                            <div class="edit">
-                                <input type="text" class="form-control input-sm width80 inline isdecimal" id="rate" name="rate" value="<?php echo $job->getRate(); ?>" />
-                                <?php
-                                    $dropdown = new Zend_Form_Element_Select('ratetype',
-                                                        array(
-                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $ratetypes),
-                                                            'view' => new Zend_View(),
-                                                            'decorators' => array('ViewHelper'),
-                                                            'class' => array('form-control','input-sm','width100','inline')
-                                                        )
-                                    );  
-                                    $dropdown->setValue($job->getRateType()); 
-                                    echo $dropdown->render();
-                                ?><input type="hidden" class="form-control" name="ratetype_old" id="ratetype_old" value="<?php echo $job->getRateType(); ?>" />
-                                <div id="rate_error"></div><div id="ratetype_error"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("job_startdate_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                        <div class="col-md-8">
-                            <p class="form-control-static nullifempty view"><?php echo formatDateAndTime($job->getStartDate(), false); ?></p>
-                            <div class="edit">
-                                <input type="text" class="form-control input-sm datefield startdate readonly width100" name="startdate" id="startdate" value="<?php echo changeMySQLDateToPageFormat($job->getStartDate()); ?>" /><div id="startdate_error"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("job_status_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                        <div class="col-md-8">
-                            <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($job->getStatus(), $jobstatuses) ? '' : $jobstatuses[$job->getStatus()]; ?></p>
-                            <div class="edit">
-                                <?php
-                                    $dropdown = new Zend_Form_Element_Select('status',
-                                                        array(
-                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $jobstatuses),
-                                                            'view' => new Zend_View(),
-                                                            'decorators' => array('ViewHelper'),
-                                                            'class' => array('form-control','input-sm')
-                                                        )
-                                    );  
-                                    $dropdown->setValue($job->getStatus()); 
-                                    echo $dropdown->render();
-                                ?><div id="status_error"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("job_enddate_label"); ?>:</label>
-                        <div class="col-md-8">
-                            <p class="form-control-static nullifempty view"><?php echo formatDateAndTime($job->getenddate(), false); ?></p>
-                            <div class="edit">
-                                <input type="text" class="form-control input-sm datefield readonly width100" name="enddate" id="enddate" value="<?php echo changeMySQLDateToPageFormat($job->getenddate()); ?>" /><input type="hidden" class="form-control" name="enddate_old" id="enddate_old" value="<?php echo $job->getenddate(); ?>" />
-                                <div id="enddate_error"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group complete">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("job_terminationtype_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                        <div class="col-md-8">
-                            <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($job->getTerminationType(), $terminationtypes) ? '': $terminationtypes[$job->getTerminationType()]; ?></p>
-                            <div class="edit">
-                                <?php
-                                    $dropdown = new Zend_Form_Element_Select('terminationtype',
-                                                        array(
-                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $terminationtypes),
-                                                            'view' => new Zend_View(),
-                                                            'decorators' => array('ViewHelper'),
-                                                            'class' => array('form-control','input-sm')
-                                                        )
-                                    );  
-                                    $dropdown->setValue($job->getTerminationType()); 
-                                    echo $dropdown->render();
-                                ?>
-                                <input type="hidden" class="form-control" name="terminationtype_old" id="terminationtype_old" value="<?php echo $job->getterminationtype(); ?>" /><div id="terminationtype_error"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group complete">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("job_terminationreason_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                        <div class="col-md-8">
-                            <p class="form-control-static nullifempty view"><?php echo $job->getTerminationReason(); ?></p>
-                            <div class="edit">
-                                <textarea class="form-control expanding" id="terminationreason" name="terminationreason"><?php echo $job->getTerminationReason(); ?></textarea>
-                                <div id="terminationreason_error"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">Medical Type<?php //echo $this->translate("job_medicaltype_label"); ?>:</label>
-                        <div class="col-md-6">
-                            <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($job->getmedicaltype(), $medicaltypes) ? '' : $medicaltypes[$job->getmedicaltype()]; ?></p>
-                            <div class="edit">
-                                <?php
-                                    $dropdown = new Zend_Form_Element_Select('medicaltype',
-                                                        array(
-                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $medicaltypes),
-                                                            'view' => new Zend_View(),
-                                                            'decorators' => array('ViewHelper'),
-                                                            'class' => array('form-control','input-sm')
-                                                        )
-                                    );  
-                                    $dropdown->setValue($job->getmedicaltype()); 
-                                    echo $dropdown->render();
-                                ?><input type="hidden" class="form-control" name="medicaltype_old" id="medicaltype_old" value="<?php echo $job->getmedicaltype(); ?>" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("job_medicalstartdate_label"); ?>:</label>
-                        <div class="col-md-8">
-                            <p class="form-control-static nullifempty view"><?php echo formatDateAndTime($job->getmedicalstartdate(), false); ?></p>
-                            <div class="edit">
-                                <input type="text" class="form-control input-sm datefield readonly width100" name="medicalstartdate" id="medicalstartdate" value="<?php echo changeMySQLDateToPageFormat($job->getmedicalstartdate()); ?>" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("job_transport_label"); ?>:</label>
-                        <div class="col-md-8">
-                            <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($job->gettransportation(), $transportmodes) ? '' : $transportmodes[$job->gettransportation()]; ?></p>
-                            <div class="edit">
-                                <?php
-                                    $dropdown = new Zend_Form_Element_Select('transportation',
-                                                        array(
-                                                            'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $transportmodes),
-                                                            'view' => new Zend_View(),
-                                                            'decorators' => array('ViewHelper'),
-                                                            'class' => array('form-control','input-sm')
-                                                        )
-                                    );  
-                                    $dropdown->setValue($job->gettransportation()); 
-                                    echo $dropdown->render();
-                                ?><input type="hidden" class="form-control" name="transportation_old" id="transportation_old" value="<?php echo $job->gettransportation(); ?>" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("job_workschedule_label"); ?>:</label>
-                        <div class="col-md-8">
-                            <p class="form-control-static nullifempty view"><?php echo $job->getworkschedule(); ?></p>
-                            <div class="edit">
-                                <input type="text" class="form-control input-sm" id="workschedule" name="workschedule" value="<?php echo $job->getworkschedule(); ?>" />
-                                <div id="workschedule_error"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                </div>
-            </div>
-        </fieldset>
-            <!--<div class="divider10"></div>-->
+        	<!--<div class="divider10"></div>-->
             <fieldset class="fieldsetcontainer">
                 <legend>Employer Details</legend>
                 <div class="panel-body well-sm">
-                    <div class="col-md-6">
+                    <div class="col-sm-6">
                         <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("job_company_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-8">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("job_company_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-sm-8">
                                 <p class="form-control-static nullifempty view"><?php echo $job->getEmployer()->getName(); ?></p>
                                 <div class="edit">
                                     <input type="text" class="form-control input-sm" id="companyname" name="companyname" value="<?php echo $job->getEmployer()->getName(); ?>" />
@@ -422,8 +238,8 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("job_contactperson_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-8">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("job_contactperson_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-sm-8">
                                 <p class="form-control-static nullifempty view"><?php echo $job->getEmployer()->getContactPerson(); ?></p>
                                 <div class="edit">
                                     <input type="text" class="form-control input-sm" id="contactperson" name="contactperson" value="<?php echo $job->getEmployer()->getContactPerson(); ?>" />
@@ -432,8 +248,8 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("job_contactphone_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-8">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("job_contactphone_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-sm-8">
                                 <p class="form-control-static nullifempty view"><?php echo $job->getEmployer()->getPhone(); ?></p>
                                 <div class="edit">
                                     <input type="text" class="form-control input-sm" id="phone" name="phone" value="<?php echo $job->getEmployer()->getPhone(); ?>" />
@@ -442,8 +258,17 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("job_contactemail_label"); ?>:</label>
-                            <div class="col-md-8">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("client_fax_label"); ?>:</label>
+                            <div class="col-sm-8">
+                                <p class="form-control-static nullifempty view"><?php echo $job->getEmployer()->getFax(); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm isphone" id="fax" name="fax" value="<?php echo $job->getEmployer()->getFax(); ?>" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("job_contactemail_label"); ?>:</label>
+                            <div class="col-sm-8">
                                 <p class="form-control-static nullifempty view"><?php echo $job->getEmployer()->getEmail(); ?></p>
                                 <div class="edit">
                                     <input type="text" class="form-control input-sm" id="email" name="email" value="<?php echo $job->getEmployer()->getEmail(); ?>" />
@@ -452,8 +277,8 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("job_supervisorname_label"); ?>:</label>
-                            <div class="col-md-8">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("job_supervisorname_label"); ?>:</label>
+                            <div class="col-sm-8">
                                 <p class="form-control-static nullifempty view"><?php echo $job->getsupervisorname(); ?></p>
                                 <div class="edit">
                                     <input type="text" class="form-control input-sm" id="supervisorname" name="supervisorname" value="<?php echo $job->getsupervisorname(); ?>" />
@@ -461,8 +286,8 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("job_supervisorphone_label"); ?>:</label>
-                            <div class="col-md-8">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("job_supervisorphone_label"); ?>:</label>
+                            <div class="col-sm-8">
                                 <p class="form-control-static nullifempty view"><?php echo $job->getsupervisorphone(); ?></p>
                                 <div class="edit">
                                     <input type="text" class="form-control input-sm" id="supervisorphone" name="supervisorphone" value="<?php echo $job->getsupervisorphone(); ?>" />
@@ -470,29 +295,20 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-sm-6">
                         <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("client_addressline1_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-8">
+                            <label class="col-sm-4 control-label">Employer address: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-sm-8">
                                 <p class="form-control-static nullifempty view"><?php echo $job->getEmployer()->getAddressline1(); ?></p>
                                 <div class="edit">
-                                    <input type="text" class="form-control input-sm" id="addressline1" name="addressline1" value="<?php echo $job->getEmployer()->getAddressline1(); ?>" />
+                                    <textarea class="form-control expanding" id="addressline1" name="addressline1"><?php echo $job->getEmployer()->getAddressline1(); ?></textarea>
                                     <div id="addressline1_error"></div>
                                 </div>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("client_addressline2_label"); ?>:</label>
-                            <div class="col-md-8">
-                                <p class="form-control-static nullifempty view"><?php echo $job->getEmployer()->getAddressline2(); ?></p>
-                                <div class="edit">
-                                    <input type="text" class="form-control input-sm" id="addressline2" name="addressline2" value="<?php echo $job->getEmployer()->getAddressline2(); ?>" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("client_city_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-8">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("client_city_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-sm-8">
                                 <p class="form-control-static nullifempty view"><?php echo $job->getEmployer()->getCity(); ?></p>
                                 <div class="edit">
                                     <input type="text" class="form-control input-sm" id="city" name="city" value="<?php echo $job->getEmployer()->getCity(); ?>" />
@@ -501,8 +317,8 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("client_state_label"); ?>:</label>
-                            <div class="col-md-8">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("client_state_label"); ?>:</label>
+                            <div class="col-sm-8">
                                 <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($job->getEmployer()->getState(), $states) ? '': $states[$job->getEmployer()->getState()]; ?></p>  
                                 <div class="edit">
                                     <?php
@@ -522,8 +338,8 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("client_zipcode_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-8">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("client_zipcode_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-sm-8">
                                 <p class="form-control-static nullifempty view"><?php echo $job->getEmployer()->getZipCode(); ?></p>
                                 <div class="edit">
                                     <input type="text" class="form-control input-sm width100" id="zipcode" name="zipcode" value="<?php echo $job->getEmployer()->getZipCode(); ?>" />
@@ -532,8 +348,8 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-4 control-label"><?php echo $this->translate("client_county_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-8">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("client_county_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-sm-8">
                                 <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($job->getEmployer()->getCounty(), $counties) ? '': $counties[$job->getEmployer()->getCounty()]; ?></p>  
                                 <div class="edit">
                                     <?php
@@ -555,8 +371,209 @@
                     </div>
                 </div>
             </fieldset>
+            <fieldset class="fieldsetcontainer">
+                <legend>Job Details</legend>
+                <div class="panel-body well-sm makerelative">
+                    <?php if($step == 'view'){ ?>
+                        <p class="margin0 lineblocked makeabsolute hideonprint" style="right:5px; top:-5px;">
+                            <?php if($acl->checkPermission('Job', ACTION_EDIT)){ ?>	
+                                <a class="btn btn-primary btn-xs <?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'update_trigger block'; ?>" message="This Account is closed and updates are disabled." href="<?php echo stripURL($baseview).'/step/edit/jobid/'.encode($job->getID()); ?>" title="Update"><i class="glyphicon glyphicon-pencil"></i> Update</a>
+                            <?php } ?>
+                            <?php if($acl->checkPermission('Job', ACTION_DELETE)){ ?>
+                                <button type="button" class="btn btn-default btn-xs confirm-dialog noimgbuttonsmall" title="Delete" message="Are you sure you want to delete this entry?" action="<?php echo $this->baseUrl('job/delete/id/'.encode($job->getID())."/entityname/Job/successurl/".encode($baseview)); ?>"><i class="glyphicon glyphicon-remove"></i></button>
+                            <?php } ?>
+                        </p>
+                    <?php } ?>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("job_jobtitle_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-sm-8">
+                                <p class="form-control-static nullifempty view"><?php echo $job->getJobTitle(); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm" id="jobtitle" name="jobtitle" value="<?php echo $job->getJobTitle(); ?>" />
+                                    <div id="jobtitle_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("job_hoursperweek_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-sm-8">
+                                <p class="form-control-static nullifempty view"><?php echo $job->gethoursperweek(); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm width100 isdecimal" id="hoursperweek" name="hoursperweek" value="<?php echo $job->gethoursperweek(); ?>" />
+                                    <div id="hoursperweek_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("job_wage_label"); ?> <small>($)</small>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-sm-8">
+                                <p class="form-control-static nullifempty view"><?php echo '$'.$job->getRate().' '.getRateTypes($job->getRateType()); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm width80 inline isdecimal" id="rate" name="rate" value="<?php echo $job->getRate(); ?>" />
+                                    <?php
+                                        $dropdown = new Zend_Form_Element_Select('ratetype',
+                                                            array(
+                                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $ratetypes),
+                                                                'view' => new Zend_View(),
+                                                                'decorators' => array('ViewHelper'),
+                                                                'class' => array('form-control','input-sm','width100','inline')
+                                                            )
+                                        );  
+                                        $dropdown->setValue($job->getRateType()); 
+                                        echo $dropdown->render();
+                                    ?><input type="hidden" class="form-control" name="ratetype_old" id="ratetype_old" value="<?php echo $job->getRateType(); ?>" />
+                                    <div id="rate_error"></div><div id="ratetype_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("job_startdate_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-sm-8">
+                                <p class="form-control-static nullifempty view"><?php echo formatDateAndTime($job->getStartDate(), false); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm datefield startdate readonly width100" name="startdate" id="startdate" value="<?php echo changeMySQLDateToPageFormat($job->getStartDate()); ?>" /><div id="startdate_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("job_status_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-sm-8">
+                                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($job->getStatus(), $jobstatuses) ? '' : $jobstatuses[$job->getStatus()]; ?></p>
+                                <div class="edit">
+                                    <?php
+                                        $dropdown = new Zend_Form_Element_Select('status',
+                                                            array(
+                                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $jobstatuses),
+                                                                'view' => new Zend_View(),
+                                                                'decorators' => array('ViewHelper'),
+                                                                'class' => array('form-control','input-sm')
+                                                            )
+                                        );  
+                                        $dropdown->setValue($job->getStatus()); 
+                                        echo $dropdown->render();
+                                    ?><div id="status_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("job_enddate_label"); ?>:</label>
+                            <div class="col-sm-8">
+                                <p class="form-control-static nullifempty view"><?php echo formatDateAndTime($job->getenddate(), false); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm datefield readonly width100" name="enddate" id="enddate" value="<?php echo changeMySQLDateToPageFormat($job->getenddate()); ?>" /><input type="hidden" class="form-control" name="enddate_old" id="enddate_old" value="<?php echo $job->getenddate(); ?>" />
+                                    <div id="enddate_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php if(false){ ?>
+                            <div class="form-group complete">
+                                <label class="col-sm-4 control-label"><?php echo $this->translate("job_terminationtype_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                <div class="col-sm-8">
+                                    <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($job->getTerminationType(), $terminationtypes) ? '': $terminationtypes[$job->getTerminationType()]; ?></p>
+                                    <div class="edit">
+                                        <?php
+                                            $dropdown = new Zend_Form_Element_Select('terminationtype',
+                                                                array(
+                                                                    'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $terminationtypes),
+                                                                    'view' => new Zend_View(),
+                                                                    'decorators' => array('ViewHelper'),
+                                                                    'class' => array('form-control','input-sm')
+                                                                )
+                                            );  
+                                            $dropdown->setValue($job->getTerminationType()); 
+                                            echo $dropdown->render();
+                                        ?>
+                                        <input type="hidden" class="form-control" name="terminationtype_old" id="terminationtype_old" value="<?php echo $job->getterminationtype(); ?>" /><div id="terminationtype_error"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php } ?>
+                        <div class="form-group complete">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("job_terminationreason_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-sm-8">
+                                <p class="form-control-static nullifempty view"><?php echo $job->getTerminationReason(); ?></p>
+                                <div class="edit">
+                                    <textarea class="form-control expanding" id="terminationreason" name="terminationreason"><?php echo $job->getTerminationReason(); ?></textarea>
+                                    <div id="terminationreason_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Medical Type<?php //echo $this->translate("job_medicaltype_label"); ?>:</label>
+                            <div class="col-sm-6">
+                                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($job->getmedicaltype(), $medicaltypes) ? '' : $medicaltypes[$job->getmedicaltype()]; ?></p>
+                                <div class="edit">
+                                    <?php
+                                        $dropdown = new Zend_Form_Element_Select('medicaltype',
+                                                            array(
+                                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $medicaltypes),
+                                                                'view' => new Zend_View(),
+                                                                'decorators' => array('ViewHelper'),
+                                                                'class' => array('form-control','input-sm')
+                                                            )
+                                        );  
+                                        $dropdown->setValue($job->getmedicaltype()); 
+                                        echo $dropdown->render();
+                                    ?><input type="hidden" class="form-control" name="medicaltype_old" id="medicaltype_old" value="<?php echo $job->getmedicaltype(); ?>" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("job_medicalstartdate_label"); ?>:</label>
+                            <div class="col-sm-8">
+                                <p class="form-control-static nullifempty view"><?php echo formatDateAndTime($job->getmedicalstartdate(), false); ?></p>
+                                <div class="edit">
+                                    <input type="text" class="form-control input-sm datefield readonly width100" name="medicalstartdate" id="medicalstartdate" value="<?php echo changeMySQLDateToPageFormat($job->getmedicalstartdate()); ?>" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("job_transport_label"); ?>:</label>
+                            <div class="col-sm-8">
+                                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($job->gettransportation(), $transportmodes) ? '' : $transportmodes[$job->gettransportation()]; ?></p>
+                                <div class="edit">
+                                    <?php
+                                        $dropdown = new Zend_Form_Element_Select('transportation',
+                                                            array(
+                                                                'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $transportmodes),
+                                                                'view' => new Zend_View(),
+                                                                'decorators' => array('ViewHelper'),
+                                                                'class' => array('form-control','input-sm')
+                                                            )
+                                        );  
+                                        $dropdown->setValue($job->gettransportation()); 
+                                        echo $dropdown->render();
+                                    ?><input type="hidden" class="form-control" name="transportation_old" id="transportation_old" value="<?php echo $job->gettransportation(); ?>" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("job_workschedule_label"); ?>:</label>
+                            <div class="col-sm-8">
+                                <p class="form-control-static nullifempty view"><?php echo $job->getworkschedule(); ?></p>
+                                <div class="edit">
+                                    <textarea class="form-control expanding" id="workschedule" name="workschedule"><?php echo $job->getworkschedule(); ?></textarea>
+                                    <div id="workschedule_error"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label"><?php echo $this->translate("job_employernotes_label"); ?>:</label>
+                            <div class="col-sm-8">
+                                <p class="form-control-static nullifempty view"><?php echo $job->getNotes(); ?></p>
+                                <div class="edit">
+                                    <textarea class="form-control expanding" id="notes" name="notes"><?php echo $job->getNotes(); ?></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        	</fieldset>
             <div class="row-fluid margin0">
-                <div class="col-md-12 padding0 pull-right rightalign">
+                <div class="col-sm-12 padding0 pull-right rightalign">
                     <?php if($step == 'edit' || $step == 'new'){ ?>
                         <p class="margin0 lineblocked">
                             <button type="submit" class="btn btn-success btn-sm button-submit save_trigger save" name="save"><i class="glyphicon glyphicon-ok"></i> <?php echo $step == 'new' ? $this->translate('global_button_save') : $this->translate('global_button_save_changes'); ?></button>
@@ -570,7 +587,7 @@
         <?php } ?>
         <?php if($job_count > 1 && isEmptyString($request->jobid)) { ?>
             <div class="divider5"></div>
-            <div class="col-md-12 padding0">
+            <div class="col-sm-12 padding0">
                 <table class="table table-condensed table-striped table-responsive viewtable">
                     <thead>
                         <tr>
@@ -589,7 +606,7 @@
                         ?>
                             <tr>
                                 <td class="centeralign"><?php echo $counter; ?></td>
-                                <td><a href="<?php echo $baseview.'/step/view/jobid/'.encode($job->getID()); ?>"><?php echo $job->getjobtitle(); ?></a></td>
+                                <td><a class="block" href="<?php echo stripURL($baseview).'/step/view/jobid/'.encode($job->getID()); ?>"><?php echo $job->getjobtitle(); ?></a></td>
                                 <td><?php echo $job->getEmployer()->getName(); ?></td>
                                 <td><?php echo $job->getDuration(); ?></td>
                                 <td><?php echo isArrayKeyAnEmptyString($job->getStatus(), $jobstatuses) ? '' : $jobstatuses[$job->getStatus()]; ?></td>

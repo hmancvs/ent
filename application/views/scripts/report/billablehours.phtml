@@ -5,7 +5,7 @@
 	$enddate = $request->enddate;
 	$voucherid = $request->voucherid;
 	
-	$baseview = $reportsdash.'/section/billablehours';
+	$baseview = stripURL($reportsdash.'/section/billablehours');
 	$act_count = 0;
 	if(!isEmptyString($request->rid)){
 		$report_count = '';
@@ -49,6 +49,7 @@
 		$actreport->processPost($formvalues);
 	}
 ?>
+<?php if(isEmptyString($request->pgc)){ ?>
 <script>
 $(document).ready(function() {
 	var dateofbirthOpts = datepickerOpts;
@@ -88,7 +89,7 @@ $(document).ready(function() {
 		}
 		// if all parameters are specified, generate the activities for the report
 		if(generate){
-			var url = '<?php echo $baseview.'/step/'.$step; ?>';
+			var url = '<?php echo stripURL($baseview).'/step/'.$step; ?>';
 			<?php if(!isEmptyString($request->rid)){ ?>
 				url += '<?php echo '/rid/'.$request->rid; ?>';
 			<?php } ?>
@@ -129,42 +130,34 @@ $(document).ready(function() {
 	
 }); 
 </script>
+<?php } ?>
 <form id="form-report" class="form-horizontal report margin0" role="form" action="<?php echo $this->baseUrl("report/processbillablehours"); ?>" method="post">
-    <div class="showonprint hidden">
-        <div class="divider15"></div>
-        <span id="reportactions">			
-            <div id="print_page_action_buttons">
-                <a title="Close Window" onClick="window.close()" class="btn btn-default btn-xs"><i class="glyphicon glyphicon-remove"></i> Close</a>
-                <?php if($request->print == '1'){ ?>
-                    <a title="Print" onClick="window.print()" class="btn btn-primary btn-xs print" ><i class="glyphicon glyphicon-print"></i> Print</a>&nbsp;
-                <?php } ?>
-                <?php if($request->pdf == '1'){ ?>
-                    <a class="btn btn-primary btn-xs exportpdf blockanchor" href="<?php echo rtrim($this->viewurl,'/').'/generate/1'; ?>"><i class="glyphicon glyphicon-save"></i> Print to PDF</a>&nbsp;
-                <?php } ?>
-            </div>
-        </span>
-        <div class="divider15"></div>
-    </div>
+    <?php if(!isEmptyString($request->pgc)){ ?>
+    	<h3 style="margin-top:10px; font-size:20px;">Billable Hours Report</h3>
+    <?php } ?>
     <div class="panel-body padding0">
         <div class="pull-right hideonprint" style="margin-top:-20px;">
-            <?php if($acl->checkPermission('Billable Hours Report', ACTION_CREATE) && $step == 'view'){ ?>
-                <a href="<?php echo $baseview.'/step/new'; ?>" title="Generate New Report" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-plus"></i> Generate New Report</a>
+            <?php //if($act_count > 0){ ?>
+            	<a title="Print" href="<?php echo stripURL($this->viewurl).'/print/1/pgc/true'; ?>" class="btn btn-default btn-sm" style="margin-right:5px;" target="_blank"><i class="glyphicon glyphicon-print"></i> Print</a>
+            <?php //} ?>
+			<?php if($acl->checkPermission('Billable Hours Report', ACTION_CREATE) && $step == 'view'){ ?>
+                <a href="<?php echo stripURL($baseview).'/step/new'; ?>" title="Generate New Report" class="btn btn-primary btn-sm block"><i class="glyphicon glyphicon-plus"></i> Generate New Report</a>
             <?php } ?>
             <?php if($acl->checkPermission('Billable Hours Report', ACTION_LIST) && (($step == 'view' && !isEmptyString($request->rid)) || $step == 'new' )){ ?>
-                <a href="<?php echo $baseview.'/step/view'; ?>" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-list"></i> Billable Hours History</a>
+                <a href="<?php echo stripURL($baseview).'/step/view'; ?>" class="btn btn-default btn-sm block"><i class="glyphicon glyphicon-list"></i> Billable Hours History</a>
             <?php } ?>
             <?php if($acl->checkPermission('Billable Hours Report', ACTION_LIST) && $step == 'view' && isEmptyString($request->rid)){ ?>
-                <a href="<?php echo $reportsdash; ?>" title="Other Reports" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-list"></i> Other Reports</a>
+                <a href="<?php echo $reportsdash; ?>" title="Other Reports" class="btn btn-default btn-sm block"><i class="glyphicon glyphicon-list"></i> Other Reports</a>
             <?php } ?>
         </div>
         <div class="divider2"></div>
         <?php if(($step == 'view' && !isEmptyString($request->rid)) || $step == 'new') { ?>
-			<?php if($step == 'new'){ ?>
+			<?php if($step == 'new' && isEmptyString($request->pgc)){ ?>
                 <h5 class="inline margin0 bolded">Generate New Billable Hours Report</h5>
                 <div class="divider2"></div>
                 <div class="separator"></div>
             <?php } ?>
-            <div class="col-md-12 padding0 hideonprint">
+            <div class="col-sm-12 padding0 hideonprint">
                 <div class="statbox widget box" style="margin-top:15px;">
                     <div class="widget-content" style="margin-bottom:0; padding-bottom:0; padding-right:0;">
                         <ul class="listfilter">
@@ -203,10 +196,6 @@ $(document).ready(function() {
                                         <a class="confirm-dialog gonowhere" message="Are you sure you want to Delete this Report?" action="<?php echo $this->baseUrl('index/delete/id/'.encode($request->rid)."/entityname/ActivityReport/successurl/".encode($baseview)); ?>">Delete</a>&nbsp; 
                                     <?php } ?>
                                 <?php } ?>   
-                                <?php if($act_count > 0){ ?> 
-                                    <a title="Print" class="btn btn-default btn-sm print" href="<?php echo rtrim($this->viewurl, "/").'/print/1'; ?>" target="_blank"><i class="glyphicon glyphicon-print"></i></a> &nbsp;
-                                    <a title="Print to PDF" class="btn btn-default btn-xs pdf" href="<?php echo rtrim($this->viewurl, "/").'/pdf/1/'; ?>" target="_blank" style="padding:2px 6px;"><i class="glyphicon glyphicon-list-alt"></i> PDF</a>
-                                <?php } ?>
                             </li>
                         </ul> 
                         <div class="divider2"></div>
@@ -230,7 +219,7 @@ $(document).ready(function() {
                                         <?php if(!$actreport->isInvoiced()){ ?>
                                             <button type="submit" class="btn btn-success btn-sm gonowhere save" name="savetheninvoice" id="savetheninvoice"><i class="glyphicon glyphicon-ok"></i> Save Changes and Generate Invoice</button>
                                         <?php } ?>
-                                        <input type="hidden" class="successurl" id="<?php echo URL_SUCCESS; ?>" name="<?php echo URL_SUCCESS; ?>" value="<?php echo encode($baseview.'/step/view'); ?>" />
+                                        <input type="hidden" class="successurl" id="<?php echo URL_SUCCESS; ?>" name="<?php echo URL_SUCCESS; ?>" value="<?php echo encode(stripURL($baseview).'/step/view'); ?>" />
                                         <input type="hidden" class="failureurl" id="<?php echo URL_FAILURE; ?>" name="<?php echo URL_FAILURE; ?>" value="<?php echo encode($this->viewurl); ?>" />
                                     <?php } else { ?>
                                         <?php if(!$actreport->isInvoiced()){ ?>
@@ -246,7 +235,7 @@ $(document).ready(function() {
                                     <?php if($showsave){ ?>
                                         <button type="submit" class="btn btn-success btn-sm gonowhere save" name="savethenview" id="savethenview"><i class="glyphicon glyphicon-ok"></i> Save Report</button>
                                         <button type="submit" class="btn btn-success btn-sm gonowhere save" name="savetheninvoice" id="savetheninvoice"><i class="glyphicon glyphicon-ok"></i> Save and Generate Invoice</button>
-                                        <input type="hidden" class="successurl" id="<?php echo URL_SUCCESS; ?>" name="<?php echo URL_SUCCESS; ?>" value="<?php echo encode($baseview.'/step/view'); ?>" />
+                                        <input type="hidden" class="successurl" id="<?php echo URL_SUCCESS; ?>" name="<?php echo URL_SUCCESS; ?>" value="<?php echo encode(stripURL($baseview).'/step/view'); ?>" />
                                         <input type="hidden" class="failureurl" id="<?php echo URL_FAILURE; ?>" name="<?php echo URL_FAILURE; ?>" value="<?php echo encode($this->viewurl); ?>" />
                                     <?php } ?>
                                 </li>
@@ -262,7 +251,7 @@ $(document).ready(function() {
                 <h5 class="inline margin0 bolded"><?php echo $actreport->getTitle(); ?> <span class="notbolded normaltext"><?php echo formatDateAndTime($startdate, false); ?> - <?php echo formatDateAndTime($enddate, false); ?></span></h5>
             <?php } ?>
             <div class="divider10"></div>
-            <div class="col-md-12 padding0" style="width:100%;">
+            <div class="col-sm-12 padding0" style="width:100%;">
                 <div class="statbox widget box">
                     <div class="widget-content">
                         <?php if($act_count == 0){ ?>
@@ -434,7 +423,7 @@ $(document).ready(function() {
             <h5 class="inline margin0 bolded">Billable Hours Report History</h5>
             <div class="divider10"></div>
             <?php if($report_count == 0){ ?>
-                <div class="col-md-12 padding0">
+                <div class="col-sm-12 padding0">
                     <div class="statbox widget box box-shadow">
                         <div class="widget-content">
                             <div style="clear:both;" class="alert alert-warning margin5">There are currently no previous reports in history</div>
@@ -444,9 +433,9 @@ $(document).ready(function() {
             <?php } else { ?>
                 <?php 
                     foreach($reports as $report){ 
-                        $reportview = $baseview.'/step/view/rid/'.$report->getID();
+                        $reportview = stripURL($baseview).'/step/view/rid/'.$report->getID();
                 ?>
-                    <div class="col-md-12 padding0">
+                    <div class="col-sm-12 padding0">
                         <div class="statbox widget box box-shadow">
                             <div class="widget-content">
                                 <a href="<?php echo $reportview; ?>" class="nodecoration">

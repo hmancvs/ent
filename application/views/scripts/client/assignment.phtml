@@ -1,6 +1,6 @@
 
-<div class="row-fluid margin0">
-    <div class="col-md-12 padding0">
+<div class="row-fluid margin0 hideonprint">
+    <div class="col-sm-12 padding0">
         <div class="btn-group pull-right">
             <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
                 Actions <span class="caret"></span>
@@ -44,7 +44,15 @@
             ?>
             <tr>
                 <td class="centeralign"><?php echo $counter; ?></td>
-                <td><a href="<?php echo $this->baseUrl('profile/view/id/'.encode($user->getUserID())); ?>"><?php echo $user->getUser()->getName(); ?></a></td>
+                <td>
+                	<?php if(isEmptyString($request->pgc)){ ?>
+	                	<a href="<?php echo $this->baseUrl('profile/view/id/'.encode($user->getUserID())); ?>">
+					<?php } ?>
+					<?php echo $user->getUser()->getName(); ?>
+                    <?php if(isEmptyString($request->pgc)){ ?>
+                    	</a>
+                    <?php } ?>    
+                </td>
                 <td>Coach</td>
                 <td><?php echo isEmptyString($user->getEndDate()) ? formatDateAndTime($user->getStartDate(), false).' - To date' : formatDateAndTime($user->getStartDate(), false).' - '.formatDateAndTime($user->getEndDate(), false); ?></td>
                 <td><?php echo isEmptyString($user->getEndDate()) ? 'Active' : 'Closed'; ?></td>

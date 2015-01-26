@@ -9,7 +9,7 @@ class AssessmentDetails extends BaseRecord  {
 		$this->hasColumn('clientid', 'integer', null);
 		$this->hasColumn('type', 'integer', null);
 		// 1 (job accomodation needed), 2 (houehold members), (3) client availability, 4(education background), 
-		// 5(client references), 6(support contact info)
+		// 5(client references), 6(support contact info), 7(client exit referrals)
 		$this->hasColumn('subtype', 'integer', null);
 		// 1 (physical, environmental, instructional), 2(null), 3(startime, endtime) 4(education level), 5(null), 
 		// 6(allowcontact)

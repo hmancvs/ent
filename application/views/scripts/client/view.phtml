@@ -26,10 +26,61 @@
 	
 	$title = $client->getName();
 	$description = 'Profile Details';	
-	$this->headTitle($title.$browserappend);/**/
+	$this->headTitle($title.$browserappend);
 ?>
+<?php if(!isEmptyString($request->pgc)){ ?>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">		
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="<?php echo $this->serverUrl($this->baseUrl('stylesheets/bootstrap-3.1.1.min.css')); ?>" rel="stylesheet" type="text/css" />
+    <link href="<?php echo $this->serverUrl($this->baseUrl('stylesheets/bootstrap-theme.css')); ?>" rel="stylesheet" type="text/css" />
+    <link href="<?php echo $this->serverUrl($this->baseUrl('stylesheets/custom.css')); ?>" rel="stylesheet" type="text/css" />
+    <link href="<?php echo $this->serverUrl($this->baseUrl('stylesheets/app.css')); ?>" rel="stylesheet" type="text/css" />
+    <link href="<?php echo $this->serverUrl($this->baseUrl('stylesheets/plugins.css')); ?>" rel="stylesheet" type="text/css" />
+    <title><?php echo $title.$browserappend; ?></title>
+<body class="print">
+	<style>
+    	#centercolumn {
+			width:100%;
+			margin-left:0;
+		}
+		#contentcontainer {
+			margin-left:0;
+		}
+		#center {
+			float:left;
+			width:100%;
+		}
+		.edit, .requiredmark, .save_trigger, .cancel_trigger {
+			display:none;
+		}
+		body.print #headercontainer, body.print #sidebar, body.print .breadcrumbs, body.print .pageheader, body.print #tabs #left, body.print .hideonprint {
+			display:none;
+		}
+		body.print .showonprint {
+			display:block;
+		}
+		body.print div.controls, body.print .nullifempty {
+			display:inline-block;
+		}
+		p.view {
+			display:inline-block;
+		}
+		#contentcontainer {
+			height:auto;
+		}
+		.panel-heading .accordion-toggle:after {
+			content:'';
+		}
+    </style>
+    <div id="container-fluid">
+        <div id="contentcontainer" class="container-fluid">
+            <div id="centercolumn" class="container-fluid padding5">
+<?php } ?>
+<?php if(isEmptyString($request->pgc)){ ?>
 <script>
-
 $(document).ready(function() {
 	$('.titlebreadcrumb').html('<?php echo $homedir.'Clients / '.$client->getName(); ?>');
 	$('.titlelabel').html('<?php echo $title; ?>');
@@ -44,12 +95,11 @@ $(document).ready(function() {
 	
 });
 </script>
-<?php if(false){ ?>
 <?php } ?>
-<?php //if(false){ ?>
+
 <div class="row-fluid margin0 view">
-    <div class="col-md-12 padding0">
-    	<div class="headerbox">
+    <div class="col-md-12 padding0 hideonprint">
+        <div class="headerbox">
             <table class="table border0 nohover margin0">                       
                 <tr>		                    
                     <td class="padding2">
@@ -67,49 +117,77 @@ $(document).ready(function() {
     <?php if (!isEmptyString($session->getVar(SUCCESS_MESSAGE))) { ?>
         <div class="alert alert-success alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> <?php echo $session->getVar(SUCCESS_MESSAGE); ?></div>
     <?php } ?>
+    <div class="showonprint <?php echo isEmptyString($request->pgc) ? 'hidden' : ''; ?>">
+        <div class="divider15"></div>
+        <span id="reportactions">			
+            <div id="print_page_action_buttons">
+                <a title="Close Window" onClick="window.close()" href="javascript: void(0)"><i class="glyphicon glyphicon-remove"></i> Close</a> &nbsp;
+                <?php if($request->print == '1'){ ?>
+                    <a title="Print" onClick="window.print()" href="javascript: void(0)" class="print" ><i class="glyphicon glyphicon-print"></i> Print</a> &nbsp; 
+                <?php } ?>
+                <?php if($request->pdf == '1'){ ?>
+                    <a class="btn btn-primary btn-xs exportpdf blockanchor" href="<?php echo stripURL($this->viewurl).'/generate/1'; ?>"><i class="glyphicon glyphicon-save"></i> Print to PDF</a>&nbsp;
+                <?php } ?>
+            </div>
+        </span>
+        <div class="divider15"></div>
+    </div>
     <div id="tabs">
         <?php require APPLICATION_PATH."/views/scripts/client/leftcolumn.phtml"; ?>
         <div class="col-md-9 tab-content makerelative padding0 clearfix" id="center">
-        	<div id="profile">
-            	<?php if($tab == 'profile'){ ?>
-                	<h4 class="hideonprint">Profile</h4>
+            <div id="profile">
+                <?php if($tab == 'profile'){ ?>
+                    <h4 class="hideonprint">Profile</h4>
                     <?php require APPLICATION_PATH."/views/scripts/client/profile.phtml"; ?>
-				<?php } ?>
-			</div> 
+                <?php } ?>
+            </div> 
             <div id="employment">
-            	<?php if($tab == 'employment'){ ?>
-                	<h4 class="hideonprint">Employment</h4>
-                	<?php require APPLICATION_PATH."/views/scripts/client/employment.phtml"; ?>
+                <?php if($tab == 'employment'){ ?>
+                    <h4 class="hideonprint">Employment</h4>
+                    <?php require APPLICATION_PATH."/views/scripts/client/employment.phtml"; ?>
                 <?php } ?>
-			</div>
+            </div>
             <div id="voucher">
-				<?php if($request->tab == 'voucher'){ ?>
-                	<h4 class="hideonprint">Vouchers</h4>
-					<?php require APPLICATION_PATH."/views/scripts/client/voucher.phtml"; ?>
+                <?php if($request->tab == 'voucher'){ ?>
+                    <h4 class="hideonprint">Vouchers</h4>
+                    <?php require APPLICATION_PATH."/views/scripts/client/voucher.phtml"; ?>
                 <?php } ?>
-			</div>
+            </div>
+            <div id="intervention">
+                <?php if($request->tab == 'intervention'){ ?>
+                    <h4 class="hideonprint">Interventions</h4>
+                    <?php require APPLICATION_PATH."/views/scripts/client/intervention.phtml"; ?>
+                <?php } ?>
+            </div>
             <div id="activity">
-				<?php if($request->tab == 'activity'){ ?>
-                	<h4 class="hideonprint">Interventions</h4>
-                	<?php require APPLICATION_PATH."/views/scripts/client/activity.phtml"; ?>
+                <?php if($request->tab == 'activity'){ ?>
+                    <h4 class="hideonprint">Activity Assessments</h4>
+                    <?php require APPLICATION_PATH."/views/scripts/client/activity.phtml"; ?>
                 <?php } ?>
-			</div>
+            </div>
             <div id="finance">
                 <?php if($request->tab == 'finance'){ ?>
-                	
-                	<?php require APPLICATION_PATH."/views/scripts/client/finance.phtml"; ?>
+                    
+                    <?php require APPLICATION_PATH."/views/scripts/client/finance.phtml"; ?>
                 <?php } ?>
-			</div>
+            </div>
             <div id="report">
                 <?php if($request->tab == 'report'){ ?>
-                	<h4 class="hideonprint">Reports</h4>
-                	<?php require APPLICATION_PATH."/views/scripts/report/dashboard.phtml"; ?>
+                    <h4 class="hideonprint">Reports</h4>
+                    <?php require APPLICATION_PATH."/views/scripts/report/dashboard.phtml"; ?>
                 <?php } ?>
-			</div>
-     	</div> 
+            </div>
+        </div> 
     </div>
 </div> 
-<?php //} ?>   
+           	
 <?php
 	require_once APPLICATION_PATH.'/includes/footer.php';
 ?>
+<?php if(!isEmptyString($request->pgc)){ ?>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<?php } ?>

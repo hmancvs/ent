@@ -2,10 +2,10 @@
 <fieldset class="fieldsetcontainer">
     <legend>Primary Contact</legend>
     <div class="panel-body well-sm">
-        <div class="col-md-6">
+        <div class="col-sm-6">
             <div class="form-group">
-                <label class="col-md-5 control-label"><?php echo $this->translate("client_contactperson_label"); ?>:</label>
-                <div class="col-md-7">
+                <label class="col-sm-5 control-label"><?php echo $this->translate("client_contactperson_label"); ?>:</label>
+                <div class="col-sm-7">
                     <p class="form-control-static nullifempty view"><?php echo $client->getContactPerson(); ?></p>
                     <?php if(($step == 'edit' && $section == 'emergency' || $step == 'new')){ ?>
                     <div class="edit">
@@ -15,8 +15,8 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-5 control-label"><?php echo $this->translate("client_relationship_label"); ?>:</label>
-                <div class="col-md-7">
+                <label class="col-sm-5 control-label"><?php echo $this->translate("client_relationship_label"); ?>:</label>
+                <div class="col-sm-7">
                     <p class="form-control-static nullifempty view"><?php echo $client->getRelationshipText(); ?></p>
                     <?php if(($step == 'edit' && $section == 'emergency' || $step == 'new')){ ?>
                     <div class="edit">
@@ -42,8 +42,8 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-5 control-label"><?php echo $this->translate("client_phone_label"); ?>:</label>
-                <div class="col-md-7">
+                <label class="col-sm-5 control-label"><?php echo $this->translate("client_phone_label"); ?>:</label>
+                <div class="col-sm-7">
                     <p class="form-control-static nullifempty view"><?php echo $client->getContactPhone(); ?></p>
                     <?php if(($step == 'edit' && $section == 'emergency' || $step == 'new')){ ?>
                     <div class="edit">
@@ -53,8 +53,8 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-5 control-label"><?php echo $this->translate("client_email_label"); ?>:</label>
-                <div class="col-md-7">
+                <label class="col-sm-5 control-label"><?php echo $this->translate("client_email_label"); ?>:</label>
+                <div class="col-sm-7">
                     <p class="form-control-static nullifempty view"><?php echo $client->getContactEmail(); ?></p> 
                     <?php if(($step == 'edit' && $section == 'emergency' || $step == 'new')){ ?>
                     <div class="edit">
@@ -69,10 +69,10 @@
 <fieldset class="fieldsetcontainer">
     <legend>Secondary Contact</legend>
     <div class="panel-body well-sm">
-        <div class="col-md-6">
+        <div class="col-sm-6">
             <div class="form-group">
-                <label class="col-md-5 control-label"><?php echo $this->translate("client_contactperson_label"); ?>:</label>
-                <div class="col-md-7">
+                <label class="col-sm-5 control-label"><?php echo $this->translate("client_contactperson_label"); ?>:</label>
+                <div class="col-sm-7">
                     <p class="form-control-static nullifempty view"><?php echo $client->getContactPerson2(); ?></p>
                     <?php if(($step == 'edit' && $section == 'emergency' || $step == 'new')){ ?>
                     <div class="edit">
@@ -82,8 +82,8 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-5 control-label"><?php echo $this->translate("client_relationship_label"); ?>:</label>
-                <div class="col-md-7">
+                <label class="col-sm-5 control-label"><?php echo $this->translate("client_relationship_label"); ?>:</label>
+                <div class="col-sm-7">
                     <p class="form-control-static nullifempty view"><?php echo $client->getRelationship2Text(); ?></p>
                     <?php if(($step == 'edit' && $section == 'emergency' || $step == 'new')){ ?>
                     <div class="edit">
@@ -109,8 +109,8 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-5 control-label"><?php echo $this->translate("client_phone_label"); ?>:</label>
-                <div class="col-md-7">
+                <label class="col-sm-5 control-label"><?php echo $this->translate("client_phone_label"); ?>:</label>
+                <div class="col-sm-7">
                     <p class="form-control-static nullifempty view"><?php echo $client->getContactPhone2(); ?></p>
                     <?php if(($step == 'edit' && $section == 'emergency' || $step == 'new')){ ?>
                     <div class="edit">
@@ -120,8 +120,8 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-5 control-label"><?php echo $this->translate("client_email_label"); ?>:</label>
-                <div class="col-md-7">
+                <label class="col-sm-5 control-label"><?php echo $this->translate("client_email_label"); ?>:</label>
+                <div class="col-sm-7">
                     <p class="form-control-static nullifempty view"><?php echo $client->getContactEmail2(); ?></p> 
                     <?php if(($step == 'edit' && $section == 'emergency' || $step == 'new')){ ?>
                     <div class="edit">

@@ -70,7 +70,7 @@
 		$('.view, .update_trigger').addClass('hidden').hide();
 		
 		// form wizard
-		/*
+		
 		$('#indexform').stepy({
 			block: true,
 			validate: true,
@@ -83,10 +83,10 @@
 			},
 			finish: function() {
 				if ($("#indexform").valid()) {
-					$.blockUI({ message: '<?php //echo $blockcontent; ?>' }); 
+					$.blockUI({ message: '<?php echo $blockcontent; ?>' }); 
 				}
 			}
-		});*/
+		});
 		
 		$(".button-back").addClass('btn btn-default btn-lg');
 		$(".button-next").addClass('btn btn-primary btn-lg'); 
@@ -102,13 +102,22 @@
 		$("#resumefilename").change(function(){
 			if(!isEmptyString($(this).val())){
 				$("#beforesave_resume .fileinput-preview").html($(this).val());
-				$("#missingresume").html('').remove();
+				$("#missingresume").html('').hide();
 			}
 		});
 		$("#coverletterfilename").change(function(){
 			if(!isEmptyString($(this).val())){
 				$("#beforesave_cover .fileinput-preview").html($(this).val());
 			}
+		});
+		$("#clearresume").click(function(){
+			$("#resumefilename").val('');
+			$("#beforesave_resume .fileinput-preview").html('');
+			$("#missingresume").html("<?php echo $this->translate("client_resumefilename_error"); ?>").show();
+		});
+		$("#clearletter").click(function(){
+			$("#coverletterfilename").val('');
+			$("#beforesave_cover .fileinput-preview").html('');
 		});
 		
 		$(".computeamount").keyup(function(){
@@ -165,6 +174,10 @@
 			}
 		});
 		
+		$("#referraldate").change(function(){
+			var value = $(this).val(); 
+			$("#assessmentdate").val(value);
+		});
 	});
 	
 </script>
@@ -382,6 +395,12 @@
                                             </div>
                                             &nbsp;<input type="checkbox" name="user2trigger" id="user2trigger" class="lineblocked" value="1" title="Switch entry mode" placeholder="enter free text" /> Other
                                         	<div id="usertext2firstname_error"></div><div id="usertext2lastname_error"></div><div id="user2text_error"></div><div id="completedbyid_error"></div> 
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                         <label class="col-sm-5 control-label">Completed Date: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control input-sm datefield readonly width100" name="assessmentdate" id="assessmentdate" value="<?php //echo changeMySQLDateToPageFormat(date('Y-m-d')); ?>" /><div id="assessmentdate_error"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">

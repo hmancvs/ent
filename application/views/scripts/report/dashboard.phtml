@@ -1,7 +1,7 @@
 <?php
 	require_once APPLICATION_PATH.'/includes/header.php';
 	
-	$reportsdash = $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/report');
+	$reportsdash = stripURL($this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/report'));
 	if(isEmptyString($request->section)){
 		$request->setParam('section', 'dashboard');
 		$section = 'dashboard';
@@ -13,13 +13,13 @@
             <div class="col-md-12 paddingleft0">
                 <div class="statbox widget box box-shadow">
                     <div class="widget-content">
-                        <a href="<?php echo $reportsdash.'/section/billablehours'; ?>" class="nodecoration">
+                        <a href="<?php echo $reportsdash.'/section/billablehours'; ?>" class="nodecoration block">
                             <div class="visual cyan"><i class="glyphicon glyphicon-signal" style="font-size:32px;"></i></div>
                             <div class="title">Billable Hours Reports</div>
                             <div class="value"></div>
                         </a>
                         <div class="divider5"></div>
-                        <a href="<?php echo $reportsdash.'/section/billablehours'; ?>" class="more">View Reports <i class="pull-right icon-angle-right"></i></a>
+                        <a href="<?php echo $reportsdash.'/section/billablehours'; ?>" class="more block">View Reports <i class="pull-right icon-angle-right"></i></a>
                     </div>
                 </div>
             </div>
@@ -28,13 +28,13 @@
             <div class="col-md-12 paddingleft0">
                 <div class="statbox widget box box-shadow">
                     <div class="widget-content">
-                        <a href="<?php echo $reportsdash.'/section/activity'; ?>" class="nodecoration">
+                        <a href="<?php echo $reportsdash.'/section/activity'; ?>" class="nodecoration block">
                             <div class="visual green"><i class="glyphicon glyphicon-signal" style="font-size:32px;"></i></div>
                             <div class="title">Activity Assessment Reports</div>
                             <div class="value"></div>
                         </a>
                         <div class="divider5"></div>
-                        <a href="<?php echo $reportsdash.'/section/activity'; ?>" class="more">View Reports <i class="pull-right icon-angle-right"></i></a>
+                        <a href="<?php echo $reportsdash.'/section/activity'; ?>" class="more block">View Reports <i class="pull-right icon-angle-right"></i></a>
                     </div>
                 </div>
             </div>

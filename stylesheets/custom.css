@@ -357,6 +357,15 @@ label.error {
 a.link, .link {
 	color:#4D7496;
 }
+.minheight50 {
+	min-height:50px;
+}
+.minheight80 {
+	min-height:80px;
+}
+.minheight90 {
+	min-height:90px;
+}
 .minheight100 {
 	min-height:100px;
 }

@@ -66,6 +66,10 @@ function getAppName(){
 	$config = Zend_Registry::get("config"); 
 	return $config->system->appname;
 }
+function getAppFullName(){
+	$config = Zend_Registry::get("config");
+	return $config->system->appname;
+}
 function getCompanyName(){
 	$config = Zend_Registry::get("config"); 
 	return $config->system->companyname;
@@ -713,6 +717,44 @@ function isMale($gender){
 function isFemale($gender){
 	return $gender == '2' ? true : false; 
 }
+function getGenderText($gender){
+	$str = 'Male';
+	if(isFemale($gender)){
+		$str = 'Male';
+	}
+	return $str;
+}
+function getImagePath($id, $filename, $gender){
+	$hasprofileimage = false;
+	$real_path = BASE_PATH.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."members".DIRECTORY_SEPARATOR."member_".$id.DIRECTORY_SEPARATOR."avatar".DIRECTORY_SEPARATOR."medium_".$filename;
+	if(file_exists($real_path) && !isEmptyString($filename)){
+		$hasprofileimage = true;
+	}
+	$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+	$photo_path = $baseUrl.'/uploads/default/default_medium_male.jpg';
+	if(isFemale($gender)){
+		$photo_path = $baseUrl.'/uploads/default/default_thumbnail_female.jpg';
+	}
+	if($hasprofileimage){
+		$photo_path = $baseUrl.'/uploads/members/member_'.$id.'/avatar/medium_'.$filename;
+	}
+	
+	return $photo_path;
+}
+function getOrganisationCoverPath($id='', $filename=''){
+	$hasprofileimage = false;
+	$real_path = BASE_PATH.DIRECTORY_SEPARATOR."uploads".DIRECTORY_SEPARATOR."organisations".DIRECTORY_SEPARATOR."org_".$id.DIRECTORY_SEPARATOR."cover".DIRECTORY_SEPARATOR."medium_".$filename;
+	$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+	$photo_path = $baseUrl.'/uploads/default/default_cover.png';
+	if(file_exists($real_path) && !isEmptyString($filename)){
+		$hasprofileimage = true;
+	}
+	
+	if($hasprofileimage){
+		$photo_path = $baseUrl.'/uploads/organisations/org_'.$id.'/cover/medium_'.$filename;
+	}
+	return $photo_path;
+}
 # determine if loggedin user is admin
 function isAdmin() {
 	$session = SessionWrapper::getInstance(); 
@@ -740,6 +782,10 @@ function isManager() {
 function isLoggedIn(){
 	$session = SessionWrapper::getInstance();
 	return isEmptyString($session->getVar('userid')) ? false : true;
+}
+function isPublicUser(){
+	$session = SessionWrapper::getInstance();
+	return isEmptyString($session->getVar('userid')) ? true : false;
 }
 # determine current status label
 function getStatusText($status) {
@@ -942,7 +988,6 @@ function getJsIncludes(){
 		
 		# include here all plugins and extensions
 		'javascript/plugins/jquery.validate-1.11.1.min.js',
-		'javascript/plugins/jquery.validate.min.js',
 		'javascript/plugins/select-chain.js',
 		'javascript/plugins/chosen.jquery-1.0.0.min.js',
 		'javascript/plugins/jquery.elastic.source.1.6.11.js',		
@@ -1178,5 +1223,9 @@ function fileUploaded() {
 		return false;
 	}
 	return true;
+}
+# format url to strip leading forward slash
+function stripURL($url){
+	return rtrim($url,"/");
 }
 ?>

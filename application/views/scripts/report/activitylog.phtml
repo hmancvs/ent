@@ -1,5 +1,6 @@
 <?php 
 	$actreport = new ActivityReport();
+	$reportsdash = $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/report');
 	$baseview_rep = $reportsdash.'/section/activity';
 	
 	$report_count = 0;
@@ -31,6 +32,7 @@
 		$actreport->processPost($formvalues);
 	}
 ?>
+<?php if(isEmptyString($request->pgc)){ ?>
 <script>
 $(document).ready(function() {
 	var dateofbirthOpts = datepickerOpts;
@@ -91,64 +93,37 @@ $(document).ready(function() {
 		});
 	<?php } ?>
 	
-	<?php if($request->print == 1 || $request->pdf == 1){ ?>
-		$("body").addClass('print');
-		$("body.print #headercontainer, body.print #sidebar, body.print .breadcrumbs, body.print .pageheader, body.print #tabs #left, body.print .hideonprint").html('').remove();
-		$("body.print .showonprint").show().removeClass('hidden');
-		$('body.print div.controls, body.print .nullifempty').each(function() {
-			var html = $(this).html();
-			if(isEmptyString(html)){
-				$(this).html('');
-			}
-		});
-	<?php } ?>
 }); 
 </script>
+<?php } ?>
 <form id="form-report" class="form-horizontal report margin0" role="form" action="<?php echo $this->baseUrl("report/processactivitylog"); ?>" method="post">
-    <div class="showonprint hidden">
-        <div class="divider15"></div>
-        <span id="reportactions">			
-            <div id="print_page_action_buttons">
-                <a title="Close Window" onClick="window.close()" class="btn btn-default btn-xs"><i class="glyphicon glyphicon-remove"></i> Close</a>
-                <?php if($request->print == '1'){ ?>
-                    <a title="Print" onClick="window.print()" class="btn btn-primary btn-xs print" ><i class="glyphicon glyphicon-print"></i> Print</a>&nbsp;
-                <?php } ?>
-                <?php if($request->pdf == '1'){ ?>
-                    <a class="btn btn-primary btn-xs exportpdf blockanchor" href="<?php echo rtrim($this->viewurl,'/').'/generate/1'; ?>"><i class="glyphicon glyphicon-save"></i> Print to PDF</a>&nbsp;
-                <?php } ?>
-            </div>
-        </span>
-        <div class="divider15"></div>
-    </div>
     <div class="panel-body padding0">
         <!-- Page actions -->
         <div class="btn-group pull-right hideonprint" style="margin-top:-20px;">
         	<?php if($acl->checkPermission('Activity Report', ACTION_CREATE) && $step == 'view' && isEmptyString($request->rid)){ ?>
-                <a href="<?php echo $baseview_rep.'/step/new'; ?>" title="Generate New Report" class="btn btn-primary btn-sm" style="margin-right:10px;"><i class="glyphicon glyphicon-plus"></i> Generate New Report</a>
+                <a href="<?php echo stripURL($baseview_rep).'/step/new'; ?>" title="New Activity Form" class="btn btn-primary btn-sm block" style="margin-right:10px;"><i class="glyphicon glyphicon-plus"></i> New Activity Form</a>
             <?php } ?>
-            <?php if($acl->checkPermission('Activity Report', ACTION_VIEW) && $step == 'view' && !isEmptyString($request->rid)){ ?>
-            	<a title="Print" class="btn btn-default btn-sm print" href="<?php echo rtrim($this->viewurl, "/").'/print/1'; ?>" target="_blank"><i class="glyphicon glyphicon-print"></i> Print</a>
-         		<a title="Print to PDF" class="btn btn-default btn-sm pdf" href="<?php echo rtrim($this->viewurl, "/").'/pdf/1/'; ?>" target="_blank"><i class="glyphicon glyphicon-list-alt"></i> PDF</a>
+            <?php if($step == 'view' /*&& !isEmptyString($request->rid)*/){ ?>
+            	<a title="Print" href="<?php echo stripURL($this->viewurl).'/print/1/pgc/true'; ?>" class="btn btn-default btn-sm" style="margin-right:5px;" target="_blank"><i class="glyphicon glyphicon-print"></i> Print</a>
             <?php } ?>
             <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
                 Report Actions <span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
             	<?php if($acl->checkPermission('Activity Report', ACTION_CREATE) && $step == 'view' && isEmptyString($request->rid)){ ?>
-                	<li><a href="<?php echo $baseview_rep.'/step/new'; ?>" title="Generate New Report"><i class="glyphicon glyphicon-plus"></i> Generate New Report</a></li>
+                	<li><a href="<?php echo stripURL($baseview_rep).'/step/new'; ?>" class="block" title="New Activity Form"><i class="glyphicon glyphicon-plus"></i> New Activity Form</a></li>
                 <?php } ?>
 				<?php if($acl->checkPermission('Activity Report', ACTION_EDIT) && $step == 'view' && !isEmptyString($request->rid)){ ?>	
-                    <li><a href="<?php echo $baseview_rep.'/step/edit/rid/'.encode($actreport->getID()); ?>" title="Update Report"><i class="glyphicon glyphicon-pencil"></i> Update Report</a></li>
+                    <li><a href="<?php echo stripURL($baseview_rep).'/step/edit/rid/'.encode($actreport->getID()); ?>" class="block" title="Update Report"><i class="glyphicon glyphicon-pencil"></i> Update Report</a></li>
                 <?php } ?>
 				<?php if($acl->checkPermission('Activity Report', ACTION_VIEW) && $step == 'view' && !isEmptyString($request->rid)){ ?>
-                	<li><a title="Print" href="<?php echo rtrim($this->viewurl, "/").'/print/1'; ?>" target="_blank"><i class="glyphicon glyphicon-print"></i> Print Report</a></li>
-                    <li><a title="Print to PDF" href="<?php echo rtrim($this->viewurl, "/").'/pdf/1/'; ?>" target="_blank"><i class="glyphicon glyphicon-list-alt"></i> Print to PDF</a></li>
+                	<li><a title="Print" href="<?php echo stripURL($this->viewurl).'/print/1/pgc/true'; ?>" target="_blank"><i class="glyphicon glyphicon-print"></i> Print Report</a></li>
                 <?php } ?>
                 <?php if($acl->checkPermission('Activity Report', ACTION_LIST)){ ?>
-                    <li><a href="<?php echo $baseview_rep.'/step/view'; ?>"><i class="glyphicon glyphicon-list"></i> Activity Log History</a></li>
+                    <li><a href="<?php echo stripURL($baseview_rep).'/step/view'; ?>" class="block"><i class="glyphicon glyphicon-list"></i> Activity Log History</a></li>
                 <?php } ?>
                 <?php if($acl->checkPermission('Activity Report', ACTION_LIST) && $step == 'view' && isEmptyString($request->rid)){ ?>
-                    <li><a href="<?php echo $reportsdash; ?>" title="Other Reports"><i class="glyphicon glyphicon-list"></i> Reports Dashboard</a></li>
+                    <li><a href="<?php echo $reportsdash; ?>" class="block" title="Other Reports"><i class="glyphicon glyphicon-list"></i> Reports Dashboard</a></li>
                 <?php } ?>
             </ul>
        	</div>
@@ -159,14 +134,14 @@ $(document).ready(function() {
         	<div class="divider10"></div>
          	<div class="panel-body padding0">
                 <div class="row-fluid margin0">
-                    <div class="col-md-12 padding0 pull-right rightalign">
+                    <div class="col-sm-12 padding0 pull-right rightalign">
                         <p class="margin0 lineblocked"><button type="submit" class="btn btn-success btn-sm button-submit save_trigger save" name="save"><i class="glyphicon glyphicon-ok"></i> <?php echo $step == 'new' ? 'Generate Report' : $this->translate('global_button_save_changes'); ?></button></p>
                         <p class="margin0 lineblocked"><a class="cancel cancel_trigger"><?php echo $this->translate('global_button_cancel'); ?></a></p>
                         <input type="hidden" id="entityname" name="entityname" value="ActivityReport" />
                         <input type="hidden" id="id" name="id" value="<?php echo encode($actreport->getID()); ?>" />
                         <input type="hidden" id="clientid" name="clientid" value="<?php echo $actreport->getClientID(); ?>" />
                         <input type="hidden" id="type" name="type" value="<?php echo $actreport->getType(); ?>" />
-                        <input type="hidden" class="successurl" id="<?php echo URL_SUCCESS; ?>" name="<?php echo URL_SUCCESS; ?>" value="<?php echo encode($baseview_rep); ?>" />
+                        <input type="hidden" class="successurl" id="<?php echo URL_SUCCESS; ?>" name="<?php echo URL_SUCCESS; ?>" value="<?php echo encode(stripURL($baseview_rep)); ?>" />
                         <input type="hidden" class="failureurl" id="<?php echo URL_FAILURE; ?>" name="<?php echo URL_FAILURE; ?>" value="<?php echo encode($this->viewurl); ?>" />
                     </div>
                 </div>
@@ -174,10 +149,10 @@ $(document).ready(function() {
         	<fieldset class="fieldsetcontainer">
                 <legend><?php echo $step == 'new' ? 'Generate New Activity Report' : 'Update Report'; ?></legend>
                 <div class="panel-body well-sm makerelative">
-                    <div class="col-md-12">
+                    <div class="col-sm-12">
                         <div class="form-group">
-                            <label class="col-md-3 control-label"><?php echo $this->translate("invoice_voucherid_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-9">
+                            <label class="col-sm-3 control-label"><?php echo $this->translate("invoice_voucherid_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-sm-9">
                                 <p class="form-control-static nullifempty view"><?php echo $actreport->getVoucher()->getVoucherNumber(); ?></p>
                                 <div class="edit">
                                     <?php
@@ -198,8 +173,8 @@ $(document).ready(function() {
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-3 control-label">Report Start: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-9">
+                            <label class="col-sm-3 control-label">Report Start: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-sm-9">
                                 <p class="form-control-static nullifempty view"><?php echo formatDateAndTime($actreport->getstartdate(), false); ?></p>
                                 <div class="edit">
                                     <input type="text" class="form-control input-sm datefield readonly width100" name="startdate" id="startdate" value="<?php echo changeMySQLDateToPageFormat($actreport->getstartdate()); ?>" />
@@ -208,8 +183,8 @@ $(document).ready(function() {
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-3 control-label">Report End: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-9">
+                            <label class="col-sm-3 control-label">Report End: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-sm-9">
                                 <p class="form-control-static nullifempty view"><?php echo formatDateAndTime($actreport->getenddate(), false); ?></p>
                                 <div class="edit">
                                     <input type="text" class="form-control input-sm datefield readonly width100" name="enddate" id="enddate" value="<?php echo changeMySQLDateToPageFormat($actreport->getenddate()); ?>" />
@@ -218,8 +193,8 @@ $(document).ready(function() {
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-3 control-label">Report Title: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-9">
+                            <label class="col-sm-3 control-label">Report Title: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-sm-9">
                                 <p class="form-control-static nullifempty view"><?php echo $actreport->getTitle(); ?></p>
                                 <div class="edit">
                                     <input type="text" class="form-control input-sm" name="title" id="title" value="<?php echo $actreport->gettitle(); ?>" />
@@ -229,11 +204,11 @@ $(document).ready(function() {
                         </div>
                 	</div>
                     <div class="divider10"></div>
-                    <h4 class="col-md-12">Assessment Details</h4>
-                    <div class="col-md-12">
+                    <h4 class="col-sm-12">Assessment Details</h4>
+                    <div class="col-sm-12">
                         <div class="form-group">
-                            <label class="col-md-12 control-label">1. <?php echo $this->translate("report_activitylog_issues"); ?> <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-12">
+                            <label class="col-sm-12 control-label">1. <?php echo $this->translate("report_activitylog_issues"); ?> <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-sm-12">
                                 <p class="form-control-static nullifempty view"><?php echo $actreport->getissues(); ?></p>
                                 <div class="edit">
                                     <textarea class="form-control expanding" id="issues" name="issues"><?php echo $actreport->getissues(); ?></textarea>
@@ -242,8 +217,8 @@ $(document).ready(function() {
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-12 control-label">2. <?php echo $this->translate("report_activitylog_strategies"); ?> <?php echo $this->translate("global_required_field_marker"); ?></label>
-                            <div class="col-md-12">
+                            <label class="col-sm-12 control-label">2. <?php echo $this->translate("report_activitylog_strategies"); ?> <?php echo $this->translate("global_required_field_marker"); ?></label>
+                            <div class="col-sm-12">
                                 <p class="form-control-static nullifempty view"><?php echo $actreport->getstrategies(); ?></p>
                                 <div class="edit">
                                     <textarea class="form-control expanding" id="strategies" name="strategies"><?php echo $actreport->getstrategies(); ?></textarea>
@@ -252,8 +227,8 @@ $(document).ready(function() {
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-12 control-label">3. <?php echo $this->translate("report_activitylog_appropriate"); ?>:</label>
-                            <div class="col-md-12">
+                            <label class="col-sm-12 control-label">3. <?php echo $this->translate("report_activitylog_appropriate"); ?>:</label>
+                            <div class="col-sm-12">
                                 <p class="form-control-static nullifempty view"><?php echo $actreport->getappropriate(); ?></p>
                                 <div class="edit">
                                     <textarea class="form-control expanding" id="appropriate" name="appropriate"><?php echo $actreport->getappropriate(); ?></textarea>
@@ -262,8 +237,8 @@ $(document).ready(function() {
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-12 control-label">4. <?php echo $this->translate("report_activitylog_comments"); ?>:</label>
-                            <div class="col-md-12">
+                            <label class="col-sm-12 control-label">4. <?php echo $this->translate("report_activitylog_comments"); ?>:</label>
+                            <div class="col-sm-12">
                                 <p class="form-control-static nullifempty view"><?php echo $actreport->getcomments(); ?></p>
                                 <div class="edit">
                                     <textarea class="form-control expanding" id="comments" name="comments"><?php echo $actreport->getcomments(); ?></textarea>
@@ -272,8 +247,8 @@ $(document).ready(function() {
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-4 control-label">5. <?php echo $this->translate("report_activitylog_meetingrequested"); ?></label>
-                            <div class="col-md-8">
+                            <label class="col-sm-4 control-label">5. <?php echo $this->translate("report_activitylog_meetingrequested"); ?></label>
+                            <div class="col-sm-8">
                                 <p class="form-control-static nullifempty view"><?php echo $actreport->getmeetingrequested() == 1 ? 'Yes' : 'No'; ?></p>
                                 <div class="edit">
                                 	<label class="radio-inline">
@@ -286,8 +261,8 @@ $(document).ready(function() {
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-4 control-label">6. <?php echo $this->translate("report_activitylog_hoursrequested"); ?>:</label>
-                            <div class="col-md-8">
+                            <label class="col-sm-4 control-label">6. <?php echo $this->translate("report_activitylog_hoursrequested"); ?>:</label>
+                            <div class="col-sm-8">
                                 <p class="form-control-static nullifempty view"><?php echo formatNumber($actreport->gethoursrequested()); ?></p>
                                 <div class="edit">
                                 	<input type="text" class="form-control input-sm width100 isdecimal" id="hoursrequested" name="hoursrequested" value="<?php echo $actreport->gethoursrequested(); ?>" />
@@ -296,8 +271,8 @@ $(document).ready(function() {
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-4 control-label">7. <?php echo $this->translate("report_activitylog_newservicetypeid"); ?>:</label>
-                            <div class="col-md-8">
+                            <label class="col-sm-4 control-label">7. <?php echo $this->translate("report_activitylog_newservicetypeid"); ?>:</label>
+                            <div class="col-sm-8">
                                 <p class="form-control-static nullifempty view"><?php echo $actreport->getnewservicetypeid(); ?></p>
                                 <div class="edit">
                                 	<input type="text" class="form-control input-sm" id="newservicetypeid" name="newservicetypeid" value="<?php echo $actreport->getnewservicetypeid(); ?>" />
@@ -306,8 +281,8 @@ $(document).ready(function() {
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-4 control-label">8. <?php echo $this->translate("report_activitylog_hasjob"); ?></label>
-                            <div class="col-md-8">
+                            <label class="col-sm-4 control-label">8. <?php echo $this->translate("report_activitylog_hasjob"); ?></label>
+                            <div class="col-sm-8">
                                 <p class="form-control-static nullifempty view"><?php echo $actreport->gethasjob() == 1 ? 'Yes' : 'No'; ?></p>
                                 <div class="edit">
                                 	<label class="radio-inline">
@@ -467,44 +442,140 @@ $(document).ready(function() {
             <div class="panel-body padding0">
                 <div class="statbox widget box">
                     <div class="widget-content">
-                        <h5 class="col-md-12 bolded">Assessment Details</h5>
-                        <div class="col-md-12">
+                        <h5 class="col-sm-12 bolded">Assessment Details</h5>
+                        <div class="col-sm-12">
                             <div class="form-group">
-                                <label class="col-md-12 control-label bolded">1. <?php echo $this->translate("report_activitylog_issues"); ?></label>
-                                <div class="col-md-12"><p class="form-control-static nullifempty view"><?php echo $actreport->getissues(); ?></p></div>
+                                <label class="col-sm-12 control-label bolded">1. <?php echo $this->translate("report_activitylog_issues"); ?></label>
+                                <div class="col-sm-12"><p class="form-control-static nullifempty view"><?php echo $actreport->getissues(); ?></p></div>
                             </div>
                             <div class="form-group">
-                                <label class="col-md-12 control-label bolded">2. <?php echo $this->translate("report_activitylog_strategies"); ?> <?php echo $this->translate("global_required_field_marker"); ?></label>
-                                <div class="col-md-12"><p class="form-control-static nullifempty view"><?php echo $actreport->getstrategies(); ?></p></div>
+                                <label class="col-sm-12 control-label bolded">2. <?php echo $this->translate("report_activitylog_strategies"); ?> <?php echo $this->translate("global_required_field_marker"); ?></label>
+                                <div class="col-sm-12"><p class="form-control-static nullifempty view"><?php echo $actreport->getstrategies(); ?></p></div>
                             </div>
                             <div class="form-group">
-                                <label class="col-md-12 control-label">3. <?php echo $this->translate("report_activitylog_appropriate"); ?>:</label>
-                                <div class="col-md-12"><p class="form-control-static nullifempty view"><?php echo $actreport->getappropriate(); ?></p></div>
+                                <label class="col-sm-12 control-label">3. <?php echo $this->translate("report_activitylog_appropriate"); ?>:</label>
+                                <div class="col-sm-12"><p class="form-control-static nullifempty view"><?php echo $actreport->getappropriate(); ?></p></div>
                             </div>
                             <div class="form-group">
-                                <label class="col-md-12 control-label">4. <?php echo $this->translate("report_activitylog_comments"); ?>:</label>
-                                <div class="col-md-12"><p class="form-control-static nullifempty view"><?php echo $actreport->getcomments(); ?></p></div>
+                                <label class="col-sm-12 control-label">4. <?php echo $this->translate("report_activitylog_comments"); ?>:</label>
+                                <div class="col-sm-12"><p class="form-control-static nullifempty view"><?php echo $actreport->getcomments(); ?></p></div>
                             </div>
                             <div class="form-group">
-                                <label class="col-md-4 control-label">5. <?php echo $this->translate("report_activitylog_meetingrequested"); ?></label>
-                                <div class="col-md-8"><p class="form-control-static nullifempty view"><?php echo $actreport->getmeetingrequested() == 1 ? 'Yes' : 'No'; ?></p></div>
+                                <label class="col-sm-4 control-label">5. <?php echo $this->translate("report_activitylog_meetingrequested"); ?></label>
+                                <div class="col-sm-8"><p class="form-control-static nullifempty view"><?php echo $actreport->getmeetingrequested() == 1 ? 'Yes' : 'No'; ?></p></div>
                             </div>
                             <div class="form-group">
-                                <label class="col-md-4 control-label">6. <?php echo $this->translate("report_activitylog_hoursrequested"); ?>:</label>
-                                <div class="col-md-8"><p class="form-control-static nullifempty view"><?php echo formatNumber($actreport->gethoursrequested()); ?></p></div>
+                                <label class="col-sm-4 control-label">6. <?php echo $this->translate("report_activitylog_hoursrequested"); ?>:</label>
+                                <div class="col-sm-8"><p class="form-control-static nullifempty view"><?php echo formatNumber($actreport->gethoursrequested()); ?></p></div>
                             </div>
                             <div class="form-group">
-                                <label class="col-md-4 control-label">7. <?php echo $this->translate("report_activitylog_newservicetypeid"); ?>:</label>
-                                <div class="col-md-8"><p class="form-control-static nullifempty view"><?php echo $actreport->getnewservicetypeid(); ?></p></div>
+                                <label class="col-sm-4 control-label">7. <?php echo $this->translate("report_activitylog_newservicetypeid"); ?>:</label>
+                                <div class="col-sm-8"><p class="form-control-static nullifempty view"><?php echo $actreport->getnewservicetypeid(); ?></p></div>
                             </div>
                             <div class="form-group">
-                                <label class="col-md-4 control-label">8. <?php echo $this->translate("report_activitylog_hasjob"); ?></label>
-                                <div class="col-md-8"><p class="form-control-static nullifempty view"><?php echo $actreport->gethasjob() == 1 ? 'Yes' : 'No'; ?></p></div>
+                                <label class="col-sm-4 control-label">8. <?php echo $this->translate("report_activitylog_hasjob"); ?></label>
+                                <div class="col-sm-8"><p class="form-control-static nullifempty view"><?php echo $actreport->gethasjob() == 1 ? 'Yes' : 'No'; ?></p></div>
                             </div>
                         </div>
                     </div>
                	</div>
            	</div>
+            <div class="panel-body padding0">
+                <div class="statbox widget box">
+                    <div class="widget-content">
+                        <h5 class="col-sm-12 bolded">Employment Information</h5>
+                    	<?php 
+							$job = $client->getLatestClientJob();
+							// debugMessage($job->toArray());
+						?>
+                        <?php if($request->generate == 1){ ?>
+                            <div class="divider20"></div>
+                        <?php } ?>
+                         <table class="table margin0 noborder printtable" style=" <?php echo $request->generate == 1 ? 'border-collapse: collapse; font-size:11px;' : ''; ?>">
+                            <tr>
+                                <td style="width:50%; padding-top:0;">
+                                    <table class="table margin0 noborder">
+                                        <tr>
+                                            <td style="width:115px;"><label class="control-label paddingleft0 floatleft">Employer's Name:</label></td>
+                                            <td><p class="form-control-static nullifempty view"><?php echo $job->getEmployer()->getName(); ?></p>
+                                        </tr>
+                                        <?php if($request->generate == 1){ ?>
+                                            <tr><td colspan="2">&nbsp;</td></tr>
+                                        <?php } ?>
+                                        <tr>
+                                            <td><label class="control-label">Employer Address:</label></td>
+                                            <td><p class="form-control-static nullifempty view"><?php echo $job->getEmployer()->getAddressline1(); ?></p></td>
+                                        </tr>
+                                        <?php if($request->generate == 1){ ?>
+                                            <tr><td colspan="2">&nbsp;</td></tr>
+                                        <?php } ?>
+                                        <tr>
+                                            <td><label class="control-label">Telephone:</label></td>
+                                            <td><p class="form-control-static nullifempty view"><?php echo $job->getEmployer()->getPhone(); ?></p></td>
+                                        </tr>
+                                        <?php if($request->generate == 1){ ?>
+                                            <tr><td colspan="2">&nbsp;</td></tr>
+                                        <?php } ?>
+                                        <tr>
+                                            <td><label class="control-label"><?php echo $this->translate("job_supervisorname_label"); ?>:</label></td>
+                                            <td><p class="form-control-static nullifempty view"><?php echo $job->getsupervisorname(); ?></p></td>
+                                        </tr>
+                                        <?php if($request->generate == 1){ ?>
+                                            <tr><td colspan="2">&nbsp;</td></tr>
+                                        <?php } ?>
+                                        <tr>
+                                            <td><label class="control-label"><?php echo $this->translate("job_supervisorphone_label"); ?>:</label></td>
+                                            <td><p class="form-control-static nullifempty view"><?php echo $job->getsupervisorphone(); ?></p></td>
+                                        </tr>
+                                        <?php if($request->generate == 1){ ?>
+                                            <tr><td colspan="2">&nbsp;</td></tr>
+                                        <?php } ?>
+                                    </table>
+                                </td>
+                                <td style="padding-top:0;">
+                                    <table class="table margin0 noborder">
+                                        <tr>
+                                            <td style="width:115px;"><label class="control-label">Job Title:</label></td>
+                                            <td><p class="form-control-static nullifempty view"><?php echo $job->getJobTitle(); ?></p></td>
+                                        </tr>
+                                        <?php if($request->generate == 1){ ?>
+                                            <tr><td colspan="2">&nbsp;</td></tr>
+                                        <?php } ?>
+                                        <tr>
+                                            <td><label class="control-label"><?php echo $this->translate("job_startdate_label"); ?>:</label></td>
+                                            <td><p class="form-control-static nullifempty view"><?php echo formatDateAndTime($job->getStartDate(), false); ?></p></td>
+                                        </tr>
+                                        <?php if($request->generate == 1){ ?>
+                                            <tr><td colspan="2">&nbsp;</td></tr>
+                                        <?php } ?>
+                                        <tr>
+                                            <td><label class="control-label"><?php echo $this->translate("job_hoursperweek_label"); ?>:</label></td>
+                                            <td><p class="form-control-static nullifempty view"><?php echo $job->gethoursperweek(); ?></p></td>
+                                        </tr>
+                                        <?php if($request->generate == 1){ ?>
+                                            <tr><td colspan="2">&nbsp;</td></tr>
+                                        <?php } ?>
+                                        <tr>
+                                            <td><label class="control-label"><?php echo $this->translate("job_wage_label"); ?>:</label></td>
+                                            <td><p class="form-control-static nullifempty view"><?php echo '$'.$job->getRate().' '.getRateTypes($job->getRateType()); ?></p></td>
+                                        </tr>
+                                        <?php if($request->generate == 1){ ?>
+                                            <tr><td colspan="2">&nbsp;</td></tr>
+                                        <?php } ?>
+                                        <tr>
+                                            <td><label class="control-label"><?php echo $this->translate("job_workschedule_label"); ?>:</label></td>
+                                            <td><p class="form-control-static nullifempty view"><?php echo $job->getworkschedule(); ?></p></td>
+                                        </tr>
+                                        <?php if($request->generate == 1){ ?>
+                                            <tr><td colspan="2">&nbsp;</td></tr>
+                                        <?php } ?>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+             	</div>
+            </div>
             <?php
                 $html = ob_get_clean(); 
                 echo $html;
@@ -513,10 +584,10 @@ $(document).ready(function() {
         
         <!--List of activity reports-->
         <?php if($step == 'view' && isEmptyString($request->rid) && isEmptyString($request->voucherid)) { ?>
-            <h5 class="inline margin0 bolded">Activity Assessment Reports</h5>
+            <h5 class="inline margin0 bolded"><!--Activity History--></h5>
             <div class="divider10"></div>
             <?php if($report_count == 0){ ?>
-                <div class="col-md-12 padding0">
+                <div class="col-sm-12 padding0">
                     <div class="statbox widget box box-shadow">
                         <div class="widget-content">
                             <div style="clear:both;" class="alert alert-warning margin5">There are currently no previous reports in history</div>
@@ -526,12 +597,12 @@ $(document).ready(function() {
             <?php } else { ?>
                 <?php 
                     foreach($reports as $report){ 
-                        $reportview = $baseview_rep.'/step/view/rid/'.encode($report->getID());
+                        $reportview = stripURL($baseview_rep).'/step/view/rid/'.encode($report->getID());
                 ?>
-                    <div class="col-md-12 padding0">
+                    <div class="col-sm-12 padding0">
                         <div class="statbox widget box box-shadow">
                             <div class="widget-content">
-                                <a href="<?php echo $reportview; ?>" class="nodecoration">
+                                <a href="<?php echo $reportview; ?>" class="nodecoration block">
                                     <div class="visual yellow"><i class="glyphicon glyphicon-signal" style="font-size:32px;"></i></div>
                                     <div class="title">
                                         <div class="blocked"><?php echo $report->getTitle(); ?> </div>
@@ -541,7 +612,7 @@ $(document).ready(function() {
                                     <div class="value"></div>
                                 </a>
                                 <div class="divider2"></div>
-                                <a href="<?php echo $reportview; ?>" class="more">View Report <i class="pull-right icon-angle-right"></i></a>
+                                <a href="<?php echo $reportview; ?>" class="more block">View Report <i class="pull-right icon-angle-right"></i></a>
                             </div>
                         </div>
                     </div>

@@ -10,6 +10,7 @@ class Activity extends BaseEntity {
 		$this->hasColumn('voucherid', 'integer', null, array('notblank' => true));
 		$this->hasColumn('clientid', 'integer', null, array('notblank' => true));
 		$this->hasColumn('coachid', 'integer', null, array('notblank' => true));
+		$this->hasColumn('jobid', 'integer', null, array('notblank' => true));
 		$this->hasColumn('activitydate','date', null, array('notblank' => true));
 		$this->hasColumn('starttime', 'time', null, array('notblank' => true));
 		$this->hasColumn('endtime', 'time', null, array('notblank' => true));
@@ -35,6 +36,7 @@ class Activity extends BaseEntity {
        									"clientid.notblank" => $this->translate->_("activity_clientid_error"),
        									"voucherid.notblank" => $this->translate->_("activity_voucherid_error"),
        									"coachid.notblank" => $this->translate->_("activity_coachid_error"),
+       									"jobid.notblank" => $this->translate->_("activity_jobid_error"),
        									"activitydate.notblank" => $this->translate->_("activity_activitydate_error"),
        									"starttime.notblank" => $this->translate->_("activity_starttime_error"),
        									"endtime.notblank" => $this->translate->_("activity_endtime_error"),
@@ -71,6 +73,12 @@ class Activity extends BaseEntity {
 				)
 		);
 		
+		$this->hasOne('Job as job',
+				array(
+						'local' => 'jobid',
+						'foreign' => 'id',
+				)
+		);
 	}
 	/**
 	 * Custom model validation

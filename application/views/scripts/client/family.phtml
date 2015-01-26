@@ -1,8 +1,8 @@
 <div class="panel-body well-sm">
     <div class="form-group">
-        <div class="col-md-12">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_qualityoflife_label'); ?></label>
-            <div class="col-md-12">
+        <div class="col-sm-12">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_qualityoflife_label'); ?></label>
+            <div class="col-sm-12">
                 <?php $lifequalities = getAllLifeQualityOptions(); ?>
                 <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getqualityoflife(), $lifequalities) ? '': $lifequalities[$client->getqualityoflife()]; ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
@@ -21,9 +21,9 @@
         </div>
     </div>
     <div class="form-group">
-        <div class="col-md-12">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_oncallhousesupport_label'); ?>:</label>
-            <div class="col-md-12">
+        <div class="col-sm-12">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_oncallhousesupport_label'); ?>:</label>
+            <div class="col-sm-12">
                 <p class="form-control-static nullifempty view"><?php echo $client->getoncallhousesupport_text(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
@@ -40,9 +40,9 @@
         </div>
     </div>
     <div class="form-group">
-        <div class="col-md-6">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_housing_label'); ?>:</label>
-            <div class="col-md-12">
+        <div class="col-sm-6">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_housing_label'); ?>:</label>
+            <div class="col-sm-12">
                 <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getHousing(), $housingtypes) ? '': $housingtypes[$client->getHousing()]; ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
@@ -65,9 +65,9 @@
                 <?php } ?>
             </div>
         </div>
-        <div class="col-md-6">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_householdcount_label'); ?>:</label>
-            <div class="col-md-12">
+        <div class="col-sm-6">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_householdcount_label'); ?>:</label>
+            <div class="col-sm-12">
                 <p class="form-control-static nullifempty view"><?php echo $client->gethouseholdcount(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
@@ -78,9 +78,9 @@
         </div>
     </div>
     <div class="form-group">
-        <div class="col-md-6">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_partner_label'); ?>:</label>
-            <div class="col-md-12">
+        <div class="col-sm-6">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_partner_label'); ?>:</label>
+            <div class="col-sm-12">
                 <p class="form-control-static nullifempty view"><?php echo $client->getpartnername(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
@@ -89,9 +89,9 @@
                 <?php } ?>
             </div> 
         </div>
-        <div class="col-md-6">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_rshipyears_label'); ?>:</label>
-            <div class="col-md-12">
+        <div class="col-sm-6">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_rshipyears_label'); ?>:</label>
+            <div class="col-sm-12">
                 <p class="form-control-static nullifempty view"><?php echo $client->getyearsinrship(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
@@ -102,10 +102,10 @@
         </div>
     </div>
     <div class="form-group">
-        <div class="col-md-12">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_householdmembers_label'); ?>:</label>
-            <div class="col-md-12">
-                <p class="form-control-static nullifempty view">
+        <div class="col-sm-12">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_householdmembers_label'); ?>:</label>
+            <div class="col-sm-12">
+                <p class="form-control-static nullifempty view maxwidth">
                     <table class="table table-condensed table-bordered table-striped table-responsive viewtable" style="margin-bottom:10px;">
                         <thead>
                             <tr>

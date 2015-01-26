@@ -8,7 +8,7 @@ class Job extends BaseEntity {
 		
 		$this->setTableName('job');
 		$this->hasColumn('clientid', 'integer', null, array('notblank' => true));
-		$this->hasColumn('employerid', 'integer', null/* , array('notblank' => true) */);
+		$this->hasColumn('employerid', 'integer', null, array('default'=>NULL));
 		$this->hasColumn('startdate', 'date', null, array('notblank' => true));
 		$this->hasColumn('enddate', 'string', 15);
 		$this->hasColumn('type', 'integer', null);
@@ -39,7 +39,6 @@ class Job extends BaseEntity {
 		# set the custom error messages
        	$this->addCustomErrorMessages(array(
        									"clientid.notblank" => $this->translate->_("job_clientid_error"),
-       									// "employerid.notblank" => $this->translate->_("job_employerid_error"),
        									"startdate.notblank" => $this->translate->_("job_startdate_error"),
        									"jobtitle.notblank" => $this->translate->_("job_jobtitle_error"),
        									"rate.notblank" => $this->translate->_("job_rate_error"),

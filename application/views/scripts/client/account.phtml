@@ -1,57 +1,3 @@
-<fieldset class="fieldsetcontainer">
-    <legend>Status History</legend>	
-    <div class="row-fluid margin0">
-        <div class="col-md-12">
-            <p class="floatright margin0">
-                <?php if($client->isActive()){ ?>
-                    <button type="button" class="btn btn-warning btn-xs confirm-dialog" message="Are you sure you want to Close this Account?" action="<?php echo $this->baseUrl('client/changestatus/id/'.$client->getID().'/status/0/successurl/'.encode($this->viewurl)); ?>"><i class="glyphicon glyphicon-remove-sign"></i> Close Account</button>
-                <?php } else { ?>
-                    <button type="button" class="btn btn-success btn-xs confirm-dialog" message="Are you sure you want to Re-Open this Account?" action="<?php echo $this->baseUrl('client/changestatus/id/'.$client->getID().'/status/1/successurl/'.encode($this->viewurl)); ?>"><i class="glyphicon glyphicon-remove-sign"></i> Re-open Account</button>
-                <?php } ?>
-            </p>
-        </div>
-    </div>
-    <div class="divider5"></div>
-    <div class="col-md-12">
-        <table class="table table-condensed table-striped table-responsive viewtable">
-            <thead>
-                <tr>
-                    <th class="centeralign" style="width:15px;">#</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                    <th style="width:12%;">Status</th>
-                    <th style="width:20%;">Opened / Closed By</th>
-                    <th style="width:25%;">Comments</th>
-                </tr>
-            </thead>
-            <tbody>
-               <?php 
-                    $history = $client->getClientHistory(); // debugMessage($assigments->toArray());													
-                    $counthistory = $history->count();
-                ?>
-                <?php if($counthistory == 0){ ?>
-                    <tr>
-                        <td colspan="7"><div class="alert alert-warning">No entries found</div></td>
-                    </tr>
-                <?php } else { ?>
-                    <?php 
-                        $counter = 1;
-                        foreach($history as $record){
-                    ?>
-                    <tr>
-                        <td class="centeralign"><?php echo $counter; ?></td>
-                        <td><?php echo formatDateAndTime($record->getStartDate(), false); ?></td>
-                        <td><?php echo formatDateAndTime($record->getEndDate(), false); ?></td>
-                        <td><?php echo $record->isActive() ? 'Open' : 'Closed'; ?></td>
-                        <td><?php echo $record->getCreator()->getName(); ?></td>
-                        <td><?php echo $record->isActive() ? '--' : $user->getReason(); ?></td>
-                    </tr>
-                    <?php $counter++; } ?>
-                <?php } ?>
-            </tbody>
-        </table>
-    </div>
-</fieldset>
 <div class="divider10"></div>
 <fieldset class="fieldsetcontainer">
     <legend>Maintenance</legend>	
@@ -60,10 +6,10 @@
             <div class="divider15"></div>
             <p class="floatleft">
                 <?php if($acl->checkPermission('Client', ACTION_EDIT)){ ?>
-                    <a class="btn btn-default btn-xs" href="<?php echo $this->baseUrl('client/picture/id/'.encode($client->getID())); ?>"><i class="glyphicon glyphicon-upload"></i> Upload Photo</a>
+                    <a class="btn btn-default btn-xs <?php echo !$client->isActive() ? 'btn-alert alert-dialog' : ''; ?>" href="<?php echo $this->baseUrl('client/picture/id/'.encode($client->getID())); ?>" message="<?php echo !$client->isActive() ? 'This Account is closed and updates are disabled' : ''; ?>"><i class="glyphicon glyphicon-upload"></i> Upload Photo</a>
                 <?php } ?>
                 <?php if($acl->checkPermission('Client', ACTION_DELETE)){ ?>
-                    <button type="button" class="btn btn-danger btn-xs confirm-dialog" message="Are you sure you want to Delete this Account? Please note that erasing this entry will also wipe out all data related to it!" action="<?php echo $this->baseUrl('client/delete/id/'.encode($client->getID())."/entityname/Client/successurl/".encode($listurl)); ?>"><i class="glyphicon glyphicon-remove"></i> Delete Account</button>
+                    <button type="button" class="btn btn-danger btn-xs <?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'confirm-dialog'; ?>" message="<?php echo !$client->isActive() ? 'This Account is closed and updates are disabled' : 'Are you sure you want to Delete this Account? Please note that erasing this entry will also wipe out all data related to it!'; ?>" action="<?php echo $this->baseUrl('client/delete/id/'.encode($client->getID())."/entityname/Client/successurl/".encode($listurl)); ?>"><i class="glyphicon glyphicon-remove"></i> Delete Account</button>
                 <?php } ?>
             </p>
         </div>

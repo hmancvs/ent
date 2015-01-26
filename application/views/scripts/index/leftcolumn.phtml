@@ -17,9 +17,9 @@
         <li class="nav dropdown <?php echo $controller == 'client' ? 'active' : ''; ?>">
             <a class="gonowhere"><span class="glyphicon glyphicon-user"></span> Manage Clients</a>
             <ul class="subNav client" <?php echo $controller == 'client' ? 'style="display:block;"' : ''; ?>>
-                <li><a href="<?php echo $this->baseUrl('client/list'); ?>">Clients</a></li>
+                <li><a href="<?php echo $this->baseUrl('client/list'); ?>" class="block">Clients</a></li>
                 <?php if ($acl->checkPermission('Client', ACTION_CREATE)) { ?>	
-                	<li><a href="<?php echo $this->baseUrl('client'); ?>">New Client</a></li>
+                	<li><a href="<?php echo $this->baseUrl('client'); ?>" class="block">New Client</a></li>
                 <?php } ?>
             </ul>						
         </li>

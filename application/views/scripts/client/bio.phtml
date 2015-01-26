@@ -1,3 +1,4 @@
+<?php if(isEmptyString($request->pgc)){ ?>
 <!--Fields for the client bio data both update and new-->
 <script>
 $(document).ready(function() {
@@ -81,6 +82,7 @@ $(document).ready(function() {
 	
 });
 </script>
+<?php } ?>
 <style>
 .birth {
 	padding-left:2px;
@@ -90,10 +92,10 @@ $(document).ready(function() {
 <fieldset class="fieldsetcontainer">
     <legend>About</legend>
     <div class="panel-body well-sm">
-        <div class="col-md-6">
+        <div class="col-sm-6">
             <div class="form-group">
-                <label class="col-md-4 control-label" for="firstname"><?php echo $this->translate("client_firstname_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                <div class="col-md-8">
+                <label class="col-sm-4 control-label" for="firstname"><?php echo $this->translate("client_firstname_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                <div class="col-sm-8">
                     <p class="form-control-static nullifempty view"><?php echo $client->getFirstName(); ?></p>
                     <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                     <div class="edit">
@@ -104,8 +106,8 @@ $(document).ready(function() {
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-4 control-label"><?php echo $this->translate("client_initial_label"); ?>: </label>
-                <div class="col-md-8">
+                <label class="col-sm-4 control-label"><?php echo $this->translate("client_initial_label"); ?>: </label>
+                <div class="col-sm-8">
                     <p class="form-control-static nullifempty view"><?php echo $client->getInitial(); ?></p>
                     <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                     <div class="edit"><input type="text" class="form-control input-sm width75" id="initial" name="initial" value="<?php echo $client->getInitial(); ?>" />
@@ -114,8 +116,8 @@ $(document).ready(function() {
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-4 control-label"><?php echo $this->translate("client_lastname_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                <div class="col-md-8">
+                <label class="col-sm-4 control-label"><?php echo $this->translate("client_lastname_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                <div class="col-sm-8">
                     <p class="form-control-static nullifempty view"><?php echo $client->getLastName(); ?></p>
                     <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                     <div class="edit">
@@ -126,8 +128,8 @@ $(document).ready(function() {
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-4 control-label"><?php echo $this->translate("client_middlename_label"); ?>:</label>
-                <div class="col-md-8">
+                <label class="col-sm-4 control-label"><?php echo $this->translate("client_middlename_label"); ?>:</label>
+                <div class="col-sm-8">
                     <p class="form-control-static nullifempty view"><?php echo $client->getmiddlename(); ?></p>
                     <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                     <div class="edit">
@@ -137,8 +139,8 @@ $(document).ready(function() {
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-4 control-label"><?php echo $this->translate("client_nickname_label"); ?>:</label>
-                <div class="col-md-8">
+                <label class="col-sm-4 control-label"><?php echo $this->translate("client_nickname_label"); ?>:</label>
+                <div class="col-sm-8">
                     <p class="form-control-static nullifempty view"><?php echo $client->getnickname(); ?></p>
                     <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                     <div class="edit">
@@ -148,8 +150,8 @@ $(document).ready(function() {
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-4 control-label"><?php echo $this->translate("client_gender_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                <div class="col-md-8" style="padding-right:0;">
+                <label class="col-sm-4 control-label"><?php echo $this->translate("client_gender_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                <div class="col-sm-8" style="padding-right:0;">
                     <p class="form-control-static nullifempty view"><?php echo $client->getGenderText(); ?></p>
                     <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                     <div class="edit" style="font-size:10px;">
@@ -163,10 +165,10 @@ $(document).ready(function() {
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-sm-6">
             <div class="form-group">
-                <label class="col-md-4 control-label"><?php echo $this->translate("client_ssn_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                <div class="col-md-8">
+                <label class="col-sm-4 control-label"><?php echo $this->translate("client_ssn_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                <div class="col-sm-8">
                     <p class="form-control-static nullifempty view"><?php echo $client->getSSN(); ?></p>
                     <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                     <div class="edit">
@@ -177,8 +179,8 @@ $(document).ready(function() {
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-4 control-label"><?php echo $this->translate("client_dob_label"); ?>:</label>
-                <div class="col-md-8" style="padding-right:0;">
+                <label class="col-sm-4 control-label"><?php echo $this->translate("client_dob_label"); ?>:</label>
+                <div class="col-sm-8" style="padding-right:0;">
                 	<?php 
 						$yeardiff = '';
 						if(!isEmptyString($client->getDateofBirth())){
@@ -243,14 +245,14 @@ $(document).ready(function() {
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-4 control-label">Age:</label>       
-                <div class="col-md-8" style="padding-left:8px;">&nbsp; 
+                <label class="col-sm-4 control-label">Age:</label>       
+                <div class="col-sm-8" style="padding-left:8px;">&nbsp; 
                     <span id="agediff" class="lineblocked">--</span>
                 </div>
             </div>                                 
             <div class="form-group">
-                <label class="col-md-4 control-label"><?php echo $this->translate("client_maritalstatus_label"); ?>:</label>
-                <div class="col-md-8">
+                <label class="col-sm-4 control-label"><?php echo $this->translate("client_maritalstatus_label"); ?>:</label>
+                <div class="col-sm-8">
                     <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getMaritalStatus(), $maritalstatuses) ? '': $maritalstatuses[$client->getMaritalStatus()]; ?></p>
                     <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                         <div class="edit">
@@ -275,8 +277,8 @@ $(document).ready(function() {
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-4 control-label"><?php echo $this->translate("client_race_label"); ?>:</label>
-                <div class="col-md-8">
+                <label class="col-sm-4 control-label"><?php echo $this->translate("client_race_label"); ?>:</label>
+                <div class="col-sm-8">
                     <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getRace(), $races) ? '': $races[$client->getRace()]; ?></p>
                     <div class="edit">
                     <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
@@ -301,8 +303,8 @@ $(document).ready(function() {
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-4 control-label"><?php echo $this->translate("client_language_label"); ?>:</label>
-                <div class="col-md-8">
+                <label class="col-sm-4 control-label"><?php echo $this->translate("client_language_label"); ?>:</label>
+                <div class="col-sm-8">
                     <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getLanguage(), $languages) ? '': $languages[$client->getLanguage()]; ?></p>
                     <div class="edit">
 						<?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
@@ -329,18 +331,20 @@ $(document).ready(function() {
         </div>
     </div>
 </fieldset>
+<?php if(isEmptyString($request->pgc)){ ?>  
 <div class="divider10"></div>
+<?php } ?>
 <div class="row-fluid margin0">
-    <div class="col-md-6 paddingleft0">
-        <fieldset class="fieldsetcontainer clearfix" id="location" style="min-height:300px;">
+    <div class="col-sm-6 paddingleft0">
+        <fieldset class="fieldsetcontainer" id="location" style="min-height:300px;">
             <legend>Address</legend>
             <div class="panel-body well-sm">
-                <div class="col-md-12">
+                <div class="col-sm-12">
                     <div id="xxx"></div>
                     <input type="text" class="form-control" name="xxx" id="xxx" value="" style="border:none; border:#fff hidden; height:2px; box-shadow:none;" />
                     <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("global_addressline1_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                        <div class="col-md-8">
+                        <label class="col-sm-4 control-label"><?php echo $this->translate("global_addressline1_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                        <div class="col-sm-8">
                             <p class="form-control-static nullifempty view"><?php echo $client->getAddressline1(); ?></p>
                             <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                             <div class="edit">
@@ -351,8 +355,8 @@ $(document).ready(function() {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("global_addressline2_label"); ?>:</label>
-                        <div class="col-md-8">
+                        <label class="col-sm-4 control-label"><?php echo $this->translate("global_addressline2_label"); ?>:</label>
+                        <div class="col-sm-8">
                             <p class="form-control-static nullifempty view"><?php echo $client->getAddressline2(); ?></p>
                             <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                             <div class="edit">
@@ -362,8 +366,8 @@ $(document).ready(function() {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("global_city_label"); ?>/<?php echo $this->translate("global_town_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                        <div class="col-md-8">
+                        <label class="col-sm-4 control-label"><?php echo $this->translate("global_city_label"); ?>/<?php echo $this->translate("global_town_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                        <div class="col-sm-8">
                             <p class="form-control-static nullifempty view"><?php echo $client->getCity(); ?></p>
                             <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                             <div class="edit">
@@ -374,8 +378,8 @@ $(document).ready(function() {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("global_state_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                        <div class="col-md-8">
+                        <label class="col-sm-4 control-label"><?php echo $this->translate("global_state_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                        <div class="col-sm-8">
                             <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getState(), $states) ? '': $states[$client->getState()]; ?></p> 
                             <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                             <div class="edit">
@@ -398,8 +402,8 @@ $(document).ready(function() {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("global_zipcode_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
-                        <div class="col-md-8">
+                        <label class="col-sm-4 control-label"><?php echo $this->translate("global_zipcode_label"); ?>: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                        <div class="col-sm-8">
                             <p class="form-control-static nullifempty view"><?php echo $client->getZipCode(); ?></p>
                             <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                             <div class="edit">
@@ -410,8 +414,8 @@ $(document).ready(function() {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("global_county_label"); ?>:</label>
-                        <div class="col-md-8">
+                        <label class="col-sm-4 control-label"><?php echo $this->translate("global_county_label"); ?>:</label>
+                        <div class="col-sm-8">
                             <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getCounty(), $counties) ? '': $counties[$client->getCounty()]; ?></p>  
                             <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                             <div class="edit">
@@ -435,23 +439,23 @@ $(document).ready(function() {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-4 control-label">&nbsp;</label>
-                        <div class="col-md-8" style="height:42px;">&nbsp;</div>
+                        <label class="col-sm-4 control-label">&nbsp;</label>
+                        <div class="col-sm-8" style="height:42px;">&nbsp;</div>
                     </div>
                 </div>
             </div>
         </fieldset>
     </div>
-    <div class="col-md-6 padding0">
-        <fieldset class="fieldsetcontainer clearfix" id="contact" style="min-height:300px;">
+    <div class="col-sm-6 padding0">
+        <fieldset class="fieldsetcontainer" id="contact" style="min-height:300px;">
             <legend>Contact</legend>
             <div class="panel-body well-sm">
-                <div class="col-md-12">
+                <div class="col-sm-12">
                 	<div id="phonecount_error"></div>
                     <input type="text" class="form-control" name="phonecount" id="phonecount" value="" style="border:none; border:#fff hidden; height:2px; box-shadow:none;" />
                     <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("client_homephone_label"); ?>:</label>
-                        <div class="col-md-8">
+                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_homephone_label"); ?>:</label>
+                        <div class="col-sm-8">
                             <p class="form-control-static nullifempty view"><?php echo $client->getHome(); ?></p>
                             <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                             <div class="edit">
@@ -461,8 +465,8 @@ $(document).ready(function() {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("client_cellphone_label"); ?>:</label>
-                        <div class="col-md-8">
+                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_cellphone_label"); ?>:</label>
+                        <div class="col-sm-8">
                             <p class="form-control-static nullifempty view"><?php echo $client->getCell(); ?></p>
                             <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                             <div class="edit">
@@ -472,8 +476,8 @@ $(document).ready(function() {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("client_workphone_label"); ?>:</label>
-                        <div class="col-md-8">
+                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_workphone_label"); ?>:</label>
+                        <div class="col-sm-8">
                             <p class="form-control-static nullifempty view"><?php echo $client->getWork(); ?></p>
                             <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                             <div class="edit">
@@ -483,8 +487,8 @@ $(document).ready(function() {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("client_workext_label"); ?>:</label>
-                        <div class="col-md-8">
+                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_workext_label"); ?>:</label>
+                        <div class="col-sm-8">
                             <p class="form-control-static nullifempty view"><?php echo $client->getExt(); ?></p> 
                             <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                             <div class="edit">
@@ -494,8 +498,8 @@ $(document).ready(function() {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo 'Personal '.$this->translate("client_email_label"); ?>:</label>
-                        <div class="col-md-8">
+                        <label class="col-sm-4 control-label"><?php echo 'Personal '.$this->translate("client_email_label"); ?>:</label>
+                        <div class="col-sm-8">
                             <p class="form-control-static nullifempty view"><?php echo $client->getEmail(); ?></p> 
                             <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                             <div class="edit">
@@ -506,8 +510,8 @@ $(document).ready(function() {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo 'Alternative / Business '.$this->translate("client_email_label"); ?>:</label>
-                        <div class="col-md-8">
+                        <label class="col-sm-4 control-label"><?php echo 'Alternative / Business '.$this->translate("client_email_label"); ?>:</label>
+                        <div class="col-sm-8">
                             <p class="form-control-static nullifempty view"><?php echo $client->getEmail2(); ?></p> 
                             <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                             <div class="edit">
@@ -518,8 +522,8 @@ $(document).ready(function() {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-4 control-label"><?php echo $this->translate("client_emailpassword_label"); ?>:</label>
-                        <div class="col-md-8">
+                        <label class="col-sm-4 control-label"><?php echo $this->translate("client_emailpassword_label"); ?>:</label>
+                        <div class="col-sm-8">
                             <p class="form-control-static nullifempty view"><?php echo $client->getEmailPassword(); ?></p> 
                             <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                             <div class="edit">
@@ -534,16 +538,19 @@ $(document).ready(function() {
         </fieldset>
     </div>
 </div>
+<?php if(isEmptyString($request->pgc)){ ?> 
 <div class="divider10"></div>
+<?php } ?>
+<div class="divider5"></div>
 <fieldset class="fieldsetcontainer">
     <legend>Income Sources</legend>
     <div class="panel-body well-sm">
-        <div class="col-md-12">
+        <div class="col-sm-12">
             <div class="form-group">
             	<?php if(isEmptyString($client->getID())){ ?>
-	            	<label class="col-md-4 control-label">Current Income Sources:</label>
+	            	<label class="col-sm-4 control-label">Current Income Sources:</label>
                 <?php } ?>
-            	<div class="col-md-12">
+            	<div class="col-sm-12">
                     <p class="form-control-static nullifempty view"><?php echo count($client->getIncomeSourcesArray())  == 0 ? '': $client->getListofIncomeSources(); ?></p>
                     <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                         <div class="edit">
@@ -553,23 +560,23 @@ $(document).ready(function() {
                                     $existing_values = $client->getIncomeSourcesArray();
                                     foreach($incomesources as $key => $value){
                                 ?>
-                                    <label class="checkbox notbolded col-md-3">
+                                    <label class="checkbox notbolded col-sm-3">
                                       <input type="checkbox" id="incomesources_<?php echo $key; ?>" name="incomesourcesids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked data-waschecked="true"' : ''; ?>><?php echo $value; ?>
                                     </label>
                                 <?php } ?>
                              </div>
                             <div class="divider5"></div>
-                            <a class="gonowhere checkothertrigger" fieldid="incomesourcesids" lookupid="26" fieldlabel="Client Employment Income Sources" fieldtype="checkbox" checkclasses="checkbox notbolded col-md-3" checkname="incomesourcesids[]" checkid="incomesources_"><?php echo $this->translate("global_addoption_label"); ?></a>
+                            <a class="gonowhere checkothertrigger" fieldid="incomesourcesids" lookupid="26" fieldlabel="Client Employment Income Sources" fieldtype="checkbox" checkclasses="checkbox notbolded col-sm-3" checkname="incomesourcesids[]" checkid="incomesources_"><?php echo $this->translate("global_addoption_label"); ?></a>
                         </div>
                     <?php } ?>
                 </div>
             </div>
      	</div>
-        <div class="col-md-12">
+        <div class="col-sm-12">
             <div class="form-group">
-                <div class="col-md-6 padding0">
-                    <label class="col-md-8 control-label"><?php echo $this->translate("client_totalmonthlyincome_label"); ?>:</label>
-                    <div class="col-md-4">
+                <div class="col-sm-6 padding0">
+                    <label class="col-sm-8 control-label"><?php echo $this->translate("client_totalmonthlyincome_label"); ?>:</label>
+                    <div class="col-sm-4">
                         <p class="form-control-static nullifempty view"><?php echo $client->gettotalmonthlyincome(); ?></p>
                         <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                         <div class="edit">
@@ -581,10 +588,10 @@ $(document).ready(function() {
                 </div>
             </div>
         </div>
-        <div class="col-md-12">
+        <div class="col-sm-12">
             <div class="form-group">
-                <label class="col-md-12 control-label"><?php echo $this->translate("client_reduceincomebenefit_label"); ?>:</label>
-                <div class="col-md-12">
+                <label class="col-sm-12 control-label"><?php echo $this->translate("client_reduceincomebenefit_label"); ?>:</label>
+                <div class="col-sm-12">
                     <p class="form-control-static nullifempty view"><?php echo $client->getreduceincomebenefit_text(); ?></p>
                     <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                     <div class="edit">
@@ -600,10 +607,10 @@ $(document).ready(function() {
                 </div>
             </div>
         </div>
-        <div class="col-md-12">
+        <div class="col-sm-12">
             <div class="form-group">
-                <label class="col-md-12 control-label"><?php echo $this->translate("client_providedwithbenefitinfo_label"); ?>:</label>
-                <div class="col-md-12">
+                <label class="col-sm-12 control-label"><?php echo $this->translate("client_providedwithbenefitinfo_label"); ?>:</label>
+                <div class="col-sm-12">
                     <p class="form-control-static nullifempty view"><?php echo $client->getprovidedwithbenefitinfotext(); ?></p>
                     <?php if(($step == 'edit' && $section == 'bio' || $step == 'new')){ ?>
                     <div class="edit">

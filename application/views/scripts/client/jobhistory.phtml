@@ -1,10 +1,10 @@
 <div class="panel-body well-sm">
-    <div class="col-md-12">
+    <div class="col-sm-12">
         <div class="form-group">
-            <label class="col-md-12 control-label">Details of Work History</label>
-            <div class="col-md-12">
-                <p class="form-control-static nullifempty view">
-                    <table class="table table-condensed table-striped table-responsive viewtable" style="margin-bottom:10px;">
+            <label class="col-sm-12 control-label">Details of Work History</label>
+            <div class="col-sm-12">
+                <p class="form-control-static nullifempty view maxwidth">
+                    <table class="table table-condensed table-striped table-responsive viewtable maxwidth" style="margin-bottom:10px;">
                         <tbody>
                             <?php 
                                 $counter = 1;
@@ -25,96 +25,96 @@
                                         <td class="centeralign bolded" style="width:20px;"><div class="divider10"></div><?php echo $counter; ?></td>
                                         <td>
                                             <div class="form-group">
-                                                <div class="col-md-6 padding0">
-                                                    <label class="col-md-12 control-label"><?php echo $this->translate('job_jobtitle_label'); ?>:</label>
-                                                    <div class="col-md-12">
+                                                <div class="col-sm-6 padding0">
+                                                    <label class="col-sm-12 control-label"><?php echo $this->translate('job_jobtitle_label'); ?>:</label>
+                                                    <div class="col-sm-12">
                                                         <p class="form-control-static nullifempty view"><?php echo $employment->getJobTitle(); ?></p>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6 padding0">
-                                                    <label class="col-md-12 control-label"><?php echo $this->translate('job_company_label'); ?>:</label>
-                                                    <div class="col-md-12">
+                                                <div class="col-sm-6 padding0">
+                                                    <label class="col-sm-12 control-label"><?php echo $this->translate('job_company_label'); ?>:</label>
+                                                    <div class="col-sm-12">
                                                         <p class="form-control-static nullifempty view"><?php echo $employment->getEmployer()->getName(); ?></p>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <div class="col-md-6 padding0">
-                                                    <label class="col-md-12 control-label"><?php echo $this->translate('job_workdetails_label'); ?>:</label>
-                                                    <div class="col-md-12">
+                                                <div class="col-sm-6 padding0">
+                                                    <label class="col-sm-12 control-label"><?php echo $this->translate('job_workdetails_label'); ?>:</label>
+                                                    <div class="col-sm-12">
                                                         <p class="form-control-static nullifempty view"><?php echo $employment->getWorkDetails(); ?></p>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6 padding0">
-                                                    <label class="col-md-12 control-label"><?php echo $this->translate('job_supervisorname_label'); ?>:</label>
-                                                    <div class="col-md-12">
+                                                <div class="col-sm-6 padding0">
+                                                    <label class="col-sm-12 control-label"><?php echo $this->translate('job_supervisorname_label'); ?>:</label>
+                                                    <div class="col-sm-12">
                                                         <p class="form-control-static nullifempty view"><?php echo $employment->getsupervisorname(); ?></p>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <div class="col-md-6 padding0">
-                                                    <label class="col-md-12 control-label"><?php echo $this->translate('job_startdate_label'); ?>:</label>
-                                                    <div class="col-md-12">
+                                                <div class="col-sm-6 padding0">
+                                                    <label class="col-sm-12 control-label"><?php echo $this->translate('job_startdate_label'); ?>:</label>
+                                                    <div class="col-sm-12">
                                                         <p class="form-control-static nullifempty view"><?php echo formatDateAndTime($employment->getStartDate(), false); ?></p>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6 padding0">
-                                                    <label class="col-md-12 control-label"><?php echo $this->translate('client_addressline1_label'); ?>:</label>
-                                                    <div class="col-md-12">
+                                                <div class="col-sm-6 padding0">
+                                                    <label class="col-sm-12 control-label"><?php echo $this->translate('client_addressline1_label'); ?>:</label>
+                                                    <div class="col-sm-12">
                                                         <p class="form-control-static nullifempty view"><?php echo $employment->getEmployer()->getAddressline1(); ?></p>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <div class="col-md-6 padding0">
-                                                    <label class="col-md-12 control-label"><?php echo $this->translate("job_enddate_label"); ?>:</label>
-                                                    <div class="col-md-12">
+                                                <div class="col-sm-6 padding0">
+                                                    <label class="col-sm-12 control-label"><?php echo $this->translate("job_enddate_label"); ?>:</label>
+                                                    <div class="col-sm-12">
                                                         <p class="form-control-static nullifempty view"><?php echo formatDateAndTime($employment->getenddate(), false); ?></p>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6 padding0">
-                                                    <label class="col-md-12 control-label"><?php echo $this->translate('client_city_label'); ?>:</label>
-                                                    <div class="col-md-12">
+                                                <div class="col-sm-6 padding0">
+                                                    <label class="col-sm-12 control-label"><?php echo $this->translate('client_city_label'); ?>:</label>
+                                                    <div class="col-sm-12">
                                                         <p class="form-control-static nullifempty view"><?php echo $employment->getEmployer()->getCity(); ?></p>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <div class="col-md-6 padding0">
-                                                    <label class="col-md-12 control-label">Hourly Rate <small>($)</small>:</label>
-                                                    <div class="col-md-12">
+                                                <div class="col-sm-6 padding0">
+                                                    <label class="col-sm-12 control-label">Hourly Rate <small>($)</small>:</label>
+                                                    <div class="col-sm-12">
                                                         <p class="form-control-static nullifempty view"><?php echo isEmptyString($employment->getRateType()) ? '' : '$'.$employment->getRate().' '.getRateTypes($employment->getRateType()); ?></p>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6 padding0">
-                                                    <label class="col-md-12 control-label"><?php echo $this->translate('client_state_label'); ?>:</label>
-                                                    <div class="col-md-12">
+                                                <div class="col-sm-6 padding0">
+                                                    <label class="col-sm-12 control-label"><?php echo $this->translate('client_state_label'); ?>:</label>
+                                                    <div class="col-sm-12">
                                                         <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($employment->getEmployer()->getState(), $states) ? '': $states[$employment->getEmployer()->getState()]; ?></p>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <div class="col-md-6 padding0">
-                                                    <label class="col-md-12 control-label"><?php echo $this->translate('job_terminationreason_label'); ?>:</label>
-                                                    <div class="col-md-12">
+                                                <div class="col-sm-6 padding0">
+                                                    <label class="col-sm-12 control-label"><?php echo $this->translate('job_terminationreason_label'); ?>:</label>
+                                                    <div class="col-sm-12">
                                                         <p class="form-control-static nullifempty view"><?php echo $employment->getTerminationReason(); ?></p>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6 padding0">
-                                                	<label class="col-md-12 control-label">Zip Code:</label>
-                                                    <div class="col-md-12">
+                                                <div class="col-sm-6 padding0">
+                                                	<label class="col-sm-12 control-label">Zip Code:</label>
+                                                    <div class="col-sm-12">
                                                         <p class="form-control-static nullifempty view"><?php echo $employment->getEmployer()->getZipCode(); ?></p>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <div class="col-md-6 padding0">
+                                                <div class="col-sm-6 padding0">
                                                     
                                                 </div>
-                                                <div class="col-md-6 padding0">
-                                                	<label class="col-md-12 control-label"><?php echo $this->translate('job_contactphone_label'); ?>:</label>
-                                                    <div class="col-md-12">
+                                                <div class="col-sm-6 padding0">
+                                                	<label class="col-sm-12 control-label"><?php echo $this->translate('job_contactphone_label'); ?>:</label>
+                                                    <div class="col-sm-12">
                                                         <p class="form-control-static nullifempty view"><?php echo $employment->getEmployer()->getPhone(); ?></p>
                                                     </div>
                                                 </div>
@@ -148,65 +148,65 @@
                                         <input type="hidden" class="form-control" id="employmentdetails_id_<?php echo $key; ?>" name="employmentdetails[<?php echo $key; ?>][id]" value="<?php echo $employment->getID(); ?>" />
                                         <input type="hidden" class="form-control" id="employmentdetails_employerid_<?php echo $key; ?>" name="employmentdetails[<?php echo $key; ?>][employerid]" value="<?php echo $employment->getEmployerID(); ?>" />
                                         <div class="form-group">
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('job_jobtitle_label'); ?>:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate('job_jobtitle_label'); ?>:</label>
+                                                <div class="col-sm-12">
                                                     <input type="text" id="employmentdetails_jobtitle_<?php echo $key; ?>" name="employmentdetails[<?php echo $key; ?>][jobtitle]" class="form-control input-sm" value="<?php echo $employment->getJobTitle(); ?>" />
                                                 </div>
                                             </div>
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('job_company_label'); ?>:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate('job_company_label'); ?>:</label>
+                                                <div class="col-sm-12">
                                                     <input type="text" id="employmentdetails_companyname_<?php echo $key; ?>" name="employmentdetails[<?php echo $key; ?>][companyname]" class="form-control input-sm" value="<?php echo $employment->getEmployer()->getName(); ?>" />
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('job_workdetails_label'); ?>:</label>
-                                                <div class="col-md-12">
-                                                    <input type="text" id="employmentdetails_workdetails_<?php echo $key; ?>" name="employmentdetails[<?php echo $key; ?>][workdetails]" class="form-control input-sm" value="<?php echo $employment->getWorkDetails(); ?>" />
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate('job_workdetails_label'); ?>:</label>
+                                                <div class="col-sm-12">
+                                                    <textarea id="employmentdetails_workdetails_<?php echo $key; ?>" name="employmentdetails[<?php echo $key; ?>][workdetails]" class="form-control expanding minheight80"><?php echo $employment->getWorkDetails(); ?></textarea>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('job_supervisorname_label'); ?>:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate('job_supervisorname_label'); ?>:</label>
+                                                <div class="col-sm-12">
                                                     <input type="text" id="employmentdetails_supervisorname_<?php echo $key; ?>" name="employmentdetails[<?php echo $key; ?>][supervisorname]" class="form-control input-sm" value="<?php echo $employment->getsupervisorname(); ?>" />
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('job_startdate_label'); ?>:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate('job_startdate_label'); ?>:</label>
+                                                <div class="col-sm-12">
                                                     <input type="text" class="form-control input-sm datefield readonly width100" name="employmentdetails[<?php echo $key; ?>][startdate]" id="employmentdetails_startdate_<?php echo $key; ?>" value="<?php echo changeMySQLDateToPageFormat($employment->getStartDate()); ?>" />
                                                 </div>
                                             </div>
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('client_address_label'); ?>:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate('client_address_label'); ?>:</label>
+                                                <div class="col-sm-12">
                                                     <input type="text" class="form-control input-sm" name="employmentdetails[<?php echo $key; ?>][addressline1]" id="employmentdetails_addressline1_<?php echo $key; ?>" value="<?php echo $employment->getEmployer()->getAddressline1(); ?>" />
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate("job_enddate_label"); ?>:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate("job_enddate_label"); ?>:</label>
+                                                <div class="col-sm-12">
                                                     <input type="text" class="form-control input-sm datefield readonly width100" name="employmentdetails[<?php echo $key; ?>][enddate]" id="employmentdetails_enddate_<?php echo $key; ?>" value="<?php echo changeMySQLDateToPageFormat($employment->getenddate()); ?>" />
                                                 </div>
                                             </div>
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('client_city_label'); ?>:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate('client_city_label'); ?>:</label>
+                                                <div class="col-sm-12">
                                                 	<input type="text" class="form-control input-sm" name="employmentdetails[<?php echo $key; ?>][city]" id="employmentdetails_city_<?php echo $key; ?>" value="<?php echo $employment->getEmployer()->getCity(); ?>" />
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label">Hourly Rate <small>($)</small>:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label">Hourly Rate <small>($)</small>:</label>
+                                                <div class="col-sm-12">
                                                     <input type="text" class="form-control input-sm width80 inline isdecimal" name="employmentdetails[<?php echo $key; ?>][rate]" id="employmentdetails_rate_<?php echo $key; ?>" value="<?php echo $employment->getRate(); ?>" />
                                                     <?php
                                                         $dropdown = new Zend_Form_Element_Select('ratetype_'.$key,
@@ -222,9 +222,9 @@
                                                     ?><input type="hidden" class="form-control" name="employmentdetails[<?php echo $key; ?>][ratetype_old]" id="employmentdetails_ratetype_old_<?php echo $key; ?>" value="<?php echo $employment->getRateType(); ?>" />
                                                 </div>
                                             </div>
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('client_state_label'); ?>:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate('client_state_label'); ?>:</label>
+                                                <div class="col-sm-12">
                                                      <?php
                                                         $dropdown = new Zend_Form_Element_Select('state_'.$key,
                                                                             array(
@@ -241,26 +241,26 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('job_terminationreason_label'); ?>:</label>
-                                                <div class="col-md-12">
-                                                    <input type="text" class="form-control input-sm" name="employmentdetails[<?php echo $key; ?>][terminationreason]" id="employmentdetails_terminationreason_<?php echo $key; ?>" value="<?php echo $employment->getTerminationReason(); ?>" />
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate('job_terminationreason_label'); ?>:</label>
+                                                <div class="col-sm-12">
+                                                    <textarea type="text" class="form-control expanding minheight80" name="employmentdetails[<?php echo $key; ?>][terminationreason]" id="employmentdetails_terminationreason_<?php echo $key; ?>"><?php echo $employment->getTerminationReason(); ?></textarea>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label">Zip Code:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label">Zip Code:</label>
+                                                <div class="col-sm-12">
                                                     <input type="text" class="form-control input-sm width100" id="employmentdetails_zipcode_<?php echo $key; ?>" name="employmentdetails[<?php echo $key; ?>][zipcode]" value="<?php echo $employment->getEmployer()->getZipCode(); ?>" />
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <div class="col-md-6 padding0">
+                                            <div class="col-sm-6 padding0">
                                                
                                             </div>
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('job_contactphone_label'); ?>:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate('job_contactphone_label'); ?>:</label>
+                                                <div class="col-sm-12">
                                                     <input type="text" class="form-control input-sm" name="employmentdetails[<?php echo $key; ?>][phone]" id="employmentdetails_phone_<?php echo $key; ?>" value="<?php echo $employment->getEmployer()->getPhone(); ?>" />
                                                 </div>
                                             </div>
@@ -289,65 +289,65 @@
                                     </td>
                                     <td>
                                         <div class="form-group">
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('job_jobtitle_label'); ?>:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate('job_jobtitle_label'); ?>:</label>
+                                                <div class="col-sm-12">
                                                     <input type="text" id="employmentdetails_jobtitle_<?php echo $i; ?>" name="employmentdetails[<?php echo md5($i); ?>][jobtitle]" class="form-control input-sm" value="" />
                                                 </div>
                                             </div>
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('job_company_label'); ?>:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate('job_company_label'); ?>:</label>
+                                                <div class="col-sm-12">
                                                     <input type="text" id="employmentdetails_companyname_<?php echo $i; ?>" name="employmentdetails[<?php echo md5($i); ?>][companyname]" class="form-control input-sm" value="" />
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('job_workdetails_label'); ?>:</label>
-                                                <div class="col-md-12">
-                                                    <input type="text" id="employmentdetails_workdetails_<?php echo $i; ?>" name="employmentdetails[<?php echo md5($i); ?>][workdetails]" class="form-control input-sm" value="" />
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate('job_workdetails_label'); ?>:</label>
+                                                <div class="col-sm-12">
+                                                    <textarea type="text" id="employmentdetails_workdetails_<?php echo $i; ?>" name="employmentdetails[<?php echo md5($i); ?>][workdetails]" class="form-control expanding minheight80"></textarea>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('job_supervisorname_label'); ?>:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate('job_supervisorname_label'); ?>:</label>
+                                                <div class="col-sm-12">
                                                     <input type="text" id="employmentdetails_supervisorname_<?php echo $i; ?>" name="employmentdetails[<?php echo md5($i); ?>][supervisorname]" class="form-control input-sm" value="" />
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('job_startdate_label'); ?>:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate('job_startdate_label'); ?>:</label>
+                                                <div class="col-sm-12">
                                                     <input type="text" class="form-control input-sm datefield readonly width100" name="employmentdetails[<?php echo md5($i); ?>][startdate]" id="employmentdetails_startdate_<?php echo $i; ?>" value="" />
                                                 </div>
                                             </div>
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('client_address_label'); ?>:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate('client_address_label'); ?>:</label>
+                                                <div class="col-sm-12">
                                                     <input type="text" class="form-control input-sm" name="employmentdetails[<?php echo md5($i); ?>][addressline1]" id="employmentdetails_addressline1_<?php echo $i; ?>" value="" />
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate("job_enddate_label"); ?>:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate("job_enddate_label"); ?>:</label>
+                                                <div class="col-sm-12">
                                                     <input type="text" class="form-control input-sm datefield readonly width100" name="employmentdetails[<?php echo md5($i); ?>][enddate]" id="employmentdetails_enddate_<?php echo $i; ?>" value="" />
                                                 </div>
                                             </div>
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('client_city_label'); ?>:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate('client_city_label'); ?>:</label>
+                                                <div class="col-sm-12">
                                                     <input type="text" class="form-control input-sm" name="employmentdetails[<?php echo md5($i); ?>][city]" id="employmentdetails_city_<?php echo $i; ?>" value="" />
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label">Hourly Rate <small>($)</small>:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label">Hourly Rate <small>($)</small>:</label>
+                                                <div class="col-sm-12">
                                                     <input type="text" class="form-control input-sm width80 inline isdecimal" name="employmentdetails[<?php echo md5($i); ?>][rate]" id="employmentdetails_rate_<?php echo $i; ?>" value="" />
                                                     <?php
                                                         $dropdown = new Zend_Form_Element_Select('ratetype_'.$i,
@@ -363,9 +363,9 @@
                                                     ?><input type="hidden" class="form-control" name="employmentdetails[<?php echo md5($i); ?>][ratetype_old]" id="employmentdetails_ratetype_old_<?php echo $i; ?>" value="" />
                                                 </div>
                                             </div>
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('client_state_label'); ?>:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate('client_state_label'); ?>:</label>
+                                                <div class="col-sm-12">
                                                     <?php
                                                         $dropdown = new Zend_Form_Element_Select('state_'.$i,
                                                                             array(
@@ -382,27 +382,27 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('job_terminationreason_label'); ?>:</label>
-                                                <div class="col-md-12">
-                                                    <input type="text" class="form-control input-sm" name="employmentdetails[<?php echo md5($i); ?>][terminationreason]" id="employmentdetails_terminationreason_<?php echo $i; ?>" value="" />
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate('job_terminationreason_label'); ?>:</label>
+                                                <div class="col-sm-12">
+                                                    <textarea type="text" class="form-control expanding minheight80" name="employmentdetails[<?php echo md5($i); ?>][terminationreason]" id="employmentdetails_terminationreason_<?php echo $i; ?>"></textarea>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label">Zip Code:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label">Zip Code:</label>
+                                                <div class="col-sm-12">
     
                                                     <input type="text" class="form-control input-sm width100" name="employmentdetails[<?php echo md5($i); ?>][zipdode]" id="employmentdetails_zipdode_<?php echo $i; ?>" value="" />
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <div class="col-md-6 padding0">
+                                            <div class="col-sm-6 padding0">
                                                
                                             </div>
-                                            <div class="col-md-6 padding0">
-                                                <label class="col-md-12 control-label"><?php echo $this->translate('job_contactphone_label'); ?>:</label>
-                                                <div class="col-md-12">
+                                            <div class="col-sm-6 padding0">
+                                                <label class="col-sm-12 control-label"><?php echo $this->translate('job_contactphone_label'); ?>:</label>
+                                                <div class="col-sm-12">
     
                                                     <input type="text" class="form-control input-sm" name="employmentdetails[<?php echo md5($i); ?>][phone]" id="employmentdetails_phone_<?php echo $i; ?>" value="" />
                                                 </div>
@@ -423,8 +423,8 @@
            	</div>
         </div>
         <div class="form-group">
-            <label class="col-md-12 control-label"><?php echo $this->translate("client_skills_label"); ?>:</label>
-            <div class="col-md-12">
+            <label class="col-sm-12 control-label"><?php echo $this->translate("client_skills_label"); ?>:</label>
+            <div class="col-sm-12">
                 <p class="form-control-static nullifempty view"><?php echo $client->getSkillsList(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
@@ -433,20 +433,20 @@
                             $existing_sources = $client->getSkillIDs();
                             foreach($skills as $key => $value){
                         ?>
-                            <label class="checkbox notbolded col-md-3">
+                            <label class="checkbox notbolded col-sm-3">
                               <input type="checkbox" id="skills_<?php echo $key; ?>" name="skillids[]" value="<?php echo $key; ?>" class="<?php echo isArrayKeyAnEmptyString($key, $existing_sources) ? 0 : 1; ?>"><?php echo $value; ?>
                             </label>
                         <?php } ?>
                     </div>
                     <div class="divider5"></div>
-                    <a class="gonowhere checkothertrigger" fieldid="skillids" lookupid="18" fieldlabel="Client Special Skills" fieldtype="checkbox" checkclasses="checkbox notbolded col-md-3" checkname="skillids[]" checkid="skills_"><?php echo $this->translate("global_addoption_label"); ?></a>
+                    <a class="gonowhere checkothertrigger" fieldid="skillids" lookupid="18" fieldlabel="Client Special Skills" fieldtype="checkbox" checkclasses="checkbox notbolded col-sm-3" checkname="skillids[]" checkid="skills_"><?php echo $this->translate("global_addoption_label"); ?></a>
                 </div>
                 <?php } ?>
             </div>
         </div>
         <div class="form-group">
-            <label class="col-md-12 control-label"><?php echo $this->translate("client_specialinfoforjobapplied_label"); ?>:</label>
-            <div class="col-md-12">
+            <label class="col-sm-12 control-label"><?php echo $this->translate("client_specialinfoforjobapplied_label"); ?>:</label>
+            <div class="col-sm-12">
                 <p class="form-control-static nullifempty view"><?php echo $client->getspecialinfoforjobapplied(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
@@ -456,9 +456,9 @@
             </div>
         </div>
         <div class="form-group">
-            <div class="col-md-6 padding0">
-                <label class="col-md-12 control-label"><?php echo $this->translate("client_photoid_label"); ?>:</label>
-                <div class="col-md-12">
+            <div class="col-sm-6 padding0">
+                <label class="col-sm-12 control-label"><?php echo $this->translate("client_photoid_label"); ?>:</label>
+                <div class="col-sm-12">
                     <p class="form-control-static nullifempty view"><?php echo $client->gethasphotoid_text(); ?></p>
 					<?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                         <div class="edit">
@@ -473,9 +473,9 @@
                     <?php } ?>
                 </div>
             </div>
-            <div class="col-md-6 padding0">
-                <label class="col-md-12 control-label"><?php echo $this->translate("client_socialsecuritycard_label"); ?>:</label>
-                <div class="col-md-12">
+            <div class="col-sm-6 padding0">
+                <label class="col-sm-12 control-label"><?php echo $this->translate("client_socialsecuritycard_label"); ?>:</label>
+                <div class="col-sm-12">
                     <p class="form-control-static nullifempty view"><?php echo $client->gethasssncard() == 1 ? 'Yes' : 'No'; ?></p>
 					<?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                         <div class="edit">
@@ -492,9 +492,9 @@
             </div>
         </div>
         <div class="form-group">
-            <div class="col-md-6 padding0">
-                <label class="col-md-12 control-label"><?php echo $this->translate("client_typingspeed_label"); ?>:</label>
-                <div class="col-md-12">
+            <div class="col-sm-6 padding0">
+                <label class="col-sm-12 control-label"><?php echo $this->translate("client_typingspeed_label"); ?>:</label>
+                <div class="col-sm-12">
                     <p class="form-control-static nullifempty view"><?php echo $client->gettypingspeed(); ?></p>
                     <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                     <div class="edit">
@@ -503,9 +503,9 @@
                     <?php } ?>
                 </div>
             </div>
-            <div class="col-md-6 padding0">
-                <label class="col-md-12 control-label"><?php echo $this->translate("client_driverslicenseno_label"); ?>:</label>
-                <div class="col-md-12">
+            <div class="col-sm-6 padding0">
+                <label class="col-sm-12 control-label"><?php echo $this->translate("client_driverslicenseno_label"); ?>:</label>
+                <div class="col-sm-12">
                     <p class="form-control-static nullifempty view"><?php echo $client->getdriverslicenseno(); ?></p>
                     <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                     <div class="edit">

@@ -1,10 +1,10 @@
-<div class="col-md-12">
+<div class="col-sm-12">
     <div class="divider15"></div>
     <div class="form-group" style="margin-left:-30px; margin-right:-30px;">
-        <div class="col-md-12 padding0">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_educ_background_label'); ?>:</label>
-            <div class="col-md-12 padding0">
-                <p class="form-control-static nullifempty view">
+        <div class="col-sm-12 padding0">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_educ_background_label'); ?>:</label>
+            <div class="col-sm-12 padding0">
+                <p class="form-control-static nullifempty view maxwidth">
                     <table class="table table-condensed table-striped table-responsive viewtable" style="margin-bottom:10px;">
                         <thead>
                             <tr>
@@ -73,9 +73,9 @@
                                 <td class="centeralign"><a heduc="javascript: doNothing();" title="<?php echo $this->translate("global_button_remove"); ?>" id="row_educ_<?php echo $e; ?>" class="removeline btn btn-xs btn-default" rel="educ">&times;</a>
                                     <input type="hidden" id="educdetails_id_<?php echo $e; ?>" class="form-control" name="educdetails[<?php echo md5($e); ?>][id]" value="<?php echo $education->getID(); ?>" />
                                 </td>
-                                <td><textarea class="form-control input-sm expanding educdetail" name="educdetails[<?php echo md5($e); ?>][value1]" id="educdetails_value1_<?php echo $e; ?>"><?php echo $education->getValue1(); ?></textarea>
+                                <td><textarea class="form-control input-sm expanding educdetail minheight100" name="educdetails[<?php echo md5($e); ?>][value1]" id="educdetails_value1_<?php echo $e; ?>"><?php echo $education->getValue1(); ?></textarea>
                                 	</td>
-                                <td><textarea class="form-control input-sm expanding educdetail" name="educdetails[<?php echo md5($e); ?>][value2]" id="educdetails_value2_<?php echo $e; ?>"><?php echo $education->getValue2(); ?></textarea></td>
+                                <td><textarea class="form-control input-sm expanding educdetail minheight100" name="educdetails[<?php echo md5($e); ?>][value2]" id="educdetails_value2_<?php echo $e; ?>"><?php echo $education->getValue2(); ?></textarea></td>
                                	<td>
 									<?php
 										$dropdown = new Zend_Form_Element_Select('value3_'.md5($e),
@@ -94,8 +94,8 @@
 										echo $dropdown->render();
 									?>
                                 </td>
-                                <td><textarea class="form-control input-sm expanding educdetail" name="educdetails[<?php echo md5($e); ?>][value4]" id="educdetails_value4_<?php echo $e; ?>"><?php echo $education->getValue4(); ?></textarea></td>
-                                <td><textarea class="form-control input-sm expanding educdetail" name="educdetails[<?php echo md5($e); ?>][value5]" id="educdetails_value5_<?php echo $e; ?>"><?php echo $education->getValue5(); ?></textarea></td>
+                                <td><textarea class="form-control input-sm expanding educdetail minheight100" name="educdetails[<?php echo md5($e); ?>][value4]" id="educdetails_value4_<?php echo $e; ?>"><?php echo $education->getValue4(); ?></textarea></td>
+                                <td><textarea class="form-control input-sm expanding educdetail minheight100" name="educdetails[<?php echo md5($e); ?>][value5]" id="educdetails_value5_<?php echo $e; ?>"><?php echo $education->getValue5(); ?></textarea></td>
                             </tr>
                             <?php $e++; $x++; $counter++; } ?>
                             <?php 
@@ -114,8 +114,8 @@
                                 <tr class="<?php echo $class; ?> row_educ_<?php echo $i; ?>" id="row_educ_<?php echo $i; ?>">
                                     <td class="centeralign"><a heduc="javascript: doNothing();" title="<?php echo $this->translate("global_button_remove"); ?>" id="row_educ_<?php echo $i; ?>" class="removeline btn btn-xs btn-default" rel="educ">&times;</a>
                                     </td>
-                                    <td><textarea class="form-control input-sm expanding educdetail" name="educdetails[<?php echo md5($i); ?>][value1]" id="educdetails_value1_<?php echo $i; ?>"></textarea></td>
-                                    <td><textarea class="form-control input-sm expanding educdetail" name="educdetails[<?php echo md5($i); ?>][value2]" id="educdetails_value2_<?php echo $i; ?>"></textarea></td>
+                                    <td><textarea class="form-control input-sm expanding educdetail minheight100" name="educdetails[<?php echo md5($i); ?>][value1]" id="educdetails_value1_<?php echo $i; ?>"></textarea></td>
+                                    <td><textarea class="form-control input-sm expanding educdetail minheight100" name="educdetails[<?php echo md5($i); ?>][value2]" id="educdetails_value2_<?php echo $i; ?>"></textarea></td>
                                     <td>
                                         <?php
 											$dropdown = new Zend_Form_Element_Select('value3_'.$i,
@@ -134,8 +134,8 @@
 											echo $dropdown->render();
 										?>
                                     </td>
-                                    <td><textarea class="form-control input-sm expanding educdetail" name="educdetails[<?php echo md5($i); ?>][value4]" id="educdetails_value4_<?php echo $i; ?>"></textarea></td>
-                                    <td><textarea class="form-control input-sm expanding educdetail" name="educdetails[<?php echo md5($i); ?>][value5]" id="educdetails_value5_<?php echo $i; ?>"></textarea></td>
+                                    <td><textarea class="form-control input-sm expanding educdetail minheight100" name="educdetails[<?php echo md5($i); ?>][value4]" id="educdetails_value4_<?php echo $i; ?>"></textarea></td>
+                                    <td><textarea class="form-control input-sm expanding educdetail minheight100" name="educdetails[<?php echo md5($i); ?>][value5]" id="educdetails_value5_<?php echo $i; ?>"></textarea></td>
                                 </tr>
                             <?php $x++; } ?>
                             <tr>
@@ -150,9 +150,9 @@
     </div>
     <div class="divider15"></div>
     <div class="form-group">
-        <div class="col-md-12 padding0">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_disableoutsidesection_label'); ?>:</label>
-            <div class="col-md-12">
+        <div class="col-sm-12 padding0">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_disableoutsidesection_label'); ?>:</label>
+            <div class="col-sm-12">
                 <p class="form-control-static nullifempty view"><?php echo $client->getcontactschooltoverify_text(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
@@ -169,9 +169,9 @@
         </div>
     </div>
     <div class="form-group">
-        <div class="col-md-6 padding0">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_experiencedlearningproblems_label'); ?>:</label>
-            <div class="col-md-12">
+        <div class="col-sm-6 padding0">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_experiencedlearningproblems_label'); ?>:</label>
+            <div class="col-sm-12">
                 <p class="form-control-static nullifempty view"><?php echo $client->getexperiencedlearningproblems_text(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
@@ -186,35 +186,35 @@
                 <?php } ?>
             </div>
         </div>
-        <div class="col-md-6 padding0">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_learningproblems_label'); ?>:</label>
-            <div class="col-md-12">
+        <div class="col-sm-6 padding0">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_learningproblems_label'); ?>:</label>
+            <div class="col-sm-12">
                 <p class="form-control-static nullifempty view"><?php echo $client->getlearningproblems(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
-                    <textarea class="form-control expanding" id="learningproblems" name="learningproblems"><?php echo $client->getlearningproblems(); ?></textarea>
+                    <textarea class="form-control expanding minheight80" id="learningproblems" name="learningproblems"><?php echo $client->getlearningproblems(); ?></textarea>
                 </div>
                 <?php } ?>
             </div>
         </div>
     </div>
     <div class="form-group">
-        <div class="col-md-12 padding0">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_academicskillsdetails_label'); ?>:</label>
-            <div class="col-md-12">
+        <div class="col-sm-12 padding0">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_academicskillsdetails_label'); ?>:</label>
+            <div class="col-sm-12">
                 <p class="form-control-static nullifempty view"><?php echo $client->getacademicskillsdetails(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
-                    <textarea class="form-control expanding" id="academicskillsdetails" name="academicskillsdetails"><?php echo $client->getacademicskillsdetails(); ?></textarea>
+                    <textarea class="form-control expanding minheight100" id="academicskillsdetails" name="academicskillsdetails"><?php echo $client->getacademicskillsdetails(); ?></textarea>
                 </div>
                 <?php } ?>
             </div>
         </div>
     </div>
     <div class="form-group">
-        <div class="col-md-12 padding0">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_formaleducinterestsids_label'); ?>:</label>
-            <div class="col-md-12">
+        <div class="col-sm-12 padding0">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_formaleducinterestsids_label'); ?>:</label>
+            <div class="col-sm-12">
                 <?php $interestoptions = getAllClientInterestsOptions(); ?>
                 <p class="form-control-static nullifempty view"><?php echo count($client->getFormalEducInterestsArray())  == 0 ? '': $client->getListofFormalEducInterests(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
@@ -224,23 +224,23 @@
                             $existing_values = $client->getFormalEducInterestsArray();
                             foreach($interestoptions as $key => $value){
                         ?>
-                            <label class="checkbox notbolded col-md-3">
+                            <label class="checkbox notbolded col-sm-3">
                               <input type="checkbox" id="formaleducinterests_<?php echo $key; ?>" name="formaleducinterestsids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked data-waschecked="true"' : 1; ?>><?php echo $value; ?>
                             </label>
                         <?php } ?>
                         <input type="hidden" name="formaleducinterests_old" id="formaleducinterests_old" value="<?php echo $client->getformaleducinterests(); ?>" />
                     </div>
                     <div class="divider5"></div>
-                    <a class="gonowhere checkothertrigger" fieldid="formaleducinterestsids" lookupid="30" fieldlabel="Client Education Subjects of Interest" fieldtype="checkbox" checkclasses="checkbox notbolded col-md-3" checkname="formaleducinterestsids[]" checkid="formaleducinterests_"><?php echo $this->translate('global_addoption_label'); ?></a>
+                    <a class="gonowhere checkothertrigger" fieldid="formaleducinterestsids" lookupid="30" fieldlabel="Client Education Subjects of Interest" fieldtype="checkbox" checkclasses="checkbox notbolded col-sm-3" checkname="formaleducinterestsids[]" checkid="formaleducinterests_"><?php echo $this->translate('global_addoption_label'); ?></a>
                 </div>
                 <?php } ?>
             </div> 
         </div>
     </div>
     <div class="form-group">
-        <div class="col-md-12 padding0">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_learningstylesids_label'); ?>:</label>
-            <div class="col-md-12">
+        <div class="col-sm-12 padding0">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_learningstylesids_label'); ?>:</label>
+            <div class="col-sm-12">
                 <?php $styles = getAllClientLearningStyles(); ?>
                 <p class="form-control-static nullifempty view"><?php echo count($client->getLearningStylesArray())  == 0 ? '': $client->getListofLearningStyles(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>

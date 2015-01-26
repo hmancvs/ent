@@ -90,8 +90,8 @@ class Client extends BaseEntity {
 		$this->hasColumn('yearsinrship', 'string', 255);
 		$this->hasColumn('jobpreferred', 'string', 50);
 		$this->hasColumn('jobpreferred1', 'string', 50);
-		$this->hasColumn('workshift', 'string', 25);
-		$this->hasColumn('jobtype', 'string', 25);
+		$this->hasColumn('workshift', 'string', 50);
+		$this->hasColumn('jobtype', 'string', 50);
 		$this->hasColumn('dateavailable','date', null);
 		$this->hasColumn('hoursavailableperweek', 'decimal', 11, array('default'=>'0.00'));
 		$this->hasColumn('traveldistance', 'decimal', 11, array('default'=>NULL));
@@ -308,6 +308,10 @@ class Client extends BaseEntity {
 		}
 		if(isArrayKeyAnEmptyString('referraldate', $formvalues)){
 			unset($formvalues['referraldate']);
+		} else {
+			if(isArrayKeyAnEmptyString('assessmentdate', $formvalues)){
+				$formvalues['assessmentdate'] = $formvalues['referraldate'];
+			}
 		}
 		if(isArrayKeyAnEmptyString('iscriminal', $formvalues)){
 			if(isArrayKeyAnEmptyString('iscriminal_old', $formvalues)){
@@ -532,7 +536,7 @@ class Client extends BaseEntity {
 				$formvalues['oncallhousesupport'] = NULL;
 			}
 		}
-		if(isArrayKeyAnEmptyString('workshift', $formvalues)){
+		/* if(isArrayKeyAnEmptyString('workshift', $formvalues)){
 			if(isArrayKeyAnEmptyString('workshift_old', $formvalues)){
 				unset($formvalues['workshift']);
 			} else {
@@ -544,6 +548,28 @@ class Client extends BaseEntity {
 				unset($formvalues['jobtype']);
 			} else {
 				$formvalues['jobtype'] = NULL;
+			}
+		} */
+		if(!isArrayKeyAnEmptyString('workshiftids', $formvalues)) {
+			$formvalues['workshift'] = implode(',', $formvalues['workshiftids']);
+		} else {
+			if(!isArrayKeyAnEmptyString('workshift_old', $formvalues)){
+				if(isArrayKeyAnEmptyString('workshiftids', $formvalues)) {
+					$formvalues['workshift'] = NULL;
+				}
+			} else {
+				unset($formvalues['workshift']);
+			}
+		}
+		if(!isArrayKeyAnEmptyString('jobtypeids', $formvalues)) {
+			$formvalues['jobtype'] = implode(',', $formvalues['jobtypeids']);
+		} else {
+			if(!isArrayKeyAnEmptyString('jobtype_old', $formvalues)){
+				if(isArrayKeyAnEmptyString('jobtypeids', $formvalues)) {
+					$formvalues['jobtype'] = NULL;
+				}
+			} else {
+				unset($formvalues['jobtype']);
 			}
 		}
 		
@@ -1167,7 +1193,7 @@ class Client extends BaseEntity {
 			}
 		}
 		
-		// debugMessage($formvalues); // exit(); 
+		// debugMessage($formvalues); exit(); 
 		parent::processPost($formvalues);
 	}
 	
@@ -1591,6 +1617,14 @@ class Client extends BaseEntity {
 		}
 		return $status;
 	}
+	# determine client status
+	function isInActive(){
+		$status = false;
+		if($this->getStatus() == 0){
+			$status = true;
+		}
+		return $status;
+	}
 	# get latest status entry in client history
 	function getLatestInHistory() {
 		$query = Doctrine_Query::create()->from('ClientHistory h')
@@ -1606,6 +1640,16 @@ class Client extends BaseEntity {
 		$result = $query->execute();
 		if($result){
 			return $result;
+		}
+		return new Job();
+	}
+	# get the employment jobs for the client
+	function getLatestClientJob($type = '1') {
+		$query = Doctrine_Query::create()->from('Job j')
+		->where("j.clientid = '".$this->getID()."' AND j.type = '".$type."' AND j.status = 1 ")->orderby('j.startdate desc')->limit(1);
+		$result = $query->execute();
+		if($result){
+			return $result->get(0);
 		}
 		return new Job();
 	}
@@ -1682,7 +1726,7 @@ class Client extends BaseEntity {
 		return $text;
 	}
 	# get the activities for client ordered by date
-	function getAssessmentDetails($type, $subtype = '', $istop = false){
+	function getAssessmentDetails($type, $subtype = '', $istop = false, $parentid = ''){
 		$custom_query = "";
 		if(!isEmptyString($subtype)){
 			$custom_query .= " AND a.subtype = '".$subtype."' ";
@@ -1690,6 +1734,10 @@ class Client extends BaseEntity {
 		if($istop){
 			$custom_query .= " AND a.value3 = '1' ";
 		}
+		if(!isEmptyString($parentid)){
+			$custom_query .= " AND a.parentid = '".$parentid."' ";
+		}
+		
 		$query = Doctrine_Query::create()->from('AssessmentDetails a')
 		->where("a.clientid = '".$this->getID()."' AND a.type = '".$type."' ".$custom_query)->orderby('a.id asc');
 		$result = $query->execute();
@@ -2063,6 +2111,54 @@ class Client extends BaseEntity {
 			return 'No';
 		}
 		return '';
+	}
+	# array the work shifts for a client
+	function getWorkShiftsArray(){
+		return isEmptyString($this->getWorkShift()) ? array() : explode(',',preg_replace('!\s+!', '', trim($this->getWorkShift())));
+	}
+	# return list work shifts preferred
+	function getListofWorkShifts(){
+		$listarray = array(); $text = '';
+		if(isEmptyString($this->getWorkShift())){
+			return $text;
+		}
+		$allvalues = getAllWorkshiftOptions();
+		$thevalues = $this->getWorkShiftsArray();
+		if(count($thevalues) > 0){
+			foreach ($thevalues as $value) {
+				if(!isArrayKeyAnEmptyString($value, $allvalues)){
+					$listarray[] = $allvalues[$value];
+				}
+			}
+		}
+		if(count($listarray) > 0){
+			$text = createHTMLCommaListFromArray($listarray, ', ');
+		}
+		return $text;
+	}
+	# array the work shifts for a client
+	function getJobTypesArray(){
+		return isEmptyString($this->getJobType()) ? array() : explode(',',preg_replace('!\s+!', '', trim($this->getJobType())));
+	}
+	# return list work shifts preferred
+	function getListofJobTypes(){
+		$listarray = array(); $text = '';
+		if(isEmptyString($this->getJobType())){
+			return $text;
+		}
+		$allvalues = getAllJobTypes();
+		$thevalues = $this->getJobTypesArray();
+		if(count($thevalues) > 0){
+			foreach ($thevalues as $value) {
+				if(!isArrayKeyAnEmptyString($value, $allvalues)){
+					$listarray[] = $allvalues[$value];
+				}
+			}
+		}
+		if(count($listarray) > 0){
+			$text = createHTMLCommaListFromArray($listarray, ', ');
+		}
+		return $text;
 	}
 }
 ?>

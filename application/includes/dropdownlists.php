@@ -1010,7 +1010,7 @@
 	}
 	# determine the medical types for the client
 	function getMedicalTypes($value = ''){
-		$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'MEDICAL_TYPES' order by optiontext ";
+		$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'MEDICAL_TYPES' order by optionvalue ";
 		// debugMessage($query); exit();
 		$array = getOptionValuesFromDatabaseQuery($query);
 		if(!isEmptyString($value)){
@@ -1108,17 +1108,9 @@
 	function getMinutesForTimePicker(){
 		$minutes = array(
 				'00'=>'00',
-				'05'=>'05',
-				'10'=>'10',
 				'15'=>'15',
-				'20'=>'20',
-				'25'=>'25',
 				'30'=>'30',
-				'35'=>'35',
-				'40'=>'40',
-				'45'=>'45',
-				'50'=>'50',
-				'55'=>'55'
+				'45'=>'45'
 		);
 		return $minutes;
 	}
@@ -1355,8 +1347,8 @@
 		return $array;
 	}
 	# determine the billable hours reports for the client
-	function getBillableHoursReportsForClient($clientid){
-		$query = "SELECT a.id as optionvalue, concat(a.title,' ', date_format(a.startdate, '%m/%d/%Y'),' to ',date_format(a.enddate, '%m/%d/%Y')) as optiontext FROM activityreport AS a WHERE a.clientid = '".$clientid."' order by a.reportdate ";
+	function getBillableHoursReportsForClient($clientid, $type = 1){
+		$query = "SELECT a.id as optionvalue, concat(a.title,' ', date_format(a.startdate, '%m/%d/%Y'),' to ',date_format(a.enddate, '%m/%d/%Y')) as optiontext FROM activityreport AS a WHERE a.clientid = '".$clientid."' AND a.type = '".$type."' order by a.reportdate ";
 		// debugMessage($query); exit();
 		$array = getOptionValuesFromDatabaseQuery($query);
 		return $array;
@@ -1378,6 +1370,58 @@
 				return '';
 			}
 		}
+		return $array;
+	}
+	# return service types at exit
+	function getExitProgramTypes($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'EXIT_PROGRAMS' ";
+	
+		// debugMessage($query); // exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			if(!isArrayKeyAnEmptyString($value, $array)){
+				return $array[$value];
+			} else {
+				return '';
+			}
+		}
+		return $array;
+	}
+	# return reasons for exit
+	function getExitReasons($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'EXIT_REASONS' ";
+	
+		// debugMessage($query); // exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			if(!isArrayKeyAnEmptyString($value, $array)){
+				return $array[$value];
+			} else {
+				return '';
+			}
+		}
+		return $array;
+	}
+	# return the exit status for exit
+	function getExitStatus($value = ''){
+		$query = "SELECT l.lookuptypevalue as optionvalue, l.lookupvaluedescription as optiontext FROM lookuptypevalue AS l INNER JOIN lookuptype AS v ON l.lookuptypeid = v.id WHERE v.name = 'EXIT_STATUS' ";
+	
+		// debugMessage($query); // exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
+		if(!isEmptyString($value)){
+			if(!isArrayKeyAnEmptyString($value, $array)){
+				return $array[$value];
+			} else {
+				return '';
+			}
+		}
+		return $array;
+	}
+	# determine the employers for a client
+	function getEmployersForClient($clientid){
+		$query = "SELECT j.id as optionvalue, c.name as optiontext FROM job as j inner join company AS c on (j.employerid = c.id) WHERE j.clientid = '".$clientid."' order by c.name ";
+		// debugMessage($query); exit();
+		$array = getOptionValuesFromDatabaseQuery($query);
 		return $array;
 	}
 ?>

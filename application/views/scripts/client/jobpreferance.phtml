@@ -1,8 +1,8 @@
 <div class="panel-body well-sm">
     <div class="form-group">
-        <div class="col-md-6">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_employmentgoal_label'); ?>:</label>
-            <div class="col-md-12">
+        <div class="col-sm-6">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_employmentgoal_label'); ?>:</label>
+            <div class="col-sm-12">
                 <?php $goals = getAllEmploymentGoalOptions(); ?>
                 <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getjobpreferred(), $goals) ? '': $goals[$client->getjobpreferred()]; ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
@@ -27,9 +27,9 @@
                 <?php } ?>
             </div> 
         </div>
-        <div class="col-md-6">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_alt_employmentgoal_label'); ?>:</label>
-            <div class="col-md-12">
+        <div class="col-sm-6">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_alt_employmentgoal_label'); ?>:</label>
+            <div class="col-sm-12">
                 <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getjobpreferred1(), $goals) ? '': $goals[$client->getjobpreferred1()]; ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
@@ -55,18 +55,19 @@
         </div>
     </div>
     <div class="form-group">
-        <div class="col-md-12">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_availability_label'); ?>:</label>
-            <div class="col-md-12">
+        <div class="col-sm-12">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_availability_label'); ?>:</label>
+            <div class="col-sm-12">
                 <?php $workshifts = getAllWorkshiftOptions(); ?>
-                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getworkshift(), $workshifts) ? '': $workshifts[$client->getworkshift()]; ?></p>
+                <p class="form-control-static nullifempty view"><?php echo count($client->getWorkShiftsArray())  == 0 ? '': $client->getListofWorkShifts(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
                     <?php 
+						$existing_values = $client->getWorkShiftsArray();
                         foreach($workshifts as $key => $value){
                     ?>
-                        <label class="radio-inline">
-                          <input type="radio" id="workshift_<?php echo $key; ?>" name="workshift" class="radiobutton disableoutsidesection" value="<?php echo $key; ?>" <?php echo $key == $client->getworkshift() && !isEmptyString($client->getworkshift()) ? 'checked data-waschecked="true"' : ''; ?>> <?php echo $value; ?>
+                        <label class="checkbox-inline notbolded">
+                          <input type="checkbox" id="workshiftids_<?php echo $key; ?>" name="workshiftids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked data-waschecked="true"' : 1; ?>> <?php echo $value; ?>
                         </label>
                     <?php } ?>
                     <input type="hidden" name="workshift_old" id="workshift_old" value="<?php echo $client->getworkshift(); ?>" />
@@ -76,30 +77,31 @@
         </div>
     </div>
     <div class="form-group">
-        <div class="col-md-12">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_workdesired_label'); ?>:</label>
-            <div class="col-md-12">
+        <div class="col-sm-12">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_workdesired_label'); ?>:</label>
+            <div class="col-sm-12">
                 <?php $jobtypes = getAllJobTypes(); ?>
-                <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->getjobtype(), $jobtypes) ? '': $jobtypes[$client->getjobtype()]; ?></p>
+                <p class="form-control-static nullifempty view"><?php echo count($client->getJobTypesArray())  == 0 ? '': $client->getListofJobTypes(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
                     <?php 
+                        $existing_values = $client->getJobTypesArray();
                         foreach($jobtypes as $key => $value){
                     ?>
-                        <label class="radio-inline">
-                          <input type="radio" id="jobtype_<?php echo $key; ?>" class="radiobutton disableoutsidesection" name="jobtype" value="<?php echo $key; ?>" <?php echo $key == $client->getjobtype() && !isEmptyString($client->getjobtype()) ? 'checked data-waschecked="true"' : ''; ?>><?php echo $value; ?>
+                        <label class="checkbox-inline notbolded">
+                          <input type="checkbox" id="jobtypeids_<?php echo $key; ?>" name="jobtypeids[]" class="disableoutsidesection" value="<?php echo $key; ?>" <?php echo in_array($key, $existing_values) ? 'checked data-waschecked="true"' : 1; ?>> <?php echo $value; ?>
                         </label>
                     <?php } ?>
-                    <input type="hidden" name="jobtype_old" id="jobtype_old" value="<?php echo $client->getworkshift(); ?>" />
+                    <input type="hidden" name="jobtype_old" id="jobtype_old" value="<?php echo $client->getjobtype(); ?>" />
                 </div>
                 <?php } ?>
             </div> 
         </div>
     </div>
     <div class="form-group">
-        <div class="col-md-6">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_dateavailable_label'); ?>:</label>
-            <div class="col-md-12">
+        <div class="col-sm-6">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_dateavailable_label'); ?>:</label>
+            <div class="col-sm-12">
                 <p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($client->getdateavailable()); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit"><div class="divider5"></div>
@@ -108,9 +110,9 @@
                 <?php } ?>
             </div> 
         </div>
-        <div class="col-md-6">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_hoursavailable_label'); ?>:</label>
-            <div class="col-md-12">
+        <div class="col-sm-6">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_hoursavailable_label'); ?>:</label>
+            <div class="col-sm-12">
                 <p class="form-control-static nullifempty view"><?php echo $client->gethoursavailableperweek(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
@@ -121,16 +123,16 @@
         </div>
     </div>
     <div class="form-group">
-        <div class="col-md-12">
-            <label class="col-md-12 control-label">Details of Availability:</label>
-            <div class="col-md-12">
+        <div class="col-sm-12">
+            <label class="col-sm-12 control-label">Details of Availability:</label>
+            <div class="col-sm-12">
                 <?php
                     $fromdetails = $client->getAssessmentDetails(3, 1);
                     $todetails = $client->getAssessmentDetails(3, 2);
                     $wkdays = array(1=>'Mon',2=>'Tue',3=>'Wed',4=>'Thur',5=>'Fri',6=>'Sat',7=>'Sun');
                 ?>
                 
-                <p class="form-control-static nullifempty view">
+                <p class="form-control-static nullifempty view maxwidth">
                     <table class="table table-condensed table-bordered table-responsive viewtable" style="margin-bottom:10px;">
                         <thead>
                             <tr>
@@ -284,9 +286,9 @@
         </div>
     </div>
     <div class="form-group">
-        <div class="col-md-6">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_traveldistance_label'); ?>:</label>
-            <div class="col-md-12">
+        <div class="col-sm-6">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_traveldistance_label'); ?>:</label>
+            <div class="col-sm-12">
                 <p class="form-control-static nullifempty view"><?php echo $client->gettraveldistance(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
@@ -296,9 +298,9 @@
                 <?php } ?>
             </div>
         </div>
-        <div class="col-md-6">
-            <label class="col-md-12 control-label" for="desiredhourlyrate"><?php echo $this->translate('client_desiredhourlyrate_label'); ?>:</label>
-            <div class="col-md-12">
+        <div class="col-sm-6">
+            <label class="col-sm-12 control-label" for="desiredhourlyrate"><?php echo $this->translate('client_desiredhourlyrate_label'); ?>:</label>
+            <div class="col-sm-12">
                 <p class="form-control-static nullifempty view"><?php echo $client->getdesiredhourlyrate(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
@@ -312,9 +314,9 @@
         </div>
     </div>
     <div class="form-group">
-        <div class="col-md-6">
-            <label class="col-md-12 control-label"><?php echo $this->translate('job_transport_label'); ?>:</label>
-            <div class="col-md-12">
+        <div class="col-sm-6">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('job_transport_label'); ?>:</label>
+            <div class="col-sm-12">
                 <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($client->gettransportation(), $transportmodes) ? '' : $transportmodes[$client->gettransportation()]; ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">

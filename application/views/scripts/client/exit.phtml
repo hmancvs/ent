@@ -1,0 +1,507 @@
+<?php
+ 	$baseview = $this->baseUrl('client/view/id/'.encode($client->getID()).'/tab/profile/section/exit');
+	if($step == 'details' || $step == 'edit'){
+		if(!isEmptyString($request->did)){
+			$history = new ClientHistory();
+			$history->populate($request->did);
+		} else { 
+			$history = $client->getClientHistory(true);
+		}
+		$exitprograms = getExitProgramTypes();
+		$reasons = getExitReasons();
+		$exitstatus = getExitStatus();
+		$istermination = false;
+		if(!isEmptyString($request->terminate) || $history->isInActive()){
+			$istermination = true;
+		}
+		if(isEmptyString($history->getassessedbyid()) && $step == 'edit'){
+			$history->setassessedbyid($session->getVar('userid'));
+		}
+	}
+?>
+<div class="row-fluid margin0">
+	<div class="divider5"></div>
+    <?php if($step != 'edit'){ ?>
+		<h4 class="inline">Account Status History</h4>
+    <?php } ?>
+    <div class="col-md-12">
+        <p class="floatright margin0 hideonprint">
+        	<?php if($step == 'view'){ ?>
+				<?php if($client->isActive()){ ?>
+                    <a href="<?php echo stripURL($baseview).'/step/edit/terminate/1'; ?>" class="btn btn-danger btn-xs blockanchor"><i class="glyphicon glyphicon-remove-sign"></i> Terminate Client</a>
+                <?php } ?>
+                <?php if(!$client->isActive()){ ?>
+                    <button type="button" class="btn btn-success btn-xs confirm-dialog" message="Are you sure you want to Re-Open this Account?" action="<?php echo $this->baseUrl('client/changestatus/id/'.$client->getID().'/status/1/successurl/'.encode($this->viewurl)); ?>"><i class="glyphicon glyphicon-remove-sign"></i> Re-open Account</button>
+                <?php } ?>
+			<?php } ?>
+            <?php if($step == 'details'){ ?>
+            	<?php if($history->isActive()){ ?>
+                	<a href="<?php echo stripURL($baseview).'/step/edit'; ?>" class="btn btn-default btn-xs blockanchor"><i class="glyphicon glyphicon-pencil"></i> Update</a> 
+                
+                	<a href="<?php echo stripURL($baseview).'/step/edit/terminate/1'; ?>" class="btn btn-danger btn-xs blockanchor"><i class="glyphicon glyphicon-remove-sign"></i> Terminate Client</a>
+                 <?php } ?>    
+				<a href="<?php echo $baseview; ?>" class="btn btn-primary btn-xs blockanchor"><i class="glyphicon glyphicon-list"></i> Status History</a>
+           	<?php } ?>               
+        </p>
+    </div>
+<div class="divider5"></div>
+<?php if($step == 'details' || $step == 'edit'){ ?>
+	<?php if(isEmptyString($request->pgc)){ ?>  
+	<script>
+	$(document).ready(function() {
+		// validation 
+		$("#form-profile").validate({		
+			// define the validation rules one field at a time
+			rules: {
+				startdate: "required",
+				enddate: "required",
+				program: "required",
+				reason: "required",
+				condition: "required",
+				assessedbyid: "required",
+				dateclosed: "required"
+			}, 
+			// the messages for each of the fields being validated
+			messages: {		
+				startdate: "Please select a Date",
+				enddate: "Please select a Date",
+				program: "Please select a Program",
+				reason: "Please select a Reason",
+				condition: "Please select a Status",
+				assessedbyid: "Please select a User",
+				dateclosed: "Please select a Date"
+			},
+			// custom error positions
+			errorPlacement: function(error, element) {
+				switch(element.attr("name")){					
+					default:
+						if(element.hasClass("useid_error")){
+							error.appendTo("#"+element.attr("id")+"_error");
+						} else {
+							error.appendTo("#"+element.attr("name")+"_error");
+						}
+						break;
+				}			
+			}
+		});
+	}); 
+	</script>
+    <?php } ?>
+    <div class="row-fluid margin0">
+        <div class="col-md-12 padding0 pull-right rightalign">
+            <?php if($step == 'edit' || $step == 'new'){ ?>
+                <p class="margin0 lineblocked">
+                    <button type="submit" class="btn btn-success btn-sm button-submit save_trigger save" name="save" section="exit"><i class="glyphicon glyphicon-ok"></i> 
+                    <?php if($step == 'edit' && !$istermination){ ?>
+                        Save Changes
+                    <?php } ?>
+                    <?php if($istermination){ ?>
+                       Terminate Now
+                    <?php } ?>
+                 	</button>
+                </p>
+                <p class="margin0 lineblocked">
+                    <a class="btn btn-default btn-sm cancel cancel_trigger"><i class="glyphicon glyphicon-remove"></i> <?php echo $this->translate('global_button_cancel'); ?></a>
+                </p>
+            <?php } ?>
+        </div>
+    </div>
+    <input type="hidden" id="historyid" name="historyid" value="<?php echo $history->getID(); ?>" />
+    <input type="hidden" id="clientid" name="clientid" value="<?php echo $client->getID(); ?>" />
+	<div class="divider15"></div>
+    <?php if($istermination){ ?>
+     <i>Please complete the Exit Form before Terminating the Account</i><div class="divider10"></div>
+    <?php } ?>
+    <fieldset class="fieldsetcontainer">
+        <legend>
+        	<?php if($step == 'details' && !$istermination){ ?>
+            	Status Details
+            <?php } ?>
+			<?php if($step == 'edit' && !$istermination){ ?>
+            	Update Details
+            <?php } ?>
+			<?php if($istermination){ ?>
+            	Client Exit 
+            <?php } ?>
+        </legend>
+        <div class="panel-body well-sm">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Service Entrance Date: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                    <div class="col-md-9">
+                        <p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($history->getstartdate()); ?></p>
+                        <div class="edit">
+                            <input type="text" class="form-control input-sm datefield readonly width100" name="startdate" id="startdate" value="<?php echo changeMySQLDateToPageFormat($history->getstartdate()); ?>" />
+                            <div id="startdate_error"></div>
+                        </div>      
+                    </div>
+                </div>
+                <?php if($istermination || $step == 'details'){ ?>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Service Exit Date: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                    <div class="col-md-9">
+                        <p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($history->getenddate()); ?></p>
+                        <div class="edit">
+                            <input type="text" class="form-control input-sm datefield readonly width100" name="enddate" id="enddate" value="<?php echo changeMySQLDateToPageFormat($history->getenddate()); ?>" />
+                            <div id="enddate_error"></div>
+                        </div>      
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Program At Time Of Exit: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                    <div class="col-md-4">
+                        <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($history->getProgram(), $exitprograms) ? '': $exitprograms[$history->getProgram()]; ?></p>
+                        <div class="edit">
+                            <?php
+                                $dropdown = new Zend_Form_Element_Select('program',
+                                                    array(
+                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $exitprograms, array('0'=>$this->translate("global_addvariable_label"))),
+                                                        'view' => new Zend_View(),
+                                                        'decorators' => array('ViewHelper'),
+                                                        'class' => array('form-control','input-sm','configvariable'),
+                                                        'lookupid' => 48,
+                                                        'fieldid' => 'program',
+                                                        'fieldlabel' => 'Client Exit Programs'
+                                                    )
+                                );  
+                                $dropdown->setValue($history->getProgram()); 
+                                echo $dropdown->render();
+                            ?>
+                            <div id="program_error"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Reason For Service Exit: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                    <div class="col-md-4">
+                        <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($history->getReason(), $reasons) ? '': $reasons[$history->getReason()]; ?></p>
+                        <div class="edit">
+                            <?php
+                                $dropdown = new Zend_Form_Element_Select('reason',
+                                                    array(
+                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $reasons, array('0'=>$this->translate("global_addvariable_label"))),
+                                                        'view' => new Zend_View(),
+                                                        'decorators' => array('ViewHelper'),
+                                                        'class' => array('form-control','input-sm','configvariable'),
+                                                        'lookupid' => 49,
+                                                        'fieldid' => 'reason',
+                                                        'fieldlabel' => 'Reasons for Service Exit'
+                                                    )
+                                );  
+                                $dropdown->setValue($history->getReason()); 
+                                echo $dropdown->render();
+                            ?>
+                            <div id="reason_error"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Client Status At Exit: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                    <div class="col-md-4">
+                        <p class="form-control-static nullifempty view"><?php echo isArrayKeyAnEmptyString($history->getCondition(), $exitstatus) ? '' : $exitstatus[$history->getcondition()]; ?></p>
+                        <div class="edit">
+                            <?php
+                                $dropdown = new Zend_Form_Element_Select('condition',
+                                                    array(
+                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $exitstatus, array('0'=>$this->translate("global_addvariable_label"))),
+                                                        'view' => new Zend_View(),
+                                                        'decorators' => array('ViewHelper'),
+                                                        'class' => array('form-control','input-sm','configvariable'),
+                                                        'lookupid' => 50,
+                                                        'fieldid' => 'condition',
+                                                        'fieldlabel' => 'Status at Exit'
+                                                    )
+                                );  
+                                $dropdown->setValue($history->getcondition()); 
+                                echo $dropdown->render();
+                            ?>
+                            <div id="condition_error"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-12 control-label">Goals Met During Service:</label>
+                    <div class="col-md-12">
+                        <p class="form-control-static nullifempty view"><?php echo str_replace('*', ',<br/>', $history->getGoalsMet()); ?></p>
+                        <div class="edit">
+                            <div class="divider10"></div>
+                            <span class="blocked">1. <textarea id="goalsmet_1" name="goalsmet_1" class="form-control expanding inline" style="display:inline; float:right; width:96%; line-height:1em;"><?php echo $history->getgoalsmet_1(); ?></textarea></span>
+                            <div class="divider5"></div>
+                            <span class="blocked">2. <textarea id="goalsmet_2" name="goalsmet_2" class="form-control expanding inline" style="display:inline; float:right; width:96%; line-height:1em;"><?php echo $history->getgoalsmet_2(); ?></textarea></span>
+                            <div class="divider5"></div>
+                            <span class="blocked">3. <textarea id="goalsmet_3" name="goalsmet_3" class="form-control expanding inline" style="display:inline; float:right; width:96%; line-height:1em;"><?php echo $history->getgoalsmet_3(); ?></textarea></span>
+                            <div class="divider5"></div>
+                            <span class="blocked">4. <textarea id="goalsmet_4" name="goalsmet_4" class="form-control expanding inline" style="display:inline; float:right; width:96%; line-height:1em;"><?php echo $history->getgoalsmet_4(); ?></textarea></span>
+                            <div class="divider5"></div>
+                            <input type="hidden" name="goalsmet_old" id="goalsmet_old" value="<?php echo $history->getgoalsmet(); ?>" />
+                            <label class="checkbox checkbox-inline"><input type="checkbox" name="nogoal" id="nogoal" <?php echo $history->getNoGoal() == 1 ? 'checked' : ''; ?> class="<?php echo $history->getNoGoal() == 1 ? 1 : 0; ?>" value="1" /> &nbsp;&nbsp;<b>No Goals Met!</b></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-12 control-label">Progress Achieved Towards Unachieved Goals Dduring Service:</label>
+                    <div class="col-md-12">
+                        <p class="form-control-static nullifempty view"><?php echo str_replace('*', ',<br/>', nl2br($history->getunachievedprogress())); ?></p>
+                        <div class="edit">
+                            <div class="divider10"></div>
+                            <span class="blocked">1. <textarea id="unachievedprogress_1" name="unachievedprogress_1" class="form-control expanding inline" style="display:inline; float:right; width:96%; line-height:1em;"><?php echo $history->getunachievedprogress_1(); ?></textarea></span>
+                            <div class="divider5"></div>
+                            <span class="blocked">2. <textarea id="unachievedprogress_2" name="unachievedprogress_2" class="form-control expanding inline" style="display:inline; float:right; width:96%; line-height:1em;"><?php echo $history->getunachievedprogress_2(); ?></textarea></span>
+                            <div class="divider5"></div>
+                            <span class="blocked">3. <textarea id="unachievedprogress_3" name="unachievedprogress_3" class="form-control expanding inline" style="display:inline; float:right; width:96%; line-height:1em;"><?php echo $history->getunachievedprogress_3(); ?></textarea></span>
+                            <input type="hidden" name="unachievedprogress_old" id="unachievedprogress_old" value="<?php echo $history->getunachievedprogress(); ?>" />
+                            <div class="divider5"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-12 control-label">Recommended Referrals to Support Systems and/or Services:</label>
+                    <div class="col-md-12">
+                        <p class="form-control-static nullifempty view">
+                        	<table class="table table-bordered table-condensed table-striped table-responsive viewtable" style="margin-bottom:10px;">
+                                <thead>
+                                    <tr>
+                                        <th style="width:20%; font-size:10px; vertical-align:top;">Type of Support Needed</th>
+                                        <th style="font-size:10px; vertical-align:top;">Preferred Provider of services <br />(if communicated)</th>
+                                        <th style="width:100px; font-size:10px; vertical-align:top;">Phone Number</th>
+                                        <th style="width:100px; font-size:10px; vertical-align:top;">Contact Person</th>
+                                        <th style="width:25%; font-size:10px; vertical-align:top;">First Appointment <br />(time and date, if known)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                	<?php
+                                        $referraldetails = $client->getAssessmentDetails(7, '', false, $history->getID()); // debugMessage($assigments->toArray());													
+                                         foreach($referraldetails as $referral){
+                                    ?>
+                                    	<tr>
+                                        	<td><?php echo $referral->getValue1(); ?></td>
+                                            <td><?php echo $referral->getValue2(); ?></td>
+                                            <td><?php echo $referral->getValue3(); ?></td>
+                                            <td><?php echo $referral->getValue4(); ?></td>
+                                            <td><?php echo $referral->getValue5(); ?></td>
+                                        </tr>
+                                    <?php } ?>
+                                </tbody>
+                            </table>
+                        </p>
+                        <div class="edit">
+                            <table class="table table-bordered table-condensed table-striped table-responsive viewtable" style="margin-bottom:10px;">
+                                <thead>
+                                    <tr>
+                                        <th style="width:20%; font-size:10px; vertical-align:top;">Type of Support Needed</th>
+                                        <th style="font-size:10px; vertical-align:top;">Preferred Provider of services <br />(if communicated)</th>
+                                        <th style="width:100px; font-size:10px; vertical-align:top;">Phone Number</th>
+                                        <th style="width:100px; font-size:10px; vertical-align:top;">Contact Person</th>
+                                        <th style="width:25%; font-size:10px; vertical-align:top;">First Appointment <br />(time and date, if known)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                        $referraldetails = $client->getAssessmentDetails(7, '', false, $history->getID()); // debugMessage($assigments->toArray());													
+                                        $count_referraldetails = $referraldetails->count(); 
+                                        $counter = 1;
+                                        $nooflines = $count_referraldetails;
+                                        $e = 0; $x = 0;
+                                         foreach($referraldetails as $referral){
+                                             $class = "visible_row_ref";
+                                    ?>
+                                    <tr class="<?php echo $class; ?> row_ref_<?php echo $e; ?>" id="row_ref_<?php echo $e; ?>">
+                                        <td><textarea class="form-control input-sm expanding referraldetails minheight50" name="referraldetails[<?php echo md5($e); ?>][value1]" id="referraldetails_value1_<?php echo $e; ?>"><?php echo $referral->getValue1(); ?></textarea>
+                                        <input type="hidden" name="referraldetails[<?php echo md5($e); ?>][id]" id="referraldetails_id_<?php echo $e; ?>" value="<?php echo $referral->getID(); ?>" />
+                                        </td>
+                                        <td><textarea class="form-control input-sm expanding referraldetails minheight50" name="referraldetails[<?php echo md5($e); ?>][value2]" id="referraldetails_value2_<?php echo $e; ?>"><?php echo $referral->getValue2(); ?></textarea></td>
+                                        <td><textarea class="form-control input-sm expanding referraldetails minheight50" name="referraldetails[<?php echo md5($e); ?>][value3]" id="referraldetails_value3_<?php echo $e; ?>"><?php echo $referral->getValue3(); ?></textarea></td>
+                                        <td><textarea class="form-control input-sm expanding referraldetails minheight50" name="referraldetails[<?php echo md5($e); ?>][value4]" id="referraldetails_value4_<?php echo $e; ?>"><?php echo $referral->getValue4(); ?></textarea></td>
+                                        <td><textarea class="form-control input-sm expanding referraldetails minheight50" name="referraldetails[<?php echo md5($e); ?>][value5]" id="referraldetails_value5_<?php echo $e; ?>"><?php echo $referral->getValue5(); ?></textarea></td>
+                                    </tr>
+                                    <?php $e++; $x++; $counter++; } ?>
+                                    <?php 
+                                        $defaultlines = 3;
+                                        if($nooflines >= 3){
+                                            $defaultlines = $nooflines + 1;
+                                        }
+                                        for($i = $e; $i<10; $i++){
+                                            // debugMessage($i);
+                                            $class = "visible_row_ref";
+                                            if($i >= $defaultlines){
+                                                $class = "hidden_row_ref";
+                                            }
+                                        
+                                    ?>
+                                        <tr class="<?php echo $class; ?> row_ref_<?php echo $i; ?>" id="row_ref_<?php echo $i; ?>">
+                                            <td><textarea class="form-control input-sm expanding referraldetails minheight50" name="referraldetails[<?php echo md5($i); ?>][value1]" id="referraldetails_value1_<?php echo $i; ?>"></textarea></td>
+                                            <td><textarea class="form-control input-sm expanding referraldetails minheight50" name="referraldetails[<?php echo md5($i); ?>][value2]" id="referraldetails_value2_<?php echo $i; ?>"></textarea></td>
+                                            <td><textarea class="form-control input-sm expanding referraldetails minheight50" name="referraldetails[<?php echo md5($i); ?>][value3]" id="referraldetails_value3_<?php echo $i; ?>"></textarea></td>
+                                            <td><textarea class="form-control input-sm expanding referraldetails minheight50" name="referraldetails[<?php echo md5($i); ?>][value4]" id="referraldetails_value4_<?php echo $i; ?>"></textarea></td>
+                                            <td><textarea class="form-control input-sm expanding referraldetails minheight50" name="referraldetails[<?php echo md5($i); ?>][value5]" id="referraldetails_value5_<?php echo $i; ?>"></textarea></td>
+                                        </tr>
+                                    <?php $x++; } ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-12 control-label">Additional Comments:</label>
+                    <div class="col-md-12">
+                        <p class="form-control-static nullifempty view"><?php echo $history->getcomments(); ?></p>
+                        <div class="edit">
+                            <textarea id="comments" name="comments" class="form-control expanding minheight80"><?php echo $history->getcomments(); ?></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Notification Given:</label>
+                    <div class="col-md-4">
+                        <?php $notifiers = array('1'=>'Client','2'=>'Family','3'=>'Guardian'); ?>
+                        <p class="form-control-static nullifempty view"><?php echo isEmptyString($history->getnotified()) ? '' : $notifiers[$history->getnotified()]; ?></p>
+                        <div class="edit">
+                            <?php
+                                $values = array('1'=>'Client','2'=>'Family','3'=>'Guardian');
+                                $dropdown = new Zend_Form_Element_Select('notified',
+                                                    array(
+                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $values),
+                                                        'view' => new Zend_View(),
+                                                        'decorators' => array('ViewHelper'),
+                                                        'class' => array('form-control','input-sm')
+                                                    )
+                                );  
+                                $dropdown->setValue($history->getnotified()); 
+                                echo $dropdown->render();
+                            ?>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Notification Method:</label>
+                    <div class="col-md-4">
+                        <?php $methods = array('1'=>'Phone','2'=>'Letter','3'=>'In-person','4'=>'Email','5'=>'Fax'); ?>
+                        <p class="form-control-static nullifempty view"><?php echo isEmptyString($history->getnotifymethod()) ? '' : $methods[$history->getnotifymethod()]; ?></p>
+                        <div class="edit">
+                            <?php
+                                $dropdown = new Zend_Form_Element_Select('notifymethod',
+                                                    array(
+                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $methods),
+                                                        'view' => new Zend_View(),
+                                                        'decorators' => array('ViewHelper'),
+                                                        'class' => array('form-control','input-sm')
+                                                    )
+                                );  
+                                $dropdown->setValue($history->getnotifymethod()); 
+                                echo $dropdown->render();
+                            ?>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Date Notified:</label>
+                    <div class="col-md-9">
+                        <p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($history->getdatenotified()); ?></p>
+                        <div class="edit">
+                            <input type="text" class="form-control input-sm datefield readonly width100" name="datenotified" id="datenotified" value="<?php echo changeMySQLDateToPageFormat($history->getdatenotified()); ?>" />
+                            <div id="datenotified_error"></div>
+                        </div>      
+                    </div>
+                </div>
+                <?php } ?>
+                <div class="divider10"></div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Completed By: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                    <div class="col-md-4">
+                        <p class="form-control-static nullifempty view"><?php echo $history->getassessedby()->getName(); ?></p>
+                        <div class="edit">
+                            <?php
+                                $allvalues = getUsers();
+                                $dropdown = new Zend_Form_Element_Select('assessedbyid',
+                                                    array(
+                                                        'multiOptions' => array_merge_maintain_keys(array('' => '<Select One>'), $allvalues),
+                                                        'view' => new Zend_View(),
+                                                        'decorators' => array('ViewHelper'),
+                                                        'class' => array('form-control','input-sm'),
+                                                        'style' => 'width:180px; display:inline;'
+                                                    )
+                                );  
+                                $dropdown->setValue($history->getassessedbyid()); 
+                                echo $dropdown->render();
+                            ?><div id="assessedbyid_error"></div>
+                        </div>
+                    </div>
+                </div>
+                <?php if($istermination || $step == 'details'){ ?>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Date Completed: <?php echo $this->translate("global_required_field_marker"); ?></label>
+                    <div class="col-md-9">
+                        <p class="form-control-static nullifempty view"><?php echo changeMySQLDateToPageFormat($history->getdateclosed()); ?></p>
+                        <div class="edit">
+                            <input type="text" class="form-control input-sm datefield readonly width100" name="dateclosed" id="dateclosed" value="<?php echo changeMySQLDateToPageFormat($history->getdateclosed()); ?>" />
+                            <div id="dateclosed_error"></div>
+                        </div>      
+                    </div>
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+    </fieldset>
+    <div class="row-fluid margin0">
+        <div class="col-md-12 padding0 pull-right rightalign">
+            <?php if($step == 'edit' || $step == 'new'){ ?>
+                <p class="margin0 lineblocked">
+                    <button type="submit" class="btn btn-success btn-sm button-submit save_trigger save" name="save" section="exit"><i class="glyphicon glyphicon-ok"></i> 
+                    <?php if($step == 'edit' && !$istermination){ ?>
+                        Save Changes
+                    <?php } ?>
+                    <?php if($istermination){ ?>
+                       Terminate Now
+                    <?php } ?>
+                 	</button>
+                </p>
+                <p class="margin0 lineblocked">
+                    <a class="btn btn-default btn-sm cancel cancel_trigger"><i class="glyphicon glyphicon-remove"></i> <?php echo $this->translate('global_button_cancel'); ?></a>
+                </p>
+            <?php } ?>
+        </div>
+    </div>
+<?php } ?>
+<?php if($step == 'view'){ ?>
+    <table class="table table-condensed table-striped table-responsive viewtable">
+        <thead>
+            <tr>
+            	<?php if(isEmptyString($request->pgc)){ ?>
+                <th style="width:25px;">Details</th>
+                <?php } ?>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th style="width:12%;">Status</th>
+                <th style="width:20%;">Open/Completed By</th>
+                <th style="width:25%;">Comments</th>
+            </tr>
+        </thead>
+        <tbody>
+           <?php 
+                $history = $client->getClientHistory(); // debugMessage($assigments->toArray());													
+                $counthistory = $history->count();
+            ?>
+            <?php if($counthistory == 0){ ?>
+                <tr>
+                    <td colspan="7"><div class="alert alert-warning">No entries found</div></td>
+                </tr>
+            <?php } else { ?>
+                <?php 
+                    $counter = 1;
+                    foreach($history as $record){
+                ?>
+                <tr>
+                	<?php if(isEmptyString($request->pgc)){ ?>
+                    <td class="centeralign"><a href="<?php echo stripURL($baseview).'/step/details/did/'.$record->getID(); ?>" class="blockanchor"><?php echo $record->isActive() ? 'Update' : 'Details'; ?></a></td>
+                    <?php } ?>
+                    <td><?php echo formatDateAndTime($record->getStartDate(), false); ?></td>
+                    <td><?php echo $record->isInActive() ? formatDateAndTime($record->getEndDate(), false) : ''; ?></td>
+                    <td><?php echo $record->getCurrentStatus(); ?></td>
+                    <td><?php echo $record->getAssessedBy()->getName(); ?></td>
+                    <td><?php echo $record->isInActive() ? $record->getReasonText() : '--'; ?></td>
+                </tr>
+                <?php $counter++; } ?>
+            <?php } ?>
+        </tbody>
+    </table>
+<?php } ?>

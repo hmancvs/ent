@@ -4,6 +4,9 @@
 		$request->setParam('section', 'bio');
 		$section = 'bio';
 	}
+	if($section == 'exit'){
+		$posturl = $this->baseUrl("client/terminate");
+	}
 	
 	// dropdown data
 	$maritalstatuses = getAllMaritalStatuses();
@@ -36,6 +39,7 @@
 	}
 	// debugMessage($birthday.' - '.$birthmonth.' - '.$birthyear.' - '.$dateofbirth);
 ?>
+<?php if(isEmptyString($request->pgc)){ ?>
 <script>
 $(document).ready(function() {
 	var section = '<?php echo $section; ?>';
@@ -50,10 +54,12 @@ $(document).ready(function() {
 		}
 	<?php } ?>
 	
-	// validation 
-	$("#form-profile").validate({		
-		<?php require APPLICATION_PATH."/views/scripts/client/validation.phtml"; ?>
-	});
+	<?php if($section != 'exit'){ ?>
+		// validation 
+		$("#form-profile").validate({		
+			<?php require APPLICATION_PATH."/views/scripts/client/validation.phtml"; ?>
+		});
+	<?php } ?>
 	
 	$.validator.addMethod("validbirth", function(value, element, params) { 
 		var day = $("#birthday").val();
@@ -136,7 +142,8 @@ $(document).ready(function() {
 	});
 	
 }); 
-</script>		
+</script>
+<?php } ?>	
 <form id="form-profile" class="form-horizontal profile" role="form" action="<?php echo $posturl; ?>" method="post" enctype="multipart/form-data">
     <input type="hidden" id="entityname" name="entityname" value="Client" />
     <input type="hidden" id="id" name="id" value="<?php echo encode($client->getID()); ?>" />
@@ -145,17 +152,23 @@ $(document).ready(function() {
     <input type="hidden" id="<?php echo SUCCESS_MESSAGE; ?>" name="<?php echo SUCCESS_MESSAGE; ?>" value="<?php echo $successmessage; ?>" />
     <input type="hidden" id="nosuccessid" name="nosuccessid" value="1" />
     <input type="hidden" id="status" name="status" value="<?php echo $client->getStatus(); ?>" />
+    <?php if($step == 'view' && isEmptyString($request->pgc)){ ?>
+    	<a title="Print" href="<?php echo stripURL($this->viewurl).'/print/1/pgc/true'; ?>" class="btn btn-default btn-sm" style="position:absolute; right:15px; top:5px;" target="_blank"><i class="glyphicon glyphicon-print"></i> Print</a>
+    <?php } ?>
+    <?php if($step == 'view' && !isEmptyString($request->pgc)){ ?>
+    	<h3 style="margin-top:10px; font-size:20px;">Profile Report - <?php echo $client->getName(); ?></h3>
+    <?php } ?>
     <div class="panel-group" id="accordion">
-        <div class="panel panel-primary" id="bio">
+        <div class="panel panel-primary clearfix" id="bio">
             <div class="panel-heading">
                 <h4 class="panel-title"><a class="accordion-toggle bolded <?php echo $section == 'bio' ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_bio">Bio Data</a> </h4>
             </div>
-            <div id="collapse_bio" class="panel-collapse collapse <?php echo $section == 'bio' ? 'in' : '' ; ?>">
+            <div id="collapse_bio" class="panel-collapse collapse <?php echo $section == 'bio' || !isEmptyString($request->pgc) ? 'in' : '' ; ?>">
                 <div class="panel-body">
-                	<div class="row-fluid margin0">
+                	<div class="row-fluid margin0 hideonprint">
                         <div class="col-md-12 padding0 pull-right rightalign">
                             <p class="margin0 lineblocked">
-                                <a href="<?php echo $baseview.'/section/bio/step/edit'; ?>" class="btn btn-xs <?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'btn-primary update_trigger'; ?>" section="bio" message="This Account is closed and updates are disabled." ><i class="glyphicon glyphicon-pencil"></i> Update</a>
+                                <a href="<?php echo stripURL($baseview).'/section/bio/step/edit'; ?>" class="btn btn-xs <?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'btn-primary update_trigger'; ?>" section="bio" message="This Account is closed and updates are disabled."><i class="glyphicon glyphicon-pencil"></i> Update</a>
                             </p>
                             <p class="margin0 lineblocked">
                                 <button type="submit" class="btn btn-success btn-sm button-submit save_trigger" section="bio" name="save"><i class="glyphicon glyphicon-ok"></i> Save Changes</button>
@@ -169,16 +182,16 @@ $(document).ready(function() {
                 </div>
             </div>
         </div>
-        <div class="panel panel-primary" id="referral">
+        <div class="panel panel-primary clearfix blocked" id="referral">
             <div class="panel-heading">
-                <h4 class="panel-title"> <a class="accordion-toggle bolded <?php echo $section == 'referral' ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_referral"> Referral Information</a> </h4>
+                <h4 class="panel-title"> <a class="accordion-toggle bolded <?php echo $section == 'referral' || !isEmptyString($request->pgc) ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_referral">Referral Information</a> </h4>
             </div>
-            <div id="collapse_referral" class="panel-collapse collapse <?php echo $section == 'referral' ? 'in' : '' ; ?>">
+            <div id="collapse_referral" class="panel-collapse collapse <?php echo $section == 'referral' || !isEmptyString($request->pgc) ? 'in' : '' ; ?>">
                 <div class="panel-body">
-                	<div class="row-fluid margin0">
+                	<div class="row-fluid margin0 hideonprint">
                         <div class="col-md-12 padding0 pull-right rightalign">
                             <p class="margin0 lineblocked">
-                                <a href="<?php echo $baseview.'/section/referral/step/edit'; ?>" class="btn btn-xs <?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'btn-primary update_trigger'; ?>" section="referral" message="This Account is closed and updates are disabled." ><i class="glyphicon glyphicon-pencil"></i> Update</a>
+                                <a href="<?php echo stripURL($baseview).'/section/referral/step/edit'; ?>" class="btn btn-xs <?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'btn-primary update_trigger'; ?>" section="referral" message="This Account is closed and updates are disabled." ><i class="glyphicon glyphicon-pencil"></i> Update</a>
                             </p>
                             <p class="margin0 lineblocked">
                                 <button type="submit" class="btn btn-success btn-sm button-submit save_trigger" section="referral" name="save"><i class="glyphicon glyphicon-ok"></i> Save Changes</button>
@@ -194,14 +207,14 @@ $(document).ready(function() {
         </div>
         <div class="panel panel-primary" id="assessment">
             <div class="panel-heading">
-                <h4 class="panel-title"> <a class="accordion-toggle bolded <?php echo $section == 'assessment' ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_assessment"> Intake Assessment</a> </h4>
+                <h4 class="panel-title"> <a class="accordion-toggle bolded <?php echo $section == 'assessment' || !isEmptyString($request->pgc) ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_assessment">Intake Assessment</a> </h4>
             </div>
-            <div id="collapse_assessment" class="panel-collapse collapse <?php echo $section == 'assessment' ? 'in' : '' ; ?>">
+            <div id="collapse_assessment" class="panel-collapse collapse <?php echo $section == 'assessment' || !isEmptyString($request->pgc) ? 'in' : '' ; ?>">
                 <div class="panel-body" style="padding-left:8px; padding-right:8px;">
-                    <div class="row-fluid margin0">
+                    <div class="row-fluid margin0 hideonprint">
                         <div class="col-md-12 padding0 pull-right rightalign">
                             <p class="margin0 lineblocked" style="padding-right:0; margin-right:0;">
-                                <a href="<?php echo $baseview.'/section/assessment/step/edit'; ?>" class="btn btn-xs <?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'btn-primary update_trigger'; ?>" section="assessment" message="This Account is closed and updates are disabled." ><i class="glyphicon glyphicon-pencil"></i> Update</a>
+                                <a href="<?php echo stripURL($baseview).'/section/assessment/step/edit'; ?>" class="btn btn-xs <?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'btn-primary update_trigger'; ?>" section="assessment" message="This Account is closed and updates are disabled." ><i class="glyphicon glyphicon-pencil"></i> Update</a>
                             </p>
                             <p class="margin0 lineblocked">
                                 <button type="submit" class="btn btn-success btn-xs button-submit save_trigger" section="assessment" name="save"><i class="glyphicon glyphicon-ok"></i> Save Changes</button>
@@ -234,9 +247,9 @@ $(document).ready(function() {
                       	</div>
                         <div class="panel panel-default" id="assess3">
                             <div class="panel-heading">
-                                <h4 class="panel-title"><a class="accordion-toggle dark collapsed" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col3"> Family and Living</a> </h4>
+                                <h4 class="panel-title"><a class="accordion-toggle dark <?php echo !isEmptyString($request->pgc) ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col3"> Family and Living</a> </h4>
                             </div>
-                            <div id="collapse_col3" class="panel-collapse collapse">
+                            <div id="collapse_col3" class="panel-collapse collapse <?php echo !isEmptyString($request->pgc) ? 'in' : '' ; ?>">
 				                <div class="panel-body">
                                 	<?php require APPLICATION_PATH."/views/scripts/client/family.phtml"; ?> 
                                 </div>
@@ -245,19 +258,20 @@ $(document).ready(function() {
                         
                         <div class="panel panel-default" id="assess4">
                             <div class="panel-heading">
-                                <h4 class="panel-title"><a class="accordion-toggle dark collapsed" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col4"> Employment Preferrences</a> </h4>
+                                <h4 class="panel-title"><a class="accordion-toggle dark <?php echo !isEmptyString($request->pgc) ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col4"> Employment Preferrences</a> </h4>
                             </div>
-                            <div id="collapse_col4" class="panel-collapse collapse">
+                            <div id="collapse_col4" class="panel-collapse collapse <?php echo !isEmptyString($request->pgc) ? 'in' : '' ; ?>">
 				                <div class="panel-body">
                                     <?php require APPLICATION_PATH."/views/scripts/client/jobpreferance.phtml"; ?> 
                                 </div>
                            	</div>
                       	</div>
+                        
                         <div class="panel panel-default" id="assess5">
                             <div class="panel-heading">
-                                <h4 class="panel-title"><a class="accordion-toggle dark collapsed" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col5"> Employment History</a> </h4>
+                                <h4 class="panel-title"><a class="accordion-toggle dark <?php echo !isEmptyString($request->pgc) ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col5"> Employment History</a> </h4>
                             </div>
-                            <div id="collapse_col5" class="panel-collapse collapse">
+                            <div id="collapse_col5" class="panel-collapse collapse <?php echo !isEmptyString($request->pgc) ? 'in' : '' ; ?>">
 				                <div class="panel-body">
                                 	<?php require APPLICATION_PATH."/views/scripts/client/jobhistory.phtml"; ?>
                                 </div>
@@ -266,9 +280,9 @@ $(document).ready(function() {
                         
                         <div class="panel panel-default" id="assess6">
                             <div class="panel-heading">
-                                <h4 class="panel-title"><a class="accordion-toggle dark collapsed" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col6"> Education Background</a> </h4>
+                                <h4 class="panel-title"><a class="accordion-toggle dark <?php echo !isEmptyString($request->pgc) ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col6"> Education Background</a> </h4>
                             </div>
-                            <div id="collapse_col6" class="panel-collapse collapse">
+                            <div id="collapse_col6" class="panel-collapse collapse <?php echo !isEmptyString($request->pgc) ? 'in' : '' ; ?>">
 				                <div class="panel-body">
                               		<div class="panel-body well-sm">
                                     	<?php require APPLICATION_PATH."/views/scripts/client/education.phtml"; ?>
@@ -278,9 +292,9 @@ $(document).ready(function() {
                       	</div>
                         <div class="panel panel-default" id="assess7">
                             <div class="panel-heading">
-                                <h4 class="panel-title"><a class="accordion-toggle dark collapsed" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col7"> References</a> </h4>
+                                <h4 class="panel-title"><a class="accordion-toggle dark <?php echo !isEmptyString($request->pgc) ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col7"> References</a> </h4>
                             </div>
-                            <div id="collapse_col7" class="panel-collapse collapse">
+                            <div id="collapse_col7" class="panel-collapse collapse <?php echo !isEmptyString($request->pgc) ? 'in' : '' ; ?>">
 				                <div class="panel-body">
                              		<div class="panel-body well-sm">
                                     	<?php require APPLICATION_PATH."/views/scripts/client/references.phtml"; ?>
@@ -290,9 +304,9 @@ $(document).ready(function() {
                       	</div>
                         <div class="panel panel-default" id="assess8">
                             <div class="panel-heading">
-                                <h4 class="panel-title"><a class="accordion-toggle dark collapsed" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col8"> Legal Information</a> </h4>
+                                <h4 class="panel-title"><a class="accordion-toggle dark <?php echo !isEmptyString($request->pgc) ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col8"> Legal Information</a> </h4>
                             </div>
-                            <div id="collapse_col8" class="panel-collapse collapse">
+                            <div id="collapse_col8" class="panel-collapse collapse <?php echo !isEmptyString($request->pgc) ? 'in' : '' ; ?>">
 				                <div class="panel-body">
                                     <?php require APPLICATION_PATH."/views/scripts/client/legal.phtml"; ?>
                                 </div>
@@ -300,9 +314,9 @@ $(document).ready(function() {
                       	</div>
                         <div class="panel panel-default" id="assess9">
                             <div class="panel-heading">
-                                <h4 class="panel-title"><a class="accordion-toggle dark" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col9"> Military Service</a> </h4>
+                                <h4 class="panel-title"><a class="accordion-toggle dark <?php echo !isEmptyString($request->pgc) ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col9"> Military Service</a> </h4>
                             </div>
-                            <div id="collapse_col9" class="panel-collapse collapse collapsed">
+                            <div id="collapse_col9" class="panel-collapse collapse <?php echo !isEmptyString($request->pgc) ? 'in' : '' ; ?>">
 				                <div class="panel-body">
                                 	<?php require APPLICATION_PATH."/views/scripts/client/military.phtml"; ?>
                                 </div>
@@ -311,9 +325,9 @@ $(document).ready(function() {
                         
                         <div class="panel panel-default" id="assess10">
                             <div class="panel-heading">
-                                <h4 class="panel-title"><a class="accordion-toggle dark collapsed" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col10"> Cultural and Social Information</a> </h4>
+                                <h4 class="panel-title"><a class="accordion-toggle dark <?php echo !isEmptyString($request->pgc) ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col10"> Cultural and Social Information</a> </h4>
                             </div>
-                            <div id="collapse_col10" class="panel-collapse collapse">
+                            <div id="collapse_col10" class="panel-collapse collapse <?php echo !isEmptyString($request->pgc) ? 'in' : '' ; ?>">
 				                <div class="panel-body">
                                 	<?php require APPLICATION_PATH."/views/scripts/client/social.phtml"; ?>
                                 </div>
@@ -322,9 +336,9 @@ $(document).ready(function() {
                         
                         <div class="panel panel-default" id="assess11">
                             <div class="panel-heading">
-                                <h4 class="panel-title"><a class="accordion-toggle dark collapsed" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col11"> Personal Health and Safety Assessment</a> </h4>
+                                <h4 class="panel-title"><a class="accordion-toggle dark <?php echo !isEmptyString($request->pgc) ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#inneraccordion" href="#collapse_col11"> Personal Health and Safety Assessment</a> </h4>
                             </div>
-                            <div id="collapse_col11" class="panel-collapse collapse">
+                            <div id="collapse_col11" class="panel-collapse collapse <?php echo !isEmptyString($request->pgc) ? 'in' : '' ; ?>">
 				                <div class="panel-body">
                                 	<div class="panel-body well-sm">
                                     	<?php require APPLICATION_PATH."/views/scripts/client/qnassessment.phtml"; ?>
@@ -332,20 +346,21 @@ $(document).ready(function() {
                                 </div>
                            	</div>
                       	</div>
+                       
                     </div>
               	</div>
           	</div>
         </div>
         <div class="panel panel-primary" id="emergency">
             <div class="panel-heading">
-                <h4 class="panel-title"><a class="accordion-toggle bolded <?php echo $section == 'emergency' ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_emergency">Emergency Information </a> </h4>
+                <h4 class="panel-title"><a class="accordion-toggle bolded <?php echo $section == 'emergency' || !isEmptyString($request->pgc) ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_emergency">Emergency Information </a> </h4>
             </div>
-            <div id="collapse_emergency" class="panel-collapse collapse <?php echo $section == 'emergency' ? 'in' : '' ; ?>">
+            <div id="collapse_emergency" class="panel-collapse collapse <?php echo $section == 'emergency' || !isEmptyString($request->pgc) ? 'in' : '' ; ?>">
             	<div class="panel-body">
-                    <div class="row-fluid margin0">
+                    <div class="row-fluid margin0 hideonprint">
                         <div class="col-md-12 padding0 pull-right rightalign">
                             <p class="margin0 lineblocked">
-                                <a href="<?php echo $baseview.'/section/emergency/step/edit'; ?>" class="btn btn-xs <?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'btn-primary update_trigger'; ?>" section="emergency" message="This Account is closed and updates are disabled." ><i class="glyphicon glyphicon-pencil"></i> Update</a>
+                                <a href="<?php echo stripURL($baseview).'/section/emergency/step/edit'; ?>" class="btn btn-xs <?php echo !$client->isActive() ? 'btn-alert alert-dialog' : 'btn-primary update_trigger'; ?>" section="emergency" message="This Account is closed and updates are disabled." ><i class="glyphicon glyphicon-pencil"></i> Update</a>
                             </p>
                             <p class="margin0 lineblocked">
                                 <button type="submit" class="btn btn-success btn-sm button-submit save_trigger" section="emergency" name="save"><i class="glyphicon glyphicon-ok"></i> Save Changes</button>
@@ -361,23 +376,35 @@ $(document).ready(function() {
         </div>
         <div class="panel panel-primary" id="assign">
             <div class="panel-heading">
-                <h4 class="panel-title"><a class="accordion-toggle bolded <?php echo $section == 'assign' ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_assign">Assignment History</a> </h4>
+                <h4 class="panel-title"><a class="accordion-toggle bolded <?php echo $section == 'assign' || !isEmptyString($request->pgc) ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_assign">Assignment History</a> </h4>
             </div>
-            <div id="collapse_assign" class="panel-collapse collapse <?php echo $section == 'assign' ? 'in' : '' ; ?>">
+            <div id="collapse_assign" class="panel-collapse collapse <?php echo $section == 'assign' || !isEmptyString($request->pgc) ? 'in' : '' ; ?>">
                 <div class="panel-body">
 					<?php require APPLICATION_PATH."/views/scripts/client/assignment.phtml"; ?>
                 </div>
             </div>
         </div>
+        <div class="panel panel-primary" id="exit">
+            <div class="panel-heading">
+                <h4 class="panel-title"><a class="accordion-toggle bolded <?php echo $section == 'exit' || !isEmptyString($request->pgc) ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_exit">Exit Summary</a> </h4>
+            </div>
+            <div id="collapse_exit" class="panel-collapse collapse <?php echo $section == 'exit' || !isEmptyString($request->pgc) ? 'in' : '' ; ?>">
+                <div class="panel-body">
+					<?php require APPLICATION_PATH."/views/scripts/client/exit.phtml"; ?>
+                </div>
+            </div>
+        </div>
+        <?php if(isEmptyString($request->pgc)){ ?>  
         <div class="panel panel-primary" id="status">
             <div class="panel-heading">
-                <h4 class="panel-title"><a class="accordion-toggle bolded <?php echo $section == 'status' ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_status">Account Information</a> </h4>
+                <h4 class="panel-title"><a class="accordion-toggle bolded <?php echo $section == 'status' || !isEmptyString($request->pgc) ? '' : 'collapsed' ; ?>" data-toggle="collapse" data-parent="#accordion" href="#collapse_status">Account Information</a> </h4>
             </div>
-            <div id="collapse_status" class="panel-collapse collapse <?php echo $section == 'status' ? 'in' : '' ; ?>">
+            <div id="collapse_status" class="panel-collapse collapse <?php echo $section == 'status' || !isEmptyString($request->pgc) ? 'in' : '' ; ?>">
                 <div class="panel-body">
                 	<?php require APPLICATION_PATH."/views/scripts/client/account.phtml"; ?>
                 </div>
             </div>
         </div>
+        <?php } ?>
     </div>                  
 </form>

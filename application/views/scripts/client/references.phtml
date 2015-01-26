@@ -1,8 +1,8 @@
-<div class="col-md-12">
+<div class="col-sm-12">
     <div class="form-group">
-        <label class="col-md-12 control-label"><?php echo $this->translate('client_references_label'); ?>:</label>
-        <div class="col-md-12">
-            <p class="form-control-static nullifempty view">
+        <label class="col-sm-12 control-label"><?php echo $this->translate('client_references_label'); ?>:</label>
+        <div class="col-sm-12">
+            <p class="form-control-static nullifempty view maxwidth">
                 <table class="table table-condensed table-striped table-responsive viewtable" style="margin-bottom:10px;">
                     <thead>
                         <tr>
@@ -67,10 +67,10 @@
                             <td class="centeralign"><a href="javascript: doNothing();" title="<?php echo $this->translate("global_button_remove"); ?>" id="row_ref_<?php echo $e; ?>" class="removeline btn btn-xs btn-default" rel="ref">&times;</a>
                                 <input type="hidden" id="references_id_<?php echo $e; ?>" class="form-control" name="references[<?php echo md5($e); ?>][id]" value="<?php echo $reference->getID(); ?>" />
                             </td>
-                            <td><input type="text" class="form-control input-sm" name="references[<?php echo md5($e); ?>][value1]" id="references_value1_<?php echo $e; ?>" value="<?php echo $reference->getValue1(); ?>" /></td>
-                            <td><input type="text" class="form-control input-sm" name="references[<?php echo md5($e); ?>][value2]" id="references_value2_<?php echo $e; ?>" value="<?php echo $reference->getValue2(); ?>" /></td>
-                            <td><input type="text" class="form-control input-sm" name="references[<?php echo md5($e); ?>][value3]" id="references_value3_<?php echo $e; ?>" value="<?php echo $reference->getValue3(); ?>" /></td>
-                            <td><input type="text" class="form-control input-sm" name="references[<?php echo md5($e); ?>][value4]" id="references_value4_<?php echo $e; ?>" value="<?php echo $reference->getValue4(); ?>" /></td>
+                            <td><textarea class="form-control expanding" name="references[<?php echo md5($e); ?>][value1]" id="references_value1_<?php echo $e; ?>"><?php echo $reference->getValue1(); ?></textarea></td>
+                            <td><textarea class="form-control expanding" name="references[<?php echo md5($e); ?>][value2]" id="references_value2_<?php echo $e; ?>"><?php echo $reference->getValue2(); ?></textarea></td>
+                            <td><textarea class="form-control expanding" name="references[<?php echo md5($e); ?>][value3]" id="references_value3_<?php echo $e; ?>"><?php echo $reference->getValue3(); ?></textarea></td>
+                            <td><textarea class="form-control expanding" name="references[<?php echo md5($e); ?>][value4]" id="references_value4_<?php echo $e; ?>"><?php echo $reference->getValue4(); ?></textarea></td>
                         </tr>
                         <?php $e++; $x++; $counter++; } ?>
                         <?php 
@@ -89,10 +89,10 @@
                             <tr class="<?php echo $class; ?> row_ref_<?php echo $i; ?>" id="row_ref_<?php echo $i; ?>">
                                 <td class="centeralign"><a href="javascript: doNothing();" title="<?php echo $this->translate("global_button_remove"); ?>" id="row_ref_<?php echo $i; ?>" class="removeline btn btn-xs btn-default" rel="ref">&times;</a>
                                 </td>
-                                <td><input type="text" class="form-control input-sm" name="references[<?php echo md5($i); ?>][value1]" id="references_value1_<?php echo $i; ?>" value="" /></td>
-                                <td><input type="text" class="form-control input-sm" name="references[<?php echo md5($i); ?>][value2]" id="references_value2_<?php echo $i; ?>" value="" /></td>
-                                <td><input type="text" class="form-control input-sm" name="references[<?php echo md5($i); ?>][value3]" id="references_value3_<?php echo $i; ?>" value="" /></td>
-                                <td><input type="text" class="form-control input-sm" name="references[<?php echo md5($i); ?>][value4]" id="references_value4_<?php echo $i; ?>" value="" /></td>
+                                <td><textarea class="form-control expanding" name="references[<?php echo md5($i); ?>][value1]" id="references_value1_<?php echo $i; ?>"></textarea></td>
+                                <td><textarea class="form-control expanding" name="references[<?php echo md5($i); ?>][value2]" id="references_value2_<?php echo $i; ?>"></textarea></td>
+                                <td><textarea class="form-control expanding" name="references[<?php echo md5($i); ?>][value3]" id="references_value3_<?php echo $i; ?>"></textarea></td>
+                                <td><textarea class="form-control expanding" name="references[<?php echo md5($i); ?>][value4]" id="references_value4_<?php echo $i; ?>"></textarea></td>
                             </tr>
                         <?php $x++; } ?>
                         <!--<tr>
@@ -106,9 +106,9 @@
         </div>
     </div>
     <div class="form-group">
-        <div class="col-md-6 padding0">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_cancontactreferences_label'); ?></label>
-            <div class="col-md-12">
+        <div class="col-sm-12 padding0">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_cancontactreferences_label'); ?></label>
+            <div class="col-sm-12">
                 <p class="form-control-static nullifempty view"><?php echo $client->getcancontactreferences_text(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
@@ -123,13 +123,13 @@
                 <?php } ?>
             </div>
         </div>
-        <div class="col-md-6 padding0">
-            <label class="col-md-12 control-label"><?php echo $this->translate('client_whynotcontact_label'); ?>:</label>
-            <div class="col-md-12">
+        <div class="col-sm-12 padding0">
+            <label class="col-sm-12 control-label"><?php echo $this->translate('client_whynotcontact_label'); ?>:</label>
+            <div class="col-sm-12">
                 <p class="form-control-static nullifempty view"><?php echo $client->getwhynotcontact(); ?></p>
                 <?php if(($step == 'edit' && $section == 'assessment') || $step == 'new'){ ?>
                 <div class="edit">
-                    <textarea class="form-control expanding" id="whynotcontact" name="whynotcontact"><?php echo $client->getwhynotcontact(); ?></textarea>
+                    <textarea class="form-control expanding minheight80" id="whynotcontact" name="whynotcontact"><?php echo $client->getwhynotcontact(); ?></textarea>
                 </div>
                 <?php } ?>
             </div>
